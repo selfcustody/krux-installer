@@ -58,7 +58,7 @@ yarn run electron:build --linux
 You will need a `wine` package installed on your system. Once installed, you will run:
 
 ```bash
-yarn run electron:build --win
+DISPLAY=:0 yarn run electron:build --win
 ```
 
 * Mac: generates an `Krux Installer v*.dmg`

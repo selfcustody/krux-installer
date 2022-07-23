@@ -26,5 +26,10 @@ services:
     image: selfcustody/krux-installer
     build:
       context: .
+    environment:
+      # xf86-video-dummy
+      - DISPLAY=:0
     volumes:
       - ./dist_electron:/app/dist_electron
+      - /tmp/.X11-unix/X0:/tmp/.X11-unix/X0
+      - ./.wine:/root/.wine

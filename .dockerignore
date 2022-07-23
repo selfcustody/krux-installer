@@ -1,6 +1,7 @@
 .DS_Store
 node_modules
-/dist
+dist/
+dist_electron/
 
 # local env files
 .env.local
@@ -13,7 +14,15 @@ yarn-error.log*
 pnpm-debug.log*
 
 # Editor directories and files
-node_modules/
-yarn.lock/
 .git/
 .gitignore
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# app files
+LICENSE
+README.md
+Makefile

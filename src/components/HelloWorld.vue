@@ -15,7 +15,6 @@
           {{ title }}
         </h1>
 
-
         <p class="subheading font-weight-regular">
           {{ description }} 
         </p>

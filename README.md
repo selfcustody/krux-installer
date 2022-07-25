@@ -17,6 +17,8 @@ git clone https://github.com/qlrd/krux-installer.git
 yarn install
 ```
 
+For windows builds on linux, you will need to install [Wine](https://www.winehq.org/)
+
 ### Compiles and hot-reloads for development
 
 ```bash

@@ -8,80 +8,57 @@ As it now, the generated application only runs a "Home" interface with some link
 ## Download
 
 ```bash
-$> git clone https://github.com/qlrd/krux-installer.git
+git clone https://github.com/qlrd/krux-installer.git
 ```
 
-## Development
-
-### Project setup
-
-To [avoid install dependencies every time you build a Docker image](https://stackoverflow.com/questions/52673921/how-do-you-cache-yarn-dependencies-for-a-docker-image-build-in-circleci), setup a `cache` dir to yarn:
+### Install dependencies
 
 ```bash
-mkdir -p .cache/yarn
-YARN_CACHE_DIR=.cache/yarn yarn install
+yarn install
 ```
 
-#### Compiles and hot-reloads for development
+### Compiles and hot-reloads for development
 
 ```bash
+# This runs on browser
 yarn serve
+
+# This runs on dedicated chrome instance
+yarn electron:serve
 ```
 
-#### Compiles and minifies for production
+### Compiles and minifies for production
 
-```bash
-yarn build
-```
+* Linux:   `yarn electron:build --linux`
+* Windows: `DISPLAY=:0 yarn electron:build --win`
+* Mac:     `yarn electron:build --mac`
 
-#### Lints and fixes files
+### Lints and fixes files
 
 ```bash
 yarn lint
 ```
 
-#### Customize configuration
+### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
 
 
-### Building for development
+### Dockerization
 
-
-* Linux: generates an `Krux Installer v*.AppImage` and a `Krux Installer v*.snap`
-
-```bash
-yarn run electron:build --linux
-```
-
-* Windows: generates an `Krux Installer v*.exe`
-
-You will need a `wine` package installed on your system. Once installed, you will run:
-
-```bash
-DISPLAY=:0 yarn run electron:build --win
-```
-
-* Mac: generates an `Krux Installer v*.dmg`
-
-```bash
-yarn run electron:build --mac
-```
-
-
-### Building for production
-
-You will need have installed:
+This repository provides a docker image, with the aim to compile in a fresh environment.
+At the moment, works only to generate `.AppImage`. For windows, needs an better wine configuration.
 
 * docker
 * docker-compose
 
-Then you can build docker image:
+#### build docker image:
 
 ```bash
 docker-compose build installer
 ```
 
-Then you can build executable:
+#### Execute instances
+
 
 * Linux: generates an `Krux Installer v*.AppImage` and a `Krux Installer v*.snap`
 
@@ -100,4 +77,3 @@ docker-compose run installer --win
 ```bash
 docker-compose run installer --mac
 ```
-

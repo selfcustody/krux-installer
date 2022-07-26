@@ -1,8 +1,12 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import { join } from 'path'
+import { platform } from 'os'
+import { handleDownloadKtool } from './lib/downloads'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Scheme must be registered before the app is ready
@@ -19,8 +23,10 @@ async function createWindow() {
 
       // Use pluginOptions.nodeIntegration, leave this alone
       // See nklayman.github.io/vue-cli-plugin-electron-builder/guide/security.html#node-integration for more info
-      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION,
-      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION
+      nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION || false,
+      contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION || true,
+      enableRemoteModule: process.env.ELECTRON_NODE_INTEGRATION || false,
+      preload: join(__static, 'preload.js')
     }
   })
 
@@ -62,6 +68,8 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
+
+  ipcMain.handle(`download:ktool:${process.platform}`, handleDownloadKtool(process.platform))
   createWindow()
 })
 

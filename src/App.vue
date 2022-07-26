@@ -39,7 +39,10 @@
             <br/>
             <v-row class="text-center">
               <v-col class="mb-4">
-                <v-btn color="primary">
+                <v-btn
+                  color="primary"
+                  @click.prevent='install2device'
+                >
                   Install to device
                 </v-btn>
               </v-col>
@@ -90,6 +93,11 @@ export default {
     ],
     x: 50,
     y: 50
-  })
+  }),
+  methods: {
+    async install2device () {
+      await window.kruxAPI.download_ktool_linux()
+    }
+  }
 }
 </script>

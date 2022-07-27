@@ -6,7 +6,7 @@ import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 
 import request from 'request'
 import { join } from 'path'
-import { createWriteStream } from 'fs'
+import { createWriteStream, exists, mkdir } from 'fs'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -17,49 +17,109 @@ protocol.registerSchemesAsPrivileged([
 
 let win;
 
-function handleDownload (url, filename, webContent) {
+/*
+ * Function to check if file or folder exists
+ */
+function notExistsAsync(p) {
+  return new Promise((resolve) => {
+    exists(p, function(exist) {
+      if (!exist) resolve(true)
+      resolve(false)
+    })
+  })
+}
+
+/*
+ * Function to create folder 
+ */
+function mkdirAsync(p) {
+  return new Promise((resolve, reject) => {
+    console.log(`[ INFO ] krux | mkdir | ${p}`)
+    mkdir(p, function(err) {
+      if (err) reject(err)
+      console.log(`[ INFO ] krux | mkdir | ${p} | DONE`)
+      resolve()
+    })
+  })
+}
+
+/*
+ * Function to handle downloads
+ * when user select to build or flash
+ * prebuiltin binaries
+ */
+function handleDownload (
+  options,
+  baseUrl='https://github.com/odudex/krux_binaries/raw/main/'
+) {
   return async function () {
-    try {
-      const destination_path = join(__dirname, '..', 'dist_electron', filename)
-      const file = createWriteStream(destination_path)
+    win.webContents.send(options.sender, 'starting')
+    const __destination__ = join(__dirname, '..', 'dist_electron', options.filename)
+
+    // options.filename can be 
+    // - ktool-*
+    // - maixpy_*/firmware.bin
+    // - maixpy_*/kboot.kfpkg
+    const notExist = await notExistsAsync(join(__dirname, '..', 'dist_electron', options.filename))
+    
+    if (!notExist) {
+      console.log(`[ INFO ] krux | download | ${options.filename} | DONE`)
+      win.webContents.send(options.sender, '100.00')
+    } else {
+      console.log(`[ INFO ] krux | download | ${options.filename}`)
+
+      // if `/` is found, then create a new directory
+      const __filename__ = options.filename.split('/')
+      let disposition
+
+      if (__filename__.length > 1) {  
+        const dirNotExist = await notExistsAsync(join(__dirname, '..', 'dist_electron', __filename__[0]))
+        if (dirNotExist) {
+          await mkdirAsync(join(__dirname, '..', 'dist_electron', __filename__[0]))
+        }
+        disposition = `attachment; filename=${__filename__[1]}`
+      } else {
+        disposition = `attachment; filename=${__filename__[0]}`
+      }
+
+      // Create a new file
+      const file = createWriteStream(__destination__)
       const req = request({
-        url: url,
+        url: `${baseUrl}/${options.filename}`,
         headers: {
-          'Content-Disposition': `attachment; filename=${filename}`,
+          'Content-Disposition': disposition,
           'User-Agent': `Chrome/${process.versions.chrome}`,
           'Connection': 'keep-alive',
           'Cache-Control': 'max-age=0',
           'Accept-Encoding': 'gzip, deflate, br'
         },
-         gzip: true
+        gzip: true
       })
-
+      
       let downloaded = 0
       let total = 0
       let percent = 0
 
-      win.webContents.send(webContent, 'starting')
-
       req.pipe(file)
       req.on('response', function ( data ) {
         total = data.headers['content-length']
-        console.log(`${url}: ${total}`)
         percent = ((downloaded/total) * 100).toFixed(2)
-        win.webContents.send(webContent, percent)
+        win.webContents.send(options.sender, percent)
       });
       req.on('data', function (chunk) {
         downloaded += chunk.length
         percent = ((downloaded/total) * 100).toFixed(2)
-        win.webContents.send(webContent, percent)
+        if (percent === '100.00') {
+          console.log(`[ INFO ] krux | download | ${options.filename} | DONE`)
+        }
+        win.webContents.send(options.sender, percent)
       })
       req.on('finish', () => {
-        win.webContents.send(webContent, 'done')
+        win.webContents.send(options.sender, 'done')
       })
       req.on('error', function(err) {
-        win.webContents.send(webContent, err)
+        win.webContents.send(options.sender, err)
       })
-    } catch (error) {
-      console.log(error)
     }
   }
 }
@@ -123,107 +183,27 @@ app.on('ready', async () => {
   // `window.kruxAPI.download_ktool(os)` is executed inside App.vue
   ipcMain.handle(
     `download:ktool:${process.platform}`, 
-    handleDownload(
-      `https://github.com/odudex/krux_binaries/raw/main/ktool-${process.platform}`,
-      `ktool-${process.platform}`,
-      'download:ktool:status'
-    )
+    handleDownload({
+      filename: `ktool-${process.platform}`,
+      sender: 'download:ktool:status'
+    })
   )
 
   // This IPC will be called everytime when the method
-  // `window.kruxAPI.download_firmware(device)` is executed inside App.vue
-  ipcMain.handle(
-    'download:firmware:maixpy_m5stickv', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_m5stickv/firmware.bin',
-      'firmware.bin',
-      'download:firmware:status'
-    )
-  )
+  // `window.kruxAPI.download_<firmware | kboot>(device)` is executed inside App.vue
+  const downloads = ['firmware.bin', 'kboot.kfpkg'];
+  const devices = ['maixpy_m5stickv', 'maixpy_amigo_ips', 'maixpy_bit', 'maixpy_bit_ov5642', 'maixpy_dock'];
+  downloads.forEach(function (bin){
+    devices.forEach(function (device){
+      const sender = bin.split('.')[0]
+      const handler = handleDownload({
+        filename: `${device}/${bin}`,
+        sender: `download:${sender}:status`
+      })
+      ipcMain.handle(`download:${sender}:${device}`, handler)
+    })
+  })
 
-  ipcMain.handle(
-    'download:firmware:maixpy_amigo_ips', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_amigo_ips/firmware.bin',
-      'firmware.bin',
-      'download:firmware:status'
-    )
-  )
-
-  ipcMain.handle(
-    'download:firmware:maixpy_bit', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_bit/firmware.bin',
-      'firmware.bin',
-      'download:firmware:status'
-    )
-  )
-
-  ipcMain.handle(
-    'download:firmware:maixpy_bit_ov5642', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_bit_ov5642/firmware.bin',
-      'firmware.bin',
-      'download:firmware:status'
-    )
-  )
-
-  ipcMain.handle(
-    'download:firmware:maixpy_dock', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_dock/firmware.bin',
-      'firmware.bin',
-      'download:firmware:status'
-    )
-  )
-
-
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.download_kboot(device)` is executed inside App.vue
-  ipcMain.handle(
-    'download:kboot:maixpy_m5stickv', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_m5stickv/kboot.kfpkg',
-      'kboot.kfpkg',
-      'download:kboot:status'
-    )
-  )
-
-  ipcMain.handle(
-    'download:kboot:maixpy_amigo_ips', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_amigo_ips/kboot.kfpkg',
-      'kboot.kfpkg',
-      'download:kboot:status'
-    )
-  )
-
-  ipcMain.handle(
-    'download:kboot:maixpy_bit', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_bit/kboot.kfpkg',
-      'kboot.kfpkg',
-      'download:kboot:status'
-    )
-  )
-
-  ipcMain.handle(
-    'download:kboot:maixpy_bit_ov5642', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_bit_ov5642/kboot.kfpkg',
-      'kboot.kfpkg',
-      'download:kboot:status'
-    )
-  )
-
-  ipcMain.handle(
-    'download:kboot:maixpy_dock', 
-    handleDownload(
-      'https://github.com/odudex/krux_binaries/raw/main/maixpy_dock/kboot.kfpkg',
-      'kboot.kfpkg',
-      'download:kboot:status'
-    )
-  )
   // Now create window
   createWindow()
 })

@@ -14,6 +14,15 @@
           />
         </v-flex>
         <v-flex
+          v-if="page === 'detect_device'"
+          class="mx-auto"
+        >
+          <DetectDevicePage
+            @onDetectedDevice="onDetectedDevice"
+            @onWrongDetectedDevice="onWrongDetectedDevice"
+          />
+        </v-flex>
+        <v-flex
           v-if="page === 'install_to_device'"
           class="ma-auto"
         >
@@ -71,6 +80,7 @@
 <script>
 import KruxLogo from './components/KruxLogo.vue'
 import MainPage from './components/MainPage.vue'
+import DetectDevicePage from './components/DetectDevicePage.vue'
 import InstallToDevicePage from './components/InstallToDevicePage.vue'
 import DownloadKtoolPage from './components/DownloadKtoolPage.vue'
 import DownloadFirmwarePage from './components/DownloadFirmwarePage.vue'
@@ -81,6 +91,7 @@ export default {
   components: {
     KruxLogo,
     MainPage,
+    DetectDevicePage,
     InstallToDevicePage,
     DownloadKtoolPage  ,
     DownloadFirmwarePage,
@@ -104,6 +115,13 @@ export default {
   methods: {
     onMainPageClicked (value) {
       this.goTo(value)
+    },
+    onDetectedDevice (value) {
+      this.device = value
+      this.goTo('download_kboot')
+    },
+    onWrongDetectedDevice (){
+      this.goTo('main')
     },
     onSelectedDevice (value) {
       this.device = value

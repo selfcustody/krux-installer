@@ -11,6 +11,12 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async download_kboot (device) {
     await ipcRenderer.invoke(`download:kboot:${device}`)
   },
+  async start_detect_device () {
+    await ipcRenderer.invoke('usb:detection:start')
+  },
+  async stop_detect_device () {
+    await ipcRenderer.invoke('usb:detection:stop')
+  },
   onDownloadedKtoolStatus(callback) {
     ipcRenderer.on('download:ktool:status', callback)
   },
@@ -19,5 +25,17 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onDownloadedKbootStatus(callback) {
     ipcRenderer.on('download:kboot:status', callback)
+  },
+  onDetectedDeviceFoundUsb(callback) {
+    ipcRenderer.on('usb:detection:found', callback)
+  },
+  onDetectedDeviceRemovedUsb(callback) {
+    ipcRenderer.on('usb:detection:removed', callback)
+  },
+  onDetectedDeviceChangedUsb(callback) {
+    ipcRenderer.on('usb:detection:change', callback)
+  },
+  onStopMonitoringDeviceUsb(callback) {
+    ipcRenderer.on('usb:detection:stop', callback)
   }
 })

@@ -3,7 +3,7 @@
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
-
+import usbDetect from 'usb-detection'
 import request from 'request'
 import { join } from 'path'
 import { createWriteStream, exists, mkdir } from 'fs'
@@ -15,6 +15,9 @@ protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true } }
 ])
 
+/*
+ * Define win variable as the app window, as visible in various methods
+ */
 let win;
 
 /*
@@ -30,7 +33,7 @@ function notExistsAsync(p) {
 }
 
 /*
- * Function to create folder 
+ * Function to create folder
  */
 function mkdirAsync(p) {
   return new Promise((resolve, reject) => {
@@ -56,12 +59,12 @@ function handleDownload (
     win.webContents.send(options.sender, 'starting')
     const __destination__ = join(__dirname, '..', 'dist_electron', options.filename)
 
-    // options.filename can be 
+    // options.filename can be
     // - ktool-*
     // - maixpy_*/firmware.bin
     // - maixpy_*/kboot.kfpkg
     const notExist = await notExistsAsync(join(__dirname, '..', 'dist_electron', options.filename))
-    
+
     if (!notExist) {
       console.log(`[ INFO ] krux | download | ${options.filename} | DONE`)
       win.webContents.send(options.sender, '100.00')
@@ -72,7 +75,7 @@ function handleDownload (
       const __filename__ = options.filename.split('/')
       let disposition
 
-      if (__filename__.length > 1) {  
+      if (__filename__.length > 1) {
         const dirNotExist = await notExistsAsync(join(__dirname, '..', 'dist_electron', __filename__[0]))
         if (dirNotExist) {
           await mkdirAsync(join(__dirname, '..', 'dist_electron', __filename__[0]))
@@ -95,7 +98,7 @@ function handleDownload (
         },
         gzip: true
       })
-      
+
       let downloaded = 0
       let total = 0
       let percent = 0
@@ -124,8 +127,92 @@ function handleDownload (
   }
 }
 
+/*
+ * Simple function that
+ * converts string that represent
+ * a hexadecimal number to decimal
+ * Utility to convert vendor and product ids
+ * os devices in decimal format
+ * (required by usb-detection module)
+ */
+function hex2dec (hexStr) {
+  return parseInt(hexStr, 16)
+}
+
+/*
+ * List of devices
+ */
+const VID_PID_DEVICES = [
+  {
+    alias: 'maixpy_m5stickv',
+    vid: hex2dec('0403'),
+    pid: hex2dec('6001')
+  },
+  {
+    alias: 'maixpy_amigo_ips',
+    vid: hex2dec('0403'),
+    pid: hex2dec('6010')
+  },
+  {
+    alias: 'maixpy_bit',
+    vid: hex2dec('0403'),
+    pid: hex2dec('6010')
+  },
+  {
+    alias: 'maixpy_doc',
+    vid: hex2dec('1a86'),
+    pid: hex2dec('7523')
+  }
+]
+
+let isUsbDetectActivate = false
+/* handles usb detection according devices
+ *
+ */
+async function handleStartUSBdetection () {
+  usbDetect.startMonitoring();
+  isUsbDetectActivate = true
+  VID_PID_DEVICES.forEach(function (device, i) {
+    usbDetect.on(`add:${device.vid}:${device.pid}`, function (d) {
+      console.log(`[ INFO ] device ${d.deviceName}/${d.manufacturer} found`)
+      win.webContents.send('usb:detection:found', device.alias)
+    })
+    usbDetect.on(`remove:${device.vid}:${device.pid}`, function (d) {
+      console.log(`[ INFO ] device ${d.deviceName}/${d.manufacturer} removed`)
+      win.webContents.send('usb:detection:removed', device.alias)
+    })
+    usbDetect.on(`change:${device.vid}:${device.pid}`, function (d) {
+      console.log(`[ INFO ] device ${d.deviceName}/${d.manufacturer} changed`)
+      win.webContents.send('usb:detection:change', device.alias)
+    })
+  })
+}
+
+/*
+ * SIGINT and SIGKILL listeners
+ */
+process.on('SIGINT', function() {
+  console.log('[ WARN ] Gracefully shutdown...')
+  if (isUsbDetectActivate) {
+    usbDetect.stopMonitoring()
+  }
+  process.exit(1)
+})
+
+/* handles stop usb detection
+ *
+ */
+function handleStopUSBdetection () {
+  if (isUsbDetectActivate) {
+    usbDetect.stopMonitoring()
+    win.webContents.send('usb:detection:stop', true)
+  }
+}
+
+/*
+ * Create the browser window
+ */
 async function createWindow() {
-  // Create the browser window.
   win = new BrowserWindow({
     width: 768,
     height: 512,
@@ -178,11 +265,22 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
+  // This IPC will be called everytime when the method
+  // `window.kruxAPI.detect_usb()` is exected inside App.vue
+  ipcMain.handle(
+    'usb:detection:start',
+    handleStartUSBdetection
+  )
+
+  ipcMain.handle(
+    'usb:detection:stop',
+    handleStopUSBdetection
+  )
 
   // This IPC will be called everytime when the method
   // `window.kruxAPI.download_ktool(os)` is executed inside App.vue
   ipcMain.handle(
-    `download:ktool:${process.platform}`, 
+    `download:ktool:${process.platform}`,
     handleDownload({
       filename: `ktool-${process.platform}`,
       sender: 'download:ktool:status'
@@ -203,6 +301,8 @@ app.on('ready', async () => {
       ipcMain.handle(`download:${sender}:${device}`, handler)
     })
   })
+
+
 
   // Now create window
   createWindow()

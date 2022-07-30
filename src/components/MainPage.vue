@@ -16,9 +16,9 @@
       <v-col class="mb-4">
         <v-btn
           color="primary"
-          @click.prevent="$emit('changePage', 'install_to_device')"
+          @click.prevent="$emit('changePage', 'detect_device')"
         >
-          Install to device
+          Flash to device
         </v-btn>
       </v-col>
     </v-row>
@@ -26,9 +26,9 @@
       <v-col class="mb-4">
         <v-btn
           color="primary"
-          @click.prevent="$emit('changePage', 'flash_to_device')"
+          @click.prevent="$emit('changePage', 'install_to_device')"
         >
-          Flash to device
+          Install to device
         </v-btn>
       </v-col>
     </v-row>

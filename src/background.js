@@ -37,10 +37,10 @@ function notExistsAsync(p) {
  */
 function mkdirAsync(p) {
   return new Promise((resolve, reject) => {
-    console.log(`[ INFO ] krux | mkdir | ${p}`)
+    win.webContents.send('window:log:info', `creating directory ${p}`)
     mkdir(p, function(err) {
       if (err) reject(err)
-      console.log(`[ INFO ] krux | mkdir | ${p} | DONE`)
+      win.webContents.send('window:log:info', `directory ${p} created`)
       resolve()
     })
   })
@@ -66,10 +66,10 @@ function handleDownload (
     const notExist = await notExistsAsync(join(__dirname, '..', 'dist_electron', options.filename))
 
     if (!notExist) {
-      console.log(`[ INFO ] krux | download | ${options.filename} | DONE`)
+      win.webContents.send('window:log:info', `${options.filename} already downloaded`)
       win.webContents.send(options.sender, '100.00')
     } else {
-      console.log(`[ INFO ] krux | download | ${options.filename}`)
+      win.webContents.send('window:log:info', `downloading ${baseUrl}/${options.filename}`)
 
       // if `/` is found, then create a new directory
       const __filename__ = options.filename.split('/')
@@ -107,13 +107,14 @@ function handleDownload (
       req.on('response', function ( data ) {
         total = data.headers['content-length']
         percent = ((downloaded/total) * 100).toFixed(2)
+        win.webContents.send('window:log:info', `${baseUrl}/${options.filename} has ${total} bytes`)
         win.webContents.send(options.sender, percent)
       });
       req.on('data', function (chunk) {
         downloaded += chunk.length
         percent = ((downloaded/total) * 100).toFixed(2)
         if (percent === '100.00') {
-          console.log(`[ INFO ] krux | download | ${options.filename} | DONE`)
+          win.webContents.send('window:log:info', `${options.filename} downloaded`)
         }
         win.webContents.send(options.sender, percent)
       })
@@ -121,6 +122,7 @@ function handleDownload (
         win.webContents.send(options.sender, 'done')
       })
       req.on('error', function(err) {
+        win.webContents.send('window:log:info', err.message)
         win.webContents.send(options.sender, err)
       })
     }
@@ -174,19 +176,20 @@ async function handleStartUSBdetection () {
   isUsbDetectActivate = true
   VID_PID_DEVICES.forEach(function (device, i) {
     usbDetect.on(`add:${device.vid}:${device.pid}`, function (d) {
-      console.log(`[ INFO ] device ${d.deviceName}/${d.manufacturer} found`)
+      win.webContents.send('window:log:info', `device ${d.deviceName}/${d.manufacturer} found`)
       win.webContents.send('usb:detection:found', device.alias)
     })
     usbDetect.on(`remove:${device.vid}:${device.pid}`, function (d) {
-      console.log(`[ INFO ] device ${d.deviceName}/${d.manufacturer} removed`)
+      win.webContents.send('window:log:info', `device ${d.deviceName}/${d.manufacturer} removed`)
       win.webContents.send('usb:detection:removed', device.alias)
     })
     usbDetect.on(`change:${device.vid}:${device.pid}`, function (d) {
-      console.log(`[ INFO ] device ${d.deviceName}/${d.manufacturer} changed`)
+      win.webContents.send('window:log:info', `device ${d.deviceName}/${d.manufacturer} changed`)
       win.webContents.send('usb:detection:change', device.alias)
     })
   })
 }
+
 
 /*
  * SIGINT and SIGKILL listeners
@@ -199,6 +202,12 @@ process.on('SIGINT', function() {
   process.exit(1)
 })
 
+process.on('exit', function () {
+  if (isUsbDetectActivate) {
+    usbDetect.stopMonitoring()
+  }
+})
+
 /* handles stop usb detection
  *
  */
@@ -208,14 +217,13 @@ function handleStopUSBdetection () {
     win.webContents.send('usb:detection:stop', true)
   }
 }
-
 /*
  * Create the browser window
  */
 async function createWindow() {
   win = new BrowserWindow({
     width: 768,
-    height: 512,
+    height: 608,
     webPreferences: {
 
       // Use pluginOptions.nodeIntegration, leave this alone

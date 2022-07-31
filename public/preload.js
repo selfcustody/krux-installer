@@ -17,6 +17,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async stop_detect_device () {
     await ipcRenderer.invoke('usb:detection:stop')
   },
+  onLogLevelInfo(callback) {
+    ipcRenderer.on('window:log:info', callback)
+  },
   onDownloadedKtoolStatus(callback) {
     ipcRenderer.on('download:ktool:status', callback)
   },

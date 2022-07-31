@@ -1,8 +1,10 @@
 <template>
   <v-container>
     <v-row>
-      <v-col>
-        <AsciiMorph :ascii="krux" x=10 y=10 />
+      <v-col
+        class="pa-4 mx-auto my-auto"
+      >
+        <AsciiMorph :ascii="krux" x=16 y=16 />
       </v-col>
     </v-row>
     <v-row class="text-center">
@@ -22,17 +24,17 @@ export default {
     return {
       title: 'Krux Installer',
       krux: [ 
-        "           ██              ",
-        "           ██              ",
-        "           ██              ",
-        "         ██████            ", 
-        "           ██              ",
-        "           ██  ██          ",
-        "           ██ ██           ", 
-        "           ████            ",
-        "           ██ ██           ",
-        "           ██  ██          ",
-        "           ██   ██         "
+        "     ██        ",
+        "     ██        ",
+        "     ██        ",
+        "   ██████      ", 
+        "     ██        ",
+        "     ██  ██    ",
+        "     ██ ██     ", 
+        "     ████      ",
+        "     ██ ██     ",
+        "     ██  ██    ",
+        "     ██   ██   "
       ]
     }
   }

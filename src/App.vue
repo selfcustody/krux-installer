@@ -7,7 +7,7 @@
         </v-flex>
         <v-flex
           v-if="page === 'main'"
-          class="mx-auto"
+          class="mx-auto my-auto"
         >
           <MainPage
             @changePage.once="onMainPageClicked"
@@ -15,7 +15,7 @@
         </v-flex>
         <v-flex
           v-if="page === 'detect_device'"
-          class="mx-auto"
+          class="mx-auto my-auto"
         >
           <DetectDevicePage
             @onDetectedDevice="onDetectedDevice"
@@ -102,7 +102,9 @@ export default {
     device: ''
   }),
   created () {
-    console.log(`[ INFO ] page: ${this.page}`)
+    window.kruxAPI.onLogLevelInfo(function(_event, value) {
+      console.log(`[ INFO ] ${value}`)
+    })
   },
   watch: {
     page (value) {
@@ -121,6 +123,7 @@ export default {
       this.goTo('download_kboot')
     },
     onWrongDetectedDevice (){
+      window.kruxAPI.stop_detect_device()
       this.goTo('main')
     },
     onSelectedDevice (value) {

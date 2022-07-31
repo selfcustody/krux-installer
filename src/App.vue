@@ -19,7 +19,16 @@
         >
           <DetectDevicePage
             @onDetectedDevice="onDetectedDevice"
-            @onWrongDetectedDevice="onWrongDetectedDevice"
+          />
+        </v-flex>
+        <v-flex
+          v-if="page === 'confirm_detected_device'"
+          class="mx-auto my-auto"
+        >
+          <ConfirmDetectedDevicePage
+            :device="device"
+            @onConfirmDetectedDevice="onConfirmDetectedDevice"
+            @onWrongConfirmDetectedDevice="onWrongDetectedDevice"
           />
         </v-flex>
         <v-flex
@@ -81,6 +90,7 @@
 import KruxLogo from './components/KruxLogo.vue'
 import MainPage from './components/MainPage.vue'
 import DetectDevicePage from './components/DetectDevicePage.vue'
+import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
 import InstallToDevicePage from './components/InstallToDevicePage.vue'
 import DownloadKtoolPage from './components/DownloadKtoolPage.vue'
 import DownloadFirmwarePage from './components/DownloadFirmwarePage.vue'
@@ -91,7 +101,8 @@ export default {
   components: {
     KruxLogo,
     MainPage,
-    DetectDevicePage,
+    DetectDevicePage, 
+    ConfirmDetectedDevicePage,
     InstallToDevicePage,
     DownloadKtoolPage  ,
     DownloadFirmwarePage,
@@ -102,6 +113,7 @@ export default {
     device: ''
   }),
   created () {
+
     window.kruxAPI.onLogLevelInfo(function(_event, value) {
       console.log(`[ INFO ] ${value}`)
     })
@@ -109,9 +121,6 @@ export default {
   watch: {
     page (value) {
       console.log(`[ INFO ] page: ${value}`)
-    },
-    device (value) {
-      console.log(`[ INFO ] device selected: ${value}`)
     }
   },
   methods: {
@@ -120,10 +129,14 @@ export default {
     },
     onDetectedDevice (value) {
       this.device = value
+      console.log(value)
+      this.goTo('confirm_detected_device')
+    },
+    onConfirmDetectedDevice (value) {
+      this.device = value
       this.goTo('download_kboot')
     },
     onWrongDetectedDevice (){
-      window.kruxAPI.stop_detect_device()
       this.goTo('main')
     },
     onSelectedDevice (value) {

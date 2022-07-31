@@ -30,10 +30,10 @@ contextBridge.exposeInMainWorld('kruxAPI',{
     ipcRenderer.on('download:kboot:status', callback)
   },
   onDetectedDeviceFoundUsb(callback) {
-    ipcRenderer.on('usb:detection:found', callback)
+    ipcRenderer.on('usb:detection:add', callback)
   },
   onDetectedDeviceRemovedUsb(callback) {
-    ipcRenderer.on('usb:detection:removed', callback)
+    ipcRenderer.on('usb:detection:remove', callback)
   },
   onDetectedDeviceChangedUsb(callback) {
     ipcRenderer.on('usb:detection:change', callback)

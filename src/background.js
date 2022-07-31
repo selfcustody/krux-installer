@@ -151,55 +151,55 @@ const VID_PID_DEVICES = [
     pid: hex2dec('6001')
   },
   {
-    alias: 'maixpy_amigo_ips',
+    alias: 'maixpy_amigo_ips/maixpy_bit/maixy_bit_ov5642',
     vid: hex2dec('0403'),
     pid: hex2dec('6010')
   },
   {
-    alias: 'maixpy_bit',
-    vid: hex2dec('0403'),
-    pid: hex2dec('6010')
-  },
-  {
-    alias: 'maixpy_doc',
+    alias: 'maixpy_dock',
     vid: hex2dec('1a86'),
     pid: hex2dec('7523')
   }
 ]
 
+/*
+ * Says if usb detecation is activated
+ */
 let isUsbDetectActivate = false
-/* handles usb detection according devices
- *
+
+/*
+ * Helper function to be used on handleStartUSBDetection
+ */
+function formatMessage(d, action) {
+  return `device ${d.deviceName}/${d.manufacturer} on ttyUSB${d.locationId} ${action}`
+}
+
+/*
+ * handles usb detection according devices
  */
 async function handleStartUSBdetection () {
   usbDetect.startMonitoring();
   isUsbDetectActivate = true
   VID_PID_DEVICES.forEach(function (device, i) {
-    usbDetect.on(`add:${device.vid}:${device.pid}`, function (d) {
-      win.webContents.send('window:log:info', `device ${d.deviceName}/${d.manufacturer} found`)
-      win.webContents.send('usb:detection:found', device.alias)
-    })
-    usbDetect.on(`remove:${device.vid}:${device.pid}`, function (d) {
-      win.webContents.send('window:log:info', `device ${d.deviceName}/${d.manufacturer} removed`)
-      win.webContents.send('usb:detection:removed', device.alias)
-    })
-    usbDetect.on(`change:${device.vid}:${device.pid}`, function (d) {
-      win.webContents.send('window:log:info', `device ${d.deviceName}/${d.manufacturer} changed`)
-      win.webContents.send('usb:detection:change', device.alias)
+    ['add', 'remove', 'change'].forEach(function(action) {
+      usbDetect.on(`${action}:${device.vid}:${device.pid}`, function (d) {
+        win.webContents.send('window:log:info', formatMessage(d, action))
+        win.webContents.send(`usb:detection:${action}`, device.alias)
+      })
     })
   })
 }
 
 
 /*
- * SIGINT and SIGKILL listeners
+ * SIGINT listener
  */
 process.on('SIGINT', function() {
   console.log('[ WARN ] Gracefully shutdown...')
   if (isUsbDetectActivate) {
     usbDetect.stopMonitoring()
   }
-  process.exit(1)
+  process.exit(0)
 })
 
 process.on('exit', function () {
@@ -214,6 +214,8 @@ process.on('exit', function () {
 function handleStopUSBdetection () {
   if (isUsbDetectActivate) {
     usbDetect.stopMonitoring()
+    isUsbDetectActivate = false
+    win.webContents.send('window:log:info', 'Stopped usb detection')
     win.webContents.send('usb:detection:stop', true)
   }
 }
@@ -314,6 +316,8 @@ app.on('ready', async () => {
 
   // Now create window
   createWindow()
+  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
+  win.webContents.send('window:log:info', 'page: main')
 })
 
 // Exit cleanly on request from parent process in development mode.

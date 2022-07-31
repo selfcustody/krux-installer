@@ -5,13 +5,8 @@
         cols="32"
         sm12
       >
-        <v-layout
-          column
-          wrap
-        >
-          <v-flex
-            v-if="device === ''"
-          >
+        <v-layout column wrap>
+          <v-flex>
             <p>
               <b>Flash to device</b> is required when you intend to install krux for the first time on your device (or for development and testing purposes).
             </p>
@@ -23,30 +18,10 @@
             <p> Connect your device, power on it, and then click in button below </p>
             <br/>
             <v-btn  
-              v-if="device === ''"
               color="primary"
               @click.prevent="detectDevice"
             >
               Start detection
-            </v-btn>
-          </v-flex>
-          <v-flex
-            v-if="device !== ''"
-          >
-            <p> Device {{ device }} detected </p>
-            <br/>
-            <v-btn
-              color="primary"
-              @click.prevent="$emit('onDetectedDevice', device)"
-            >
-              Ok. This is my device
-            </v-btn>
-            <br/>
-            <v-btn
-              color="red"
-              @click.prevent="$emit('onWrongDetectedDevice')"
-            >
-              Wait! This isn't my device!
             </v-btn>
           </v-flex>
         </v-layout>
@@ -66,9 +41,11 @@ export default {
   methods: {
     async detectDevice () {
       await window.kruxAPI.start_detect_device()
+    
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDetectedDeviceFoundUsb(async (_event, value) => {
-        this.device = value
+      window.kruxAPI.onDetectedDeviceFoundUsb((_event, value) => {
+        console.log(value)
+        this.$emit('onDetectedDevice', value)
       })
     }
   }

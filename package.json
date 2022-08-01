@@ -18,6 +18,7 @@
   "main": "background.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "buffered-spawn": "^3.3.2",
     "core-js": "^3.8.3",
     "roboto-fontface": "*",
     "usb-detection": "4.14.1",

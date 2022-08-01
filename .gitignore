@@ -28,3 +28,6 @@ dist/
 
 # Yarn cache
 .yarn-cache.tgz
+
+# resources
+resources/

@@ -17,6 +17,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async stop_detect_device () {
     await ipcRenderer.invoke('usb:detection:stop')
   },
+  async sdcard_detect () {
+    await ipcRenderer.invoke('sdcard:detection:start')
+  },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
   },

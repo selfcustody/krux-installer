@@ -4,9 +4,8 @@ import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import usbDetect from 'usb-detection'
-import request from 'request'
 import { join } from 'path'
-import { createWriteStream, exists, mkdir } from 'fs'
+import { notExistsAsync, mkdirAsync, download, hex2dec, formatMessage, lsblk } from './lib/utils'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -21,32 +20,6 @@ protocol.registerSchemesAsPrivileged([
 let win;
 
 /*
- * Function to check if file or folder exists
- */
-function notExistsAsync(p) {
-  return new Promise((resolve) => {
-    exists(p, function(exist) {
-      if (!exist) resolve(true)
-      resolve(false)
-    })
-  })
-}
-
-/*
- * Function to create folder
- */
-function mkdirAsync(p) {
-  return new Promise((resolve, reject) => {
-    win.webContents.send('window:log:info', `creating directory ${p}`)
-    mkdir(p, function(err) {
-      if (err) reject(err)
-      win.webContents.send('window:log:info', `directory ${p} created`)
-      resolve()
-    })
-  })
-}
-
-/*
  * Function to handle downloads
  * when user select to build or flash
  * prebuiltin binaries
@@ -57,13 +30,25 @@ function handleDownload (
 ) {
   return async function () {
     win.webContents.send(options.sender, 'starting')
-    const __destination__ = join(__dirname, '..', 'dist_electron', options.filename)
+
+    // If __dirname/resources isnt exists
+    // create it
+    const resources = join(__dirname, '..', 'resources')
+    const resourcesNotExists = await notExistsAsync(resources)
+    if (resourcesNotExists) {
+      win.webContents.send('window:log:info', `creating directory ${resources}`)
+      await mkdirAsync(resources)
+      win.webContents.send('window:log:info', `directory ${resources} created`)
+    }
+
+    // Now start the downloading and creation file
+    const __destination__ = join(resources, options.filename)
 
     // options.filename can be
     // - ktool-*
     // - maixpy_*/firmware.bin
     // - maixpy_*/kboot.kfpkg
-    const notExist = await notExistsAsync(join(__dirname, '..', 'dist_electron', options.filename))
+    const notExist = await notExistsAsync(__destination__)
 
     if (!notExist) {
       win.webContents.send('window:log:info', `${options.filename} already downloaded`)
@@ -71,75 +56,68 @@ function handleDownload (
     } else {
       win.webContents.send('window:log:info', `downloading ${baseUrl}/${options.filename}`)
 
-      // if `/` is found, then create a new directory
-      const __filename__ = options.filename.split('/')
-      let disposition
+      // if `/` string is found in filename
+      // (could be `maixpy_*/kboot.kfpkg` or `maixpy_*/firmware.bin`
+      // then create a new directory
+      // in `__dirname/resources`
+      // if not have an `/`
+      // (could be ktool-*)
+      // put it in `__dirname/resources`
+      try {
+        const __filename__ = options.filename.split('/')
+        let disposition
 
-      if (__filename__.length > 1) {
-        const dirNotExist = await notExistsAsync(join(__dirname, '..', 'dist_electron', __filename__[0]))
-        if (dirNotExist) {
-          await mkdirAsync(join(__dirname, '..', 'dist_electron', __filename__[0]))
+        if (__filename__.length > 1) {
+          const d = join(resources, __filename__[0])
+          const dirNotExist = await notExistsAsync(d)
+          if (dirNotExist) {
+            const p = join(d)
+            win.webContents.send('window:log:info', `creating directory ${d}`)
+            await mkdirAsync(d)
+            win.webContents.send('window:log:info', `directory ${d} created`)
+          }
+          disposition = `attachment; filename=${__filename__[1]}`
+        } else {
+          disposition = `attachment; filename=${__filename__[0]}`
         }
-        disposition = `attachment; filename=${__filename__[1]}`
-      } else {
-        disposition = `attachment; filename=${__filename__[0]}`
+
+        let downloaded = 0
+        let total = 0
+        let percent = 0
+
+        download({
+          destination: __destination__,
+          url: `${baseUrl}/${options.filename}`,
+          headers: {
+            'Content-Disposition': disposition,
+            'User-Agent': `Chrome/${process.versions.chrome}`,
+          },
+          onResponse: function (data) {
+            total = data.headers['content-length']
+            percent = ((downloaded/total) * 100).toFixed(2)
+            win.webContents.send('window:log:info', `${baseUrl}/${options.filename} has ${total} bytes`)
+            win.webContents.send(options.sender, percent)
+          },
+          onData: function (chunk) {
+            downloaded += chunk.length
+            percent = ((downloaded/total) * 100).toFixed(2)
+            win.webContents.send(options.sender, percent)
+            if (percent === '100.00') {
+              win.webContents.send('window:log:info', `${options.filename} downloaded`)
+            }
+          },
+          onError: function(err) {
+            win.webContents.send('window:log:info', err.message)
+            win.webContents.send(options.sender, err)
+          }
+        })
+      } catch (error) {
+        win.webContents.send('window:log:info', error.stack)
       }
-
-      // Create a new file
-      const file = createWriteStream(__destination__)
-      const req = request({
-        url: `${baseUrl}/${options.filename}`,
-        headers: {
-          'Content-Disposition': disposition,
-          'User-Agent': `Chrome/${process.versions.chrome}`,
-          'Connection': 'keep-alive',
-          'Cache-Control': 'max-age=0',
-          'Accept-Encoding': 'gzip, deflate, br'
-        },
-        gzip: true
-      })
-
-      let downloaded = 0
-      let total = 0
-      let percent = 0
-
-      req.pipe(file)
-      req.on('response', function ( data ) {
-        total = data.headers['content-length']
-        percent = ((downloaded/total) * 100).toFixed(2)
-        win.webContents.send('window:log:info', `${baseUrl}/${options.filename} has ${total} bytes`)
-        win.webContents.send(options.sender, percent)
-      });
-      req.on('data', function (chunk) {
-        downloaded += chunk.length
-        percent = ((downloaded/total) * 100).toFixed(2)
-        if (percent === '100.00') {
-          win.webContents.send('window:log:info', `${options.filename} downloaded`)
-        }
-        win.webContents.send(options.sender, percent)
-      })
-      req.on('finish', () => {
-        win.webContents.send(options.sender, 'done')
-      })
-      req.on('error', function(err) {
-        win.webContents.send('window:log:info', err.message)
-        win.webContents.send(options.sender, err)
-      })
     }
   }
 }
 
-/*
- * Simple function that
- * converts string that represent
- * a hexadecimal number to decimal
- * Utility to convert vendor and product ids
- * os devices in decimal format
- * (required by usb-detection module)
- */
-function hex2dec (hexStr) {
-  return parseInt(hexStr, 16)
-}
 
 /*
  * List of devices
@@ -167,12 +145,6 @@ const VID_PID_DEVICES = [
  */
 let isUsbDetectActivate = false
 
-/*
- * Helper function to be used on handleStartUSBDetection
- */
-function formatMessage(d, action) {
-  return `device ${d.deviceName}/${d.manufacturer} on ttyUSB${d.locationId} ${action}`
-}
 
 /*
  * handles usb detection according devices
@@ -190,24 +162,6 @@ async function handleStartUSBdetection () {
   })
 }
 
-
-/*
- * SIGINT listener
- */
-process.on('SIGINT', function() {
-  console.log('[ WARN ] Gracefully shutdown...')
-  if (isUsbDetectActivate) {
-    usbDetect.stopMonitoring()
-  }
-  process.exit(0)
-})
-
-process.on('exit', function () {
-  if (isUsbDetectActivate) {
-    usbDetect.stopMonitoring()
-  }
-})
-
 /* handles stop usb detection
  *
  */
@@ -219,6 +173,28 @@ function handleStopUSBdetection () {
     win.webContents.send('usb:detection:stop', true)
   }
 }
+
+function handleSDCardDetection () {
+  if (process.platform === 'linux' || process.platform === 'darwin') {
+    const { blockdevices } = lsblk({
+      paths: true,
+      bytes: true,
+      output_all: true
+    })
+    const regexp = /mmcblk.*/g
+    const sdcards = filter(blockdevices, function(block) {
+      if (block.name.match(regexp)) {
+        return block
+      }
+    })
+    sdcards.forEach(function(sdcard) {
+      win.webContents.send('window:log:info', `found ${sdcard.type} at ${sdcard.path}`)
+    })
+  } else {
+    win.webContents.send('window:log:info', `not implemented sdcard detection for ${process.platform}`)
+  }
+}
+
 /*
  * Create the browser window
  */
@@ -261,6 +237,8 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
+  win.webContents.send('window:log:info', 'page: main')
 })
 
 // This method will be called when Electron has finished
@@ -277,25 +255,15 @@ app.on('ready', async () => {
   }
   // This IPC will be called everytime when the method
   // `window.kruxAPI.detect_usb()` is exected inside App.vue
-  ipcMain.handle(
-    'usb:detection:start',
-    handleStartUSBdetection
-  )
-
-  ipcMain.handle(
-    'usb:detection:stop',
-    handleStopUSBdetection
-  )
+  ipcMain.handle('usb:detection:start', handleStartUSBdetection)
+  ipcMain.handle('usb:detection:stop', handleStopUSBdetection)
 
   // This IPC will be called everytime when the method
   // `window.kruxAPI.download_ktool(os)` is executed inside App.vue
-  ipcMain.handle(
-    `download:ktool:${process.platform}`,
-    handleDownload({
-      filename: `ktool-${process.platform}`,
-      sender: 'download:ktool:status'
-    })
-  )
+  ipcMain.handle(`download:ktool:${process.platform}`, handleDownload({
+    filename: `ktool-${process.platform}`,
+    sender: 'download:ktool:status'
+  }))
 
   // This IPC will be called everytime when the method
   // `window.kruxAPI.download_<firmware | kboot>(device)` is executed inside App.vue
@@ -312,12 +280,12 @@ app.on('ready', async () => {
     })
   })
 
-
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.sdcard_detect` is executed inside `App.vue`
+  ipcMain.handle('sdcard:detection:start', handleSDCardDetection)
 
   // Now create window
   createWindow()
-  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
-  win.webContents.send('window:log:info', 'page: main')
 })
 
 // Exit cleanly on request from parent process in development mode.
@@ -325,12 +293,18 @@ if (isDevelopment) {
   if (process.platform === 'win32') {
     process.on('message', (data) => {
       if (data === 'graceful-exit') {
+        if (isUsbDetectActivate) usbDetect.stopMonitoring()
         app.quit()
       }
     })
   } else {
     process.on('SIGTERM', () => {
+      if (isUsbDetectActivate) usbDetect.stopMonitoring()
       app.quit()
+    })
+    process.on('SIGINT', function() {
+      if (isUsbDetectActivate) usbDetect.stopMonitoring()
+      process.exit(0)
     })
   }
 }

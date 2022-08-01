@@ -22,3 +22,25 @@
 appId: com.electron.krux
 productName: Krux Installer
 copyright: MIT LICENSE
+linux:
+  extraResources:
+    from: ../resources
+    to: $HOME/.krux-installer
+    filter:
+      - ktool-linux
+      - maixpy_*/firmware.bin
+      - maixpy_*/kboot.kfpkg
+mac:
+  extraResources:
+    from: ../resources
+    filter:
+      - ktool-mac
+      - maixpy_*/firmware.bin
+      - maixpy_*/kboot.kfpkg
+win:
+  extraResources:
+    from: ../resources
+    filter:
+      - ktool-windows
+      - maixpy_*/firmware.bin
+      - maixpy_*/kboot.kfpkg

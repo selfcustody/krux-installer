@@ -26,9 +26,9 @@
       <v-col class="mb-4">
         <v-btn
           color="primary"
-          @click.prevent="$emit('changePage', 'install_to_device')"
+          @click.prevent="$emit('changePage', 'detect_sdcard')"
         >
-          Install to device
+          Update firmware to SDCard
         </v-btn>
       </v-col>
     </v-row>

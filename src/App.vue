@@ -18,7 +18,7 @@
           class="mx-auto my-auto"
         >
           <DetectDevicePage
-            @onDetectedDevice="onDetectedDevice"
+            @onDetectedDevice.once="onDetectedDevice"
           />
         </v-flex>
         <v-flex
@@ -27,8 +27,24 @@
         >
           <ConfirmDetectedDevicePage
             :device="device"
-            @onConfirmDetectedDevice="onConfirmDetectedDevice"
-            @onWrongConfirmDetectedDevice="onWrongDetectedDevice"
+            @onConfirmDetectedDevice.once="onConfirmDetectedDevice"
+            @onWrongConfirmDetectedDevice.once="onWrongDetectedDevice"
+          />
+        </v-flex>
+        <v-flex
+          v-if="page === 'detect_sdcard'"
+          class="mx-auto my-auto"
+        >
+          <DetectSDCardPage
+            @onDetectedSDCard="onDetectedSDCard"
+          />
+        </v-flex>
+        <v-flex
+          v-if="page === 'confirm_detected_sdcard'"
+          class="mx-auto my-auto"
+        >
+          <ConfirmDetectedSDCardPage
+            :sdcard="sdcard"
           />
         </v-flex>
         <v-flex
@@ -91,6 +107,8 @@ import KruxLogo from './components/KruxLogo.vue'
 import MainPage from './components/MainPage.vue'
 import DetectDevicePage from './components/DetectDevicePage.vue'
 import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
+import DetectSDCardPage from './components/DetectSDCardPage.vue'
+import ConfirmDetectedSDCardPage from './components/ConfirmDetectedSDCardPage.vue'
 import InstallToDevicePage from './components/InstallToDevicePage.vue'
 import DownloadKtoolPage from './components/DownloadKtoolPage.vue'
 import DownloadFirmwarePage from './components/DownloadFirmwarePage.vue'
@@ -103,6 +121,8 @@ export default {
     MainPage,
     DetectDevicePage, 
     ConfirmDetectedDevicePage,
+    DetectSDCardPage,
+    ConfirmDetectedSDCardPage,
     InstallToDevicePage,
     DownloadKtoolPage  ,
     DownloadFirmwarePage,
@@ -110,10 +130,10 @@ export default {
   },
   data: () => ({
     page: 'main',
-    device: ''
+    device: '',
+    sdcard: {}
   }),
   created () {
-
     window.kruxAPI.onLogLevelInfo(function(_event, value) {
       console.log(`[ INFO ] ${value}`)
     })
@@ -137,6 +157,17 @@ export default {
       this.goTo('download_kboot')
     },
     onWrongDetectedDevice (){
+      this.goTo('main')
+    },
+    onDetectedSDCard (value) {
+      this.sdcard = value
+      this.goTo('confirm_detected_sdcard')
+    },
+    onConfirmDetectedSDCard (value) {
+      this.device = value
+      this.goTo('download_firmware')
+    },
+    onWrongDetectedSDCard (){
       this.goTo('main')
     },
     onSelectedDevice (value) {

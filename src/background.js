@@ -4,8 +4,17 @@ import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import usbDetect from 'usb-detection'
+import { filter } from 'lodash'
 import { join } from 'path'
-import { notExistsAsync, mkdirAsync, download, hex2dec, formatMessage, lsblk } from './lib/utils'
+import {
+  notExistsAsync,
+  mkdirAsync,
+  download,
+  hex2dec,
+  formatMessage,
+  formatBytes,
+  lsblk
+} from './lib/utils'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -174,9 +183,10 @@ function handleStopUSBdetection () {
   }
 }
 
-function handleSDCardDetection () {
+async function handleSDCardDetection () {
+  win.webContents.send('window:log:info', 'sdcard detection started')
   if (process.platform === 'linux' || process.platform === 'darwin') {
-    const { blockdevices } = lsblk({
+    const { blockdevices } = await lsblk({
       paths: true,
       bytes: true,
       output_all: true
@@ -187,9 +197,15 @@ function handleSDCardDetection () {
         return block
       }
     })
-    sdcards.forEach(function(sdcard) {
-      win.webContents.send('window:log:info', `found ${sdcard.type} at ${sdcard.path}`)
-    })
+    const data = {
+      name: sdcards[0].name,
+      type: sdcards[0].type,
+      path: sdcards[0].path,
+      size: formatBytes(sdcards[0].size),
+      state: sdcards[0].mountpoints[0] === null ? 'unmounted' : 'mounted'
+    }
+    win.webContents.send('window:log:info', `found a ${data.state} ${data.size} ${data.type} card at ${data.path}`)
+    win.webContents.send('sdcard:detection:add', data)
   } else {
     win.webContents.send('window:log:info', `not implemented sdcard detection for ${process.platform}`)
   }

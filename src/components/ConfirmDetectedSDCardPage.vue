@@ -7,21 +7,32 @@
       >
         <v-layout column wrap>
           <v-flex> 
-            <p> With your aid, we detected a <b>{{ sdcard.state }} {{ sdcard.size }} {{ sdcard.type}} card at {{ sdcard.path }}</b></p>
+            <p> With your aid, we detected a <b>{{ sdcard.state }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
             <br/>
-            <p
-              v-if="sdcard.state === 'unmounted'"
-            >
-              We need to mount it. Click in the button below to mount it
-            </p>
-            <br/>
-            <v-btn
-              v-if="sdcard.state === 'unmounted'"
-              color="primary"
-              @click.prevent="mountSDCard"
-            >
-              Mount the {{ sdcard.size }} {{ sdcard.type }} card at {{ sdcard.path }}
-            </v-btn>
+            <div v-if="sdcard.state === 'unmounted'">
+              <p>
+                We need to mount it. Click in the button below to mount it
+              </p>
+              <br/>
+              <v-btn
+                color="primary"
+                @click.prevent="mountSDCard"
+              >
+                Mount it!
+              </v-btn>
+            </div>
+            <div v-if="sdcard.state === 'mounted'">
+              <p>
+                SDCard already mounted. Let's proceed with download
+              </p>
+              <br/>
+              <v-btn
+                color="primary"
+                @click.prevent="$emit('onConfirmDetectedSDCard', sdcard)"
+              >
+                Download firmware!
+              </v-btn>
+            </div>
           </v-flex>
         </v-layout>
       </v-col>

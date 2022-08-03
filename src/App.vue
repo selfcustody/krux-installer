@@ -45,6 +45,7 @@
         >
           <ConfirmDetectedSDCardPage
             :sdcard="sdcard"
+            @onConfirmDetectedSDCard="onConfirmDetectedSDCard"
           />
         </v-flex>
         <v-flex
@@ -164,7 +165,7 @@ export default {
       this.goTo('confirm_detected_sdcard')
     },
     onConfirmDetectedSDCard (value) {
-      this.device = value
+      this.sdcard = value
       this.goTo('download_firmware')
     },
     onWrongDetectedSDCard (){

@@ -13,7 +13,7 @@ import {
   hex2dec,
   formatMessage,
   formatBytes,
-  lsblk
+  detectSDCard
 } from './lib/utils'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -184,30 +184,19 @@ function handleStopUSBdetection () {
 }
 
 async function handleSDCardDetection () {
-  win.webContents.send('window:log:info', 'sdcard detection started')
-  if (process.platform === 'linux' || process.platform === 'darwin') {
-    const { blockdevices } = await lsblk({
-      paths: true,
-      bytes: true,
-      output_all: true
-    })
-    const regexp = /mmcblk.*/g
-    const sdcards = filter(blockdevices, function(block) {
-      if (block.name.match(regexp)) {
-        return block
-      }
-    })
+  try {
+    win.webContents.send('window:log:info', 'sdcard detection started')
+    const sdcard = await detectSDCard(process.platform)
     const data = {
-      name: sdcards[0].name,
-      type: sdcards[0].type,
-      path: sdcards[0].path,
-      size: formatBytes(sdcards[0].size),
-      state: sdcards[0].mountpoints[0] === null ? 'unmounted' : 'mounted'
+      device: sdcard.device,
+      size: formatBytes(sdcard.size),
+      state: sdcard.mountpoints.length === 0 ? 'unmounted' : 'mounted'
     }
-    win.webContents.send('window:log:info', `found a ${data.state} ${data.size} ${data.type} card at ${data.path}`)
+    const msg = `found a ${data.state === 'unmounted' ? 'n' : ''} ${data.size} SDCard at ${data.device}`
+    win.webContents.send('window:log:info', msg)
     win.webContents.send('sdcard:detection:add', data)
-  } else {
-    win.webContents.send('window:log:info', `not implemented sdcard detection for ${process.platform}`)
+  } catch (error) {
+    win.webContents.send('window:log:info', error)
   }
 }
 

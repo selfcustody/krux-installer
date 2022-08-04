@@ -13,7 +13,8 @@ import {
   hex2dec,
   formatMessage,
   formatBytes,
-  detectSDCard
+  detectSDCard,
+  sdcardFilesystemType
 } from './lib/utils'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -190,18 +191,25 @@ async function handleSDCardDetection () {
   try {
     win.webContents.send('window:log:info', 'sdcard detection started')
     const sdcard = await detectSDCard()
+    let fstype = await sdcardFilesystemType(process.platform, sdcard)
+    if (fstype === 'dos') {
+      fstype = 'FAT32'
+    } else {
+      fstype = '(not) FAT32'
+    }
     const data = {
       device: sdcard.device,
       size: formatBytes(sdcard.size),
       description: sdcard.description,
+      fstype: fstype,
       state: sdcard.mountpoints.length === 0 ? 'unmounted' : 'mounted'
     }
-    const msg = `found a ${data.state === 'unmounted' ? 'n' : ''} ${data.size} SDCard at ${data.device}`
+    const msg = `found a ${data.state === 'unmounted' ? 'n' : ''} ${data.fstype} ${data.size} SDCard at ${data.device}`
     win.webContents.send('window:log:info', msg)
     win.webContents.send('sdcard:detection:add', data)
   } catch (error) {
     win.webContents.send('window:log:info', error)
-    win.webContents.send('sdcard:detection:add', { error: error })
+    win.webContents.send('sdcard:detection:add', { error: error.message })
   }
 }
 

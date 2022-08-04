@@ -26,7 +26,7 @@
             </v-btn>
           </v-flex>
           <v-flex v-if="!sdcard.error"> 
-            <p> With your aid, we detected a <b>{{ sdcard.state }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
+            <p> We detected a{{ sdcard.state === 'unmounted' ? 'n' : '' }}  <b>{{ sdcard.state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
             <br/>
             <div v-if="sdcard.state === 'unmounted'">
               <p>

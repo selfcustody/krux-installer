@@ -93,6 +93,48 @@ async function detectSDCard () {
   }
 }
 
+
+function __lsblk__ () {
+  return new Promise(function(resolve, reject) {
+    bufferedSpawn('lsblk', [
+      '--bytes',
+      '--paths',
+      '--output-all',
+      '--json'
+    ], function(err, stdout, stderr) {
+      if (err) reject(error)
+      const obj = JSON.parse(stdout)
+      resolve(obj)
+    })
+  })
+}
+
+/*
+ * Detect filesystem type of a sdcard
+ */
+async function sdcardFilesystemType (platform, sdcard) {
+  if (platform === 'linux') {
+    const { blockdevices } = await __lsblk__()
+    console.log(sdcard.device)
+    const sdcards = _.filter(blockdevices, { path: sdcard.device })
+    console.log(sdcards)
+    if (sdcards.length > 0) {
+      const sdcard = sdcards[0]
+      return sdcard.pttype
+    } else {
+      throw new Error(`SDCard Filesystem type detection: no device ${sdcard.device} found`)
+    }
+  } else if (platform === 'darwin') {
+    throw new Error(`SDCard Filesystem type detection: ${platform} not implemented`)
+  } else if (platform === 'win32') {
+    // https://stackoverflow.com/questions/46853070/get-filesystem-type-with-node-js
+    //const fsutil = await bufferedSpawn(`fsutil fsinfo volumeinfo ${sdcard.device}`
+    throw new Error(`SDCard Filesystem type detection: ${platform} not implemented`)
+  } else {
+    throw new Error(`SDCard Filesystem type detection: ${platform} not implemented`)
+  }
+}
+
 /*
  * Function to format the size in bytes
  *
@@ -108,4 +150,13 @@ if (bytes === 0) return '0 Bytes';
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-module.exports = { notExistsAsync, mkdirAsync, hex2dec, download, formatMessage, formatBytes, detectSDCard }
+module.exports = {
+  notExistsAsync,
+  mkdirAsync,
+  hex2dec,
+  download,
+  formatMessage,
+  formatBytes,
+  detectSDCard,
+  sdcardFilesystemType
+}

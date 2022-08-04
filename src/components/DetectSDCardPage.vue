@@ -24,10 +24,17 @@
             </p>
             <br/>
             <v-btn  
-              color="primary"
+              color="green"
               @click.prevent="detectSDCard"
             >
-              Start detection
+              Start
+            </v-btn>
+            <br/>
+            <v-btn
+              color="primary"
+              @click.prevent="$emit('onBack', 'main')"
+            >
+              Back
             </v-btn>
           </v-flex>
         </v-layout>

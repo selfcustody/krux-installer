@@ -6,19 +6,45 @@
         sm12
       >
         <v-layout column wrap>
-          <v-flex> 
+          <v-flex v-if="sdcard.error">
+            <p>No SDCard detected.</p>
+            <br/>
+            <p>Click in the button below, insert your SDCard and try again</p>
+            <br/>
+            <v-btn
+              color="green"
+              @click.prevent="mountSDCard"
+            >
+              Try again
+            </v-btn>
+            <br/>
+            <v-btn
+              color="primary"
+              @click.prevent="$emit('onBack', 'detect_sdcard')"
+            >
+              Back
+            </v-btn>
+          </v-flex>
+          <v-flex v-if="!sdcard.error"> 
             <p> With your aid, we detected a <b>{{ sdcard.state }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
             <br/>
             <div v-if="sdcard.state === 'unmounted'">
               <p>
-                We need to mount it. Click in the button below to mount it
+                Click in the button below to mount it
               </p>
               <br/>
               <v-btn
-                color="primary"
+                color="green"
                 @click.prevent="mountSDCard"
               >
                 Mount it!
+              </v-btn>
+              <br/>
+              <v-btn
+                color="primary"
+                @click.prevent="$emit('onBack', 'detect_sdcard')"
+              >
+                Back
               </v-btn>
             </div>
             <div v-if="sdcard.state === 'mounted'">

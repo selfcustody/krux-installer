@@ -171,8 +171,8 @@ async function handleStartUSBdetection () {
   })
 }
 
-/* handles stop usb detection
- *
+/*
+ * handles stop usb detection
  */
 function handleStopUSBdetection () {
   if (isUsbDetectActivate) {
@@ -183,13 +183,17 @@ function handleStopUSBdetection () {
   }
 }
 
+/*
+ * handles sdcard detection
+ */
 async function handleSDCardDetection () {
   try {
     win.webContents.send('window:log:info', 'sdcard detection started')
-    const sdcard = await detectSDCard(process.platform)
+    const sdcard = await detectSDCard()
     const data = {
       device: sdcard.device,
       size: formatBytes(sdcard.size),
+      description: sdcard.description,
       state: sdcard.mountpoints.length === 0 ? 'unmounted' : 'mounted'
     }
     const msg = `found a ${data.state === 'unmounted' ? 'n' : ''} ${data.size} SDCard at ${data.device}`
@@ -197,6 +201,7 @@ async function handleSDCardDetection () {
     win.webContents.send('sdcard:detection:add', data)
   } catch (error) {
     win.webContents.send('window:log:info', error)
+    win.webContents.send('sdcard:detection:add', { error: error })
   }
 }
 

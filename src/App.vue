@@ -19,6 +19,7 @@
         >
           <DetectDevicePage
             @onDetectedDevice.once="onDetectedDevice"
+            @onBack="goTo"
           />
         </v-flex>
         <v-flex
@@ -36,7 +37,8 @@
           class="mx-auto my-auto"
         >
           <DetectSDCardPage
-            @onDetectedSDCard="onDetectedSDCard"
+            @onDetectedSDCard="onDetectedSDCard" 
+            @onBack.once="goTo"
           />
         </v-flex>
         <v-flex
@@ -46,6 +48,7 @@
           <ConfirmDetectedSDCardPage
             :sdcard="sdcard"
             @onConfirmDetectedSDCard="onConfirmDetectedSDCard"
+            @onBack="goTo"
           />
         </v-flex>
         <v-flex

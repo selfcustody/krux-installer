@@ -18,10 +18,17 @@
             <p> Connect your device, power on it, and then click in button below </p>
             <br/>
             <v-btn  
-              color="primary"
+              color="green"
               @click.prevent="detectDevice"
             >
-              Start detection
+              Start
+            </v-btn>
+            <br/>
+            <v-btn  
+              color="primary"
+              @click.prevent="$emit('onBack', 'main')"
+            >
+              Back
             </v-btn>
           </v-flex>
         </v-layout>

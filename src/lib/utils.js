@@ -2,7 +2,7 @@ const bufferedSpawn = require('buffered-spawn');
 const { createWriteStream, exists, mkdir } = require('fs')
 const request = require('request')
 const drivelist = require('drivelist')
-const { filter } = require('lodash')
+const _ = require('lodash')
 /*
  * Function to check if file or folder exists
  */
@@ -82,23 +82,17 @@ function download(options) {
 /*
  * Detects if a SD card is inserted in any OS
  *
- * TODO: customize regular expression for each platform
- * @param platform
  */
-async function detectSDCard (platform) {
+async function detectSDCard () {
   const drives = await drivelist.list()
-  if (platform === 'linux') {
-    const regex = /mmcblk.*g/
-    const sdcards = filter(drives, (d) => /mmcblk/g.test(d.device))
-    return sdcards[0]
-  } else if (platform === 'darwin') {
-    throw new Error(`SDCard detection: ${platform} not implemented yet`)
-  } else if (platform === 'windows') {
-    throw new Error(`SDCard detection: ${platform} not implemented yet`)
+  const removables = _.reject(drives, { isSystem: true })
+  if (removables.length > 0) {
+    return removables[0]
   } else {
-    throw new Error(`SDCard Detection: ${platform} not supported by module drivelist`)
+    throw Error("SDCard Detection: no device detected")
   }
 }
+
 /*
  * Function to format the size in bytes
  *

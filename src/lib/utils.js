@@ -1,7 +1,9 @@
+const { userInfo } = require('os');
 const bufferedSpawn = require('buffered-spawn');
 const { createWriteStream, exists, mkdir } = require('fs')
 const request = require('request')
 const drivelist = require('drivelist')
+const sudo = require('sudo-prompt');
 const _ = require('lodash')
 /*
  * Function to check if file or folder exists
@@ -111,13 +113,14 @@ function __lsblk__ () {
 
 /*
  * Detect filesystem type of a sdcard
+ *
+ * @param platform
+ * @param sdcard (see detectSDCard)
  */
 async function sdcardFilesystemType (platform, sdcard) {
   if (platform === 'linux') {
     const { blockdevices } = await __lsblk__()
-    console.log(sdcard.device)
     const sdcards = _.filter(blockdevices, { path: sdcard.device })
-    console.log(sdcards)
     if (sdcards.length > 0) {
       const sdcard = sdcards[0]
       return sdcard.pttype
@@ -135,6 +138,84 @@ async function sdcardFilesystemType (platform, sdcard) {
   }
 }
 
+async function sdcardPartitions (platform, sdcard) {
+  if (platform === 'linux') {
+    const { blockdevices } = await __lsblk__()
+    const sdcards = _.filter(blockdevices, { path: sdcard.device })
+    if (sdcards.length > 0) {
+      return sdcards[0].children
+    } else {
+      throw new Error(`SDCard Filesystem type detection: no device ${sdcard.device} found`)
+    }
+  } else if (platform === 'darwin') {
+    throw new Error(`SDCard Filesystem type detection: ${platform} not implemented`)
+  } else if (platform === 'win32') {
+    // https://stackoverflow.com/questions/46853070/get-filesystem-type-with-node-js
+    //const fsutil = await bufferedSpawn(`fsutil fsinfo volumeinfo ${sdcard.device}`
+    throw new Error(`SDCard Filesystem type detection: ${platform} not implemented`)
+  } else {
+    throw new Error(`SDCard Filesystem type detection: ${platform} not implemented`)
+  }
+}
+
+function sudoAsync (script) {
+  return new Promise(function (resolve, reject) {
+    const options = {
+      name: 'Krux Installer'
+    };
+    sudo.exec(script, options, function (err, stdout, stderr){
+      if (err) reject(err);
+      if (stderr) reject(stderr);
+      resolve();
+    })
+  });
+}
+
+/*
+ * Mounts an Sdcard
+ *
+ * @param sdcard (see detectSDCard)
+ */
+async function mountSDCard (platform, sdcard) {
+  if (platform === 'linux') {
+    const partitions = await sdcardPartitions(platform, sdcard);
+    console.log(partitions);
+    const part = partitions[0].name;
+    const uuid = partitions[0].uuid;
+    const script = `mkdir -p /run/media/${userInfo().username}/${uuid} && mount -t vfat ${part} /run/media/${userInfo().username}/${uuid}`;
+    await sudoAsync(script);
+    return `/run/media${userInfo().username}/${uuid}`
+  } else if (platform === 'darwin') {
+    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
+  } else if (platform === 'win32') {
+    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
+  } else {
+    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
+  }
+}
+
+/*
+ * Umounts an Sdcard
+ *
+ * @param sdcard (see detectSDCard)
+ */
+async function umountSDCard (platform, sdcard) {
+  if (platform === 'linux') {
+    const partitions = sdcardPartition(platform, sdcard);
+    const part = partitions[0].name;
+    const script = `umount /run/media/${userInfo().username}/sdcard && rm -rf /run/media/${userInfo().username}/sdcard`;
+    return {
+      partition: part,
+      result: await sudoAsync(script)
+    }
+  } else if (platform === 'darwin') {
+    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
+  } else if (platform === 'win32') {
+    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
+  } else {
+    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
+  }
+}
 /*
  * Function to format the size in bytes
  *
@@ -158,5 +239,7 @@ module.exports = {
   formatMessage,
   formatBytes,
   detectSDCard,
-  sdcardFilesystemType
+  sdcardFilesystemType,
+  mountSDCard,
+  umountSDCard
 }

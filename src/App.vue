@@ -60,21 +60,21 @@
           />
         </v-flex>
         <v-flex
-          v-if="page === 'download_ktool'"
-          class="ma-auto"
-        >
-          <DownloadKtoolPage
-            :os="'linux'"
-            @onDownloadedKtool="onDownloadedKtool"
-          />
-        </v-flex>
-        <v-flex
           v-if="page === 'download_firmware'"
           class="ma-auto"
         >
           <DownloadFirmwarePage
             :device="device"
             @onDownloadedFirmware="onDownloadedFirmware"
+          />
+        </v-flex>
+        <v-flex
+          v-if="page === 'download_ktool'"
+          class="ma-auto"
+        >
+          <DownloadKtoolPage
+            :os="'linux'"
+            @onDownloadedKtool="onDownloadedKtool"
           />
         </v-flex>
         <v-flex
@@ -169,20 +169,23 @@ export default {
     },
     onConfirmDetectedSDCard (value) {
       this.sdcard = value
-      this.goTo('download_firmware')
+      this.goTo('install_to_device')
     },
     onWrongDetectedSDCard (){
       this.goTo('main')
     },
+    onDownloadedFirmware () {
+      this.goTo('mount_sdcard')
+    },
+    onMountedSDCard () {
+      this.goTO('write_firmware_to_sdcard')
+    },
     onSelectedDevice (value) {
       this.device = value
-      this.goTo('download_ktool')
+      this.goTo('download_firmware')
     },
     onDownloadedKtool () {
       this.goTo('download_firmware')
-    },
-    onDownloadedFirmware () {
-      this.goTo('download_kboot')
     },
     onDownloadedKboot () {
       this.goTo('burn_microSD')

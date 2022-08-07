@@ -26,9 +26,9 @@
             </v-btn>
           </v-flex>
           <v-flex v-if="!sdcard.error"> 
-            <p> We detected a{{ sdcard.state === 'unmounted' ? 'n' : '' }}  <b>{{ sdcard.state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
+            <p> We detected a{{ state === 'unmounted' ? 'n' : '' }}  <b>{{ state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
             <br/>
-            <div v-if="sdcard.state === 'unmounted'">
+            <div v-if="state === 'unmounted'">
               <p>
                 Click in the button below to mount it
               </p>
@@ -47,7 +47,10 @@
                 Back
               </v-btn>
             </div>
-            <div v-if="sdcard.state === 'mounted'">
+            <div v-if="state === 'mounting'">
+              <p> Wait for sudo permissions... </p>
+            </div>
+            <div v-if="state === 'mounted'">
               <p>
                 SDCard already mounted. Let's proceed with download
               </p>
@@ -56,7 +59,7 @@
                 color="primary"
                 @click.prevent="$emit('onConfirmDetectedSDCard', sdcard)"
               >
-                Download firmware!
+                Select firmware!
               </v-btn>
             </div>
           </v-flex>
@@ -67,6 +70,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'ConfirmDetectedSDCardPage',
   props: {
@@ -75,9 +79,21 @@ export default {
       required: true
     }
   },
+  data () {
+    return {
+      state: this.sdcard.state
+    }
+  },
   methods: {
-    mountSDCard () {
-      console.log('Not implemented')
+    async mountSDCard () { 
+      this.state = 'mounting'
+      await window.kruxAPI.start_mount_sdcard();
+
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onMountedSDCard(async (_event, value) => {
+        // reload sdcard.status
+        this.state = 'mounted'
+      });
     }
   }
 } 

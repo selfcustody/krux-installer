@@ -20,6 +20,12 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async start_detect_sdcard () {
     await ipcRenderer.invoke('sdcard:detection:start')
   },
+  async start_mount_sdcard () {
+    await ipcRenderer.invoke('sdcard:mount:start')
+  },
+  async stop_mount_sdcard () {
+    await ipcRenderer.invoke('sdcard:mount:start')
+  },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
   },
@@ -46,5 +52,11 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onDetectedSDCardFound(callback) {
     ipcRenderer.on('sdcard:detection:add', callback)
+  },
+  onMountedSDCard(callback) {
+    ipcRenderer.on('sdcard:mount:add', callback)
+  },
+  onUmountedSDCard(callback) {
+    ipcRenderer.on('sdcard:mount:remove', callback)
   }
 })

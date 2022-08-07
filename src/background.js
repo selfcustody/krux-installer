@@ -14,7 +14,9 @@ import {
   formatMessage,
   formatBytes,
   detectSDCard,
-  sdcardFilesystemType
+  sdcardFilesystemType,
+  mountSDCard,
+  umountSDCard
 } from './lib/utils'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -214,6 +216,35 @@ async function handleSDCardDetection () {
 }
 
 /*
+ * handles sdcard mounting
+ */
+async function handleSDCardMounting () {
+  try {
+    win.webContents.send('window:log:info', 'sdcard mounting started');
+    const sdcard = await detectSDCard();
+    const mounted = await mountSDCard(process.platform, sdcard);
+    win.webContents.send('window:log:info', `sdcard mounted at ${mounted}`);
+    win.webContents.send('sdcard:mount:add', mounted.partition);
+  } catch (error) {
+    win.webContents.send('window:log:info', error);
+  }
+}
+
+/*
+ * handles sdcard umounting
+ */
+async function handleSDCardUmounting () {
+  try {
+    win.webContents.send('window:log:info', 'sdcard umounting started');
+    const sdcard = await detectSDCard();
+    const mounted = await umountSDCard(process.platform, sdcard);
+    win.webContents.send('window:log:info', `sdcard at ${mounted.partition} umounted ${mounted.result}`);
+    win.webContents.send('sdcard:mount:remove', mounted.partition);
+  } catch (error) {
+    win.webContents.send('window:log:info', error);
+  }
+}
+/*
  * Create the browser window
  */
 async function createWindow() {
@@ -300,7 +331,16 @@ app.on('ready', async () => {
 
   // This IPC will be called will be called everytime when the method
   // `window.kruxAPI.sdcard_detect` is executed inside `App.vue`
-  ipcMain.handle('sdcard:detection:start', handleSDCardDetection)
+  ipcMain.handle('sdcard:detection:start', handleSDCardDetection);
+
+
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.sdcard_mount` is executed inside `App.vue`
+  ipcMain.handle('sdcard:mount:start', handleSDCardMounting);
+
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.sdcard_umount` is executed inside `App.vue`
+  ipcMain.handle('sdcard:mount:stop', handleSDCardUmounting);
 
   // Now create window
   createWindow()

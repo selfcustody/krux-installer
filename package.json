@@ -22,6 +22,7 @@
     "core-js": "^3.8.3",
     "drivelist": "^11.0.0",
     "roboto-fontface": "*",
+    "sudo-prompt": "^9.2.1",
     "usb-detection": "4.14.1",
     "vue": "^3.2.13",
     "vue-uuid": "^3.0.0",

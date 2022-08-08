@@ -20,15 +20,14 @@
             <br/>
             <v-btn
               color="primary"
-              @click.prevent="$emit('onBack', 'detect_sdcard')"
+              @click.prevent="umountSDCard"
             >
               Back
             </v-btn>
           </v-flex>
           <v-flex v-if="!sdcard.error"> 
-            <p> We detected a{{ state === 'unmounted' ? 'n' : '' }}  <b>{{ state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
-            <br/>
-            <div v-if="state === 'unmounted'">
+            <div v-if="state === 'umounted'">
+              <p> We detected an <b>{{ state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
               <p>
                 Click in the button below to mount it
               </p>
@@ -42,24 +41,32 @@
               <br/>
               <v-btn
                 color="primary"
-                @click.prevent="$emit('onBack', 'detect_sdcard')"
+                @click.prevent="umountSDCard"
               >
                 Back
               </v-btn>
             </div>
-            <div v-if="state === 'mounting'">
-              <p> Wait for sudo permissions... </p>
+            <div v-if="state === 'mounting' || state === 'umounting'">
+              <p> Waiting for administrator permissions... </p>
             </div>
-            <div v-if="state === 'mounted'">
+            <div v-if="state === 'mounted'"> 
+              <p> We detected an <b>{{ state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ mountpoint }}</b></p>
               <p>
-                SDCard already mounted. Let's proceed with download
+                SDCard mounted. Let's proceed with download
               </p>
               <br/>
               <v-btn
-                color="primary"
-                @click.prevent="$emit('onConfirmDetectedSDCard', sdcard)"
+                color="green"
+                @click.prevent="select_firmware"
               >
                 Select firmware!
+              </v-btn>
+              <br/>
+              <v-btn
+                color="primary"
+                @click.prevent="umountSDCard"
+              >
+                back
               </v-btn>
             </div>
           </v-flex>
@@ -81,19 +88,38 @@ export default {
   },
   data () {
     return {
-      state: this.sdcard.state
+      state: this.sdcard.state,
+      mountpoint: ''
     }
   },
   methods: {
-    async mountSDCard () { 
+    async mountSDCard () {
       this.state = 'mounting'
       await window.kruxAPI.start_mount_sdcard();
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onMountedSDCard(async (_event, value) => {
-        // reload sdcard.status
+      window.kruxAPI.onMountedSDCard((_event, value) => {
         this.state = 'mounted'
+        this.mountpoint = value
       });
+    },
+    async umountSDCard () {
+      if (this.state === 'mounted') {
+        this.state = 'umounting'
+        await window.kruxAPI.stop_mount_sdcard();
+
+        // eslint-disable-next-line no-unused-vars
+        window.kruxAPI.onUmountedSDCard((_event, value) => {
+          this.state = 'umounted'
+          this.$emit('onError', { sdcard: this.mountpoint, page: 'DetectSDCardPage' })
+        });
+
+      } else {
+        this.$emit('onError', { sdcard: this.mountpoint, page: 'DetectSDCardPage' })
+      }
+    },
+    select_firmware () {
+      this.$emit('onSuccess', { sdcard: this.mountpoint, page: 'SelectFirmwarePage' })
     }
   }
 } 

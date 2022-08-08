@@ -8,15 +8,23 @@
         <v-layout column wrap>
           <v-flex>
             <p>
-              <b>Update firmware to SDCard</b> is required when you intend to update a newly krux firmware krux.
+              <b>Update firmware to SDCard</b> is required when you intend to update a newly krux firmware.
             </p>
             <br/>
             <p>
-                We will first <b>detect</b> your SDcard; and, if necessary, format it to <b>FAT32</b> filesystem.
+                We will first <b>detect</b> your SDcard.
             </p>
             <br/>
             <p>
-                Then we will ask which device you want update to, so that we can download appropriate <b>firmware.bin</b> and <b>firmware.bin.sig</b> files.
+              <b>It's imperative that SDCard is formatted to FAT32 filesystem</b>.
+            </p>
+            <br/>
+            <p>
+              If not, close this program and format it.
+            </p>
+            <br/>
+            <p>
+              Then we will mount it and ask which firmware you want update to, so that we can download appropriate <b>firmware.bin</b> and <b>firmware.bin.sig</b> files.
             </p>
             <br/>
             <p>
@@ -32,7 +40,7 @@
             <br/>
             <v-btn
               color="primary"
-              @click.prevent="$emit('onBack', 'main')"
+              @click.prevent="$emit('onError', { page: 'MainPage' })"
             >
               Back
             </v-btn>
@@ -45,19 +53,14 @@
 
 <script>
 export default {
-  name: 'DetectDevicePage',
-  data () {
-    return {
-      device: ''
-    }
-  },
+  name: 'DetectSDCardPage',
   methods: {
     async detectSDCard () {
       await window.kruxAPI.start_detect_sdcard()
     
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onDetectedSDCardFound((_event, value) => {
-        this.$emit('onDetectedSDCard', value)
+        this.$emit('onSuccess', { sdcard: value, page: 'ConfirmDetectedSDCardPage' })
       })
     }
   }

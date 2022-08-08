@@ -30,6 +30,10 @@ export default {
     device: {
       type: String,
       required: true
+    },
+    sdcard: {
+      type: String,
+      required: true
     }
   },
   data () {
@@ -42,13 +46,18 @@ export default {
   },
   methods: {
     async onDownload () {
-      await window.kruxAPI.download_firmware(this.device)
-      window.kruxAPI.onDownloadedFirmwareStatus(async (_event, value) => {
-        this.model = value
-        if (value === '100.00') {
-          await this.$emit('onDownloadedFirmware')
-        }
-      })
+      try { 
+        await window.kruxAPI.download_firmware(this.device)
+        window.kruxAPI.onDownloadedFirmwareStatus((_event, value) => {
+          this.model = value
+        })
+        window.kruxAPI.onDownloadFirmwareDone((_event, value) => {
+          console.log(value)
+          this.$emit('onSuccess', { sdcard: this.sdcard, resource: value, page: 'WriteFirmwareToSDCardPage' })
+        })
+      } catch (error) {
+        this.$emit('onError', { page: 'SelectFirmwarePage' })
+      }
     }
   }
 }

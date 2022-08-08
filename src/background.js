@@ -16,7 +16,7 @@ import {
   detectSDCard,
   sdcardFilesystemType,
   mountSDCard,
-  umountSDCard
+  copyFileAsync
 } from './lib/utils'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -63,8 +63,10 @@ function handleDownload (
     const notExist = await notExistsAsync(__destination__)
 
     if (!notExist) {
+
       win.webContents.send('window:log:info', `${options.filename} already downloaded`)
       win.webContents.send(options.sender, '100.00')
+      win.webContents.send(`${options.sender}:done`, join(__destination__, options.filename))
     } else {
       win.webContents.send('window:log:info', `downloading ${baseUrl}/${options.filename}`)
 
@@ -107,6 +109,7 @@ function handleDownload (
           onResponse: function (data) {
             total = data.headers['content-length']
             percent = ((downloaded/total) * 100).toFixed(2)
+            //
             win.webContents.send('window:log:info', `${baseUrl}/${options.filename} has ${total} bytes`)
             win.webContents.send(options.sender, percent)
           },
@@ -115,7 +118,9 @@ function handleDownload (
             percent = ((downloaded/total) * 100).toFixed(2)
             win.webContents.send(options.sender, percent)
             if (percent === '100.00') {
-              win.webContents.send('window:log:info', `${options.filename} downloaded`)
+              win.webContents.send('window:log:info', `${baseUrl}/${options.filename} downloaded`);
+              win.webContents.send('window:log:info', `resource can be found in ${__destination__}`);
+              win.webContents.send(`${options.sender}:done`, __destination__)
             }
           },
           onError: function(err) {
@@ -130,7 +135,6 @@ function handleDownload (
   }
 }
 
-
 /*
  * List of devices
  */
@@ -141,12 +145,12 @@ const VID_PID_DEVICES = [
     pid: hex2dec('6001')
   },
   {
-    alias: 'maixpy_amigo_ips/maixpy_bit/maixy_bit_ov5642',
+    alias: 'maixpy_amigo/maixy_bit',
     vid: hex2dec('0403'),
     pid: hex2dec('6010')
   },
   {
-    alias: 'maixpy_dock',
+      alias: 'maixpy_dock',
     vid: hex2dec('1a86'),
     pid: hex2dec('7523')
   }
@@ -204,9 +208,9 @@ async function handleSDCardDetection () {
       size: formatBytes(sdcard.size),
       description: sdcard.description,
       fstype: fstype,
-      state: sdcard.mountpoints.length === 0 ? 'unmounted' : 'mounted'
+      state: sdcard.mountpoints.length === 0 ? 'umounted' : 'mounted'
     }
-    const msg = `found a ${data.state === 'unmounted' ? 'n' : ''} ${data.fstype} ${data.size} SDCard at ${data.device}`
+    const msg = `found a ${data.state === 'umounted' ? 'n' : ''} ${data.fstype} ${data.size} SDCard at ${data.device}`
     win.webContents.send('window:log:info', msg)
     win.webContents.send('sdcard:detection:add', data)
   } catch (error) {
@@ -222,9 +226,9 @@ async function handleSDCardMounting () {
   try {
     win.webContents.send('window:log:info', 'sdcard mounting started');
     const sdcard = await detectSDCard();
-    const mounted = await mountSDCard(process.platform, sdcard);
-    win.webContents.send('window:log:info', `sdcard mounted at ${mounted}`);
-    win.webContents.send('sdcard:mount:add', mounted.partition);
+    const result = await mountSDCard(process.platform, sdcard, 'mount');
+    win.webContents.send('window:log:info', `sdcard mounted at ${result.mount}`);
+    win.webContents.send('sdcard:mount:add', result.mount);
   } catch (error) {
     win.webContents.send('window:log:info', error);
   }
@@ -237,13 +241,27 @@ async function handleSDCardUmounting () {
   try {
     win.webContents.send('window:log:info', 'sdcard umounting started');
     const sdcard = await detectSDCard();
-    const mounted = await umountSDCard(process.platform, sdcard);
-    win.webContents.send('window:log:info', `sdcard at ${mounted.partition} umounted ${mounted.result}`);
-    win.webContents.send('sdcard:mount:remove', mounted.partition);
+    const result = await mountSDCard(process.platform, sdcard, 'umount');
+    win.webContents.send('window:log:info', `sdcard at ${result.umount} umounted`);
+    win.webContents.send('sdcard:mount:remove', result.umount);
+  } catch (error) {
+    console.log(error);
+    win.webContents.send('window:log:info', error);
+  }
+}
+
+async function handleWriteFirmwareOnSDCard (options) {
+  try {
+    console.log(options)
+    win.webContents.send('window:log:info', 'starting write')
+    const result = await copyFileAsync(options);
+    win.webContents.send('window:log:info', `${options.origin} copied to ${result}`);
+    win.webContents.send('sdcard:write:done', result);
   } catch (error) {
     win.webContents.send('window:log:info', error);
   }
 }
+
 /*
  * Create the browser window
  */
@@ -314,10 +332,10 @@ app.on('ready', async () => {
     sender: 'download:ktool:status'
   }))
 
-  // This IPC will be called everytime when the method
+  // This IPCs will be called everytime when the method
   // `window.kruxAPI.download_<firmware | kboot>(device)` is executed inside App.vue
   const downloads = ['firmware.bin', 'kboot.kfpkg'];
-  const devices = ['maixpy_m5stickv', 'maixpy_amigo_ips', 'maixpy_bit', 'maixpy_bit_ov5642', 'maixpy_dock'];
+  const devices = ['maixpy_m5stickv', 'maixpy_amigo_ips', 'maixpy_bit', 'maixpy_dock'];
   downloads.forEach(function (bin){
     devices.forEach(function (device){
       const sender = bin.split('.')[0]
@@ -342,7 +360,19 @@ app.on('ready', async () => {
   // `window.kruxAPI.sdcard_umount` is executed inside `App.vue`
   ipcMain.handle('sdcard:mount:stop', handleSDCardUmounting);
 
-  // Now create window
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.start_write_firmware_to_sdcard` is executed inside `App.vue`
+  ipcMain.handle('sdcard:write:start', async (_event, options) => {
+    const filename = options.resource.split('/')
+    const file = filename[filename.length - 1]
+    const result = await handleWriteFirmwareOnSDCard({
+      origin: options.resource,
+      destination: join(options.sdcard, file)
+    });
+    return result;
+  });
+
+    // Now create window
   createWindow()
 })
 

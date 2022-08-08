@@ -26,7 +26,7 @@
             <br/>
             <v-btn  
               color="primary"
-              @click.prevent="$emit('onBack', 'main')"
+              @click.prevent="$emit('onError', { page: 'MainPage' })"
             >
               Back
             </v-btn>
@@ -52,7 +52,7 @@ export default {
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onDetectedDeviceFoundUsb((_event, value) => {
         console.log(value)
-        this.$emit('onDetectedDevice', value)
+        this.$emit('onSuccess', { device: value, page: 'ConfirmDetectedDevicePage' })
       })
     }
   }

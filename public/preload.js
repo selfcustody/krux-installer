@@ -24,7 +24,10 @@ contextBridge.exposeInMainWorld('kruxAPI',{
     await ipcRenderer.invoke('sdcard:mount:start')
   },
   async stop_mount_sdcard () {
-    await ipcRenderer.invoke('sdcard:mount:start')
+    await ipcRenderer.invoke('sdcard:mount:stop')
+  },
+  async start_write_firmware_to_sdcard (resource, sdcard) {
+    await ipcRenderer.invoke(`sdcard:write:start`, { resource: resource, sdcard: sdcard })
   },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
@@ -34,6 +37,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onDownloadedFirmwareStatus(callback) {
     ipcRenderer.on('download:firmware:status', callback)
+  },
+  onDownloadFirmwareDone(callback) {
+    ipcRenderer.on('download:firmware:status:done', callback)
   },
   onDownloadedKbootStatus(callback) {
     ipcRenderer.on('download:kboot:status', callback)
@@ -58,5 +64,8 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onUmountedSDCard(callback) {
     ipcRenderer.on('sdcard:mount:remove', callback)
+  },
+  onFirmwareWritedOnSDCard(callback) {
+    ipcRenderer.on('sdcard:write:done', callback)
   }
 })

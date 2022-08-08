@@ -12,33 +12,17 @@
       </v-col>
     </v-row>
     <br/>
-    <v-row class="text-center">
+    <v-row
+      v-for="(action, i) in actions"
+      :key="i"
+      class="text-center"
+    >
       <v-col class="mb-4">
         <v-btn
           color="primary"
-          @click.prevent="$emit('changePage', 'detect_device')"
+          @click.prevent="$emit('onSuccess', { page: action.page })"
         >
-          Flash to device
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row class="text-center">
-      <v-col class="mb-4">
-        <v-btn
-          color="primary"
-          @click.prevent="$emit('changePage', 'detect_sdcard')"
-        >
-          Update firmware to SDCard
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row class="text-center">
-      <v-col class="mb-4">
-        <v-btn
-          color="primary"
-          @click.prevent="$emit('changePage', 'build_from_source')"
-        >
-          Build from source
+          {{ action.label }}
         </v-btn>
       </v-col>
     </v-row>
@@ -54,7 +38,17 @@ export default {
         'Krux is an open-source DIY hardware signer for Bitcoin that can sign for multisignature and single-key wallets.',
         'It is a low-cost airgapped device built from off-the-shelf parts that communicates with wallet software via QR codes and wipes its memory after every session.',
         'Krux Installer is a GUI tool to simplify the flash, installation or build process that a user would be do in command line interfaces.'
-        ]
+        ],
+      actions: [
+        {
+          label: 'Flash to device',
+          page: 'DetectDevicePage' 
+        },
+        {
+          label: 'Update firmware to SDCard',
+          page: 'DetectSDCardPage'
+        }
+      ]
     }
   }
 }

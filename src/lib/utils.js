@@ -1,6 +1,6 @@
 const { userInfo } = require('os');
 const bufferedSpawn = require('buffered-spawn');
-const { createWriteStream, exists, mkdir } = require('fs')
+const { createWriteStream, exists, mkdir, copyFile } = require('fs')
 const request = require('request')
 const drivelist = require('drivelist')
 const sudo = require('sudo-prompt');
@@ -176,15 +176,42 @@ function sudoAsync (script) {
  *
  * @param sdcard (see detectSDCard)
  */
-async function mountSDCard (platform, sdcard) {
+async function mountSDCard (platform, sdcard, action='mount') {
+  if (action !== 'mount' && action !== 'umount') {
+    throw new Error(`SDCard mount: ${action} notimplemented`);
+  }
+
   if (platform === 'linux') {
     const partitions = await sdcardPartitions(platform, sdcard);
-    console.log(partitions);
-    const part = partitions[0].name;
-    const uuid = partitions[0].uuid;
-    const script = `mkdir -p /run/media/${userInfo().username}/${uuid} && mount -t vfat ${part} /run/media/${userInfo().username}/${uuid}`;
-    await sudoAsync(script);
-    return `/run/media${userInfo().username}/${uuid}`
+    const { name, uuid } = partitions[0];
+    const username = userInfo().username;
+    const usergid = userInfo().gid;
+    const useruid = userInfo().uid;
+    const umask = '0755'
+    const mountpoint = `/run/media/${username}/${uuid}`;
+    const result = {};
+
+    if (action === 'mount') {
+      const script = [
+        `mkdir -p ${mountpoint}`,
+        `mount -o uid=${useruid},gid=${usergid},umask=0022 -t vfat ${name} ${mountpoint}`
+      ].join(" && ")
+      await sudoAsync(script);
+      result[action] = mountpoint;
+    }
+
+    if (action === 'umount') {
+      console.log(mountpoint)
+      const script = [
+        `umount ${mountpoint}`,
+        `rm -rf ${mountpoint}`
+      ].join(' && ');
+      await sudoAsync(script);
+      result[action] = mountpoint;
+    }
+
+    return result;
+
   } else if (platform === 'darwin') {
     throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
   } else if (platform === 'win32') {
@@ -194,28 +221,15 @@ async function mountSDCard (platform, sdcard) {
   }
 }
 
-/*
- * Umounts an Sdcard
- *
- * @param sdcard (see detectSDCard)
- */
-async function umountSDCard (platform, sdcard) {
-  if (platform === 'linux') {
-    const partitions = sdcardPartition(platform, sdcard);
-    const part = partitions[0].name;
-    const script = `umount /run/media/${userInfo().username}/sdcard && rm -rf /run/media/${userInfo().username}/sdcard`;
-    return {
-      partition: part,
-      result: await sudoAsync(script)
-    }
-  } else if (platform === 'darwin') {
-    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
-  } else if (platform === 'win32') {
-    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
-  } else {
-    throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
-  }
+function copyFileAsync (options) {
+  return new Promise(function(resolve, reject) {
+    copyFile(options.origin, options.destination, function (err) {
+      if (err) reject(err)
+      resolve(options.destination)
+    });
+  });
 }
+
 /*
  * Function to format the size in bytes
  *
@@ -241,5 +255,5 @@ module.exports = {
   detectSDCard,
   sdcardFilesystemType,
   mountSDCard,
-  umountSDCard
+  copyFileAsync
 }

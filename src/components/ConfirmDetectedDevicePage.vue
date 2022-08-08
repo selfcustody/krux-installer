@@ -7,60 +7,45 @@
       >
         <v-layout column wrap>
           <v-flex> 
-            <p> With your aid, we detected <b>{{ device }}</b></p>
+            <p> With your aid, we detected <b>{{ device }}</b>. But it's good that you confim.</p>
             <br/>
-            <p
-              v-if="device === 'maixpy_amigo_ips/maixpy_bit/maixy_bit_ov5642'"
+            <div 
+              v-if="device === 'maixpy_amigo/maixy_bit'"
             >
-              Both <b>Sipeed Amigo IPS</b>,  <b>Sipeed Bit</b> and <b>Sipeed Bit ov5642</b> use the same chip for serial communication and have the same Vendor and Product IDs.
-            </p>
-            <br/>
-            <p> It will be necessary to confirm which of these devices you are using.</p>
-            <br/>
-            <v-btn
-              v-if="device === 'maixpy_amigo_ips/maixpy_bit/maixy_bit_ov5642'"
-              color="primary"
-              @click.prevent="$emit('onConfirmDetectedDevice', 'maixpy_amigo_ips')"
+              <p>
+                Both <b>Sipeed Amigo</b> (IPS and TFT), <b>Sipeed Bit</b> use the same chip for serial communication and have the same Vendor and Product IDs.
+              </p>
+              <br/>
+              <v-btn
+                v-for="(d, i) in sharedDevices()"
+                :key="i"
+                color="primary"
+                @click.prevent="$emit('onSuccess', { device: d.name, page: 'DownloadKbootPage' })"
+              >
+                I'm using {{ d.label }}
+              </v-btn>
+              <br/>
+            </div>
+            <div
+              v-else
             >
-              I'm using Amigo IPS
-            </v-btn>
-            <br/>
-            <v-btn 
-              v-if="device === 'maixpy_amigo_ips/maixpy_bit/maixy_bit_ov5642'"
-              color="primary"
-              @click.prevent="$emit('onConfirmDetectedDevice', 'maixpy_bit')"
-            >
-              I'm using Bit
-            </v-btn>
-            <br/>
-            <v-btn
-              v-if="device === 'maixpy_amigo_ips/maixpy_bit/maixy_bit_ov5642'"
-              color="primary"
-              @click.prevent="$emit('onConfirmDetectedDevice', 'maixpy_bit_ov5642')"
-            >
-              I'm using Bit ov5642
-            </v-btn>
-            <v-btn
-              v-if="device === 'maixpy_m5stickv'"
-              color="primary"
-              @click.prevent="$emit('onConfirmDetectedDevice', 'maixpy_m5stickv')"
-            >
-              I'm using M5StickV
-            </v-btn>
-            <br/>
-            <v-btn
-              v-if="device === 'maixpy_dock'"
-              color="primary"
-              @click.prevent="$emit('onConfirmDetectedDevice', 'maixpy_dock')"
-            >
-              I'm using Dock
-            </v-btn>
-            <v-btn
-              color="red"
-              @click.prevent="$emit('onWrongConfirmDetectedDevice')"
-            >
-              Wait! None of these are my device!
-            </v-btn>
+              <v-btn
+                v-for="(d, i) in uniqueDevices(device)"
+                :key="i"
+                color="primary"
+                @click.prevent="$emit('onSuccess', { device: d.name, page: 'DownloadKbootPage' })"
+              >
+                I'm using {{ d.label }}
+              </v-btn>
+            </div>
+            <div>
+              <v-btn
+                color="red"
+                @click.prevent="$emit('onError', { page: 'DetectDevicePage' })"
+              >
+                Wait! My device is incorrect!
+              </v-btn>
+            </div>
           </v-flex>
         </v-layout>
       </v-col>
@@ -69,12 +54,53 @@
 </template>
 
 <script>
+import { filter } from 'lodash'
+
 export default {
   name: 'ConfirmDetectedDevicePage',
   props: {
     device: {
       type: String,
       required: true
+    }
+  },
+  data () {
+    return {
+      devices_list: [
+        {
+          label: 'M5StickV',
+          name: 'maixpy_m5stickv',
+          vidpid: 'unique'
+        },
+        {
+          label: 'Dock',
+          name: 'maixpy_dock',
+          vidpid: 'unique'
+        },
+        {
+          label: 'Amigo IPS',
+          name: 'maixpy_amigo_ips',
+          vidpid: 'shared'
+        },
+        {
+          label: 'Amigo TFT',
+          name: 'maixpy_amigo_tft',
+          vidpid: 'shared'
+        },
+        {
+          label: 'Bit',
+          name: 'maixpy_bit',
+          vidpid: 'shared'
+        }
+      ]
+    }
+  },
+  methods: {
+    uniqueDevices (name) {
+      return filter(this.devices_list, { name: name, vidpid: 'unique' })    
+    },
+    sharedDevices () {
+      return filter(this.devices_list, { vidpid: 'shared' })
     }
   }
 } 

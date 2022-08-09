@@ -63,7 +63,11 @@ export default {
   methods: {
     async writeFirmwareToSDCard () {
       try {
-        await window.kruxAPI.start_write_firmware_to_sdcard(this.resource, this.sdcard)
+        await window.kruxAPI.sdcard_action({
+          action: 'copyto',
+          origin: this.resource,
+          destination: `${this.sdcard}/firmware.bin`
+        })
     
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onFirmwareWritedOnSDCard((_event, value) => {

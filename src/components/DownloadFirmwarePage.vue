@@ -47,12 +47,11 @@ export default {
   methods: {
     async onDownload () {
       try { 
-        await window.kruxAPI.download_firmware(this.device)
-        window.kruxAPI.onDownloadedFirmwareStatus((_event, value) => {
+        await window.kruxAPI.download_resource(`${this.device}/firmware.bin`)
+        window.kruxAPI.onDownloadStatus((_event, value) => {
           this.model = value
         })
-        window.kruxAPI.onDownloadFirmwareDone((_event, value) => {
-          console.log(value)
+        window.kruxAPI.onDownloadDone((_event, value) => {
           this.$emit('onSuccess', { sdcard: this.sdcard, resource: value, page: 'WriteFirmwareToSDCardPage' })
         })
       } catch (error) {

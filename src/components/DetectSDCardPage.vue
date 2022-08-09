@@ -56,7 +56,7 @@ export default {
   name: 'DetectSDCardPage',
   methods: {
     async detectSDCard () {
-      await window.kruxAPI.start_detect_sdcard()
+      await window.kruxAPI.sdcard_action({ action: 'detect' })
     
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onDetectedSDCardFound((_event, value) => {

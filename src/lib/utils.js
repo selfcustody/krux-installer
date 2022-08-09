@@ -189,7 +189,6 @@ async function mountSDCard (platform, sdcard, action='mount') {
     const useruid = userInfo().uid;
     const umask = '0755'
     const mountpoint = `/run/media/${username}/${uuid}`;
-    const result = {};
 
     if (action === 'mount') {
       const script = [
@@ -197,20 +196,17 @@ async function mountSDCard (platform, sdcard, action='mount') {
         `mount -o uid=${useruid},gid=${usergid},umask=0022 -t vfat ${name} ${mountpoint}`
       ].join(" && ")
       await sudoAsync(script);
-      result[action] = mountpoint;
     }
 
     if (action === 'umount') {
-      console.log(mountpoint)
       const script = [
         `umount ${mountpoint}`,
         `rm -rf ${mountpoint}`
       ].join(' && ');
       await sudoAsync(script);
-      result[action] = mountpoint;
     }
 
-    return result;
+    return { state: `${action}ed`, mountpoint: mountpoint }
 
   } else if (platform === 'darwin') {
     throw new Error(`SDCard Filesystem mount: ${platform} not implemented`)
@@ -221,11 +217,11 @@ async function mountSDCard (platform, sdcard, action='mount') {
   }
 }
 
-function copyFileAsync (options) {
+function copyFileAsync (origin, destination) {
   return new Promise(function(resolve, reject) {
-    copyFile(options.origin, options.destination, function (err) {
+    copyFile(origin, destination, function (err) {
       if (err) reject(err)
-      resolve(options.destination)
+      resolve()
     });
   });
 }

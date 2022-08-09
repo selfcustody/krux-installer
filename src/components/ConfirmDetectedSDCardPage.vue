@@ -95,22 +95,22 @@ export default {
   methods: {
     async mountSDCard () {
       this.state = 'mounting'
-      await window.kruxAPI.start_mount_sdcard();
+      await window.kruxAPI.sdcard_action({ action: 'mount' });
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onMountedSDCard((_event, value) => {
-        this.state = 'mounted'
-        this.mountpoint = value
+      window.kruxAPI.onMountAction((_event, value) => {
+        this.state = value.state
+        this.mountpoint = value.mountpoint
       });
     },
     async umountSDCard () {
       if (this.state === 'mounted') {
         this.state = 'umounting'
-        await window.kruxAPI.stop_mount_sdcard();
+        await window.kruxAPI.sdcard_action({ action: 'umount' });
 
         // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onUmountedSDCard((_event, value) => {
-          this.state = 'umounted'
+        window.kruxAPI.onMountAction((_event, value) => {
+          this.state = value.state
           this.$emit('onError', { sdcard: this.mountpoint, page: 'DetectSDCardPage' })
         });
 

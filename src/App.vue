@@ -17,58 +17,6 @@
             />
           </keep-alive>
         </v-flex>
-        <!--
-        <v-flex
-          v-if="page === 'install_to_device'"
-          class="ma-auto"
-        >
-          <InstallToDevicePage
-            @changePage.once="onSelectedDevice"
-          />
-        </v-flex>
-        <v-flex
-          v-if="page === 'download_firmware'"
-          class="ma-auto"
-        >
-          <DownloadFirmwarePage
-            :device="device"
-            @onDownloadedFirmware="onDownloadedFirmware"
-          />
-        </v-flex>
-        <v-flex
-          v-if="page === 'download_ktool'"
-          class="ma-auto"
-        >
-          <DownloadKtoolPage
-            :os="'linux'"
-            @onDownloadedKtool="onDownloadedKtool"
-          />
-        </v-flex>
-        <v-flex
-          v-if="page === 'download_kboot'"
-          class="ma-auto"
-        >
-          <DownloadKbootPage
-            :device="device"
-            @onDownloadedKboot="onDownloadedKboot"
-          />
-        </v-flex>
-        <v-flex
-          v-if="page === 'burn_microSD'"
-          class="ma-auto"
-        >
-          <v-container fluid>
-            <v-row align="justify">
-              <v-col
-                cols="12"
-                sm="6"
-              >
-                BURNING TO MICROSD (TODO)
-              </v-col>
-            </v-row>
-          </v-container>
-        </v-flex>
-        -->
       </v-layout>
     </v-main>
   </v-app>

@@ -2,14 +2,8 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 
 contextBridge.exposeInMainWorld('kruxAPI',{
-  async download_ktool (os) {
-    await ipcRenderer.invoke(`download:ktool:${os}`)
-  },
-  async download_firmware (device) {
-    await ipcRenderer.invoke(`download:firmware:${device}`)
-  },
-  async download_kboot (device) {
-    await ipcRenderer.invoke(`download:kboot:${device}`)
+  async download_resource (resource) {
+    await ipcRenderer.invoke(`download:resource`, resource)
   },
   async start_detect_device () {
     await ipcRenderer.invoke('usb:detection:start')
@@ -17,32 +11,17 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async stop_detect_device () {
     await ipcRenderer.invoke('usb:detection:stop')
   },
-  async start_detect_sdcard () {
-    await ipcRenderer.invoke('sdcard:detection:start')
-  },
-  async start_mount_sdcard () {
-    await ipcRenderer.invoke('sdcard:mount:start')
-  },
-  async stop_mount_sdcard () {
-    await ipcRenderer.invoke('sdcard:mount:stop')
-  },
-  async start_write_firmware_to_sdcard (resource, sdcard) {
-    await ipcRenderer.invoke(`sdcard:write:start`, { resource: resource, sdcard: sdcard })
+  async sdcard_action (options) {
+    await ipcRenderer.invoke('sdcard:action', options)
   },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
   },
-  onDownloadedKtoolStatus(callback) {
-    ipcRenderer.on('download:ktool:status', callback)
+  onDownloadStatus(callback) {
+    ipcRenderer.on('download:status', callback)
   },
-  onDownloadedFirmwareStatus(callback) {
-    ipcRenderer.on('download:firmware:status', callback)
-  },
-  onDownloadFirmwareDone(callback) {
-    ipcRenderer.on('download:firmware:status:done', callback)
-  },
-  onDownloadedKbootStatus(callback) {
-    ipcRenderer.on('download:kboot:status', callback)
+  onDownloadDone(callback) {
+    ipcRenderer.on('download:status:done', callback)
   },
   onDetectedDeviceFoundUsb(callback) {
     ipcRenderer.on('usb:detection:add', callback)
@@ -59,11 +38,8 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onDetectedSDCardFound(callback) {
     ipcRenderer.on('sdcard:detection:add', callback)
   },
-  onMountedSDCard(callback) {
-    ipcRenderer.on('sdcard:mount:add', callback)
-  },
-  onUmountedSDCard(callback) {
-    ipcRenderer.on('sdcard:mount:remove', callback)
+  onMountAction(callback) {
+    ipcRenderer.on('sdcard:mount', callback)
   },
   onFirmwareWritedOnSDCard(callback) {
     ipcRenderer.on('sdcard:write:done', callback)

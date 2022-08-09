@@ -48,9 +48,13 @@ export default {
     async onDownload () {
       try { 
         await window.kruxAPI.download_resource(`${this.device}/firmware.bin`)
+        
+        // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onDownloadStatus((_event, value) => {
           this.model = value
         })
+        
+        // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onDownloadDone((_event, value) => {
           this.$emit('onSuccess', { sdcard: this.sdcard, resource: value, page: 'WriteFirmwareToSDCardPage' })
         })

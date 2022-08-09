@@ -16,15 +16,18 @@
                 Both <b>Sipeed Amigo</b> (IPS and TFT), <b>Sipeed Bit</b> use the same chip for serial communication and have the same Vendor and Product IDs.
               </p>
               <br/>
-              <v-btn
+              <div  
                 v-for="(d, i) in sharedDevices()"
                 :key="i"
-                color="primary"
-                @click.prevent="$emit('onSuccess', { device: d.name, page: 'DownloadKbootPage' })"
               >
-                I'm using {{ d.label }}
-              </v-btn>
-              <br/>
+                <v-btn
+                  color="primary"
+                  @click.prevent="$emit('onSuccess', { device: d.name, page: 'DownloadKbootPage' })"
+                >
+                  I'm using {{ d.label }}
+                </v-btn>
+                <br/>
+              </div>
             </div>
             <div
               v-else

@@ -26,29 +26,37 @@
 <script>
 export default {
   name: 'DownloadKtoolPage',
-  props: {
-    os: {
-      type: String,
-      required: true
-    }
-  },
   data () {
     return {
+      os: '',
       model: 0
     }
   },
   async created () {
-    await this.onDownload()
+    await window.kruxAPI.verify_os()
+   
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onVerifiedOS(async (_event, value) => {
+      if (value === 'darwin') {
+        this.os = 'mac'
+      } else {
+        this.os = value
+      } 
+      await this.onDownload()
+    })
   },
   methods: {
     async onDownload () {
-      await window.kruxAPI.download_ktool(this.os)
+      await window.kruxAPI.download_resource(`ktool-${this.os}`)
+     
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDownloadedKtoolStatus(async (_event, value) => {
+      window.kruxAPI.onDownloadStatus((_event, value) => {
         this.model = value
-        if (value === '100.00') {
-          this.$emit('onDownloadedKtool')
-        }
+      })
+      
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onDownloadDone((_event, value) => {
+        this.$emit('onSuccess', { device: this.device, page: 'FlashKbootToDevicePage' })
       })
     }
   }

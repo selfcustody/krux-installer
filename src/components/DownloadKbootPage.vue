@@ -42,12 +42,16 @@ export default {
   },
   methods: {
     async onDownload () {
-      await window.kruxAPI.download_kboot(this.device)
-      window.kruxAPI.onDownloadedKbootStatus(async (_event, value) => {
+      await window.kruxAPI.download_resource(`${this.device}/kboot.kfpkg`)
+      
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onDownloadStatus((_event, value) => {
         this.model = value
-        if (value === '100.00') {
-          await this.$emit('onDownloadedKboot')
-        }
+      })
+      
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onDownloadDone((_event, value) => {
+        this.$emit('onSuccess', { device: this.device, page: 'DownloadKtoolPage' })
       })
     }
   }

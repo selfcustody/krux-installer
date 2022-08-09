@@ -57,6 +57,7 @@ export default {
     sdcard: {}
   }),
   created () {
+    console.log('[ INFO ] page: MainPage')
     window.kruxAPI.onLogLevelInfo(function(_event, value) {
       console.log(`[ INFO ] ${value}`)
     })
@@ -76,6 +77,14 @@ export default {
         this.page = value.page
       }
       if (this.page === 'ConfirmDetectedDevicePage') {
+        this.device = value.device
+        this.page = value.page
+      }
+      if (this.page === 'DownloadKbootPage') {
+        this.device = value.device
+        this.page = value.page
+      }
+      if (this.page === 'DownloadKtoolPage') {
         this.device = value.device
         this.page = value.page
       }
@@ -103,25 +112,6 @@ export default {
     handleError (value) {
       this.page = value.page
     },
-    onWrongDetectedSDCard (){
-      this.goTo('main')
-    },
-    onDownloadedFirmware () {
-      this.goTo('mount_sdcard')
-    },
-    onMountedSDCard () {
-      this.goTO('write_firmware_to_sdcard')
-    },
-    onSelectedDevice (value) {
-      this.device = value
-      this.goTo('download_firmware')
-    },
-    onDownloadedKtool () {
-      this.goTo('download_firmware')
-    },
-    onDownloadedKboot () {
-      this.goTo('burn_microSD')
-    }
   }
 }
 </script>

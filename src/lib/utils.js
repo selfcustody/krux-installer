@@ -30,25 +30,6 @@ function mkdirAsync(p, beforeCreate, afterCreate) {
 }
 
 
-/*
- * Simple function that
- * converts string that represent
- * a hexadecimal number to decimal
- * Utility to convert vendor and product ids
- * os devices in decimal format
- * (required by usb-detection module)
- */
-function hex2dec (hexStr) {
-  return parseInt(hexStr, 16)
-}
-
-
-/*
- * Helper function to be used on handleStartUSBDetection
- */
-function formatMessage(d, action) {
-  return `device ${d.deviceName}/${d.manufacturer} on ttyUSB${d.locationId} ${action}`
-}
 
 /*
  * @name donwload
@@ -244,9 +225,7 @@ if (bytes === 0) return '0 Bytes';
 module.exports = {
   notExistsAsync,
   mkdirAsync,
-  hex2dec,
   download,
-  formatMessage,
   formatBytes,
   detectSDCard,
   sdcardFilesystemType,

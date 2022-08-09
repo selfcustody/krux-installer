@@ -47,12 +47,15 @@ export default {
   },
   methods: {
     async detectDevice () {
-      await window.kruxAPI.start_detect_device()
+      await window.kruxAPI.usb_detection('detect')
     
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDetectedDeviceFoundUsb((_event, value) => {
-        console.log(value)
-        this.$emit('onSuccess', { device: value, page: 'ConfirmDetectedDevicePage' })
+      window.kruxAPI.onDetectedDevice((_event, value) => {
+        if (value.status ===  'add') {
+          this.$emit('onSuccess', { device: value.alias, page: 'ConfirmDetectedDevicePage' })
+        } else {
+          throw new Error(`UsbDetectionHandler was trying to detect and received status '${value.status}'`)
+        }
       })
     }
   }

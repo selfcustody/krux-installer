@@ -1,13 +1,9 @@
 'use strict'
-
+import { join } from 'path'
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
-import usbDetect from 'usb-detection'
-import { filter } from 'lodash'
-import { join } from 'path'
-import { handleDownload, handleSDCard } from './lib/handlers'
-import { hex2dec } from './lib/utils'
+import { handleDownload, handleSDCard, handleUsbDetection } from './lib/handlers'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -21,60 +17,6 @@ protocol.registerSchemesAsPrivileged([
  */
 let win;
 
-/*
- * List of devices
- */
-const VID_PID_DEVICES = [
-  {
-    alias: 'maixpy_m5stickv',
-    vid: hex2dec('0403'),
-    pid: hex2dec('6001')
-  },
-  {
-    alias: 'maixpy_amigo/maixy_bit',
-    vid: hex2dec('0403'),
-    pid: hex2dec('6010')
-  },
-  {
-    alias: 'maixpy_dock',
-    vid: hex2dec('1a86'),
-    pid: hex2dec('7523')
-  }
-]
-
-/*
- * Says if usb detecation is activated
- */
-let isUsbDetectActivate = false
-
-
-/*
- * handles usb detection according devices
- */
-async function handleStartUSBdetection () {
-  usbDetect.startMonitoring();
-  isUsbDetectActivate = true
-  VID_PID_DEVICES.forEach(function (device, i) {
-    ['add', 'remove', 'change'].forEach(function(action) {
-      usbDetect.on(`${action}:${device.vid}:${device.pid}`, function (d) {
-        win.webContents.send('window:log:info', formatMessage(d, action))
-        win.webContents.send(`usb:detection:${action}`, device.alias)
-      })
-    })
-  })
-}
-
-/*
- * handles stop usb detection
- */
-function handleStopUSBdetection () {
-  if (isUsbDetectActivate) {
-    usbDetect.stopMonitoring()
-    isUsbDetectActivate = false
-    win.webContents.send('window:log:info', 'Stopped usb detection')
-    win.webContents.send('usb:detection:stop', true)
-  }
-}
 
 /*
  * Create the browser window
@@ -107,6 +49,9 @@ async function createWindow() {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
+
+  handleUsbDetection(win, 'stop')
+
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
@@ -118,8 +63,6 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) createWindow()
-  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
-  win.webContents.send('window:log:info', 'page: main')
 })
 
 // This method will be called when Electron has finished
@@ -136,8 +79,9 @@ app.on('ready', async () => {
   }
   // This IPC will be called everytime when the method
   // `window.kruxAPI.detect_usb()` is exected inside App.vue
-  ipcMain.handle('usb:detection:start', handleStartUSBdetection)
-  ipcMain.handle('usb:detection:stop', handleStopUSBdetection)
+  ipcMain.handle('usb:detection', (_event, action) => {
+    handleUsbDetection(win, action)
+  })
 
   // This IPCs will be called everytime when the method
   // `window.kruxAPI.download_resource` is executed inside App.vue
@@ -152,31 +96,40 @@ app.on('ready', async () => {
     await handleSDCard(win, __args__)
   })
 
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.verify_os` is executed inside `App.vue`
+  ipcMain.handle('os:verify', async (_event, args) => {
+    win.webContents.send('os:verify:done', process.platform)
+  })
+
   // Now create window
   createWindow()
-})
 
-process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection:', reason, p)
-});
+  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
+})
 
 // Exit cleanly on request from parent process in development mode.
 if (isDevelopment) {
   if (process.platform === 'win32') {
     process.on('message', (data) => {
       if (data === 'graceful-exit') {
-        if (isUsbDetectActivate) usbDetect.stopMonitoring()
+        handleUsbDetection(win, 'stop')
         app.quit()
       }
     })
   } else {
     process.on('SIGTERM', () => {
-      if (isUsbDetectActivate) usbDetect.stopMonitoring()
+      handleUsbDetection(win, 'stop')
       app.quit()
     })
     process.on('SIGINT', function() {
-      if (isUsbDetectActivate) usbDetect.stopMonitoring()
+      handleUsbDetection(win, 'stop')
       process.exit(0)
     })
   }
 }
+
+
+process.on('unhandledRejection', (reason, p) => {
+  console.log('Unhandled Rejection:', reason, p)
+});

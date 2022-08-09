@@ -5,14 +5,14 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async download_resource (resource) {
     await ipcRenderer.invoke(`download:resource`, resource)
   },
-  async start_detect_device () {
-    await ipcRenderer.invoke('usb:detection:start')
-  },
-  async stop_detect_device () {
-    await ipcRenderer.invoke('usb:detection:stop')
+  async usb_detection (action) {
+    await ipcRenderer.invoke('usb:detection', action)
   },
   async sdcard_action (options) {
     await ipcRenderer.invoke('sdcard:action', options)
+  },
+  async verify_os () {
+    await ipcRenderer.invoke('os:verify')
   },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
@@ -23,17 +23,8 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onDownloadDone(callback) {
     ipcRenderer.on('download:status:done', callback)
   },
-  onDetectedDeviceFoundUsb(callback) {
-    ipcRenderer.on('usb:detection:add', callback)
-  },
-  onDetectedDeviceRemovedUsb(callback) {
-    ipcRenderer.on('usb:detection:remove', callback)
-  },
-  onDetectedDeviceChangedUsb(callback) {
-    ipcRenderer.on('usb:detection:change', callback)
-  },
-  onStopMonitoringDeviceUsb(callback) {
-    ipcRenderer.on('usb:detection:stop', callback)
+  onDetectedDevice(callback) {
+    ipcRenderer.on('usb:detection', callback)
   },
   onDetectedSDCardFound(callback) {
     ipcRenderer.on('sdcard:detection:add', callback)
@@ -43,5 +34,8 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onFirmwareWritedOnSDCard(callback) {
     ipcRenderer.on('sdcard:write:done', callback)
+  },
+  onVerifiedOS(callback) {
+    ipcRenderer.on('os:verify:done', callback)
   }
 })

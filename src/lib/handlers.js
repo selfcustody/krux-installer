@@ -1,10 +1,33 @@
 import DownloadHandler from './handler-download'
 import SDCardHandler from './handler-sdcard'
+import UsbDetectionHandler from './handler-usb-detection'
+
+
+/**
+ * Function to handle usbDetection
+ * of implmented devices
+ *
+ * @param
+ */
+function handleUsbDetection (app, action) {
+  const handler = new UsbDetectionHandler(app)
+  if (action === 'detect') {
+    handler.activate()
+    handler.detect()
+  } else if (action === 'stop') {
+    handler.deactivate()
+  } else {
+    throw new Error(`UsbDetectionHandler action '${action}' not implemented`)
+  }
+}
+
 /**
  * Function to handle mount,
  * umount and copy files to SDCard
  *
- * @param
+ * @param app: the electron window application
+ * @param args: Object
+ *
  */
 async function handleSDCard (app, args) {
   const sdcard = new SDCardHandler(app, args.platform)
@@ -42,4 +65,4 @@ async function handleDownload (app, filename) {
   await handler.onDownloadIfDestinationNotExists()
 }
 
-export { handleDownload, handleSDCard }
+export { handleDownload, handleSDCard, handleUsbDetection }

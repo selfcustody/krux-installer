@@ -1,11 +1,15 @@
-import Handler from './handler-base'
+'use strict'
+
+import Handler from './base'
 import {
-  detectSDCard,
-  sdcardFilesystemType,
-  mountSDCard,
   copyFileAsync,
+  sudoPromptAsync,
+  detectSDCard,
+  getBlockDeviceFilesystemType,
+  mountSDCard,
   formatBytes
 } from './utils'
+
 
 /**
  * Class to handle SDCard actions
@@ -14,7 +18,7 @@ import {
  * TODO: work in 'darwin'
  * TODO: work in 'win32'
  */
-class SDCardHandler extends Handler {
+export default class SDCardHandler extends Handler {
 
   constructor (app, platform) {
     super(app)
@@ -32,14 +36,8 @@ class SDCardHandler extends Handler {
    */
   async onDetection () {
     try {
-      this.send('window:log:info', 'sdcard detection started')
       const sdcard = await detectSDCard()
-      let fstype = await sdcardFilesystemType(this.platform, sdcard)
-      if (fstype === 'dos') {
-        fstype = 'FAT32'
-      } else {
-        fstype = '(not) FAT32'
-      }
+      const fstype = await getBlockDeviceFilesystemType(this.platform, sdcard)
       const data = {
         device: sdcard.device,
         size: formatBytes(sdcard.size),
@@ -54,7 +52,7 @@ class SDCardHandler extends Handler {
       this.send('window:log:info', msg)
       this.send('sdcard:detection:add', data)
     } catch (error) {
-      this.send('window:log:info', error)
+      this.send('window:log:info', error.stack)
       this.send('sdcard:detection:add', { error: error.message })
     }
   }
@@ -67,7 +65,7 @@ class SDCardHandler extends Handler {
       throw new Error(`SDCardHandler ${action} isn't implemented`)
     }
     try {
-      this.send('window:log:info', `sdcard ${action}ing started`);
+      this.send('window:log:info', `sdcard ${action}ing started for ${this.platform}`);
       const sdcard = await detectSDCard()
       const result = await mountSDCard(this.platform, sdcard, action);
       this.send('window:log:info', `sdcard ${result.state} at ${result.mountpoint}`);
@@ -88,5 +86,3 @@ class SDCardHandler extends Handler {
     }
   }
 }
-
-export default SDCardHandler

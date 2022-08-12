@@ -1,5 +1,5 @@
 import usbDetect from 'usb-detection'
-import  Handler from './handler-base'
+import Handler from './base'
 
 /*
  * List of devices as hexadecimal

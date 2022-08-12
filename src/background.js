@@ -3,7 +3,12 @@ import { join } from 'path'
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
-import { handleDownload, handleSDCard, handleUsbDetection } from './lib/handlers'
+import {
+  handleDownload,
+  handleSDCard,
+  handleUsbDetection,
+  handleOSVerify
+} from './lib/handlers'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -36,6 +41,22 @@ async function createWindow() {
     }
   })
 
+  // This IPC will be called everytime when the method
+  // `window.kruxAPI.detect_usb()` is exected inside App.vue
+  ipcMain.handle('usb:detection', handleUsbDetection(win))
+
+  // This IPCs will be called everytime when the method
+  // `window.kruxAPI.download_resource` is executed inside App.vue
+  ipcMain.handle('download:resource', handleDownload(win))
+
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.sdcard_action` is executed inside `App.vue`
+  ipcMain.handle('sdcard:action', handleSDCard(win))
+
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.verify_os` is executed inside `App.vue`
+  ipcMain.handle('os:verify', handleOSVerify(win))
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -45,6 +66,8 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
 }
 
 // Quit when all windows are closed.
@@ -77,35 +100,9 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.detect_usb()` is exected inside App.vue
-  ipcMain.handle('usb:detection', (_event, action) => {
-    handleUsbDetection(win, action)
-  })
-
-  // This IPCs will be called everytime when the method
-  // `window.kruxAPI.download_resource` is executed inside App.vue
-  ipcMain.handle('download:resource', async (_event, resource) => {
-    await handleDownload(win, resource)
-  })
-
-  // This IPC will be called will be called everytime when the method
-  // `window.kruxAPI.sdcard_action` is executed inside `App.vue`
-  ipcMain.handle('sdcard:action', async (_event, args) => {
-    const __args__ = Object.assign(args, { platform: process.platform })
-    await handleSDCard(win, __args__)
-  })
-
-  // This IPC will be called will be called everytime when the method
-  // `window.kruxAPI.verify_os` is executed inside `App.vue`
-  ipcMain.handle('os:verify', async (_event, args) => {
-    win.webContents.send('os:verify:done', process.platform)
-  })
 
   // Now create window
   createWindow()
-
-  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
 })
 
 // Exit cleanly on request from parent process in development mode.
@@ -131,5 +128,5 @@ if (isDevelopment) {
 
 
 process.on('unhandledRejection', (reason, p) => {
-  console.log('Unhandled Rejection:', reason, p)
+  p.catch((error) => console.error(error.stack))
 });

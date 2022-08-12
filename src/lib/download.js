@@ -1,32 +1,99 @@
 import { join } from 'path'
-import Handler from './handler-base'
-import {
-  notExistsAsync,
-  mkdirAsync,
-  download,
-} from './utils'
+import { createWriteStream, exists, mkdir } from 'fs'
+import request from 'request'
+import Handler from './base'
 
+/*
+ * Function to check if file or folder exists
+ * in async/await approach. Always resoulves to
+ * a boolean value.
+ *
+ * @param p<String>: path of the file
+ * @return Boolean
+ */
+function existsAsync(p) {
+  return new Promise((resolve) => {
+    exists(p, function(exist) {
+      if (exist) {
+        resolve(true)
+      } else {
+        resolve(false)
+      }
+    })
+  })
+}
 
+/*
+ * Function to create folder
+ * in async/await approach. Throws
+ * an error if any occurs.
+ *
+ * @param p<String>: path of the file
+ * @throw Error: if some error occurs
+ */
+function mkdirAsync(p) {
+  return new Promise((resolve, reject) => {
+    mkdir(p, function(err) {
+      if (err) reject(err)
+      resolve()
+    })
+  })
+}
+
+/*
+ * Dowload an attachment file
+ *
+ * @params options<Object>: key/value based arguments
+ * @params options.destination<String>: where the file should live
+ * @params options.url<String>: where we get the file
+ * @params options.headers<Object>: some headers to add to request. Generally 'Content-Disposition' and 'User-Agent'. 'Connection', 'Cache-Control' and 'Accept-Encoding' are added by default.
+ * @params options.onResponse<Function>: callback on request's first response
+ * @params options.onData<Function>: callback when a chunk of data comes in
+ * @params options.onError<Function>: callback when an error occurs
+ */
+function download(options) {
+  // Create a new file
+  const file = createWriteStream(options.destination)
+  const headers = Object.assign(options.headers, {
+    'Connection': 'keep-alive',
+    'Cache-Control': 'max-age=0',
+    'Accept-Encoding': 'gzip, deflate, br'
+  })
+  const req = request({
+    url: options.url,
+    headers: headers,
+    gzip: true
+  })
+
+  req.pipe(file)
+  req.on('response', options.onResponse)
+  req.on('data', options.onData)
+  req.on('error', options.onError)
+}
 /**
  * Class to handle downloads
  */
 class DownloadHandler extends Handler {
 
-  constructor (app) {
-    super(app)
-    this.resources = join(__dirname, '..', 'resources')
-    this.baseUrl = 'https://github.com/odudex/krux_binaries/raw/main'
+  constructor (
+    app,
+    options={
+      resources: join(__dirname, '..', 'resources'),
+      baseUrl: 'https://github.com/odudex/krux_binaries/raw/main'
+    }
+  ) {
+    super(app, options)
+    this.resources = options.resources
+    this.baseUrl = options.baseUrl
   }
 
   /**
    * Create a resource directory in the
    * root directory, if not exists.
-   *
-   * @param dirname: String
    */
   async onCreateResourceDir() {
-    const resourcesNotExists = await notExistsAsync(this.resources)
-    if (resourcesNotExists) {
+    const resourcesExists = await existsAsync(this.resources)
+    if (!resourcesExists) {
       this.send('window:log:info', `creating directory ${this.resources}`)
       await mkdirAsync(this.resources)
       this.send('window:log:info', `directory ${this.resources} created`)
@@ -46,7 +113,7 @@ class DownloadHandler extends Handler {
 
     const __filenameArray__ = this.destination.split('/')
     const resource = __filenameArray__[__filenameArray__.length - 1]
-    this.isDestinationExists = !(await notExistsAsync(this.destination))
+    this.isDestinationExists = await existsAsync(this.destination)
   }
 
   /**
@@ -89,8 +156,8 @@ class DownloadHandler extends Handler {
         let disposition = ''
         if (__filename__.length > 1) {
           const d = join(this.resources, __filename__[0])
-          const dirNotExist = await notExistsAsync(d)
-          if (dirNotExist) {
+          const dirExist = await existsAsync(d)
+          if (!dirExist) {
             this.send('window:log:info', `creating directory ${d}`)
             await mkdirAsync(d)
             this.send('window:log:info', `directory ${d} created`)

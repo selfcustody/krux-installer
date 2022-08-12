@@ -5,9 +5,9 @@
     "baseUrl": "./",
     "moduleResolution": "node",
     "paths": {
-      "@/*": [
+      "@/*:": [
         "src/*",
-        "src/lib/handler*"
+        "src/lib/*
       ]
     },
     "lib": [

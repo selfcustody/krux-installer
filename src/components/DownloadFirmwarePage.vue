@@ -65,3 +65,4 @@ export default {
   }
 }
 </script>
+const { createWriteStream, exists, mkdir, copyFile } = require('fs')

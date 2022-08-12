@@ -1,11 +1,9 @@
-'use strict'
-
 import { copyFile } from 'fs'
-import { userInfo } from 'os'
 import _ from 'lodash'
 import bufferedSpawn from 'buffered-spawn'
-import * as drivelist from 'drivelist'
+import drivelist from 'drivelist'
 import sudo from 'sudo-prompt'
+import Handler from './base'
 
 /**
  * Copy file in asynchronous manner
@@ -13,7 +11,7 @@ import sudo from 'sudo-prompt'
  * @param origin<String>: the full path of origin file
  * @param destination<String>: the full path of destination file
  */
-export function copyFileAsync (origin, destination) {
+function copyFileAsync (origin, destination) {
   return new Promise(function(resolve, reject) {
     copyFile(origin, destination, function (err) {
       if (err) reject(err)
@@ -26,7 +24,7 @@ export function copyFileAsync (origin, destination) {
  * Detects if a SD card is inserted in any OS
  *
  */
-export async function detectSDCard () {
+async function detectSDCard () {
   const drives = await drivelist.list()
   const removables = _.reject(drives, { isSystem: true })
   if (removables.length > 0) {
@@ -89,12 +87,12 @@ function getWin32BlockDevices (sdcard) {
  * @param platform
  * @param sdcard (see detectSDCard)
  */
-export async function getBlockDeviceFilesystemType (platform, sdcard) {
+async function getBlockdeviceFilesystemType (platform, sdcard) {
   if (platform === 'linux') {
     const blockdevice = await getUnixBlockDevice(sdcard)
     return blockdevice.fsver
   } else if (platform === 'darwin') {
-    throw new Error(`Filesystem type detection: ${platform} not implemented`)
+    throw new Error(`SDCardHandler: Filesystem type detection: ${platform} not implemented`)
   } else if (platform === 'win32') {
     const sdcard = await getWin32BlockDevices(sdcard)
     return sdcard.pttype
@@ -112,8 +110,13 @@ export async function getBlockDeviceFilesystemType (platform, sdcard) {
  */
 async function getBlockPartitions (platform, sdcard) {
   if (platform === 'linux') {
-    const partition = await getUnixBlockDevice(sdcard)
-    return partition.children[0]
+    const { blockdevices } = await getUnixBlockDevices()
+    const sdcards = _.filter(blockdevices, { path: sdcard.device })
+    if (sdcards.length > 0) {
+      return sdcards[0].children
+    } else {
+      throw new Error(`SDCard Filesystem type detection: no device ${sdcard.device} found`)
+    }
   } else if (platform === 'darwin') {
     throw new Error(`SDCard Filesystem type detection: ${platform} not implemented`)
   } else if (platform === 'win32') {
@@ -132,7 +135,7 @@ async function getBlockPartitions (platform, sdcard) {
  *
  * @param script<String>: the main script to run with sudo prompt
  */
-export function sudoPromptAsync (script) {
+function sudoPromptAsync (script) {
   return new Promise(function (resolve, reject) {
     const options = {
       name: 'Krux Installer'
@@ -152,14 +155,14 @@ export function sudoPromptAsync (script) {
  * @param sdcard<Object> (see detectSDCard)
  * @param action<String>: the action ('mount' || 'umount')
  */
-export async function mountSDCard (platform, sdcard, action='mount') {
+async function mountSDCard (platform, sdcard, action='mount') {
   if (action !== 'mount' && action !== 'umount') {
     throw new Error(`SDCard mount: ${action} notimplemented`);
   }
 
   if (platform === 'linux') {
-    const partition = await getBlockPartitions(platform, sdcard);
-    const { name, uuid } = partition;
+    const partitions = await sdcardPartitions(platform, sdcard);
+    const { name, uuid } = partitions[0];
     const username = userInfo().username;
     const usergid = userInfo().gid;
     const useruid = userInfo().uid;
@@ -171,7 +174,7 @@ export async function mountSDCard (platform, sdcard, action='mount') {
         `mkdir -p ${mountpoint}`,
         `mount -o uid=${useruid},gid=${usergid},umask=0022 -t vfat ${name} ${mountpoint}`
       ].join(" && ")
-      await sudoPromptAsync(script);
+      await sudoAsync(script);
     }
 
     if (action === 'umount') {
@@ -179,7 +182,7 @@ export async function mountSDCard (platform, sdcard, action='mount') {
         `umount ${mountpoint}`,
         `rm -rf ${mountpoint}`
       ].join(' && ');
-      await sudoPromptAsync(script);
+      await sudoAsync(script);
     }
 
     return { state: `${action}ed`, mountpoint: mountpoint }
@@ -199,7 +202,7 @@ export async function mountSDCard (platform, sdcard, action='mount') {
  *
  * found at https://stackoverflow.com/questions/15900485/correct-way-to-convert-size-in-bytes-to-kb-mb-gb-in-javascript#18650828
  */
-export function formatBytes(bytes, decimals = 2) {
+function formatBytes(bytes, decimals = 2) {
   if (bytes === 0) return '0 Bytes'
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
@@ -207,3 +210,82 @@ export function formatBytes(bytes, decimals = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
+
+
+/**
+ * Class to handle SDCard actions
+ *
+ * Currently, only works with 'linux'
+ * TODO: work in 'darwin'
+ * TODO: work in 'win32'
+ */
+class SDCardHandler extends Handler {
+
+  constructor (app, platform) {
+    super(app)
+    if (platform !== 'linux') {
+      throw new Error(`SDCardHandler not implemented on '${platform}'`)
+    } else {
+      this.platform = platform
+    }
+  }
+
+  /*
+   * handles sdcard detection
+   *
+   * @param platform: String
+   */
+  async onDetection () {
+    try {
+      const sdcard = await detectSDCard()
+      const fstype = await sdcardFilesystemType(this.platform, sdcard)
+      const data = {
+        device: sdcard.device,
+        size: formatBytes(sdcard.size),
+        description: sdcard.description,
+        isFAT32: fstype === 'dos',
+        state: sdcard.mountpoints.length === 0 ? 'umounted' : 'mounted'
+      }
+      const msg = [
+        `found a ${data.state === 'umounted' ? 'n' : ''} `,
+        `${data.fstype} ${data.size} SDCard at ${data.device}`
+      ].join('')
+      this.send('window:log:info', msg)
+      this.send('sdcard:detection:add', data)
+    } catch (error) {
+      this.send('window:log:info', error.stack)
+      this.send('sdcard:detection:add', { error: error.message })
+    }
+  }
+
+  /*
+   * handles sdcard mounting
+   */
+  async onAction (action) {
+    if (action !== 'mount' && action !== 'umount') {
+      throw new Error(`SDCardHandler ${action} isn't implemented`)
+    }
+    try {
+      this.send('window:log:info', `sdcard ${action}ing started`);
+      const sdcard = await detectSDCard()
+      const result = await mountSDCard(this.platform, sdcard, action);
+      this.send('window:log:info', `sdcard ${result.state} at ${result.mountpoint}`);
+      this.send('sdcard:mount', result)
+    } catch (error) {
+      this.send('window:log:info', error.stack);
+    }
+  }
+
+  async onWrite (origin, destination) {
+    try {
+      this.send('window:log:info', `starting write ${origin} -> ${destination}`)
+      const result = await copyFileAsync(origin, destination);
+      this.send('window:log:info', `${origin} copied to ${destination}`);
+      this.send('sdcard:write:done', destination);
+    } catch (error) {
+      this.send('window:log:info', error.stack);
+    }
+  }
+}
+
+export default SDCardHandler

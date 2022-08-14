@@ -2,8 +2,11 @@ const { contextBridge, ipcRenderer } = require('electron')
 
 
 contextBridge.exposeInMainWorld('kruxAPI',{
-  async download_resource (resource) {
-    await ipcRenderer.invoke(`download:resource`, resource)
+  async window_started () {
+    await ipcRenderer.invoke('window:started', { state: 'running' })
+  },
+  async download_resource (options) {
+    await ipcRenderer.invoke('download:resource', options)
   },
   async usb_detection (action) {
     await ipcRenderer.invoke('usb:detection', action)
@@ -14,6 +17,15 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async verify_os () {
     await ipcRenderer.invoke('os:verify')
   },
+  async set_version(value) {
+    await ipcRenderer.invoke('store:set', { key: 'version', value: value })
+  },
+  async get_version() {
+    await ipcRenderer.invoke('store:get', { key: 'version' })
+  },
+  async verify_official_releases() {
+    await ipcRenderer.invoke('official:releases:set')
+  },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
   },
@@ -22,6 +34,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onDownloadDone(callback) {
     ipcRenderer.on('download:status:done', callback)
+  },
+  onDownloadError(callback) {
+    ipcRenderer.on('download:status:error', callback)
   },
   onDetectedDevice(callback) {
     ipcRenderer.on('usb:detection', callback)
@@ -37,5 +52,14 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onVerifiedOS(callback) {
     ipcRenderer.on('os:verify:done', callback)
+  },
+  onSetVersion(callback) {
+    ipcRenderer.on('store:set:done', callback)
+  },
+  onGetVersion(callback) {
+    ipcRenderer.on('store:get:done', callback)
+  },
+  onVerifyOfficialReleases(callback) {
+    ipcRenderer.on('official:releases:get', callback)
   }
 })

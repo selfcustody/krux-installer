@@ -18,9 +18,11 @@
   "main": "background.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "axios": "^0.27.2",
     "buffered-spawn": "^3.3.2",
     "core-js": "^3.8.3",
     "drivelist": "^11.0.0",
+    "electron-store": "^8.1.0",
     "roboto-fontface": "*",
     "sudo-prompt": "^9.2.1",
     "usb-detection": "4.14.1",

@@ -41,6 +41,10 @@ export default {
         ],
       actions: [
         {
+          label: 'Select version',
+          page: 'SelectVersionPage'
+        },
+        {
           label: 'Flash to device',
           page: 'DetectDevicePage' 
         },
@@ -50,6 +54,9 @@ export default {
         }
       ]
     }
+  },
+  created () {
+    
   }
 }
 </script>

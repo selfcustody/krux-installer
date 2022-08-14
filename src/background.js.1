@@ -3,12 +3,7 @@ import { join } from 'path'
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
-import createStore from './lib/store'
 import {
-  handleWindowStarted,
-  handleVerifyOfficialReleases,
-  handleStoreSet,
-  handleStoreGet,
   handleDownload,
   handleSDCard,
   handleUsbDetection,
@@ -25,8 +20,8 @@ protocol.registerSchemesAsPrivileged([
 /*
  * Define win variable as the app window, as visible in various methods
  */
-let win
-let store
+let win;
+
 
 /*
  * Create the browser window
@@ -47,31 +42,20 @@ async function createWindow() {
   })
 
   // This IPC will be called everytime when the method
-  // `window.kruxAPI.isStarted()` is executed inside App.vue
-  ipcMain.handle('window:started', handleWindowStarted(win, store))
-
-  // This IPC will be called everytime when the method
   // `window.kruxAPI.detect_usb()` is exected inside App.vue
-  ipcMain.handle('usb:detection', handleUsbDetection(win, store))
+  ipcMain.handle('usb:detection', handleUsbDetection(win))
 
   // This IPCs will be called everytime when the method
   // `window.kruxAPI.download_resource` is executed inside App.vue
-  ipcMain.handle('download:resource', handleDownload(win, store))
+  ipcMain.handle('download:resource', handleDownload(win))
 
-  // This IPC will be called everytime when the method
+  // This IPC will be called will be called everytime when the method
   // `window.kruxAPI.sdcard_action` is executed inside `App.vue`
-  ipcMain.handle('sdcard:action', handleSDCard(win, store))
+  ipcMain.handle('sdcard:action', handleSDCard(win))
 
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.verify_official_releases` is executed inside `App.vue`
-  ipcMain.handle('official:releases:set', handleVerifyOfficialReleases(win, store))
-
-  // These IPC will be act like Vuex store,
-  // called everytime when the methods
-  // `window.kruxAPI.set_version`
-  // are executed inside `App.vue`
-  ipcMain.handle('store:set', handleStoreSet(win, store))
-  ipcMain.handle('store:get', handleStoreGet(win, store))
+  // This IPC will be called will be called everytime when the method
+  // `window.kruxAPI.verify_os` is executed inside `App.vue`
+  ipcMain.handle('os:verify', handleOSVerify(win))
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -82,6 +66,8 @@ async function createWindow() {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  win.webContents.send('window:log:info', 'Krux installer v.0.01 started')
 }
 
 // Quit when all windows are closed.
@@ -99,10 +85,7 @@ app.on('window-all-closed', () => {
 app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (BrowserWindow.getAllWindows().length === 0) {
-    store = createStore(app)
-    createWindow()
-  }
+  if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
 // This method will be called when Electron has finished
@@ -117,9 +100,6 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
-
-  // Now create store
-  store = createStore(app)
 
   // Now create window
   createWindow()

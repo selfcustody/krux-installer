@@ -9,9 +9,6 @@
           <keep-alive>
             <component
               :is="page"
-              :device="device"
-              :sdcard="sdcard"
-              :resource="resource"
               @onSuccess="handleSuccess"
               @onError="handleError"
             />
@@ -25,6 +22,10 @@
 <script>
 import KruxLogo from './components/KruxLogo.vue'
 import MainPage from './components/MainPage.vue'
+import SelectVersionPage from './components/SelectVersionPage.vue'
+import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
+import DownloadOfficialReleaseSHA256Page from './components/DownloadOfficialReleaseSHA256Page.vue'
+import DownloadOfficialReleaseSigPage from './components/DownloadOfficialReleaseSigPage.vue'
 import DetectDevicePage from './components/DetectDevicePage.vue'
 import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
 import DetectSDCardPage from './components/DetectSDCardPage.vue'
@@ -40,6 +41,10 @@ export default {
   components: {
     KruxLogo,
     MainPage,
+    SelectVersionPage,
+    DownloadOfficialReleasePage,
+    DownloadOfficialReleaseSHA256Page,
+    DownloadOfficialReleaseSigPage,
     DetectDevicePage, 
     ConfirmDetectedDevicePage,
     DetectSDCardPage,
@@ -51,13 +56,10 @@ export default {
     DownloadKbootPage  
   },
   data: () => ({
-    page: 'MainPage',
-    device: '',
-    resource: '',
-    sdcard: {}
+    page: 'MainPage'
   }),
   created () {
-    console.log('[ INFO ] page: MainPage')
+    window.kruxAPI.window_started()
     window.kruxAPI.onLogLevelInfo(function(_event, value) {
       console.log(`[ INFO ] ${value}`)
     })
@@ -69,48 +71,10 @@ export default {
   },
   methods: {
     handleSuccess (value) {
-      if (this.page === 'MainPage') {
-        this.page = value.page
-      }
-      if (this.page === 'DetectDevicePage') {
-        this.device = value.device
-        this.page = value.page
-      }
-      if (this.page === 'ConfirmDetectedDevicePage') {
-        this.device = value.device
-        this.page = value.page
-      }
-      if (this.page === 'DownloadKbootPage') {
-        this.device = value.device
-        this.page = value.page
-      }
-      if (this.page === 'DownloadKtoolPage') {
-        this.device = value.device
-        this.page = value.page
-      }
-      if (this.page === 'DetectSDCardPage') {
-        this.sdcard = value.sdcard
-        this.page = value.page
-      }
-      if (this.page === 'ConfirmDetectedSDCardPage' ){
-        this.sdcard = value.sdcard
-        this.page = value.page
-      }
-      if (this.page === 'SelectFirmwarePage'){
-        this.device = value.device
-        this.sdcard = value.sdcard
-        this.page = value.page
-      }
-      if (this.page === 'DownloadFirmwarePage') {
-        this.resource = value.resource
-        this.page = value.page
-      }
-      if (this.page === 'WriteFirmwareToSDCardPage') {
-        this.page = value.page
-      }
+      this.page = value.page
     },
     handleError (value) {
-      this.page = value.page
+      alert(value.error)
     },
   }
 }

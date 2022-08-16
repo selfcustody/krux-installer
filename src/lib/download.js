@@ -35,7 +35,7 @@ function existsAsync(p) {
  */
 function mkdirAsync(p) {
   return new Promise((resolve, reject) => {
-    mkdir(p, function(err) {
+    mkdir(p, { recursive: true }, function(err) {
       if (err) reject(err)
       resolve()
     })
@@ -66,7 +66,7 @@ class DownloadHandler extends Handler {
     this.isDestinationExists = await existsAsync(this.destinationFilename)
 
     if (this.isResourceExists && this.isDestinationExists) {
-      this.send('window:log:info', `${this.destination} already downloaded`)
+      this.send('window:log:info', `${this.destinationFilename} already downloaded`)
       this.send('download:status', '100.00')
       this.send('download:status:done', this.destinationFilename)
     }

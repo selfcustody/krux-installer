@@ -2,6 +2,7 @@ import DownloadHandler from './download'
 import SDCardHandler from './sdcard'
 import UsbDetectionHandler from './usb-detection'
 import VerifyOfficialReleasesHandler from './verify-official-releases'
+
 /**
  * Function to handle when
  * window is started
@@ -43,7 +44,6 @@ function handleVerifyOfficialReleases (win, store) {
       store.set('versions', __list__)
       list = store.get('releases')
     }
-    handler.send('window:log:info', `available releases: ${list.join(', ')}`)
     handler.send('official:releases:get', { releases: list })
   }
 }
@@ -156,9 +156,17 @@ function handleOSVerify (app) {
   }
 }
 
+function handleVerifyOfficialReleasesHash (win, store) {
+  return async function (_event, options) {
+    const handler = new VerifyOfficialReleasesHandler(win, store)
+    handler.verifyHash(options)
+  }
+}
+
 export {
   handleWindowStarted,
   handleVerifyOfficialReleases,
+  handleVerifyOfficialReleasesHash,
   handleStoreSet,
   handleStoreGet,
   handleDownload,

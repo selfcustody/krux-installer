@@ -33,16 +33,16 @@ export default {
   },
   methods: {
     async download () {
-      window.kruxAPI.get_version('version')
+      await window.kruxAPI.get_version()
        
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onGetVersion((_event, value) => { 
+      window.kruxAPI.onGetVersion(async (_event, value) => { 
         const regex = /tag/g
         let baseUrl = value.replace(regex, 'download') 
         const version = baseUrl.split('download/')[1]
         baseUrl = baseUrl.split(`/${version}`)[0]
         this.version = `${baseUrl}/${version}/krux-${version}.zip`
-        window.kruxAPI.download_resource({
+        await window.kruxAPI.download_resource({
           baseUrl: `https://github.com/${baseUrl}`,
           resource: version,
           filename: `krux-${version}.zip`

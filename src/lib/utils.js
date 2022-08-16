@@ -1,6 +1,6 @@
 'use strict'
 
-import { copyFile } from 'fs'
+import { copyFile, readFile } from 'fs'
 import { userInfo } from 'os'
 import _ from 'lodash'
 import bufferedSpawn from 'buffered-spawn'
@@ -18,6 +18,21 @@ export function copyFileAsync (origin, destination) {
     copyFile(origin, destination, function (err) {
       if (err) reject(err)
       resolve()
+    });
+  });
+}
+
+/**
+ * Copy file in asynchronous manner
+ *
+ * @param origin<String>: the full path of origin file
+ * @param destination<String>: the full path of destination file
+ */
+export function readFileAsync (origin, options) {
+  return new Promise(function(resolve, reject) {
+    readFile(origin, options, function (err, data) {
+      if (err) reject(err)
+      resolve(data)
     });
   });
 }

@@ -23,6 +23,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async get_version() {
     await ipcRenderer.invoke('store:get', { key: 'version' })
   },
+  async verify_hash(zipFile, sha256File) {
+    await ipcRenderer.invoke('official:releases:verify:hash', { zipFile: zipFile, sha256File: sha256File })
+  },
   async verify_official_releases() {
     await ipcRenderer.invoke('official:releases:set')
   },
@@ -61,5 +64,11 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onVerifyOfficialReleases(callback) {
     ipcRenderer.on('official:releases:get', callback)
+  },
+  onVerifiedHash(callback) {
+    ipcRenderer.on('official:releases:verified:hash', callback)
+  },
+  onVerifiedHashError(callback) {
+    ipcRenderer.on('official:releases:verified:error', callback)
   }
 })

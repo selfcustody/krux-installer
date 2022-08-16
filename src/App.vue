@@ -26,6 +26,7 @@ import SelectVersionPage from './components/SelectVersionPage.vue'
 import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
 import DownloadOfficialReleaseSHA256Page from './components/DownloadOfficialReleaseSHA256Page.vue'
 import DownloadOfficialReleaseSigPage from './components/DownloadOfficialReleaseSigPage.vue'
+import VerifyOfficialReleasesPage from './components/VerifyOfficialReleasesPage.vue'
 import DetectDevicePage from './components/DetectDevicePage.vue'
 import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
 import DetectSDCardPage from './components/DetectSDCardPage.vue'
@@ -45,6 +46,7 @@ export default {
     DownloadOfficialReleasePage,
     DownloadOfficialReleaseSHA256Page,
     DownloadOfficialReleaseSigPage,
+    VerifyOfficialReleasesPage,
     DetectDevicePage, 
     ConfirmDetectedDevicePage,
     DetectSDCardPage,

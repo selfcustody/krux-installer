@@ -36,16 +36,9 @@ export default function (app) {
     const appVersion = store.get('appVersion')
     const resources = store.get('resources')
     const state = store.get('state')
-    const versions = store.get('versions')
 
-    if (appVersion === undefined || appVersion === null) {
-      store.set('appVersion', pjson.version)
-    }
-
-    if (resources === undefined || resources === null) {
-      store.set('resources', join(app.getPath('appData'), pjson.name, 'blob_storage'))
-    }
-
+    store.set('appVersion', pjson.version)
+    store.set('resources', join(app.getPath('documents'), pjson.name))
     store.set('state', 'loading')
 
     return store

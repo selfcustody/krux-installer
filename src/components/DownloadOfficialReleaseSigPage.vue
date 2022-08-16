@@ -57,7 +57,7 @@ export default {
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onDownloadDone((_event, value) => {
         if (!value.error) {
-          this.$emit('onSuccess', { page: 'VerifyOfficialReleaseSignaturePage' })
+          this.$emit('onSuccess', { page: 'VerifyOfficialReleasesPage' })
         } else {
           this.$emit('onError', value.error)
         }

@@ -7,6 +7,7 @@ import createStore from './lib/store'
 import {
   handleWindowStarted,
   handleVerifyOfficialReleases,
+  handleVerifyOfficialReleasesHash,
   handleStoreSet,
   handleStoreGet,
   handleDownload,
@@ -65,6 +66,10 @@ async function createWindow() {
   // This IPC will be called everytime when the method
   // `window.kruxAPI.verify_official_releases` is executed inside `App.vue`
   ipcMain.handle('official:releases:set', handleVerifyOfficialReleases(win, store))
+
+  // This IPC will be called everytime when the method
+  // `window.kruxAPI.verify_official_releases` is executed inside `App.vue`
+  ipcMain.handle('official:releases:verify:hash', handleVerifyOfficialReleasesHash(win, store))
 
   // These IPC will be act like Vuex store,
   // called everytime when the methods

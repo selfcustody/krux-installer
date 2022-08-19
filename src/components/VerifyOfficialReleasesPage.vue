@@ -6,42 +6,49 @@
     fill-height
   >
     <v-flex
-      v-if="!verified"
+      xs12
+      v-if="!verifiedHash && !verifiedSign"
     >
-      <p>Verifying <b>{{ version }}.zip</b> sha256sum...</p>
+      <p>Verifying <b>{{ version }}.zip</b>...</p>
     </v-flex>
     <v-flex
-      v-if="verified"
+      xs12
+      v-if="verifiedHash"
     >
-      <v-toolbar color="indigo" dark>
-        <v-toolbar-title>{{ version }}</v-toolbar-title>
-      </v-toolbar>
-      <v-list>
-        <v-list-tile
-          v-for="hash in hashes"
-          :key="hash.name"
-          class="pa-5"
-        >
-          <v-list-tile-content class="my-2">
-            <h4>
-              Filename
-            </h4>
-            <p>{{ hash.name }}</p>
-            <br />
-            <h4>Hash</h4>
-            <v-chip
-              class="ma-2"
-              color="orange"
-              text-color="white"
-            >
-              {{ hash.value }}
-            </v-chip>
-            <v-divider></v-divider>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
+      <h1>SHA256 sum</h1>
+      <v-card
+        v-for="hash in hashes"
+        :key="hash.name"
+      >
+        <v-card-title>Filename: {{ hash.name }}</v-card-title>
+        <v-card-text>
+          <v-chip
+            class="ma-2"
+            color="primary"
+            text-color="white"
+          >
+            {{ hash.value }}
+          </v-chip>
+        </v-card-text>
+      </v-card>
+      <v-card
+        v-if="verifiedSign"
+      >
+        <h1>Signature check</h1>
+        <v-card-text>
+          <v-chip
+            class="ma-2"
+            color="primary"
+            text-color="white"
+          >
+            {{ signed }}
+          </v-chip>
+        </v-card-text>
+      </v-card>
+      <br/>
       <v-btn
         color="green"
+        v-if="verifiedHash && verifiedSign"
         @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
       >
         It's Ok.
@@ -49,6 +56,7 @@
       <br/>
       <v-btn
         color="primary"
+        v-if="verifiedHash && verifiedSign"
         @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })"
       >
         Back.
@@ -63,8 +71,10 @@ export default {
   data () {
     return {
       version: '',
-      verified: false,
-      hashes: []
+      verifiedHash: false,
+      verifiedSign: false,
+      hashes: [],
+      signed: ''
     }
   },
   async created () {
@@ -86,14 +96,40 @@ export default {
 
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onVerifiedHash((_event, value) => { 
-          this.verified = value.length > 0
+          this.verifiedHash = value.length > 0
           this.hashes = value
         })
     
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onVerifiedHashError((_event, value) => {
-          this.$emit('onError', value.error)
+          this.errors.push(value.error)
         })
+      }
+    },
+    async hashes (value) {
+      if (value.length == 2) { 
+        const resource = this.version.split('tag/')[1]
+        await window.kruxAPI.verify_signature({ 
+          bin: `${resource}/krux-${resource}.zip`,
+          pem: `main/selfcustody.pem`,
+          sig: `${resource}/krux-${resource}.zip.sig`,
+        })
+
+        // eslint-disable-next-line no-unused-vars
+        window.kruxAPI.onVerifiedSign((_event, value) => { 
+          this.verifiedSign = value.length > 0
+          this.signed = value
+        })
+    
+        // eslint-disable-next-line no-unused-vars
+        window.kruxAPI.onVerifiedSignError((_event, value) => {
+          this.errors.push(value.error)
+        })
+      }
+    },
+    errors (value) {
+      if (value.length > 0) {
+        value.forEach(e => this.$emit('onError', e))
       }
     }
   }

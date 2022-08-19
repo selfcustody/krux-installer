@@ -21,7 +21,7 @@
 
 <script>
 export default {
-  name: 'DownloadOfficialReleaseSigPage',
+  name: 'DownloadOfficialReleasePemPage',
   data () {
     return {
       version: '',
@@ -33,20 +33,12 @@ export default {
   },
   methods: {
     async download () {
-      window.kruxAPI.get_version('version')
-       
-      // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onGetVersion((_event, value) => { 
-        const regex = /tag/g
-        let baseUrl = value.replace(regex, 'download') 
-        const version = baseUrl.split('download/')[1]
-        baseUrl = baseUrl.split(`/${version}`)[0]
-        this.version = `${baseUrl}/${version}/krux-${version}.zip.sig`
-        window.kruxAPI.download_resource({
-          baseUrl: `https://github.com/${baseUrl}`,
-          resource: version,
-          filename: `krux-${version}.zip.sig`
-        })
+      // const version = value.split('tag/')[1]
+      this.version = 'selfcustody/krux/main/selfcustody.pem'
+      window.kruxAPI.download_resource({
+        baseUrl: 'https://raw.githubusercontent.com/selfcustody/krux',
+        resource: 'main',
+        filename: 'selfcustody.pem'
       })
       
       // eslint-disable-next-line no-unused-vars
@@ -57,7 +49,7 @@ export default {
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onDownloadDone((_event, value) => {
         if (!value.error) {
-          this.$emit('onSuccess', { page: 'DownloadOfficialReleasePemPage' })
+          this.$emit('onSuccess', { page: 'VerifyOfficialReleasesPage' })
         } else {
           this.$emit('onError', value.error)
         }

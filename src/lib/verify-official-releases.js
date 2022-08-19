@@ -1,7 +1,8 @@
-import crypto from 'crypto'
+import { createHash } from 'crypto'
 import fs from 'fs'
 import { join } from 'path'
 import axios from 'axios'
+import bufferedSpawn from 'buffered-spawn'
 import { readFileAsync } from './utils'
 import Handler from './base'
 
@@ -51,7 +52,7 @@ export default class VerifyOfficialReleasesHandler extends Handler {
       })
 
       const zipBuffer = await readFileAsync(zipFilePath, null)
-      const hashSum = crypto.createHash('sha256')
+      const hashSum = createHash('sha256')
       hashSum.update(zipBuffer)
 
       result.push({
@@ -77,12 +78,37 @@ export default class VerifyOfficialReleasesHandler extends Handler {
         ].join(' ')
         const error = new Error(msg)
         this.send('window:log:info', error)
-        this.send('official:releases:verified:error', error)
+        this.send('official:releases:verified:hash:error', error)
         console.log(error)
       }
     } catch (error) {
       this.send('window:log:info', error)
-      this.send('official:releases:verified:error', error)
+      this.send('official:releases:verified:hash:error', error)
+      console.log(error)
+    }
+  }
+
+  async verifySign (options) {
+    try {
+      const resources = this.store.get('resources')
+      const binPath = join(resources, options.bin)
+      const pemPath = join(resources, options.pem)
+      const sigPath =  join(resources, options.sig)
+
+      // if platform is linux, use the same command
+      // used in krux CLI. Else use sign-check package
+      if (options.platform === 'linux') {
+        const { stdout, stderr } = await bufferedSpawn('sh', [
+          '-c',
+          `openssl sha256 <${binPath} -binary | openssl pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
+        ])
+        this.send('window:log:info', stdout)
+        this.send('official:releases:verified:sign', stdout)
+      } else {
+        throw new Error(`${options.platform} not implemented`)
+      }
+    } catch (error) {
+      this.send('window:log:info', error)
       console.log(error)
     }
   }

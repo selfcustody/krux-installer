@@ -10,7 +10,7 @@ import VerifyOfficialReleasesHandler from './verify-official-releases'
  * @param win
  * @apram store
  */
-function handleWindowStarted (win, store) {
+export function handleWindowStarted (win, store) {
   return function (_event, action) {
     store.set('state', 'running')
     const version = store.get('appVersion')
@@ -28,7 +28,7 @@ function handleWindowStarted (win, store) {
  * @param win
  * @apram store
  */
-function handleVerifyOfficialReleases (win, store) {
+export function handleVerifyOfficialReleases (win, store) {
   return async function (_event, action) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
     const releases = await handler.fetchReleases()
@@ -54,7 +54,7 @@ function handleVerifyOfficialReleases (win, store) {
  * @param win
  * @param store
  */
-function handleStoreSet (win, store) {
+export function handleStoreSet (win, store) {
   return function (_event, action) {
     if (
       action.key !== 'appVersion' ||
@@ -77,7 +77,7 @@ function handleStoreSet (win, store) {
  * @param win
  * @param store
  */
-function handleStoreGet (win, store) {
+export function handleStoreGet (win, store) {
   return function (_event, action) {
     const val = store.get(action.key)
     win.webContents.send('window:log:info', `store get: ${action.key} = ${val}`)
@@ -90,7 +90,7 @@ function handleStoreGet (win, store) {
  *
  * @param app<ElectronApp>
  */
-function handleUsbDetection (app) {
+export function handleUsbDetection (app) {
   return function (_event, action) {
     const handler = new UsbDetectionHandler(app)
     if (action === 'detect') {
@@ -114,7 +114,7 @@ function handleUsbDetection (app) {
  *
  * @param app<ElectronApp>
  */
-function handleSDCard (app) {
+export function handleSDCard (app) {
   return async function (_event, args) {
     const handler = new SDCardHandler(app, process.platform)
     handler.send('window:log:info', `Starting sdcard '${args.action}' action`)
@@ -137,7 +137,7 @@ function handleSDCard (app) {
 *
 * @param fileanme: String
 */
-function handleDownload (app, store) {
+export function handleDownload (app, store) {
   return async function (_event, options) {
     const handler = new DownloadHandler(app, store, options)
 
@@ -149,28 +149,24 @@ function handleDownload (app, store) {
   }
 }
 
-function handleOSVerify (app) {
+export function handleOSVerify (app) {
   return function () {
     app.webContents.send('window:log:info', `OS detected: using ${process.platform}`)
     app.webContents.send('os:verify', process.platform)
   }
 }
 
-function handleVerifyOfficialReleasesHash (win, store) {
+export function handleVerifyOfficialReleasesHash (win, store) {
   return async function (_event, options) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
     handler.verifyHash(options)
   }
 }
 
-export {
-  handleWindowStarted,
-  handleVerifyOfficialReleases,
-  handleVerifyOfficialReleasesHash,
-  handleStoreSet,
-  handleStoreGet,
-  handleDownload,
-  handleSDCard,
-  handleUsbDetection,
-  handleOSVerify
+export function handleVerifyOfficialReleasesSign (win, store) {
+  return async function (_event, options) {
+    const handler = new VerifyOfficialReleasesHandler(win, store)
+    options.platform = process.platform
+    handler.verifySign(options)
+  }
 }

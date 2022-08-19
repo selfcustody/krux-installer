@@ -26,6 +26,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async verify_hash(zipFile, sha256File) {
     await ipcRenderer.invoke('official:releases:verify:hash', { zipFile: zipFile, sha256File: sha256File })
   },
+  async verify_signature(options) {
+    await ipcRenderer.invoke('official:releases:verify:sign', options)
+  },
   async verify_official_releases() {
     await ipcRenderer.invoke('official:releases:set')
   },
@@ -69,6 +72,12 @@ contextBridge.exposeInMainWorld('kruxAPI',{
     ipcRenderer.on('official:releases:verified:hash', callback)
   },
   onVerifiedHashError(callback) {
-    ipcRenderer.on('official:releases:verified:error', callback)
-  }
+    ipcRenderer.on('official:releases:verified:hash:error', callback)
+  },
+  onVerifiedSign(callback) {
+    ipcRenderer.on('official:releases:verified:sign', callback)
+  },
+  onVerifiedSignError(callback) {
+    ipcRenderer.on('official:releases:verified:sign:error', callback)
+  },
 })

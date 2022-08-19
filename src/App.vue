@@ -6,13 +6,11 @@
           <KruxLogo />
         </v-flex>
         <v-flex class="mx-auto my-auto">
-          <keep-alive>
-            <component
-              :is="page"
-              @onSuccess="handleSuccess"
-              @onError="handleError"
-            />
-          </keep-alive>
+          <component
+            :is="page"
+            @onSuccess="handleSuccess"
+            @onError="handleError"
+          />
         </v-flex>
       </v-layout>
     </v-main>
@@ -26,6 +24,7 @@ import SelectVersionPage from './components/SelectVersionPage.vue'
 import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
 import DownloadOfficialReleaseSHA256Page from './components/DownloadOfficialReleaseSHA256Page.vue'
 import DownloadOfficialReleaseSigPage from './components/DownloadOfficialReleaseSigPage.vue'
+import DownloadOfficialReleasePemPage from './components/DownloadOfficialReleasePemPage.vue'
 import VerifyOfficialReleasesPage from './components/VerifyOfficialReleasesPage.vue'
 import DetectDevicePage from './components/DetectDevicePage.vue'
 import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
@@ -46,6 +45,7 @@ export default {
     DownloadOfficialReleasePage,
     DownloadOfficialReleaseSHA256Page,
     DownloadOfficialReleaseSigPage,
+    DownloadOfficialReleasePemPage,
     VerifyOfficialReleasesPage,
     DetectDevicePage, 
     ConfirmDetectedDevicePage,

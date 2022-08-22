@@ -13,7 +13,7 @@ import {
   handleStoreGet,
   handleDownload,
   handleSDCard,
-  handleUsbDetection,
+  handleSerialport,
   handleOSVerify
 } from './lib/handlers'
 
@@ -54,7 +54,7 @@ async function createWindow() {
 
   // This IPC will be called everytime when the method
   // `window.kruxAPI.detect_usb()` is exected inside App.vue
-  ipcMain.handle('usb:detection', handleUsbDetection(win, store))
+  ipcMain.handle('serialport:action', handleSerialport(win, store))
 
   // This IPCs will be called everytime when the method
   // `window.kruxAPI.download_resource` is executed inside App.vue
@@ -96,8 +96,7 @@ async function createWindow() {
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
 
-  handleUsbDetection(win, 'stop')
-
+  store.delete('device')
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
@@ -139,17 +138,20 @@ if (isDevelopment) {
   if (process.platform === 'win32') {
     process.on('message', (data) => {
       if (data === 'graceful-exit') {
-        handleUsbDetection(win, 'stop')
+        store.delete('device')
+        store.set('state', 'stopped')
         app.quit()
       }
     })
   } else {
     process.on('SIGTERM', () => {
-      handleUsbDetection(win, 'stop')
+      store.delete('device')
+      store.set('state', 'stopped')
       app.quit()
     })
     process.on('SIGINT', function() {
-      handleUsbDetection(win, 'stop')
+      store.delete('device')
+      store.set('state', 'stopped')
       process.exit(0)
     })
   }

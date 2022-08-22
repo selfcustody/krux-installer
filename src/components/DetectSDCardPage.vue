@@ -16,19 +16,11 @@
             </p>
             <br/>
             <p>
-              <b>It's imperative that SDCard is formatted to FAT32 filesystem</b>.
+              <b>It's imperative that SDCard is formatted to FAT32 filesystem</b>. If it's not formatted, close this program and format it.
             </p>
             <br/>
             <p>
-              If not, close this program and format it.
-            </p>
-            <br/>
-            <p>
-              Then we will mount it and ask which firmware you want update to, so that we can download appropriate <b>firmware.bin</b> and <b>firmware.bin.sig</b> files.
-            </p>
-            <br/>
-            <p>
-                Next, these files will be written to the SDCard, which will be unmounted, so you can use it on your device.
+              Then we will mount it (administrator privileges will be required), and we will use the selected version of firmware. If a version was not selected, press <b>Back</b> and the <b>Select version</b> page. If you selected an <b>official release</b> the <b>firmware.bin</b> and <b>firmware.bin.sig</b> will be written to the SDCard. If you selected a <b>test release</b>, only the <b>firmware.bin</b> will be written to SDCard.
             </p>
             <br/>
             <v-btn  
@@ -40,7 +32,7 @@
             <br/>
             <v-btn
               color="primary"
-              @click.prevent="$emit('onError', { page: 'MainPage' })"
+              @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
             >
               Back
             </v-btn>
@@ -60,7 +52,7 @@ export default {
     
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onDetectedSDCardFound((_event, value) => {
-        this.$emit('onSuccess', { sdcard: value, page: 'ConfirmDetectedSDCardPage' })
+        this.$emit('onSuccess', { page: 'ConfirmDetectedSDCardPage' })
       })
     }
   }

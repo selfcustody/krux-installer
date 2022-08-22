@@ -1,6 +1,6 @@
 import DownloadHandler from './download'
 import SDCardHandler from './sdcard'
-import UsbDetectionHandler from './usb-detection'
+import SerialportHandler from './serialport'
 import VerifyOfficialReleasesHandler from './verify-official-releases'
 
 /**
@@ -90,19 +90,14 @@ export function handleStoreGet (win, store) {
  *
  * @param app<ElectronApp>
  */
-export function handleUsbDetection (app) {
-  return function (_event, action) {
-    const handler = new UsbDetectionHandler(app)
-    if (action === 'detect') {
-      handler.send('window:log:info', 'Activating usb detection')
-      handler.activate()
-      handler.send('window:log:info', 'Starting usb detection')
-      handler.detect()
-    } else if (action === 'stop') {
-      handler.send('window:log:info', 'Starting usb deactvation')
-      handler.deactivate()
-    } else {
-      throw new Error(`UsbDetectionHandler action '${action}' not implemented`)
+export function handleSerialport (win, store) {
+  return function (_event, options) {
+    const handler = new SerialportHandler(win, store)
+    if (options.action === 'list') {
+      handler.list()
+    }
+    if (options.action === 'select') {
+      handler.select(options.device)
     }
   }
 }
@@ -114,9 +109,10 @@ export function handleUsbDetection (app) {
  *
  * @param app<ElectronApp>
  */
-export function handleSDCard (app) {
+export function handleSDCard (app, store) {
   return async function (_event, args) {
-    const handler = new SDCardHandler(app, process.platform)
+
+    const handler = new SDCardHandler(app, store, process.platform)
     handler.send('window:log:info', `Starting sdcard '${args.action}' action`)
     if (args.action === 'detect') {
       await handler.onDetection()

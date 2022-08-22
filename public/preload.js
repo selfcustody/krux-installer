@@ -1,6 +1,5 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
-
 contextBridge.exposeInMainWorld('kruxAPI',{
   async window_started () {
     await ipcRenderer.invoke('window:started', { state: 'running' })
@@ -8,8 +7,8 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async download_resource (options) {
     await ipcRenderer.invoke('download:resource', options)
   },
-  async usb_detection (action) {
-    await ipcRenderer.invoke('usb:detection', action)
+  async serialport (options) {
+    await ipcRenderer.invoke('serialport:action', options)
   },
   async sdcard_action (options) {
     await ipcRenderer.invoke('sdcard:action', options)
@@ -44,8 +43,11 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onDownloadError(callback) {
     ipcRenderer.on('download:status:error', callback)
   },
-  onDetectedDevice(callback) {
-    ipcRenderer.on('usb:detection', callback)
+  onSerialportList(callback) {
+    ipcRenderer.on('serialport:list', callback)
+  },
+  onSerialportSelected(callback) {
+    ipcRenderer.on('serialport:selected', callback)
   },
   onDetectedSDCardFound(callback) {
     ipcRenderer.on('sdcard:detection:add', callback)

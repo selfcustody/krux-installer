@@ -80,16 +80,13 @@
 
 export default {
   name: 'ConfirmDetectedSDCardPage',
-  props: {
-    sdcard: {
-      type: String,
-      required: true
-    }
-  },
   data () {
     return {
-      state: this.sdcard.state,
-      mountpoint: ''
+      device: '',
+      size: 0,
+      description: '',
+      isFAT32: false,
+      state: 'umounted'
     }
   },
   methods: {

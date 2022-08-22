@@ -116,9 +116,12 @@ export default {
         })
 
         // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onVerifiedSign((_event, value) => { 
-          this.verifiedSign = value.length > 0
-          this.signed = value
+        window.kruxAPI.onVerifiedSign((_event, value) => {
+          const jsencrypt = new window.JSEncrypt()
+          jsencrypt.setPublicKey(value.pem)
+          const verified = jsencrypt.verify(value.bin, value.sig, 'sha256');
+          console.log(verified)
+          this.signed = verified
         })
     
         // eslint-disable-next-line no-unused-vars

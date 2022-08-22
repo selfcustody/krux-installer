@@ -20,8 +20,9 @@ import {
  */
 export default class SDCardHandler extends Handler {
 
-  constructor (app, platform) {
+  constructor (app, store, platform) {
     super(app)
+    this.store = store
     if (platform !== 'linux') {
       throw new Error(`SDCardHandler not implemented on '${platform}'`)
     } else {
@@ -45,6 +46,7 @@ export default class SDCardHandler extends Handler {
         isFAT32: fstype === 'dos',
         state: sdcard.mountpoints.length === 0 ? 'umounted' : 'mounted'
       }
+      this.store('sdcard', data)
       const msg = [
         `found a ${data.state === 'umounted' ? 'n' : ''} `,
         `${data.fstype} ${data.size} SDCard at ${data.device}`

@@ -49,9 +49,9 @@
       <v-btn
         color="green"
         v-if="verifiedHash && verifiedSign"
-        @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+        @click.prevent="$emit('onSuccess', { page: 'UnzipOfficialReleasesPage' })"
       >
-        It's Ok.
+        It's Ok. Unzip it!
       </v-btn>
       <br/>
       <v-btn
@@ -89,7 +89,7 @@ export default {
     async version (value) {
       if (value !== '') {
         const resource = value.split('tag/')[1]
-        await window.kruxAPI.verify_hash(
+        window.kruxAPI.verify_hash(
           `${resource}/krux-${resource}.zip`,
           `${resource}/krux-${resource}.zip.sha256.txt`
         )
@@ -109,7 +109,7 @@ export default {
     async hashes (value) {
       if (value.length == 2) { 
         const resource = this.version.split('tag/')[1]
-        await window.kruxAPI.verify_signature({ 
+        window.kruxAPI.verify_signature({ 
           bin: `${resource}/krux-${resource}.zip`,
           pem: `main/selfcustody.pem`,
           sig: `${resource}/krux-${resource}.zip.sig`,
@@ -117,11 +117,9 @@ export default {
 
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onVerifiedSign((_event, value) => {
-          const jsencrypt = new window.JSEncrypt()
-          jsencrypt.setPublicKey(value.pem)
-          const verified = jsencrypt.verify(value.bin, value.sig, 'sha256');
-          console.log(verified)
-          this.signed = verified
+          console.log(value)
+          this.verifiedSign = value.match(new RegExp('Signature Verified Successfully')) ? true : false
+          this.signed = value
         })
     
         // eslint-disable-next-line no-unused-vars

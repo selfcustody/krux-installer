@@ -31,6 +31,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async verify_official_releases() {
     await ipcRenderer.invoke('official:releases:set')
   },
+  async unzip (options) {
+    await ipcRenderer.invoke('zip:extract', options)
+  },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
   },
@@ -82,4 +85,13 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onVerifiedSignError(callback) {
     ipcRenderer.on('official:releases:verified:sign:error', callback)
   },
+  onUnzipped(callback) {
+    ipcRenderer.on('zip:extracted:done', callback)
+  },
+  onUnzipProgress(callback) {
+    ipcRenderer.on('zip:extract:progress', callback)
+  },
+  onUnzipError(callback) {
+    ipcRenderer.on('zip:extract:error', callback)
+  }
 })

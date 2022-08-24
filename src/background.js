@@ -9,6 +9,7 @@ import {
   handleVerifyOfficialReleases,
   handleVerifyOfficialReleasesHash,
   handleVerifyOfficialReleasesSign,
+  handleUnzip,
   handleStoreSet,
   handleStoreGet,
   handleDownload,
@@ -59,6 +60,10 @@ async function createWindow() {
   // This IPCs will be called everytime when the method
   // `window.kruxAPI.download_resource` is executed inside App.vue
   ipcMain.handle('download:resource', handleDownload(win, store))
+
+  // This IPCs will be called everytime when the method
+  // `window.kruxAPI.unzip` is executed inside App.vue
+  ipcMain.handle('zip:extract', handleUnzip(win, store))
 
   // This IPC will be called everytime when the method
   // `window.kruxAPI.sdcard_action` is executed inside `App.vue`

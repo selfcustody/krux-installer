@@ -3,7 +3,7 @@ import { join } from 'path'
 import { createWriteStream, exists, mkdir } from 'fs'
 import axios from 'axios'
 import Handler from './base'
-import { formatBytes } from './utils'
+import { mkdirAsync, formatBytes } from './utils'
 
 /*
  * Function to check if file or folder exists
@@ -25,22 +25,6 @@ function existsAsync(p) {
   })
 }
 
-/*
- * Function to create folder
- * in async/await approach. Throws
- * an error if any occurs.
- *
- * @param p<String>: path of the file
- * @throw Error: if some error occurs
- */
-function mkdirAsync(p) {
-  return new Promise((resolve, reject) => {
-    mkdir(p, { recursive: true }, function(err) {
-      if (err) reject(err)
-      resolve()
-    })
-  })
-}
 
 /**
  * Class to handle downloads

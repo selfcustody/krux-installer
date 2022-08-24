@@ -102,9 +102,7 @@ export default {
   },
   methods: {
     async detect () {
-      await window.kruxAPI.serialport({
-        action: 'list'
-      })
+      window.kruxAPI.serialport({ action: 'list' })
     
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onSerialportList((_event, value) => {
@@ -112,7 +110,7 @@ export default {
       })
     },
     async select(device) {
-      await window.kruxAPI.serialport({
+      window.kruxAPI.serialport({
         action: 'select',
         device: device
       })

@@ -1,6 +1,6 @@
 'use strict'
 
-import { copyFile, readFile } from 'fs'
+import { copyFile, readFile, mkdir } from 'fs'
 import { userInfo } from 'os'
 import _ from 'lodash'
 import bufferedSpawn from 'buffered-spawn'
@@ -35,6 +35,23 @@ export function readFileAsync (origin, options) {
       resolve(data)
     });
   });
+}
+
+/*
+ * Function to create folder
+ * in async/await approach. Throws
+ * an error if any occurs.
+ *
+ * @param p<String>: path of the file
+ * @throw Error: if some error occurs
+ */
+export function mkdirAsync(p) {
+  return new Promise((resolve, reject) => {
+    mkdir(p, { recursive: true }, function(err) {
+      if (err) reject(err)
+      resolve()
+    })
+  })
 }
 
 /*

@@ -99,15 +99,23 @@ export default class VerifyOfficialReleasesHandler extends Handler {
 
       // if platform is linux, use the same command
       // used in krux CLI. Else use sign-check package
-      // if (options.platform === 'linux' || options.platform === 'darwin') {
-      //  const { stdout, stderr } = await bufferedSpawn('sh', [
-      //    '-c',
-      //    `openssl sha256 <${binPath} -binary | openssl pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
-      //  ])
-      this.send('official:releases:verified:sign', { bin: bin, pem: pem, sig: sig})
-      //} else {
-      //  throw new Error(`${options.platform} not implemented`)
-      //}
+      if (options.platform === 'linux' || options.platform === 'darwin') {
+        const { stdout, stderr } = await bufferedSpawn('sh', [
+          '-c',
+          `openssl sha256 <${binPath} -binary | openssl pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
+        ])
+        if (stderr !== null && stderr !== '') {
+          this.send('window:log:info', stderr)
+          this.send('official:releases:verified:sign:error', stderr)
+        } else {
+          this.send('window:log:info', stdout)
+          this.send('official:releases:verified:sign', stdout)
+        }
+      } else {
+        const err = new Error(`${options.platform} not implemented`)
+        this.send('window:log:info', err)
+        this.send('official:releases:verified:sign:error', err)
+      }
     } catch (error) {
       this.send('window:log:info', error)
       console.log(error)

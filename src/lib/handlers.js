@@ -2,6 +2,7 @@ import DownloadHandler from './download'
 import SDCardHandler from './sdcard'
 import SerialportHandler from './serialport'
 import VerifyOfficialReleasesHandler from './verify-official-releases'
+import UnzipHandler from './unzip'
 
 /**
  * Function to handle when
@@ -164,5 +165,12 @@ export function handleVerifyOfficialReleasesSign (win, store) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
     options.platform = process.platform
     handler.verifySign(options)
+  }
+}
+
+export function handleUnzip (win, store) {
+  return async function (_event, options) {
+    const handler = new UnzipHandler(win, store)
+    handler.unzip(options)
   }
 }

@@ -1,3 +1,4 @@
+import { map } from 'lodash'
 import DownloadHandler from './download'
 import SDCardHandler from './sdcard'
 import SerialportHandler from './serialport'
@@ -12,6 +13,7 @@ import UnzipHandler from './unzip'
  * @apram store
  */
 export function handleWindowStarted (win, store) {
+  // eslint-disable-next-line no-unused-vars
   return function (_event, action) {
     store.set('state', 'running')
     const version = store.get('appVersion')
@@ -30,20 +32,21 @@ export function handleWindowStarted (win, store) {
  * @apram store
  */
 export function handleVerifyOfficialReleases (win, store) {
+  // eslint-disable-next-line no-unused-vars
   return async function (_event, action) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
     const releases = await handler.fetchReleases()
     let list = store.get('versions')
 
     // verify for new releases if length of fetch is greater than the local list
-    if (list === undefined || list.length === 0 || list.length < (Object.keys(releases)).length) {
-      const __list__ = _.map(releases, (r) => {
+    if (list.length === 0 || list.length < (Object.keys(releases)).length) {
+      const __list__ = map(releases, (r) => {
         const version = r.ref.split('tags/')[1]
         return `selfcustody/krux/releases/tag/${version}`
       })
       __list__.push('odudex/krux_binaries')
       store.set('versions', __list__)
-      list = store.get('releases')
+      list = store.get('versions')
     }
     handler.send('official:releases:get', { releases: list })
   }
@@ -122,7 +125,7 @@ export function handleSDCard (app, store) {
     } else if (args.action === 'copyto') {
       await handler.onWrite(args.origin, args.destination)
     } else {
-      throw new Error(`SDCardHandler ${action} not implemented`)
+      throw new Error(`SDCardHandler ${args.action} not implemented`)
     }
   }
 }

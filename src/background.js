@@ -14,8 +14,7 @@ import {
   handleStoreGet,
   handleDownload,
   handleSDCard,
-  handleSerialport,
-  handleOSVerify
+  handleSerialport
 } from './lib/handlers'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -45,6 +44,7 @@ async function createWindow() {
       nodeIntegration: process.env.ELECTRON_NODE_INTEGRATION || false,
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION || true,
       enableRemoteModule: process.env.ELECTRON_NODE_INTEGRATION || false,
+      // eslint-disable-next-line no-undef
       preload: join(__static, 'preload.js')
     }
   })

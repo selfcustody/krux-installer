@@ -1,10 +1,12 @@
-import { createHash, createVerify, getCiphers, getHashes } from 'crypto'
-import ECKey from 'ec-key'
-import fs from 'fs'
+'use strict'
+
 import { join } from 'path'
+import { createHash } from 'crypto'
+
 import axios from 'axios'
 import bufferedSpawn from 'buffered-spawn'
-import { readFileAsync } from './utils'
+
+import { readFileAsync } from './utils/fs-async'
 import Handler from './base'
 
 export default class VerifyOfficialReleasesHandler extends Handler {
@@ -19,27 +21,22 @@ export default class VerifyOfficialReleasesHandler extends Handler {
   }
 
   async fetchReleases() {
-    try {
-      this.send('window:log:info', `fetching ${this.url}`)
-      const response = await axios({
-        method: 'get',
-        url: this.url,
-        headers: this.headers
-      })
-      if (response.status === 200) {
-        return response.data
-      } else {
-        throw new Error(`${this.url} returned ${response.status} code`)
-      }
-    } catch (error) {
-      throw error
+    this.send('window:log:info', `fetching ${this.url}`)
+    const response = await axios({
+      method: 'get',
+      url: this.url,
+      headers: this.headers
+    })
+    if (response.status === 200) {
+      return response.data
+    } else {
+      throw new Error(`${this.url} returned ${response.status} code`)
     }
   }
 
   async verifyHash (options) {
     try {
       const result = []
-      const version = this.store.get('version')
       const resources = this.store.get('resources')
 
       const zipFilePath = join(resources, options.zipFile)

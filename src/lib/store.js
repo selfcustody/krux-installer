@@ -31,15 +31,13 @@ export default function (app) {
       }
     })
 
-    // Initialize configuration
-    // if needed for each key in store
-    const appVersion = store.get('appVersion')
-    const resources = store.get('resources')
-    const state = store.get('state')
-
     store.set('appVersion', pjson.version)
     store.set('resources', join(app.getPath('documents'), pjson.name))
     store.set('state', 'loading')
+    store.set('versions', [])
+    store.set('version', '')
+    store.set('device', '')
+    store.set('sdcard', '')
 
     return store
   } catch (error) {

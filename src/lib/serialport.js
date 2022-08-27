@@ -1,22 +1,6 @@
 import { SerialPort } from 'serialport'
-import { filter, includes } from 'lodash'
+import { filter } from 'lodash'
 import Handler from './base'
-
-/*
- * List of devices as hexadecimal
- * vendor ids and product ids
- */
-
-const MAIXPY_M5STICKV_AMIGO_BIT_PID = '0403'
-const MAIXPY_DOCK_PID = '1a86'
-
-const MAIXPY_M5STICKV_VID = '6001'
-const MAIXPY_AMIGO_BIT_VID= '6010'
-const MAIXPY_DOCK_VID = '7523'
-
-const MAIXPY_M5STICKV_ALIAS = 'maixpy_m5stickv'
-const MAIXPY_AMIGO_BIT_ALIAS = 'maixpy_amigo/maixy_bit'
-const MAIXPY_DOCK_ALIAS = 'maixpy_dock'
 
 class SerialportHandler extends Handler {
 

@@ -1,29 +1,10 @@
-import { homedir } from 'os'
 import { join } from 'path'
-import { createWriteStream, exists, mkdir } from 'fs'
+import { createWriteStream } from 'fs'
 import axios from 'axios'
 import Handler from './base'
-import { mkdirAsync, formatBytes } from './utils'
+import { mkdirAsync, existsAsync } from './utils/fs-async'
+import { formatBytes } from './utils/format'
 
-/*
- * Function to check if file or folder exists
- * in async/await approach. Always resoulves to
- * a boolean value.
- *
- * @param p<String>: path of the file
- * @return Boolean
- */
-function existsAsync(p) {
-  return new Promise((resolve) => {
-    exists(p, function(exist) {
-      if (exist) {
-        resolve(true)
-      } else {
-        resolve(false)
-      }
-    })
-  })
-}
 
 
 /**

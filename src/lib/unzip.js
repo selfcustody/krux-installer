@@ -1,7 +1,7 @@
 import { join } from 'path'
 import { createWriteStream } from 'fs'
 import { open } from 'yauzl'
-import { mkdirAsync } from './utils'
+import { mkdirAsync } from './utils/fs-async'
 import Handler from './base'
 
 /**

@@ -102,7 +102,7 @@ export default {
     
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onVerifiedHashError((_event, value) => {
-          this.errors.push(value.error)
+          this.$emit('onError', value.error)
         })
       }
     },
@@ -124,13 +124,8 @@ export default {
     
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onVerifiedSignError((_event, value) => {
-          this.errors.push(value.error)
+          this.$emit('onError', value.error)
         })
-      }
-    },
-    errors (value) {
-      if (value.length > 0) {
-        value.forEach(e => this.$emit('onError', e))
       }
     }
   }

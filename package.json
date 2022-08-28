@@ -4,6 +4,7 @@
   "author": [
     "qlrd <106913782+qlrd@users.noreply.github.com>"
   ],
+  "license": "LICENSE.md",
   "description": "An imager installer for Krux firmwares",
   "private": true,
   "scripts": {

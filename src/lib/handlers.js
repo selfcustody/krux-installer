@@ -157,9 +157,10 @@ export function handleOSVerify (app) {
 }
 
 export function handleVerifyOfficialReleasesHash (win, store) {
+  // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
-    handler.verifyHash(options)
+    handler.verifyHash()
   }
 }
 

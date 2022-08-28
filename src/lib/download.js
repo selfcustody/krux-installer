@@ -88,6 +88,10 @@ class DownloadHandler extends Handler {
           }
         })
 
+        data.on('finish', function () {
+          file.close()
+        })
+
         data.on('error', (error) => {
           this.send('window:log:info', error.stack)
           this.send('download:status:error', error.stack)

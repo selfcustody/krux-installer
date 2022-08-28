@@ -6,7 +6,7 @@ import { createHash } from 'crypto'
 import axios from 'axios'
 import bufferedSpawn from 'buffered-spawn'
 
-import { readFileAsync } from './utils/fs-async'
+import { readFileAsync, existsAsync } from './utils/fs-async'
 import Handler from './base'
 
 export default class VerifyOfficialReleasesHandler extends Handler {
@@ -34,56 +34,75 @@ export default class VerifyOfficialReleasesHandler extends Handler {
     }
   }
 
-  async verifyHash (options) {
-    try {
-      const result = []
-      const resources = this.store.get('resources')
+  /*
+   * verifyHash
+   */
+  async verifyHash () {
+    const result = []
+    const resources = this.store.get('resources')
+    const version = this.store.get('version')
+    const resource = version.split('tag/')[1]
 
-      const zipFilePath = join(resources, options.zipFile)
-      const shaFilePath = join(resources, options.sha256File)
+    const zipFileRelPath = `${resource}/krux-${resource}.zip`
+    const shaFileRelPath = `${resource}/krux-${resource}.zip.sha256.txt`
 
-      const sha256buffer = await readFileAsync(shaFilePath, { encoding: 'utf8'})
+    const zipFilePath = join(resources, zipFileRelPath)
+    const shaFilePath = join(resources, shaFileRelPath)
 
-      result.push({
-        name: options.sha256File,
-        value: sha256buffer.replace(/[\n\t\r]/g,'')
-      })
+    // Maybe the sha256txt file could be downloade
+    // after checking, so we will check if the file exists
+    // and the string represenation is valid
+    // every second, and then, return the result to client
+    const verify = async (p) => {
+      try {
+        const exists = await existsAsync(p)
+        const sha256buffer = await readFileAsync(shaFilePath, null)
+        const sha256txt = sha256buffer.toString()
+        if (exists && sha256txt !== '') {
+          result.push({
+            name: shaFileRelPath,
+            value: sha256txt.replace(/[\n\t\r]/g,'')
+          })
 
-      const zipBuffer = await readFileAsync(zipFilePath, null)
-      const hashSum = createHash('sha256')
-      hashSum.update(zipBuffer)
+          const zipBuffer = await readFileAsync(zipFilePath, null)
+          const hashSum = createHash('sha256')
+          hashSum.update(zipBuffer)
 
-      result.push({
-        name: options.zipFile,
-        value: hashSum.digest('hex')
-      })
+          result.push({
+            name: zipFileRelPath,
+            value: hashSum.digest('hex')
+          })
 
-      const isMatch = result[0].value === result[1].value
+          const isMatch = result[0].value === result[1].value
 
-      if (isMatch) {
-        const msg = [
-          'sha256sum match:',
-          `${result[0].name} has a ${result[1].value} hash`,
-          `and ${result[1].name} summed a hash ${result[1].value}.`
-        ].join(' ')
-        this.send('window:log:info', msg)
-        this.send('official:releases:verified:hash', result)
-      } else {
-        const msg = [
-          'sha256sum match error:',
-          `${result[0].name} has a hash of ${result[0].value}`,
-          `and ${result[1].name} summed a hash of ${result[1].value}`
-        ].join(' ')
-        const error = new Error(msg)
+          if (isMatch) {
+            const msg = [
+              'sha256sum match:',
+              `${result[0].name} has a ${result[1].value} hash`,
+              `and ${result[1].name} summed a hash ${result[1].value}.`
+            ].join(' ')
+            this.send('window:log:info', msg)
+            this.send('official:releases:verified:hash', result)
+          } else {
+            const msg = [
+              'sha256sum match error:',
+              `${result[0].name} has a hash of ${result[0].value}`,
+              `and ${result[1].name} summed a hash of ${result[1].value}`
+            ].join(' ')
+            const error = new Error(msg)
+            this.send('window:log:info', error)
+            this.send('official:releases:verified:hash:error', error)
+            console.log(error)
+          }
+          clearInterval(interval)
+        }
+      } catch (error) {
         this.send('window:log:info', error)
         this.send('official:releases:verified:hash:error', error)
         console.log(error)
       }
-    } catch (error) {
-      this.send('window:log:info', error)
-      this.send('official:releases:verified:hash:error', error)
-      console.log(error)
     }
+    const interval = setInterval(verify, 1000, shaFilePath)
   }
 
   async verifySign (options) {

@@ -22,8 +22,8 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async get_version() {
     await ipcRenderer.invoke('store:get', { key: 'version' })
   },
-  async verify_hash(zipFile, sha256File) {
-    await ipcRenderer.invoke('official:releases:verify:hash', { zipFile: zipFile, sha256File: sha256File })
+  async verify_hash(version) {
+    await ipcRenderer.invoke('official:releases:verify:hash')
   },
   async verify_signature(options) {
     await ipcRenderer.invoke('official:releases:verify:sign', options)

@@ -1,6 +1,7 @@
 'use strict'
 
 import { userInfo } from 'os'
+import { join } from 'path'
 import _ from 'lodash'
 import bufferedSpawn from 'buffered-spawn'
 import * as drivelist from 'drivelist'
@@ -63,7 +64,7 @@ export default class SDCardHandler extends Handler {
       const { blockdevices } = JSON.parse(stdout)
       const sdcards = _.filter(blockdevices, { path: sdcard.device })
       if (sdcards.length > 0) {
-        return sdcards[0]
+        return sdcards[0].children[0]
       } else {
         throw new Error(`SDCardHandler: Filesystem type detection: no device ${sdcard.device} found`)
       }
@@ -117,7 +118,10 @@ export default class SDCardHandler extends Handler {
     }
 
     if (platform === 'linux') {
-      const { name, uuid } = await SDCardHandler.getBlockPartitions(platform, sdcard)
+      const device = await SDCardHandler.getBlockDevice(platform, sdcard)
+      console.log(device)
+      const name = device.name
+      const uuid = device.uuid
       const username = userInfo().username;
       const usergid = userInfo().gid;
       const useruid = userInfo().uid;
@@ -163,19 +167,21 @@ export default class SDCardHandler extends Handler {
         device: sdcard.device,
         size: formatBytes(sdcard.size),
         description: sdcard.description,
-        isFAT32: blk.fsver === 'dos',
+        pttype: blk.pttype === 'dos' ? 'FAT32' : 'not FAT32',
         state: sdcard.mountpoints.length === 0 ? 'umounted' : 'mounted'
       }
-      this.store('sdcard', data)
+      this.store.set('sdcard', data)
       const msg = [
-        `found a ${data.state === 'umounted' ? 'n' : ''} `,
-        `${data.fstype} ${data.size} SDCard at ${data.device}`
+        `found ${data.state === 'umounted' ? 'an' : 'a'} `,
+        data.state,
+        `${data.fsver ? data.fsver : ''} ${data.size} SDCard at ${data.device}`
       ].join('')
       this.send('window:log:info', msg)
-      this.send('sdcard:detection:add', data)
+      this.send('sdcard:detection:success', data)
     } catch (error) {
+      this.send('window:log:info', error.message)
       this.send('window:log:info', error.stack)
-      this.send('sdcard:detection:add', { error: error.message })
+      this.send('sdcard:detection:error', error)
     }
   }
 
@@ -193,16 +199,24 @@ export default class SDCardHandler extends Handler {
       this.send('window:log:info', `sdcard ${result.state} at ${result.mountpoint}`);
       this.send('sdcard:mount', result)
     } catch (error) {
+      this.send('sdcard:mount:error', error)
       this.send('window:log:info', error.stack);
     }
   }
 
-  async onWrite (origin, destination) {
+  async onCopyFirmwareBin () {
     try {
-      this.send('window:log:info', `starting write ${origin} -> ${destination}`)
-      await copyFileAsync(origin, destination);
-      this.send('window:log:info', `${origin} copied to ${destination}`);
-      this.send('sdcard:write:done', destination);
+      const resources = this.store.get('resources')
+      const version = this.store.get('version').split('tag/')[1]
+      const sdcard = this.store.get('sdcard')
+      const device = this.store.get('device')
+
+      const firmwareBinPathOrig = join(resources, version, `krux-${version}`, device, 'firmware.bin')
+      const firmwareBinPathDest = join(sdcard, 'firmware.bin')
+
+      await copyFileAsync(firmwareBinPathOrig, firmwareBinPathDest);
+      this.send('window:log:info', `copied ${firmwareBinPathOrig} to ${firmwareBinPathDest}`)
+      this.send('sdcard:action:copy_firmware_bin:done', firmwareBinPathDest);
     } catch (error) {
       this.send('window:log:info', error.stack);
     }

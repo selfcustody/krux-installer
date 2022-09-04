@@ -67,8 +67,8 @@ export function handleStoreSet (win, store) {
       action.key !== 'versions'
     ) {
       store.set(action.key, action.value)
-      win.webContents.send('window:log:info', `store set: ${action.key} = ${action.value}`)
-      win.webContents.send('store:set:done', store.get(action.key) ? true : false)
+      win.webContents.send('window:log:info', `store set: ${action.key} = '${store.get(action.key)}'`)
+      win.webContents.send(`store:set:${action.key}`, store.get(action.key) ? true : false)
     } else {
       throw new Error(`Forbidden: cannot set '${action.key}'`)
     }
@@ -84,8 +84,8 @@ export function handleStoreSet (win, store) {
 export function handleStoreGet (win, store) {
   return function (_event, action) {
     const val = store.get(action.key)
-    win.webContents.send('window:log:info', `store get: ${action.key} = ${val}`)
-    win.webContents.send('store:get:done', val)
+    win.webContents.send('window:log:info', `store get: ${action.key} = '${val}'`)
+    win.webContents.send(`store:get:${action.key}`, val)
   }
 }
 /**
@@ -122,8 +122,8 @@ export function handleSDCard (app, store) {
       await handler.onDetection()
     } else if (args.action === 'mount' || args.action === 'umount') {
       await handler.onAction(args.action)
-    } else if (args.action === 'copyto') {
-      await handler.onWrite(args.origin, args.destination)
+    } else if (args.action === 'copy_firmware_bin') {
+      await handler.onCopyFirmwareBin()
     } else {
       throw new Error(`SDCardHandler ${args.action} not implemented`)
     }

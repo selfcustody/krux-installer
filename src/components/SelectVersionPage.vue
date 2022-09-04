@@ -5,36 +5,44 @@
     row
     fill-height
   >
-    <v-flex v-if="isChecking">
-      Checking...
-    </v-flex>
-    <v-flex
-      v-if="!isChecking"
-      xs12
-      align="justify"
-    >
-      <p>Choose between oficial realeases (selfcustody/krux) and test binaries (odudex/krux_binaries).</p>
-      <br/>
-      <v-select
-        v-model="version"
-        :items="versions"
-        label="versions"
-      />
-      <br/>
-      <v-btn
-        v-if="version !== ''"
-        color="green"
-        @click.prevent="select"
+    <v-flex xs12 sm4>
+      <v-card
+        class="pa-5"
       >
-        Download krux {{ version }}
-      </v-btn>
-      <br/>
-      <v-btn
-        color="primary"
-        @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
-      >
-        Back
-      </v-btn>
+        <v-card-title
+          v-if="isChecking"
+        >
+          Checking...
+        </v-card-title>
+        <v-card-title
+          v-if="!isChecking"
+        >
+          Choose between official or test release
+        </v-card-title>
+        <v-card-content
+          v-if="!isChecking"
+        >
+          <v-select
+            v-model="version"
+            :items="versions"
+            label="Versions"
+          />
+        </v-card-content>
+        <v-card-actions>
+          <v-btn
+            v-if="version !== ''"
+            @click.prevent="select"
+          >
+            Select
+          </v-btn>
+          <br/>
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+          >
+            Back
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-flex>
   </v-layout>
 </template>
@@ -61,16 +69,12 @@ export default {
     })
   },
   methods: {
-    select () {
-      window.kruxAPI.set_version(this.version)
+    async select () {
+      await window.kruxAPI.set_version(this.version)
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onSetVersion((_event, value) => {
-        if (this.version === 'odudex/krux_binaries') {
-          this.$emit('onSuccess', { page: 'DownloadTestBinariesPage' })
-        } else {
-          this.$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })
-        }
+      window.kruxAPI.onSetVersion((_event, data) => {
+        this.$emit('onSuccess', { page: 'MainPage' })
       })
     }
   }

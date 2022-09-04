@@ -2,10 +2,10 @@
   <v-app>
     <v-main>
       <v-layout column wrap>
-        <v-flex class="mx-auto my-auto">
+        <v-flex xs2 sm2 class="mx-auto my-auto">
           <KruxLogo />
         </v-flex>
-        <v-flex class="mx-auto my-auto">
+        <v-flex xs10 sm10 class="mx-auto my-auto">
           <component
             :is="page"
             @onSuccess="handleSuccess"
@@ -21,6 +21,8 @@
 import KruxLogo from './components/KruxLogo.vue'
 import MainPage from './components/MainPage.vue'
 import SelectVersionPage from './components/SelectVersionPage.vue'
+import SelectActionPage from './components/SelectActionPage.vue'
+import ExecutePage from './components/ExecutePage.vue'
 import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
 import DownloadOfficialReleaseSHA256Page from './components/DownloadOfficialReleaseSHA256Page.vue'
 import DownloadOfficialReleaseSigPage from './components/DownloadOfficialReleaseSigPage.vue'
@@ -43,6 +45,8 @@ export default {
     KruxLogo,
     MainPage,
     SelectVersionPage,
+    SelectActionPage,
+    ExecutePage,
     DownloadOfficialReleasePage,
     DownloadOfficialReleaseSHA256Page,
     DownloadOfficialReleaseSigPage,
@@ -64,6 +68,8 @@ export default {
   }),
   created () {
     window.kruxAPI.window_started()
+
+    // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onLogLevelInfo(function(_event, value) {
       console.log(`[ INFO ] ${value}`)
     })
@@ -79,6 +85,7 @@ export default {
     },
     handleError (value) {
       alert(value.error)
+      this.page = 'MainPage'
     },
   }
 }

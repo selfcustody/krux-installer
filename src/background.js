@@ -35,7 +35,7 @@ let store
  */
 async function createWindow() {
   win = new BrowserWindow({
-    width: 768,
+    width: 840,
     height: 608,
     webPreferences: {
 
@@ -165,4 +165,4 @@ if (isDevelopment) {
 
 process.on('unhandledRejection', (reason, p) => {
   p.catch((error) => console.error(error.stack))
-});
+})

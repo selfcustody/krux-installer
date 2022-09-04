@@ -7,60 +7,68 @@
   >
     <v-flex
       xs12
+      sm12
       v-if="!verifiedHash && !verifiedSign"
     >
       <p>Verifying <b>{{ version }}.zip</b>...</p>
     </v-flex>
     <v-flex
       xs12
+      sm12
       v-if="verifiedHash"
     >
-      <h1>SHA256 sum</h1>
-      <v-card
-        v-for="hash in hashes"
-        :key="hash.name"
-      >
-        <v-card-title>Filename: {{ hash.name }}</v-card-title>
-        <v-card-text>
-          <v-chip
-            class="ma-2"
-            color="primary"
-            text-color="white"
-          >
-            {{ hash.value }}
-          </v-chip>
-        </v-card-text>
-      </v-card>
-      <v-card
-        v-if="verifiedSign"
-      >
-        <h1>Signature check</h1>
-        <v-card-text>
-          <v-chip
-            class="ma-2"
-            color="primary"
-            text-color="white"
-          >
-            {{ signed }}
-          </v-chip>
-        </v-card-text>
-      </v-card>
-      <br/>
-      <v-btn
-        color="green"
-        v-if="verifiedHash && verifiedSign"
-        @click.prevent="$emit('onSuccess', { page: 'UnzipOfficialReleasesPage' })"
-      >
-        It's Ok. Unzip it!
-      </v-btn>
-      <br/>
-      <v-btn
-        color="primary"
-        v-if="verifiedHash && verifiedSign"
-        @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })"
-      >
-        Back.
-      </v-btn>
+      <v-container>
+        <v-row>
+          <v-col cols="12">
+            <v-card class="ma-5 pa-5">
+              <v-card-title>
+                Verify Sha256sum and signature results
+              </v-card-title>
+              <v-card-content>
+                <v-card-text
+                  v-for="hash in hashes"
+                  :key="hash.name"
+                >
+                  Filename: {{ hash.name }}
+                  <v-chip
+                    class="ma-2"
+                    color="primary"
+                    text-color="white"
+                  >
+                    {{ hash.value }}
+                  </v-chip>
+                </v-card-text>
+                <v-card-text
+                  v-if="verifiedSign"
+                >
+                  Signature check
+                  <v-chip
+                    class="ma-2"
+                    color="primary"
+                    text-color="white"
+                  >
+                    {{ signed }}
+                  </v-chip>
+                </v-card-text>
+              </v-card-content>
+              <v-card-actions>
+                <v-btn
+                  v-if="verifiedHash && verifiedSign"
+                  @click.prevent="$emit('onSuccess', { page: 'UnzipOfficialReleasesPage' })"
+                >
+                  It's Ok. Unzip it!
+                </v-btn>
+                <v-btn
+                  v-if="verifiedHash && verifiedSign"
+                  @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })"
+                >
+                  Back
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
     </v-flex>
   </v-layout>
 </template>

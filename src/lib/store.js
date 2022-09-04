@@ -35,7 +35,8 @@ export default function (app) {
     store.set('resources', join(app.getPath('documents'), pjson.name))
     store.set('state', 'loading')
     store.set('versions', [])
-    store.set('version', '')
+    store.set('version', 'Select version')
+    store.set('action', 'Select action')
     store.set('device', '')
     store.set('sdcard', '')
 

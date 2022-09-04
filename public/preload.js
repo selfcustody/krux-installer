@@ -22,7 +22,25 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async get_version() {
     await ipcRenderer.invoke('store:get', { key: 'version' })
   },
-  async verify_hash(version) {
+  async set_action(value) {
+    await ipcRenderer.invoke('store:set', { key: 'action', value: value })
+  },
+  async get_action() {
+    await ipcRenderer.invoke('store:get', { key: 'action' })
+  },
+  async set_device(value) {
+    await ipcRenderer.invoke('store:set', { key: 'device', value: value })
+  },
+  async get_device() {
+    await ipcRenderer.invoke('store:get', { key: 'device' })
+  },
+  async set_sdcard(value) {
+    await ipcRenderer.invoke('store:set', { key: 'sdcard', value: value })
+  },
+  async get_sdcard() {
+    await ipcRenderer.invoke('store:get', { key: 'sdcard' })
+  },
+  async verify_hash() {
     await ipcRenderer.invoke('official:releases:verify:hash')
   },
   async verify_signature(options) {
@@ -52,23 +70,47 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onSerialportSelected(callback) {
     ipcRenderer.on('serialport:selected', callback)
   },
-  onDetectedSDCardFound(callback) {
-    ipcRenderer.on('sdcard:detection:add', callback)
+  onDetectedSDCardSuccess(callback) {
+    ipcRenderer.on('sdcard:detection:success', callback)
+  },
+  onDetectedSDCardError(callback) {
+    ipcRenderer.on('sdcard:detection:error', callback)
   },
   onMountAction(callback) {
     ipcRenderer.on('sdcard:mount', callback)
   },
-  onFirmwareWritedOnSDCard(callback) {
-    ipcRenderer.on('sdcard:write:done', callback)
+  onMountActionError(callback) {
+    ipcRenderer.on('sdcard:mount:error', callback)
+  },
+  onFirmwareCopied(callback) {
+    ipcRenderer.on('sdcard:action:copy_firmware_bin:done', callback)
   },
   onVerifiedOS(callback) {
     ipcRenderer.on('os:verify:done', callback)
   },
   onSetVersion(callback) {
-    ipcRenderer.on('store:set:done', callback)
+    ipcRenderer.on('store:set:version', callback)
   },
   onGetVersion(callback) {
-    ipcRenderer.on('store:get:done', callback)
+    ipcRenderer.on('store:get:version', callback)
+  },
+  onSetAction(callback) {
+    ipcRenderer.on('store:set:action', callback)
+  },
+  onGetAction(callback) {
+    ipcRenderer.on('store:get:action', callback)
+  },
+  onSetDevice(callback) {
+    ipcRenderer.on('store:set:device', callback)
+  },
+  onGetDevice(callback) {
+    ipcRenderer.on('store:get:device', callback)
+  },
+  onSetSdcard(callback) {
+    ipcRenderer.on('store:set:sdcard', callback)
+  },
+  onGetSdcard(callback) {
+    ipcRenderer.on('store:get:sdcard', callback)
   },
   onVerifyOfficialReleases(callback) {
     ipcRenderer.on('official:releases:get', callback)
@@ -86,7 +128,7 @@ contextBridge.exposeInMainWorld('kruxAPI',{
     ipcRenderer.on('official:releases:verified:sign:error', callback)
   },
   onUnzipped(callback) {
-    ipcRenderer.on('zip:extracted:done', callback)
+    ipcRenderer.on('zip:extract:done', callback)
   },
   onUnzipProgress(callback) {
     ipcRenderer.on('zip:extract:progress', callback)

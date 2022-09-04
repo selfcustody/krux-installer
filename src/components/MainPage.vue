@@ -1,62 +1,85 @@
 <template>
-  <v-container>
-    <v-row
-      v-for="(description,i) in descriptions"
-      :key="i"
-      class="text-justify"
-    >
-      <v-col> 
-        <p class="subheading font-weight-regular">
-          {{ description }} 
-        </p>
-      </v-col>
-    </v-row>
-    <br/>
-    <v-row
-      v-for="(action, i) in actions"
-      :key="i"
-      class="text-center"
-    >
-      <v-col class="mb-4">
-        <v-btn
-          color="primary"
-          @click.prevent="$emit('onSuccess', { page: action.page })"
-        >
-          {{ action.label }}
-        </v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-layout row>
+    <v-flex xs12 sm12>
+      <v-container>
+        <v-row dense>
+          <v-col cols="12">
+            <v-card class="ma-5 pa-5">
+              <v-card-subtitle>
+                Select between available official (selfcustody) or test (odudex) releases,
+              </v-card-subtitle>
+              <v-card-actions>
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })">
+                  {{ version }}
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+            <v-card class="ma-5 pa-5">
+              <v-card-subtitle>
+                Select betweeen "Flash firmware onto device" or "Write firmware to microSD"
+              </v-card-subtitle>
+              <v-card-actions>
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectActionPage' })">
+                  {{ action }}
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+            <v-card class="ma-5 pa-5">
+              <v-card-subtitle>
+                Execute the selected action with select version
+              </v-card-subtitle>
+              <v-card-actions>
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'ExecutePage' })">
+                  Execute
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-col>
+        </v-row>
+      </v-container>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
 export default {
   name: 'MainPage',
+  /**
+   * If user selected:
+   * - a version: change the button 'version' with the selected string
+   * - a device: change the button 'flash' with the selected string
+   * - a firmware: change the button 'firmware' with the selected string
+   */
+  async created () {
+    await window.kruxAPI.get_version()
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onGetVersion((_event, value) => {
+      this.version = value
+    })
+
+    await window.kruxAPI.get_action()
+    
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onGetAction((_event, value) => {
+      this.action = value
+    })
+  },
   data () {
     return {
-      descriptions: [
-        'Krux is an open-source DIY hardware signer for Bitcoin that can sign for multisignature and single-key wallets.',
-        'It is a low-cost airgapped device built from off-the-shelf parts that communicates with wallet software via QR codes and wipes its memory after every session.',
-        'Krux Installer is a GUI tool to simplify the flash, installation or build process that a user would be do in command line interfaces.'
-        ],
-      actions: [
-        {
-          label: 'Select version',
-          page: 'SelectVersionPage'
-        },
-        {
-          label: 'Flash to device',
-          page: 'DetectDevicePage' 
-        },
-        {
-          label: 'Update firmware to SDCard',
-          page: 'DetectSDCardPage'
-        }
-      ]
+      version: '',
+      action: ''
     }
-  },
-  created () {
-    
   }
 }
 </script>
+
+<style>
+.v-main{
+  background: rgba(242, 169, 0);
+} 
+.v-btn{
+  background:  rgba(0, 150, 255);
+  color:       rgba(255, 255, 255);
+}
+</style>

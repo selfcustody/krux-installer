@@ -1,79 +1,58 @@
 <template>
-  <v-container>
-    <v-row align="justify">
-      <v-col
-        cols="32"
-        sm12
-      >
-        <v-layout column wrap>
-          <v-flex v-if="sdcard.error">
-            <p>No SDCard detected.</p>
-            <br/>
-            <p>Click in the button below, insert your SDCard and try again</p>
-            <br/>
-            <v-btn
-              color="green"
-              @click.prevent="mountSDCard"
-            >
-              Try again
-            </v-btn>
-            <br/>
-            <v-btn
-              color="primary"
-              @click.prevent="umountSDCard"
-            >
-              Back
-            </v-btn>
-          </v-flex>
-          <v-flex v-if="!sdcard.error"> 
-            <div v-if="state === 'umounted'">
-              <p> We detected an <b>{{ state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ sdcard.device }}</b></p>
-              <p>
-                Click in the button below to mount it
-              </p>
-              <br/>
-              <v-btn
-                color="green"
-                @click.prevent="mountSDCard"
-              >
-                Mount it!
-              </v-btn>
-              <br/>
-              <v-btn
-                color="primary"
-                @click.prevent="umountSDCard"
-              >
-                Back
-              </v-btn>
-            </div>
-            <div v-if="state === 'mounting' || state === 'umounting'">
-              <p> Waiting for administrator permissions... </p>
-            </div>
-            <div v-if="state === 'mounted'"> 
-              <p> We detected an <b>{{ state }} {{ sdcard.fstype }} {{ sdcard.size }} card at {{ mountpoint }}</b></p>
-              <p>
-                SDCard mounted. Let's proceed with download
-              </p>
-              <br/>
-              <v-btn
-                color="green"
-                @click.prevent="select_firmware"
-              >
-                Select firmware!
-              </v-btn>
-              <br/>
-              <v-btn
-                color="primary"
-                @click.prevent="umountSDCard"
-              >
-                back
-              </v-btn>
-            </div>
-          </v-flex>
-        </v-layout>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-layout column wrap> 
+    <v-flex
+      v-if="info.state === 'mounting'"
+      xs12 sm12
+    >
+      <v-card class="ma-5 pa-5">
+        <v-card-title>
+          Waiting for administrator permissions...
+        </v-card-title>
+      </v-card>
+    </v-flex>
+    <v-flex
+      v-if="info.state !== 'mounting'"
+      xs12
+      sm12
+    >
+      <v-card class="ma-5 pa-5">
+        <v-card-title>
+          {{ action }}
+        </v-card-title>
+        <v-card-subtitle>
+          {{ version }}
+        </v-card-subtitle>
+        <v-card-content>
+          <v-card-text
+            v-for="(val, key) in info"
+            :key="key"
+          >
+            <b>microSD {{ key }}</b>: {{ val }}
+          </v-card-text>
+        </v-card-content>
+        <v-card-actions>
+          <v-btn
+            v-if="info.state === 'umounted'"
+            @click.prevent="mountSDCard"
+          >
+            Mount it!
+          </v-btn>
+          <v-btn
+            v-if="this.info.state === 'mounted'"
+            @click.prevent="select_device"
+          >
+            Select a device
+          </v-btn>
+          <br/>
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'DetectSDCardPage' })"
+          >
+            Back
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -82,41 +61,67 @@ export default {
   name: 'ConfirmDetectedSDCardPage',
   data () {
     return {
-      device: '',
-      size: 0,
-      description: '',
-      isFAT32: false,
-      state: 'umounted'
+      action: '',
+      version: '',
+      infos: ['state', 'pttype', 'size', 'device', 'description', 'mountpoint'],
+      info: {}
     }
+  },
+  async created () {
+    await window.kruxAPI.get_action()
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onGetAction((_event, value) => {
+      this.action = value
+    })
+
+    await window.kruxAPI.get_version()
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onGetVersion((_event, value) => {
+      this.version = value
+    })
+
+    await window.kruxAPI.sdcard_action({ action: 'detect' })
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onDetectedSDCardSuccess((_event, value) => {
+      this.infos.forEach((e) => {
+        if (value[e]) this.info[e] = value[e]
+      })
+    })
   },
   methods: {
     async mountSDCard () {
-      this.state = 'mounting'
-      await window.kruxAPI.sdcard_action({ action: 'mount' });
-
+      this.info.state = 'mounting'
+      await window.kruxAPI.sdcard_action({ action: 'mount' })
+        
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onMountAction((_event, value) => {
-        this.state = value.state
-        this.mountpoint = value.mountpoint
-      });
+        this.infos.forEach((e) => {
+          if (value[e]) this.info[e] = value[e]
+        })
+      })
+
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onMountActionError((_event, value) => {
+        this.$emit('onError', { error: value })
+      })
     },
-    async umountSDCard () {
-      if (this.state === 'mounted') {
-        this.state = 'umounting'
-        await window.kruxAPI.sdcard_action({ action: 'umount' });
-
-        // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onMountAction((_event, value) => {
-          this.state = value.state
-          this.$emit('onError', { sdcard: this.mountpoint, page: 'DetectSDCardPage' })
-        });
-
-      } else {
-        this.$emit('onError', { sdcard: this.mountpoint, page: 'DetectSDCardPage' })
+    async select_device () {
+      let sdcard = ''
+      if (this.info.mountpoint !== '') {
+        sdcard = this.info.mountpoint
       }
-    },
-    select_firmware () {
-      this.$emit('onSuccess', { sdcard: this.mountpoint, page: 'SelectFirmwarePage' })
+      else if (this.info.description !== '') {
+        sdcard = this.info.description.split('(')[1].split(')')[0]
+      }
+      await window.kruxAPI.set_sdcard(sdcard)
+
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onSetSdcard((_event, value) => {
+        this.$emit('onSuccess', { page: 'SelectFirmwarePage' })
+      })
     }
   }
 } 

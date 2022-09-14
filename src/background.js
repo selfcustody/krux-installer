@@ -54,8 +54,8 @@ async function createWindow() {
   ipcMain.handle('window:started', handleWindowStarted(win, store))
 
   // This IPC will be called everytime when the method
-  // `window.kruxAPI.detect_usb()` is exected inside App.vue
-  ipcMain.handle('serialport:action', handleSerialport(win, store))
+  // `window.kruxAPI.list_serialport` is exected inside App.vue
+  ipcMain.handle('serialport:list', handleSerialport(win, store))
 
   // This IPCs will be called everytime when the method
   // `window.kruxAPI.download_resource` is executed inside App.vue

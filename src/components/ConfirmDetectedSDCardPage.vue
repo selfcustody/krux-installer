@@ -1,7 +1,17 @@
 <template>
-  <v-layout column wrap> 
+  <v-layout column wrap>
     <v-flex
-      v-if="info.state === 'mounting'"
+      v-if="error"
+      xs12 sm12
+    >
+      <v-card class="ma-5 pa-5">
+        <v-card-title>
+          {{ error.message }}
+        </v-card-title>
+      </v-card>
+    </v-flex>
+    <v-flex
+      v-if="!error && info.state === 'mounting'"
       xs12 sm12
     >
       <v-card class="ma-5 pa-5">
@@ -11,7 +21,7 @@
       </v-card>
     </v-flex>
     <v-flex
-      v-if="info.state !== 'mounting'"
+      v-if="!error && info.state !== 'mounting'"
       xs12
       sm12
     >
@@ -38,10 +48,10 @@
             Mount it!
           </v-btn>
           <v-btn
-            v-if="this.info.state === 'mounted'"
-            @click.prevent="select_device"
+            v-if="info.state === 'mounted'"
+            @click.prevent="set_sdcard"
           >
-            Select a device
+            Download and write
           </v-btn>
           <br/>
           <v-btn
@@ -64,7 +74,8 @@ export default {
       action: '',
       version: '',
       infos: ['state', 'pttype', 'size', 'device', 'description', 'mountpoint'],
-      info: {}
+      info: {},
+      error: null
     }
   },
   async created () {
@@ -86,10 +97,17 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onDetectedSDCardSuccess((_event, value) => {
+      this.error = null
       this.infos.forEach((e) => {
         if (value[e]) this.info[e] = value[e]
       })
     })
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onDetectedSDCardError((_event, value) => {
+      this.error = value
+    })
+
   },
   methods: {
     async mountSDCard () {
@@ -108,19 +126,24 @@ export default {
         this.$emit('onError', { error: value })
       })
     },
-    async select_device () {
+    async set_sdcard () {
       let sdcard = ''
       if (this.info.mountpoint !== '') {
         sdcard = this.info.mountpoint
       }
-      else if (this.info.description !== '') {
-        sdcard = this.info.description.split('(')[1].split(')')[0]
+      if (this.info.description !== '') {
+        console.log(this.info.description)
+        sdcard = this.info.description.split('(')[1]
+        console.log(sdcard)
+        sdcard = sdcard.split(')')[0]
       }
+
+      console.log(sdcard)
       await window.kruxAPI.set_sdcard(sdcard)
 
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onSetSdcard((_event, value) => {
-        this.$emit('onSuccess', { page: 'SelectFirmwarePage' })
+        this.$emit('onSuccess', { page: 'DownloadPage' })
       })
     }
   }

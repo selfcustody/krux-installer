@@ -26,6 +26,16 @@
             </v-card>
             <v-card class="ma-5 pa-5">
               <v-card-subtitle>
+                Select device firmware
+              </v-card-subtitle>
+              <v-card-actions>
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectFirmwarePage' })">
+                  {{ device }}
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+            <v-card class="ma-5 pa-5">
+              <v-card-subtitle>
                 Execute the selected action with select version
               </v-card-subtitle>
               <v-card-actions>
@@ -64,11 +74,19 @@ export default {
     window.kruxAPI.onGetAction((_event, value) => {
       this.action = value
     })
+
+    await window.kruxAPI.get_device()
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onGetDevice((_event, value) => {
+      this.device = value
+    })
   },
   data () {
     return {
       version: '',
-      action: ''
+      action: '',
+      device: ''
     }
   }
 }

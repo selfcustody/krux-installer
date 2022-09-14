@@ -4,6 +4,7 @@ import SDCardHandler from './sdcard'
 import SerialportHandler from './serialport'
 import VerifyOfficialReleasesHandler from './verify-official-releases'
 import UnzipHandler from './unzip'
+import FlashHandler from './flash'
 
 /**
  * Function to handle when
@@ -95,14 +96,10 @@ export function handleStoreGet (win, store) {
  * @param app<ElectronApp>
  */
 export function handleSerialport (win, store) {
+  // eslint-disable-next-line no-unused-vars
   return function (_event, options) {
     const handler = new SerialportHandler(win, store)
-    if (options.action === 'list') {
-      handler.list()
-    }
-    if (options.action === 'select') {
-      handler.select(options.device)
-    }
+    handler.list()
   }
 }
 
@@ -176,5 +173,13 @@ export function handleUnzip (win, store) {
   return async function (_event, options) {
     const handler = new UnzipHandler(win, store)
     handler.unzip(options)
+  }
+}
+
+export function handleFlash (win, store) {
+  // eslint-disable-next-line no-unused-vars
+  return async function (_event, options) {
+    const handler = new FlashHandler(win, store, process.platform)
+    handler.flash()
   }
 }

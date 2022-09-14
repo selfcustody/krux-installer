@@ -22,19 +22,21 @@ import KruxLogo from './components/KruxLogo.vue'
 import MainPage from './components/MainPage.vue'
 import SelectVersionPage from './components/SelectVersionPage.vue'
 import SelectActionPage from './components/SelectActionPage.vue'
+import SelectFirmwarePage from './components/SelectFirmwarePage.vue'
 import ExecutePage from './components/ExecutePage.vue'
+import DetectDevicePage from './components/DetectDevicePage.vue'
+import DetectSDCardPage from './components/DetectSDCardPage.vue'
+import DownloadPage from './components/DownloadPage.vue'
 import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
 import DownloadOfficialReleaseSHA256Page from './components/DownloadOfficialReleaseSHA256Page.vue'
 import DownloadOfficialReleaseSigPage from './components/DownloadOfficialReleaseSigPage.vue'
 import DownloadOfficialReleasePemPage from './components/DownloadOfficialReleasePemPage.vue'
 import VerifyOfficialReleasesPage from './components/VerifyOfficialReleasesPage.vue'
 import UnzipOfficialReleasesPage from './components/UnzipOfficialReleasesPage.vue'
-import DetectDevicePage from './components/DetectDevicePage.vue'
 import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
-import DetectSDCardPage from './components/DetectSDCardPage.vue'
 import ConfirmDetectedSDCardPage from './components/ConfirmDetectedSDCardPage.vue'
-import SelectFirmwarePage from './components/SelectFirmwarePage.vue'
 import WriteFirmwareToSDCardPage from './components/WriteFirmwareToSDCardPage.vue'
+import WriteFirmwareToDevicePage from './components/WriteFirmwareToSDCardPage.vue'
 import DownloadKtoolPage from './components/DownloadKtoolPage.vue'
 import DownloadFirmwarePage from './components/DownloadFirmwarePage.vue'
 import DownloadKbootPage from './components/DownloadKbootPage.vue'
@@ -45,20 +47,22 @@ export default {
     KruxLogo,
     MainPage,
     SelectVersionPage,
-    SelectActionPage,
-    ExecutePage,
+    SelectActionPage, 
+    SelectFirmwarePage,
+    ExecutePage, 
+    DetectDevicePage,  
+    DetectSDCardPage,
+    DownloadPage,
     DownloadOfficialReleasePage,
     DownloadOfficialReleaseSHA256Page,
     DownloadOfficialReleaseSigPage,
     DownloadOfficialReleasePemPage,
     VerifyOfficialReleasesPage,
     UnzipOfficialReleasesPage,
-    DetectDevicePage, 
     ConfirmDetectedDevicePage,
-    DetectSDCardPage,
     ConfirmDetectedSDCardPage,
-    SelectFirmwarePage,
     WriteFirmwareToSDCardPage,
+    WriteFirmwareToDevicePage,    
     DownloadKtoolPage  ,
     DownloadFirmwarePage,
     DownloadKbootPage  

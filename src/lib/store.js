@@ -37,7 +37,7 @@ export default function (app) {
     store.set('versions', [])
     store.set('version', 'Select version')
     store.set('action', 'Select action')
-    store.set('device', '')
+    store.set('device', 'Select device firmware')
     store.set('sdcard', '')
 
     return store

@@ -7,8 +7,8 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async download_resource (options) {
     await ipcRenderer.invoke('download:resource', options)
   },
-  async serialport (options) {
-    await ipcRenderer.invoke('serialport:action', options)
+  async list_serialport () {
+    await ipcRenderer.invoke('serialport:list')
   },
   async sdcard_action (options) {
     await ipcRenderer.invoke('sdcard:action', options)
@@ -64,11 +64,11 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onDownloadError(callback) {
     ipcRenderer.on('download:status:error', callback)
   },
-  onSerialportList(callback) {
+  onListSerialport(callback) {
     ipcRenderer.on('serialport:list', callback)
   },
   onSerialportSelected(callback) {
-    ipcRenderer.on('serialport:selected', callback)
+    ipcRenderer.on('store:get:device', callback)
   },
   onDetectedSDCardSuccess(callback) {
     ipcRenderer.on('sdcard:detection:success', callback)
@@ -84,6 +84,15 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onFirmwareCopied(callback) {
     ipcRenderer.on('sdcard:action:copy_firmware_bin:done', callback)
+  },
+  onFlashing(callback) {
+    ipcRenderer.on('flash:writing', callback)
+  },
+  onFlashingError(callback) {
+    ipcRenderer.on('flash:writing:error', callback)
+  },
+  onFlashingDone(callback) {
+    ipcRenderer.on('flash:writing:done', callback)
   },
   onVerifiedOS(callback) {
     ipcRenderer.on('os:verify:done', callback)

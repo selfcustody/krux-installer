@@ -119,7 +119,6 @@ export default class SDCardHandler extends Handler {
 
     if (platform === 'linux') {
       const device = await SDCardHandler.getBlockDevice(platform, sdcard)
-      console.log(device)
       const name = device.name
       const uuid = device.uuid
       const username = userInfo().username;
@@ -214,8 +213,15 @@ export default class SDCardHandler extends Handler {
       const firmwareBinPathOrig = join(resources, version, `krux-${version}`, device, 'firmware.bin')
       const firmwareBinPathDest = join(sdcard, 'firmware.bin')
 
+      const firmwareBinSigPathOrig = join(resources, version, `krux-${version}`, device, 'firmware.bin.sig')
+      const firmwareBinSigPathDest = join(sdcard, 'firmware.bin.sig')
+
       await copyFileAsync(firmwareBinPathOrig, firmwareBinPathDest);
       this.send('window:log:info', `copied ${firmwareBinPathOrig} to ${firmwareBinPathDest}`)
+
+      await copyFileAsync(firmwareBinSigPathOrig, firmwareBinSigPathDest);
+      this.send('window:log:info', `copied ${firmwareBinSigPathOrig} to ${firmwareBinSigPathDest}`)
+
       this.send('sdcard:action:copy_firmware_bin:done', firmwareBinPathDest);
     } catch (error) {
       this.send('window:log:info', error.stack);

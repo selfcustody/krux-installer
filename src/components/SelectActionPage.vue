@@ -6,9 +6,7 @@
     fill-height
   >
     <v-flex xs12 sm4>
-      <v-card
-        class="pa-5"
-      >
+      <v-card class="ma-5 pa-5">
         <v-card-title>
           Choose an action
         </v-card-title>

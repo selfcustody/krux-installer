@@ -59,12 +59,6 @@ class SerialportHandler extends Handler {
       console.log(error)
     }
   }
-
-  select(device) {
-    this.store.set('device', device)
-    this.send('serialport:selected', device)
-  }
-
 }
 
 export default SerialportHandler

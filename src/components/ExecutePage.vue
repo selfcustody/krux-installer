@@ -20,7 +20,7 @@ export default {
     window.kruxAPI.onGetAction((_event, value) => {
       if (value === 'Flash firmware onto device') {
         this.$emit('onSuccess', {
-          page: 'DetectDevicePage'
+          page: 'BeforeFlashDevicePage'
         })
       }
       else if (value === 'Write firmware onto microSD') {

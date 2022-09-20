@@ -24,7 +24,7 @@ import SelectVersionPage from './components/SelectVersionPage.vue'
 import SelectActionPage from './components/SelectActionPage.vue'
 import SelectFirmwarePage from './components/SelectFirmwarePage.vue'
 import ExecutePage from './components/ExecutePage.vue'
-import DetectDevicePage from './components/DetectDevicePage.vue'
+import BeforeFlashDevicePage from './components/BeforeFlashDevicePage.vue'
 import DetectSDCardPage from './components/DetectSDCardPage.vue'
 import DownloadPage from './components/DownloadPage.vue'
 import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
@@ -36,7 +36,7 @@ import UnzipOfficialReleasesPage from './components/UnzipOfficialReleasesPage.vu
 import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
 import ConfirmDetectedSDCardPage from './components/ConfirmDetectedSDCardPage.vue'
 import WriteFirmwareToSDCardPage from './components/WriteFirmwareToSDCardPage.vue'
-import WriteFirmwareToDevicePage from './components/WriteFirmwareToSDCardPage.vue'
+import WriteFirmwareToDevicePage from './components/WriteFirmwareToDevicePage.vue'
 import DownloadKtoolPage from './components/DownloadKtoolPage.vue'
 import DownloadFirmwarePage from './components/DownloadFirmwarePage.vue'
 import DownloadKbootPage from './components/DownloadKbootPage.vue'
@@ -50,7 +50,7 @@ export default {
     SelectActionPage, 
     SelectFirmwarePage,
     ExecutePage, 
-    DetectDevicePage,  
+    BeforeFlashDevicePage,  
     DetectSDCardPage,
     DownloadPage,
     DownloadOfficialReleasePage,

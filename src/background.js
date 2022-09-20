@@ -14,7 +14,8 @@ import {
   handleStoreGet,
   handleDownload,
   handleSDCard,
-  handleSerialport
+  handleSerialport,
+  handleFlash
 } from './lib/handlers'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -80,6 +81,7 @@ async function createWindow() {
   // This IPC will be called everytime when the method
   // `window.kruxAPI.verify_official_releases` is executed inside `App.vue`
   ipcMain.handle('official:releases:verify:sign', handleVerifyOfficialReleasesSign(win, store))
+
   // These IPC will be act like Vuex store,
   // called everytime when the methods
   // `window.kruxAPI.set_version`
@@ -87,6 +89,10 @@ async function createWindow() {
   ipcMain.handle('store:set', handleStoreSet(win, store))
   ipcMain.handle('store:get', handleStoreGet(win, store))
 
+
+  // This IPC will be called everytime when the method
+  // `window.kruxAPI.flash_firmware_to_device` is executed inside `App.vue`
+  ipcMain.handle('flash:firmware', handleFlash(win, store))
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)

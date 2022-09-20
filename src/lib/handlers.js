@@ -180,6 +180,7 @@ export function handleFlash (win, store) {
   // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {
     const handler = new FlashHandler(win, store, process.platform)
+    handler.chmod()
     handler.flash()
   }
 }

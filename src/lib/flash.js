@@ -17,6 +17,23 @@ export default class FlashHandler extends Handler {
     }
   }
 
+  async chmod () {
+    const resources = this.store.get('resources')
+    const version = this.store.get('version')
+
+    const __version__ = version.split('tag/')[1]
+    const __cwd__ = join(resources, __version__, `krux-${__version__}`)
+
+    if (this.platform === 'linux') {
+      try {
+        await bufferedSpawn('chmod', ['+x', './ktool-linux'], { cwd: __cwd__ })
+      } catch (error) {
+        this.send('window:log:info', error)
+        this.send('flash:writing:error', error)
+      }
+    }
+  }
+
   async flash () {
     const resources = this.store.get('resources')
     const version = this.store.get('version')
@@ -24,60 +41,41 @@ export default class FlashHandler extends Handler {
 
     const __version__ = version.split('tag/')[1]
     const __cwd__ = join(resources, __version__, `krux-${__version__}`)
+    console.log(__cwd__)
+    try {
+      if (this.platform === 'linux') {
+        const { stdout, stderr } = await bufferedSpawn(
+          './ktool-linux',
+          ['-B', 'goE', '-b', '1500000', `${device}/kboot.kfpkg`],
+          { cwd: __cwd__ }
+        )
 
-    if (this.platform === 'linux') {
-      let maixpy_device = ''
-
-      // maixpy_m5stickv
-      if (device.vendorId === '0403' && device.productId === '6001') {
-        maixpy_device = 'maixpy_m5stickv'
-      }
-      // maixpy_bit
-      else if (device.path === '/dev/ttyUSB0' && device.vendorId === '0403' && device.productId === '6010') {
-        maixpy_device = 'maixpy_bit'
-      }
-      // maixpy_amigo
-      else if (device.path === '/dev/ttyUSB1' && device.vendorId === '0403' && device.productId === '6010') {
-        if (device.type === 'tft') maixpy_device = 'maixpy_amigo_tft'
-        if (device.type === 'ips') maixpy_device = 'maixpy_amigo_ips'
-      }
-      // maixpy_dock
-      else if (device.vendorId === '7523' && device.productId === '1a86') {
-        maixpy_device = 'maixpy_dock'
-      }
-
-      const { stdout, stderr } = await bufferedSpawn('./ktool', [
-        '-B',
-        'goE',
-        '-b',
-        '1500000',
-        `${maixpy_device}/kboot.kfpkg`
-      ],
-        {
-          cwd: __cwd__,
-          stdio: 'pipe'
+        console.log(stdout)
+        console.log(stderr)
+        if (stdout) {
+          this.send('flash:writing', stdout)
         }
-      )
 
-      const err = []
-      stdout.on('data', (chunk) => {
-        this.send('flash:writing', chunk.toString())
-      })
-
-      stdout.on('end', () => {
-        this.send('flash:writing:done', true)
-      })
-
-      stderr.on('data', (chunk) => {
-        this.send('flash:writing', chunk.toString())
-        err.push(chunk.toString())
-      })
-
-      stderr.on('end', () => {
-        const __err__ = new Error(err.join(''))
-        this.send('window:log:info', __err__)
-        this.send('flash:writing:error', __err__)
-      })
+        if (stderr) {
+          this.send('flash:writing', stderr)
+          const __err__ = new Error('Flash failed')
+          this.send('window:log:info', __err__)
+          this.send('flash:writing:error', __err__)
+        }
+      }
+    } catch (err) {
+      if (err.code === 'ECMDERR') {
+        let msg = err.stdout.split('\x1B[0m ')[1]
+        msg = msg.replace('\x1B[32m', ' ')
+        msg = msg.replace('`', '')
+        msg = msg.replace('`', '')
+        const e = new Error(msg)
+        this.send('window:log:info', e)
+        this.send('flash:writing:error', e)
+      } else {
+        this.send('window:log:info', err)
+        this.send('flash:writing:error', err)
+      }
     }
   }
 }

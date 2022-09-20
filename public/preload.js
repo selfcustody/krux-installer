@@ -52,6 +52,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async unzip (options) {
     await ipcRenderer.invoke('zip:extract', options)
   },
+  async flash_firmware_to_device() {
+    await ipcRenderer.invoke('flash:firmware')
+  },
   onLogLevelInfo(callback) {
     ipcRenderer.on('window:log:info', callback)
   },

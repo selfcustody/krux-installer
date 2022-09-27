@@ -3,6 +3,7 @@
 import bufferedSpawn from 'buffered-spawn'
 import { join } from 'path'
 import Handler from './base'
+import sudo from 'sudo-prompt'
 
 export default class FlashHandler extends Handler {
 
@@ -34,6 +35,26 @@ export default class FlashHandler extends Handler {
     }
   }
 
+  /*
+   * Shows a dialog requiring the
+   * system's administrador password to
+   * execute privileged tasks (mounting)
+   *
+   * @param script<String>: the main script to run with sudo prompt
+   */
+  static sudoPromptAsync (script) {
+    return new Promise(function (resolve, reject) {
+      const options = {
+        name: 'Krux Installer'
+      };
+      sudo.exec(script, options, function (err, stdout, stderr){
+        if (err) reject(err);
+        if (stderr) reject(stderr);
+        resolve(stdout);
+      })
+    });
+  }
+
   async flash () {
     const resources = this.store.get('resources')
     const version = this.store.get('version')
@@ -44,24 +65,17 @@ export default class FlashHandler extends Handler {
     console.log(__cwd__)
     try {
       if (this.platform === 'linux') {
-        const { stdout, stderr } = await bufferedSpawn(
-          './ktool-linux',
-          ['-B', 'goE', '-b', '1500000', `${device}/kboot.kfpkg`],
-          { cwd: __cwd__ }
-        )
-
-        console.log(stdout)
-        console.log(stderr)
-        if (stdout) {
-          this.send('flash:writing', stdout)
-        }
-
-        if (stderr) {
-          this.send('flash:writing', stderr)
-          const __err__ = new Error('Flash failed')
-          this.send('window:log:info', __err__)
-          this.send('flash:writing:error', __err__)
-        }
+        const script = [
+          `${__cwd__}/ktool-linux`,
+          '-B',
+          'goE',
+          '-b',
+          '1500000',
+          `${__cwd__}/${device}/kboot.kfpkg`
+        ].join(' ')
+        const output = await FlashHandler.sudoPromptAsync(script)
+        console.log(output)
+        this.send('flash:writing:done', output)
       }
     } catch (err) {
       if (err.code === 'ECMDERR') {
@@ -73,6 +87,7 @@ export default class FlashHandler extends Handler {
         this.send('window:log:info', e)
         this.send('flash:writing:error', e)
       } else {
+        console.log(err)
         this.send('window:log:info', err)
         this.send('flash:writing:error', err)
       }

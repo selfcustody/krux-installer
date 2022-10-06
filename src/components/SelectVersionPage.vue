@@ -74,7 +74,7 @@ export default {
 
       // eslint-disable-next-line no-unused-vars
       window.kruxAPI.onSetVersion((_event, data) => {
-        this.$emit('onSuccess', { page: 'MainPage' })
+        this.$emit('onSuccess', { page: 'CheckResourcesPage' })
       })
     }
   }

@@ -42,7 +42,7 @@
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'WriteFirmwareToSDCardPage' })">
+          <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
             {{ action }}
           </v-btn>
           <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })">

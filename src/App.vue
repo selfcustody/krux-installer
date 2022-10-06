@@ -26,20 +26,20 @@ import SelectFirmwarePage from './components/SelectFirmwarePage.vue'
 import ExecutePage from './components/ExecutePage.vue'
 import BeforeFlashDevicePage from './components/BeforeFlashDevicePage.vue'
 import DetectSDCardPage from './components/DetectSDCardPage.vue'
-import DownloadPage from './components/DownloadPage.vue'
+import CheckResourcesPage from './components/CheckResourcesPage.vue'
 import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
 import DownloadOfficialReleaseSHA256Page from './components/DownloadOfficialReleaseSHA256Page.vue'
 import DownloadOfficialReleaseSigPage from './components/DownloadOfficialReleaseSigPage.vue'
 import DownloadOfficialReleasePemPage from './components/DownloadOfficialReleasePemPage.vue'
+import DownloadTestFirmwarePage from './components/DownloadTestFirmwarePage.vue'
+import DownloadTestKtoolPage from './components/DownloadTestKtoolPage.vue'
+import DownloadTestKbootPage from './components/DownloadTestKbootPage.vue'
 import VerifyOfficialReleasesPage from './components/VerifyOfficialReleasesPage.vue'
 import UnzipOfficialReleasesPage from './components/UnzipOfficialReleasesPage.vue'
 import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
 import ConfirmDetectedSDCardPage from './components/ConfirmDetectedSDCardPage.vue'
 import WriteFirmwareToSDCardPage from './components/WriteFirmwareToSDCardPage.vue'
 import WriteFirmwareToDevicePage from './components/WriteFirmwareToDevicePage.vue'
-import DownloadKtoolPage from './components/DownloadKtoolPage.vue'
-import DownloadFirmwarePage from './components/DownloadFirmwarePage.vue'
-import DownloadKbootPage from './components/DownloadKbootPage.vue'
 
 export default {
   name: 'App',
@@ -52,20 +52,20 @@ export default {
     ExecutePage, 
     BeforeFlashDevicePage,  
     DetectSDCardPage,
-    DownloadPage,
+    CheckResourcesPage,
     DownloadOfficialReleasePage,
     DownloadOfficialReleaseSHA256Page,
     DownloadOfficialReleaseSigPage,
-    DownloadOfficialReleasePemPage,
+    DownloadOfficialReleasePemPage, 
+    DownloadTestKtoolPage,
+    DownloadTestFirmwarePage,
+    DownloadTestKbootPage,  
     VerifyOfficialReleasesPage,
     UnzipOfficialReleasesPage,
     ConfirmDetectedDevicePage,
     ConfirmDetectedSDCardPage,
     WriteFirmwareToSDCardPage,
     WriteFirmwareToDevicePage,    
-    DownloadKtoolPage  ,
-    DownloadFirmwarePage,
-    DownloadKbootPage  
   },
   data: () => ({
     page: 'MainPage'

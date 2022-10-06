@@ -60,7 +60,7 @@
                 </v-btn>
                 <v-btn
                   v-if="verifiedHash && verifiedSign"
-                  @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })"
+                  @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
                 >
                   Back
                 </v-btn>

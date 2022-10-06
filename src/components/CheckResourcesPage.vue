@@ -6,7 +6,7 @@
 
 <script>
 export default {
-  name: 'DownloadPage',
+  name: 'CheckResourcesPage',
   /**
    * If user selected:
    * - a version: change the button 'version' with the selected string
@@ -24,7 +24,7 @@ export default {
       if (value.match(regexp_selfcustody)) {
         this.$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })
       } else if (value.match(regexp_odudex)) {
-        this.$emit('onSuccess', { page: 'DownloadFirmwarePage' })
+        this.$emit('onSuccess', { page: 'DownloadTestFirmwarePage' })
       } else {
         this.$emit('onError', { error: new Error(`Invalid action '${value}'`) })
       }

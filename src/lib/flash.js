@@ -22,8 +22,18 @@ export default class FlashHandler extends Handler {
     const resources = this.store.get('resources')
     const version = this.store.get('version')
 
-    const __version__ = version.split('tag/')[1]
-    const __cwd__ = join(resources, __version__, `krux-${__version__}`)
+    let __version__ = version
+    let __cwd__ = ''
+
+    if (version.match(/selfcustody/g)) {
+      __version__ = version.split('tag/')[1]
+      __cwd__ = join(resources, __version__, `krux-${__version__}`)
+    }
+
+    if (version.match(/odudex/g)) {
+      __version__ = join(version, 'raw', 'main')
+      __cwd__ = join(resources, __version__)
+    }
 
     if (this.platform === 'linux') {
       try {
@@ -60,9 +70,19 @@ export default class FlashHandler extends Handler {
     const version = this.store.get('version')
     const device = this.store.get('device')
 
-    const __version__ = version.split('tag/')[1]
-    const __cwd__ = join(resources, __version__, `krux-${__version__}`)
-    console.log(__cwd__)
+    let __version__ = version
+    let __cwd__ = ''
+
+    if (version.match(/selfcustody/g)) {
+      __version__ = version.split('tag/')[1]
+      __cwd__ = join(resources, __version__, `krux-${__version__}`)
+    }
+
+    if (version.match(/odudex/g)) {
+      __version__ = join(version, 'raw', 'main')
+      __cwd__ = join(resources, __version__)
+    }
+
     try {
       if (this.platform === 'linux') {
         const script = [

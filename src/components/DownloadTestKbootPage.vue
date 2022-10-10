@@ -37,30 +37,35 @@ export default {
 
     window.kruxAPI.onGetDevice((_event, value) => {
       this.device = value
+      this.$nextTick(() => {
+        this.download()
+      })
     })
-    
-    await window.kruxAPI.download_resource({
-      baseUrl: 'https://github.com/odudex',
-      resource: `krux_binaries/raw/main/${this.device}`,
-      filename: 'kboot.kfpkg'
-    })
+  },
+  methods: {
+    async download () {
+      await window.kruxAPI.download_resource({
+        baseUrl: 'https://github.com',
+        resource: `odudex/krux_binaries/raw/main/${this.device}`,
+        filename: 'kboot.kfpkg'
+      })
 
-    // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onDownloadStatus((_event, value) => {
-      this.model = value
-    })
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onDownloadStatus((_event, value) => {
+        this.model = value
+      })
 
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onDownloadDone((_event, value) => {
+        this.$emit('onSuccess', { page: 'DownloadTestKtoolPage' })
+      })
 
-    // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onDownloadDone((_event, value) => {
-      this.$emit('onSuccess', { page: 'DownloadTestKtoolPage' })
-    })
-
-    // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onDownloadError((_event, value) => {
-      alert(value)
-      this.$emit('onSuccess', { page: 'MainPage' })
-    })
+      // eslint-disable-next-line no-unused-vars
+      window.kruxAPI.onDownloadError((_event, value) => {
+        alert(value)
+        this.$emit('onSuccess', { page: 'MainPage' })
+      })
+    }
   }
 }
 </script>

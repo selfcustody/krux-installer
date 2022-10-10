@@ -3,17 +3,17 @@
     <v-flex xs12 sm12>
       <v-container>
         <v-row dense>
-          <v-col cols="12">
+          <v-col cols="12"> 
             <v-card class="ma-5 pa-5">
               <v-card-subtitle>
-                Select between available official (selfcustody) or test (odudex) releases,
+                Select device firmware
               </v-card-subtitle>
               <v-card-actions>
-                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })">
-                  {{ version }}
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectFirmwarePage' })">
+                  {{ device }}
                 </v-btn>
               </v-card-actions>
-            </v-card>
+            </v-card> 
             <v-card class="ma-5 pa-5">
               <v-card-subtitle>
                 Select betweeen "Flash firmware onto device" or "Write firmware to microSD"
@@ -26,17 +26,17 @@
             </v-card>
             <v-card class="ma-5 pa-5">
               <v-card-subtitle>
-                Select device firmware
+                Select between available official (selfcustody) or test (odudex) releases,
               </v-card-subtitle>
               <v-card-actions>
-                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectFirmwarePage' })">
-                  {{ device }}
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })">
+                  {{ version }}
                 </v-btn>
               </v-card-actions>
             </v-card>
             <v-card class="ma-5 pa-5">
               <v-card-subtitle>
-                Execute the selected action with select version
+                Execute the selected action combined with the select firmware's version
               </v-card-subtitle>
               <v-card-actions>
                 <v-btn @click.prevent="$emit('onSuccess', { page: 'ExecutePage' })">

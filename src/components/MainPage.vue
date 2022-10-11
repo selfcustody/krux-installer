@@ -65,21 +65,27 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onGetVersion((_event, value) => {
-      this.version = value
+      this.$nextTick(() => {
+        this.version = value
+      })
     })
 
     await window.kruxAPI.get_action()
     
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onGetAction((_event, value) => {
-      this.action = value
+      this.$nextTick(() => {
+        this.action = value
+      })
     })
 
     await window.kruxAPI.get_device()
 
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onGetDevice((_event, value) => {
-      this.device = value
+      this.$nextTick(() => {
+        this.device = value
+      })
     })
   },
   data () {

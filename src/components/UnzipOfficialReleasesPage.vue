@@ -38,12 +38,14 @@
             color="primary"
             text-color="white"
           >
-            {{ file }}
+            <div class="singleLine">
+              {{ file }}
+            </div>
           </v-card-text>
         </v-card-content>
         <v-card-actions>
           <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
-            {{ action }}
+            Done
           </v-btn>
           <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })">
             Back.
@@ -115,3 +117,10 @@ export default {
   }
 }
 </script>
+
+<style>
+.singleLine {
+  white-space: nowrap;
+  word-break: normal;
+}
+</style>

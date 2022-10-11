@@ -15,9 +15,7 @@ import Handler from './base'
  */
 function unzipAsync (handler, options) {
   return new Promise(function (resolve, reject) {
-    console.log(options)
     const zipFilePath = join(options.destination, options.resource, options.file)
-    console.log(zipFilePath)
     open(zipFilePath, { lazyEntries: true }, function (err, zipfile) {
       if (err) reject(err)
       zipfile.readEntry()
@@ -41,7 +39,6 @@ function unzipAsync (handler, options) {
 
           // create the destination file
           const writeStreamPath = join(options.destination, options.resource, entry.fileName)
-          console.log(writeStreamPath)
           const writeStream = createWriteStream(writeStreamPath)
 
           // define some variables to calculate the

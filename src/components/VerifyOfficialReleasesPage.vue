@@ -125,14 +125,14 @@ export default {
 
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onVerifiedSign((_event, value) => {
-          console.log(value)
           this.verifiedSign = value.match(new RegExp('Signature Verified Successfully')) ? true : false
           this.signed = value
         })
     
         // eslint-disable-next-line no-unused-vars
         window.kruxAPI.onVerifiedSignError((_event, value) => {
-          this.$emit('onError', value.error)
+          alert(value.error)
+          this.$emit('onSuccess', { page: 'MainPage' })
         })
       }
     }

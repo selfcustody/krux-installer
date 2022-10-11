@@ -5,16 +5,24 @@
     row
     fill-height
   >
-    <v-flex>
-      <p>Downloading <b>{{ version }}</b>...</p>
-      <br/>
-      <v-progress-linear
-        v-model="model"
-        height="25"
-        color="blue-grey"
-      >
-        <strong>{{ model }}%</strong>
-      </v-progress-linear>
+    <v-flex xs12>
+      <v-card flat>
+        <v-card-title>
+          Downloading...
+        </v-card-title>
+        <v-card-subtitle>
+          <b>{{ version }}</b>
+        </v-card-subtitle>
+        <v-card-actions>
+          <v-progress-linear
+            v-model="model"
+            height="25"
+            color="blue-grey"
+          >
+            <strong>{{ model }}%</strong>
+          </v-progress-linear>
+        </v-card-actions>
+      </v-card>
     </v-flex>
   </v-layout>
 </template>

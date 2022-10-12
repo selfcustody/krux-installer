@@ -13,9 +13,6 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async sdcard_action (options) {
     await ipcRenderer.invoke('sdcard:action', options)
   },
-  async verify_os () {
-    await ipcRenderer.invoke('os:verify')
-  },
   async set_version(value) {
     await ipcRenderer.invoke('store:set', { key: 'version', value: value })
   },
@@ -39,6 +36,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   async get_sdcard() {
     await ipcRenderer.invoke('store:get', { key: 'sdcard' })
+  },
+  async get_os() {
+    await ipcRenderer.invoke('store:get', { key: 'os' })
   },
   async verify_hash() {
     await ipcRenderer.invoke('official:releases:verify:hash')
@@ -123,6 +123,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onGetSdcard(callback) {
     ipcRenderer.on('store:get:sdcard', callback)
+  },
+  onGetOS(callback) {
+    ipcRenderer.on('store:get:os', callback)
   },
   onVerifyOfficialReleases(callback) {
     ipcRenderer.on('official:releases:get', callback)

@@ -1,26 +1,56 @@
 <template>
-  <v-container fluid>
-    <v-row align="justify">
-      <v-col
-        cols="12"
-        sm="6"
-      >
-        Downloading ktool-{{ os }}...
-      </v-col>
-      <v-col
-        cols="12"
-        sm="6"
-      >
-        <v-progress-linear
-          v-model="model"
-          height="25"
-          color="blue-grey"
-        >
-          <strong>{{ model }}%</strong>
-        </v-progress-linear>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-layout
+    align-start
+    justify-start
+    row
+    fill-height
+  >
+    <v-flex 
+      v-if="checking == 0"
+      xs12
+      sm4
+    >
+      <v-card flat class="ma-5 pa-5">
+        <v-card-title>
+          Choose ktool-mac flavor
+        </v-card-title>
+        <v-card-content>
+          <v-select
+            v-model="tool"
+            :items="['ktool-mac', 'ktool-mac-10']"
+            label="Mac Flavour"
+          />
+        </v-card-content>
+        <v-card-actions>
+          <v-btn @click.prevent="tool !== '' ? (checking = 1) : (checking = 0)">
+            Choose
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+    <v-flex
+      v-if="checking == 1"
+      xs12
+    >
+      <v-card flat>
+        <v-card-title>
+          Downloading...
+        </v-card-title>
+        <v-card-subtitle>
+          <b>ktool</b>: {{ tool }}
+        </v-card-subtitle>
+        <v-card-actions>
+          <v-progress-linear
+            v-model="model"
+            height="25"
+            color="blue-grey"
+          >
+            <strong>{{ model }}%</strong>
+          </v-progress-linear>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>
@@ -30,25 +60,59 @@ export default {
     return {
       model: 0,
       device: '',
-      os: 'linux'
+      checking: -1,
+      tool: ''
     }
   },
   async created () {
-    await window.kruxAPI.get_device()
 
-    window.kruxAPI.onGetDevice((_event, value) => {
-      this.device = value
-      this.$nextTick(() => {
-        this.download()
-      })
+    await window.kruxAPI.get_os()
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onGetOS((_event, value) => {
+      if (value === 'linux') {
+        this.$nextTick(() => { 
+          this.tool = 'ktool-linux'
+          this.checking = 1
+        })
+      }
+      if (value === 'darwin') {
+        this.$nextTick(() => {
+          this.checking = 0
+        })
+      }
+      if (value === 'win32') {
+        this.$nextTick(() => { 
+          this.tool = 'ktool-win.exe'
+          this.checking = 1
+        })
+      }
     })
+  },
+  watch: {
+    async checking (value) {
+      if (value === 1) {
+        await window.kruxAPI.get_device()
+
+        window.kruxAPI.onGetDevice((_event, _value) => {
+          this.$nextTick(() => {
+            this.device = _value
+          })
+        })
+      }
+    },
+    async device (value) {
+      if (value !== '') {
+        await this.download()
+      }
+    }
   },
   methods: {
     async download () {
       await window.kruxAPI.download_resource({
         baseUrl: 'https://github.com',
         resource: 'odudex/krux_binaries/raw/main',
-        filename: `ktool-${this.os}`
+        filename: this.tool
       })
 
       // eslint-disable-next-line no-unused-vars

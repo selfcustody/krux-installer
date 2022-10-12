@@ -1,26 +1,30 @@
 <template>
-  <v-container fluid>
-    <v-row align="justify">
-      <v-col
-        cols="12"
-        sm="6"
-      >
-        Downloading kboot.kfpkg for {{ device }}...
-      </v-col>
-      <v-col
-        cols="12"
-        sm="6"
-      >
-        <v-progress-linear
-          v-model="model"
-          height="25"
-          color="blue-grey"
-        >
-          <strong>{{ model }}%</strong>
-        </v-progress-linear>
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-layout
+    align-start
+    justify-start
+    row
+    fill-height
+  >
+    <v-flex xs12 sm4>
+      <v-card flat class="ma-5 pa-5">
+        <v-card-title>
+          Downloading...
+        </v-card-title>
+        <v-card-subtitle>
+          <b>kboot.kfpkg</b>: {{ device }}
+        </v-card-subtitle>
+        <v-card-actions>
+          <v-progress-linear
+            v-model="model"
+            height="25"
+            color="blue-grey"
+          >
+            <strong>{{ model }}%</strong>
+          </v-progress-linear>
+        </v-card-actions>
+      </v-card>
+    </v-flex>
+  </v-layout>
 </template>
 
 <script>

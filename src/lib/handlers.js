@@ -146,13 +146,6 @@ export function handleDownload (app, store) {
   }
 }
 
-export function handleOSVerify (app) {
-  return function () {
-    app.webContents.send('window:log:info', `OS detected: using ${process.platform}`)
-    app.webContents.send('os:verify', process.platform)
-  }
-}
-
 export function handleVerifyOfficialReleasesHash (win, store) {
   // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {

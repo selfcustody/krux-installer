@@ -33,7 +33,7 @@ export default function (app) {
 
     store.set('appVersion', pjson.version)
     store.set('resources', join(app.getPath('documents'), pjson.name))
-    store.set('state', 'loading')
+    store.set('os', process.platform)
     store.set('versions', [])
     store.set('version', 'Select version')
     store.set('action', 'Select action')

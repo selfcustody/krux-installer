@@ -89,10 +89,10 @@ async function createWindow() {
   ipcMain.handle('store:set', handleStoreSet(win, store))
   ipcMain.handle('store:get', handleStoreGet(win, store))
 
-
   // This IPC will be called everytime when the method
   // `window.kruxAPI.flash_firmware_to_device` is executed inside `App.vue`
   ipcMain.handle('flash:firmware', handleFlash(win, store))
+
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)

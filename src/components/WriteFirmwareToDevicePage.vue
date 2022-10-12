@@ -6,12 +6,12 @@
         class="ma-5 pa-5"
       >
         <v-card-title>Flashing...</v-card-title>
+        <v-card-subtitle>
+          <b>Wait a moment</b>
+        </v-card-subtitle>
         <v-card-content>
-          <v-card-text
-            v-for="(text, i) in response"
-            :key="i"
-          >
-            {{ text }}
+          <v-card-text>
+            DO NOT UNPLUG DEVICE OR SHUTDOWN COMPUTER!
           </v-card-text>
         </v-card-content>
       </v-card>
@@ -20,9 +20,18 @@
         class="ma-5 pa-5"
       >
         <v-card-title>Flashing done</v-card-title>
+        <v-card-subtitle>
+          Now your device should be rebooting! Enjoy!
+        </v-card-subtitle>
         <v-card-content>
           <v-card-text>
-            Now you can poweroff your device!
+            <div
+              class="text--simple"
+              v-for="(text, i) in response"
+              :key="i"
+            >
+              {{ text }}
+            </div>
           </v-card-text>
         </v-card-content>
         <v-card-actions>
@@ -40,20 +49,18 @@ export default {
   name: 'WriteFirmwareToDevicePage',
   async created () {  
     await window.kruxAPI.flash_firmware_to_device()
-    
+  
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onFlashing((_event, value) => {
-      this.response.push(value)
+    window.kruxAPI.onFlashingDone((_event, value) => {
+      this.$nextTick(() => {
+        this.response = value
+        this.isWritten = true
+      })
     })
 
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onFlashingError((_event, value) => { 
       this.$emit('onError', { error: value })
-    })
-
-    // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onFlashingDone((_event, value) => {
-      this.isWritten = true
     })
   },
   data () {

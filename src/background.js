@@ -106,8 +106,6 @@ async function createWindow() {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-
-  store.delete('device')
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
@@ -149,20 +147,14 @@ if (isDevelopment) {
   if (process.platform === 'win32') {
     process.on('message', (data) => {
       if (data === 'graceful-exit') {
-        store.delete('device')
-        store.set('state', 'stopped')
         app.quit()
       }
     })
   } else {
     process.on('SIGTERM', () => {
-      store.delete('device')
-      store.set('state', 'stopped')
       app.quit()
     })
     process.on('SIGINT', function() {
-      store.delete('device')
-      store.set('state', 'stopped')
       process.exit(0)
     })
   }

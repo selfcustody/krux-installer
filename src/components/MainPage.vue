@@ -54,12 +54,13 @@
 <script>
 export default {
   name: 'MainPage',
-  /**
-   * If user selected:
-   * - a version: change the button 'version' with the selected string
-   * - a device: change the button 'flash' with the selected string
-   * - a firmware: change the button 'firmware' with the selected string
-   */
+  data () {
+    return {
+      version: '',
+      action: '',
+      device: ''
+    }
+  },
   async created () {
     await window.kruxAPI.get_version()
 
@@ -69,30 +70,31 @@ export default {
         this.version = value
       })
     })
-
-    await window.kruxAPI.get_action()
-    
-    // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetAction((_event, value) => {
-      this.$nextTick(() => {
-        this.action = value
-      })
-    })
-
-    await window.kruxAPI.get_device()
-
-    // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetDevice((_event, value) => {
-      this.$nextTick(() => {
-        this.device = value
-      })
-    })
   },
-  data () {
-    return {
-      version: '',
-      action: '',
-      device: ''
+  watch: {
+    async version (v) {
+      if (v !== '') { 
+        await window.kruxAPI.get_action()
+    
+        // eslint-disable-next-line no-unused-vars
+        window.kruxAPI.onGetAction((_event, value) => {
+          this.$nextTick(() => {
+            this.action = value
+          })
+        })
+      }
+    },
+    async action (a) {
+      if (a !== '') {
+        await window.kruxAPI.get_device()
+
+        // eslint-disable-next-line no-unused-vars
+        window.kruxAPI.onGetDevice((_event, value) => {
+          this.$nextTick(() => {
+            this.device = value
+          })
+        })
+      }
     }
   }
 }

@@ -40,6 +40,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async get_os() {
     await ipcRenderer.invoke('store:get', { key: 'os' })
   },
+  async get_resources_path() {
+    await ipcRenderer.invoke('store:get', { key: 'resources' })
+  },
   async verify_hash() {
     await ipcRenderer.invoke('official:releases:verify:hash')
   },
@@ -126,6 +129,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   },
   onGetOS(callback) {
     ipcRenderer.on('store:get:os', callback)
+  },
+  onGetResourcesPath(callback) {
+    ipcRenderer.on('store:get:resources', callback)
   },
   onVerifyOfficialReleases(callback) {
     ipcRenderer.on('official:releases:get', callback)

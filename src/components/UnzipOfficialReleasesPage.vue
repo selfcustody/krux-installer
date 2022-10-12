@@ -11,8 +11,11 @@
     >
       <v-card flat>
         <v-card-title>
-          <b>{{ currentFile }}</b>...
+          Unzipping...
         </v-card-title>
+        <v-card-subtitle>
+          <b>file:</b> {{ currentFile }}
+        </v-card-subtitle>
         <v-card-actions>
           <v-progress-linear
             v-model="progress"
@@ -28,17 +31,20 @@
       xs12
       v-if="unzipped"
     >
-      <v-card flat>
-        <v-card-title>Extracted files:</v-card-title>
+      <v-card flat class="ma-2 pa-2">
+        <v-card-title>
+          Extracted files
+        </v-card-title>
+        <v-card-subtitle>
+          Relative to: {{ resourcesPath }}
+        </v-card-subtitle>
         <v-card-content>
-          <v-card-text
-            v-for="(file, i) in files"
-            :key="i"
-            class="ma-2"
-            color="primary"
-            text-color="white"
-          >
-            <div class="singleLine">
+          <v-card-text>
+            <div
+              v-for="(file, i) in files"
+              :key="i"
+              class="text--primary"
+            >
               {{ file }}
             </div>
           </v-card-text>
@@ -61,6 +67,7 @@ export default {
   name: 'UnzipOfficialReleasePage',
   data () {
     return {
+      resourcesPath: '',
       progress: 0,
       version: '',
       action: '',
@@ -70,6 +77,13 @@ export default {
     }
   },
   async created () {
+    window.kruxAPI.get_resources_path()
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onGetResourcesPath(async (_event, value) => {
+      this.resourcesPath = value
+    })
+
     window.kruxAPI.get_version()
 
     // eslint-disable-next-line no-unused-vars
@@ -117,10 +131,3 @@ export default {
   }
 }
 </script>
-
-<style>
-.singleLine {
-  white-space: nowrap;
-  word-break: normal;
-}
-</style>

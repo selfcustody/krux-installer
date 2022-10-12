@@ -16,10 +16,8 @@ import FlashHandler from './flash'
 export function handleWindowStarted (win, store) {
   // eslint-disable-next-line no-unused-vars
   return function (_event, action) {
-    store.set('state', 'running')
     const version = store.get('appVersion')
-    const state = store.get('state')
-    win.webContents.send('window:log:info', `Krux installer ${version} ${state}`)
+    win.webContents.send('window:log:info', `Krux installer ${version} running`)
     win.webContents.send('window:log:info', 'page: MainPage')
   }
 }
@@ -172,7 +170,7 @@ export function handleUnzip (win, store) {
 export function handleFlash (win, store) {
   // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {
-    const handler = new FlashHandler(win, store, process.platform)
+    const handler = new FlashHandler(win, store)
     handler.chmod()
     handler.flash()
   }

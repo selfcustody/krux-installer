@@ -92,7 +92,6 @@ export default class VerifyOfficialReleasesHandler extends Handler {
             const error = new Error(msg)
             this.send('window:log:info', error)
             this.send('official:releases:verified:hash:error', error)
-            console.log(error)
           }
           clearInterval(interval)
         }

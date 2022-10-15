@@ -49,7 +49,11 @@ export default {
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onFlashingDone((_event, value) => {
       this.$nextTick(() => {
+        // see 
+        // https://www.appsloveworld.com/vuejs/100/8/stream-shell-output-to-web-front-end
         const ansi = new AnsiUp()
+        value = value.replace(/%\s/, "\n")
+        value = value.replace(/kiB\/s/g, "kiB/s\n")
         this.html = ansi.ansi_to_html(value).replace(/\n/gm, '<br>')
         this.isWritten = true
       })
@@ -70,7 +74,13 @@ export default {
 </script>
 
 <style>
-  .v-card-text >>> p {
-    font-size: 0.5em;
-  }
+.console {
+  font-family: monospace;
+  text-align: left;
+  background-color: black;
+  color: #fff;
+  overflow-y: auto;
+  width: 390px;
+  height: 360px;
+}
 </style>

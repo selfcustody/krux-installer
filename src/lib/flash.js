@@ -139,13 +139,10 @@ export default class FlashHandler extends Handler {
         ].join(' ')
       }
       let output = await FlashHandler.sudoPromptAsync(__cmd__)
+      output = Buffer.from(output, 'utf-8').toString()
       console.log(output)
-      output = output.replace('\x1B[0m\x1B[32m[INFO]\x1B[32m\x1B[0m', '\n[INFO]')
-      output = output.replace('\x1B[0m\x1B[32m\x1B[0m\x1B[33m', '')
-      output = output.replace('\x1B[0m\x1B[32m\x1B[1m\x1B[0m', '')
-      output.split('\n')
       this.send('flash:writing:done', output)
-      this.send('window:log:info', output.join('\n'))
+      this.send('window:log:info', output)
     } catch (err) {
       if (err.code === 'ECMDERR') {
         let msg = err.stdout.split('\x1B[0m ')[1]

@@ -25,13 +25,7 @@
         </v-card-subtitle>
         <v-card-content>
           <v-card-text>
-            <div
-              class="text--simple"
-              v-for="(text, i) in response"
-              :key="i"
-            >
-              {{ text }}
-            </div>
+            <div class="console" v-html="html" />
           </v-card-text>
         </v-card-content>
         <v-card-actions>
@@ -45,6 +39,8 @@
 </template>
 
 <script>
+import AnsiUp from 'ansi_up'
+
 export default {
   name: 'WriteFirmwareToDevicePage',
   async created () {  
@@ -53,7 +49,8 @@ export default {
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onFlashingDone((_event, value) => {
       this.$nextTick(() => {
-        this.response = value
+        const ansi = new AnsiUp()
+        this.html = ansi.ansi_to_html(value).replace(/\n/gm, '<br>')
         this.isWritten = true
       })
     })
@@ -66,7 +63,7 @@ export default {
   data () {
     return {
       isWritten: false,
-      response: []
+      html: ''
     }
   }
 }

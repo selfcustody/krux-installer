@@ -19,10 +19,11 @@
     "postinstall": "electron-builder install-app-deps && electron-rebuild",
     "postuninstall": "electron-builder install-app-deps && electron-rebuild"
   },
-  "main": "background.js",
+  "main": "src/background.js",
   "dependencies": {
     "@mdi/font": "5.9.55",
     "@serialport/bindings-cpp": "^10.7.0",
+    "ansi_up": "^5.1.0",
     "axios": "^0.27.2",
     "buffered-spawn": "^3.3.2",
     "core-js": "^3.8.3",

@@ -11,6 +11,16 @@
           Choose an action
         </v-card-title>
         <v-card-content>
+          <v-card-text>
+            <v-layout column wrap>
+              <v-flex>
+                <v-icon>info</v-icon>
+              </v-flex>
+              <v-flex>
+                In this version of krux-installer, only Flashing is supported. We are working for write firmware onto SDCards for airgapped updates to multiple platforms.
+              </v-flex>
+            </v-layout>
+          </v-card-text>
           <v-select
             v-model="action"
             :items="actions"
@@ -43,8 +53,8 @@ export default {
     return {
       action: '',
       actions: [
-        'Flash firmware onto device',
-        'Write firmware onto microSD'
+        'Flash firmware onto device'
+        // 'Write firmware onto microSD'
       ],
     }
   },

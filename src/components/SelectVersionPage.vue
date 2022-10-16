@@ -19,7 +19,14 @@
         >
           Choose between official or test release
         </v-card-title>
+        <v-card-subtitle>
+          <b>Official</b>: selfcustody/krux/releases/tag/v*
+        </v-card-subtitle>
+        <v-card-subtitle>
+          <b>Test</b>: odudex/krux_binaries
+        </v-card-subtitle>
         <v-card-content
+          class="ma-2 pa-2"
           v-if="!isChecking"
         >
           <v-select

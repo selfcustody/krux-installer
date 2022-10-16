@@ -7,12 +7,12 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async download_resource (options) {
     await ipcRenderer.invoke('download:resource', options)
   },
-  async list_serialport () {
-    await ipcRenderer.invoke('serialport:list')
-  },
-  async sdcard_action (options) {
-    await ipcRenderer.invoke('sdcard:action', options)
-  },
+  // async list_serialport () {
+  //  await ipcRenderer.invoke('serialport:list')
+  // },
+  // async sdcard_action (options) {
+  //  await ipcRenderer.invoke('sdcard:action', options)
+  // },
   async set_version(value) {
     await ipcRenderer.invoke('store:set', { key: 'version', value: value })
   },
@@ -31,12 +31,12 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   async get_device() {
     await ipcRenderer.invoke('store:get', { key: 'device' })
   },
-  async set_sdcard(value) {
-    await ipcRenderer.invoke('store:set', { key: 'sdcard', value: value })
-  },
-  async get_sdcard() {
-    await ipcRenderer.invoke('store:get', { key: 'sdcard' })
-  },
+  // async set_sdcard(value) {
+  //   await ipcRenderer.invoke('store:set', { key: 'sdcard', value: value })
+  // },
+  // async get_sdcard() {
+  //   await ipcRenderer.invoke('store:get', { key: 'sdcard' })
+  //},
   async get_os() {
     await ipcRenderer.invoke('store:get', { key: 'os' })
   },
@@ -70,24 +70,24 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onDownloadError(callback) {
     ipcRenderer.on('download:status:error', callback)
   },
-  onListSerialport(callback) {
-    ipcRenderer.on('serialport:list', callback)
-  },
-  onSerialportSelected(callback) {
-    ipcRenderer.on('store:get:device', callback)
-  },
-  onDetectedSDCardSuccess(callback) {
-    ipcRenderer.on('sdcard:detection:success', callback)
-  },
-  onDetectedSDCardError(callback) {
-    ipcRenderer.on('sdcard:detection:error', callback)
-  },
-  onMountAction(callback) {
-    ipcRenderer.on('sdcard:mount', callback)
-  },
-  onMountActionError(callback) {
-    ipcRenderer.on('sdcard:mount:error', callback)
-  },
+  // onListSerialport(callback) {
+  //   ipcRenderer.on('serialport:list', callback)
+  // },
+  // onSerialportSelected(callback) {
+  //   ipcRenderer.on('store:get:device', callback)
+  // },
+  // onDetectedSDCardSuccess(callback) {
+  //   ipcRenderer.on('sdcard:detection:success', callback)
+  // },
+  // onDetectedSDCardError(callback) {
+  //   ipcRenderer.on('sdcard:detection:error', callback)
+  // },
+  // onMountAction(callback) {
+  //   ipcRenderer.on('sdcard:mount', callback)
+  // },
+  // onMountActionError(callback) {
+  //   ipcRenderer.on('sdcard:mount:error', callback)
+  // },
   onFirmwareCopied(callback) {
     ipcRenderer.on('sdcard:action:copy_firmware_bin:done', callback)
   },
@@ -121,12 +121,12 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onGetDevice(callback) {
     ipcRenderer.on('store:get:device', callback)
   },
-  onSetSdcard(callback) {
-    ipcRenderer.on('store:set:sdcard', callback)
-  },
-  onGetSdcard(callback) {
-    ipcRenderer.on('store:get:sdcard', callback)
-  },
+  // onSetSdcard(callback) {
+  //   ipcRenderer.on('store:set:sdcard', callback)
+  // },
+  // onGetSdcard(callback) {
+  //   ipcRenderer.on('store:get:sdcard', callback)
+  // },
   onGetOS(callback) {
     ipcRenderer.on('store:get:os', callback)
   },

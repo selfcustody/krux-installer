@@ -6,5 +6,10 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 
 export default createVuetify(
+  {
+    icons: {
+      iconfont: 'mdi'
+    }
+  }
   // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides
 )

@@ -1,7 +1,7 @@
 import { map } from 'lodash'
 import DownloadHandler from './download'
-import SDCardHandler from './sdcard'
-import SerialportHandler from './serialport'
+// import SDCardHandler from './sdcard'
+// import SerialportHandler from './serialport'
 import VerifyOfficialReleasesHandler from './verify-official-releases'
 import UnzipHandler from './unzip'
 import FlashHandler from './flash'
@@ -51,6 +51,52 @@ export function handleVerifyOfficialReleases (win, store) {
   }
 }
 
+
+/**
+ * Function to handle when
+ * wants to verify signature of official releases
+ *
+ * @param win
+ * @apram store
+ */
+export function handleVerifyOfficialReleasesSign (win, store) {
+  return async function (_event, options) {
+    const handler = new VerifyOfficialReleasesHandler(win, store)
+    options.platform = process.platform
+    handler.verifySign(options)
+  }
+}
+
+
+/**
+ * Function to handle when
+ * wants to verify hashes of official releases
+ *
+ * @param win
+ * @apram store
+ */
+export function handleVerifyOfficialReleasesHash (win, store) {
+  // eslint-disable-next-line no-unused-vars
+  return async function (_event, options) {
+    const handler = new VerifyOfficialReleasesHandler(win, store)
+    handler.verifyHash()
+  }
+}
+
+/**
+ * Function to handle when
+ * wants to unzip official releases
+ *
+ * @param win
+ * @apram store
+ */
+export function handleUnzip (win, store) {
+  return async function (_event, options) {
+    const handler = new UnzipHandler(win, store)
+    handler.unzip(options)
+  }
+}
+
 /**
  * Function to handle the setting of many config values
  *
@@ -87,43 +133,6 @@ export function handleStoreGet (win, store) {
     win.webContents.send(`store:get:${action.key}`, val)
   }
 }
-/**
- * Function to handle usbDetection
- * of implmented devices
- *
- * @param app<ElectronApp>
- */
-export function handleSerialport (win, store) {
-  // eslint-disable-next-line no-unused-vars
-  return function (_event, options) {
-    const handler = new SerialportHandler(win, store)
-    handler.list()
-  }
-}
-
-
-/**
- * Function to handle mount,
- * umount and copy files to SDCard
- *
- * @param app<ElectronApp>
- */
-export function handleSDCard (app, store) {
-  return async function (_event, args) {
-
-    const handler = new SDCardHandler(app, store, process.platform)
-    handler.send('window:log:info', `Starting sdcard '${args.action}' action`)
-    if (args.action === 'detect') {
-      await handler.onDetection()
-    } else if (args.action === 'mount' || args.action === 'umount') {
-      await handler.onAction(args.action)
-    } else if (args.action === 'copy_firmware_bin') {
-      await handler.onCopyFirmwareBin()
-    } else {
-      throw new Error(`SDCardHandler ${args.action} not implemented`)
-    }
-  }
-}
 
 /*
 * Function to handle downloads
@@ -144,29 +153,14 @@ export function handleDownload (app, store) {
   }
 }
 
-export function handleVerifyOfficialReleasesHash (win, store) {
-  // eslint-disable-next-line no-unused-vars
-  return async function (_event, options) {
-    const handler = new VerifyOfficialReleasesHandler(win, store)
-    handler.verifyHash()
-  }
-}
 
-export function handleVerifyOfficialReleasesSign (win, store) {
-  return async function (_event, options) {
-    const handler = new VerifyOfficialReleasesHandler(win, store)
-    options.platform = process.platform
-    handler.verifySign(options)
-  }
-}
-
-export function handleUnzip (win, store) {
-  return async function (_event, options) {
-    const handler = new UnzipHandler(win, store)
-    handler.unzip(options)
-  }
-}
-
+/**
+ * Function to handle the
+ * Flashing (write krux firmware direct onto device) process
+ *
+ * @param win
+ * @param store
+ */
 export function handleFlash (win, store) {
   // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {
@@ -175,3 +169,43 @@ export function handleFlash (win, store) {
     handler.flash()
   }
 }
+
+/**
+ * Function to handle usbDetection
+ * of implmented devices
+ *
+ * @param app<ElectronApp>
+ *
+export function handleSerialport (win, store) {
+  // eslint-disable-next-line no-unused-vars
+  return function (_event, options) {
+    const handler = new SerialportHandler(win, store)
+    handler.list()
+  }
+}
+*/
+
+
+/**
+ * Function to handle mount,
+ * umount and copy files to SDCard
+ *
+ * @param app<ElectronApp>
+ *
+export function handleSDCard (app, store) {
+  return async function (_event, args) {
+
+    const handler = new SDCardHandler(app, store, process.platform)
+    handler.send('window:log:info', `Starting sdcard '${args.action}' action`)
+    if (args.action === 'detect') {
+      await handler.onDetection()
+    } else if (args.action === 'mount' || args.action === 'umount') {
+      await handler.onAction(args.action)
+    } else if (args.action === 'copy_firmware_bin') {
+      await handler.onCopyFirmwareBin()
+    } else {
+      throw new Error(`SDCardHandler ${args.action} not implemented`)
+    }
+  }
+}
+*/

@@ -1,0 +1,36 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+
+
+jobs:
+  lint:
+    name: Run linter on src/**.js public/*.js and src/**.vue
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v2
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 16.16.0
+
+      - name: Install Node.js dependencies
+        run: yarn install
+
+      - name: Run src/**.js linting
+        run: yarn run lint:server
+
+      - name: Run public/*.js linting
+        run: yarn run lint:public
+
+      - name: Run src/**.vue linting
+        run: yarn run lint:client

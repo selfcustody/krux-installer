@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  build:
+    name: Build executables for linux
+    strategy:
+      matrix:
+        - os: ubuntu-22.04
+          target: AppImage
+          node_version: '16.18.0'
+
+        - os: ubuntu-20.04
+          target: AppImage
+          node_version: '16.18.0'
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v2
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: Install Node.js dependencies
+        run: yarn install
+
+      - name: Build Krux Installer for linux
+        run: yarn run electron:build --linux ${{ matrix.target }}

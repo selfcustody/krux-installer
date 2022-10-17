@@ -32,4 +32,6 @@ jobs:
         run: yarn install
 
       - name: Build Krux Installer for linux
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
         run: yarn run electron:build --linux ${{ matrix.target }}

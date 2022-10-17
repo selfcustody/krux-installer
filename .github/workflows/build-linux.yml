@@ -13,13 +13,9 @@ jobs:
     name: Build executables for linux
     strategy:
       matrix:
-        - os: ubuntu-22.04
-          target: AppImage
-          node_version: '16.18.0'
-
-        - os: ubuntu-20.04
-          target: AppImage
-          node_version: '16.18.0'
+        os: [ubuntu-22.04, ubuntu-20.04]
+        target: [AppImage]
+        node_version: ['16.18.0']
 
     runs-on: ${{ matrix.os }}
     

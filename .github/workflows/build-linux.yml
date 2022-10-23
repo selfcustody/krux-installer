@@ -32,6 +32,14 @@ jobs:
       - name: Install Node.js dependencies
         run: yarn install
 
+      - name: Generate icons
+        run: |
+          yarn run icon:svg
+          yarn run icon:png
+          yarn run icon:resize
+          rm ./build/*.svg
+          rm ./build/krux.png
+
       - name: Build Krux Installer for linux
         env:
           GH_TOKEN: ${{ secrets.github_token }}

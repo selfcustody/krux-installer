@@ -24,6 +24,25 @@ jobs:
       - name: Checkout Git repository
         uses: actions/checkout@v2
 
+      - name: Prepare WINE installation
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo mkdir -pm755 /etc/apt/keyrings
+          sudo wget -O /etc/apt/keyrings/winehq-archive.key https://dl.winehq.org/wine-builds/winehq.key
+
+      - name: Download WINE sources for Ubuntu-22.04 
+        if: ${{ matrix.os == 'ubuntu-22.04' }}
+        run: sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-jammy.sources
+
+      - name: Download WINE sources for Ubuntu-20.04 
+        if: ${{ matrix.os == 'ubuntu-20.04' }}
+        run: sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-focal.sources
+
+      - name: Install WINE
+        run: |
+          sudo apt-get update
+          sudo apt install --install-recommends winehq-stable
+
       - name: Setup node.js
         uses: actions/setup-node@v1
         with:

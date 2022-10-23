@@ -32,11 +32,9 @@ jobs:
       - name: Install WINE for ubuntu
         run: |
           sudo dpkg --add-architecture i386
-          wget -nc https://dl.winehq.org/wine-builds/winehq.key
-          sudo mv winehq.key /usr/share/keyrings/winehq-archive.key
-          wget -nc https://dl.winehq.org/wine-builds/ubuntu/dists/${{ matrix.alias }}/winehq-${{ matrix.alias }}.sources
-          sudo mv winehq-${{ matrix.alias }}.sources /etc/apt/sources.list.d/
-          sudo apt-get update
+          sudo apt update
+          wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
+          sudo apt-add-repository "deb http://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -cs) main"
           sudo apt install --install-recommends winehq-devel
 
       - name: Setup node.js

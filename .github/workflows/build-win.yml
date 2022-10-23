@@ -44,6 +44,7 @@ jobs:
       - name: Build Krux Installer for windows
         env:
           GH_TOKEN: ${{ secrets.github_token }}
-        run: DEBUG=electron-builder yarn run electron:build --${{ matrix.targetos }} ${{ matrix.target }}
+          DEBUG: electron-builder
+        run: yarn run electron:build --${{ matrix.targetos }} ${{ matrix.target }}
 
 

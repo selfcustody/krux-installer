@@ -36,7 +36,7 @@ jobs:
 
       - name: Download WINE sources for Ubuntu-20.04 
         if: ${{ matrix.os == 'ubuntu-20.04' }}
-        run: sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/jammy/winehq-focal.sources
+        run: sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/focal/winehq-focal.sources
 
       - name: Install WINE
         run: |

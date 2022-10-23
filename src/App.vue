@@ -75,11 +75,13 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.kruxAPI.onLogLevelInfo(function(_event, value) {
+      // eslint-disable-next-line
       console.log(`[ INFO ] ${value}`)
     })
   },
   watch: {
     page (value) {
+      // eslint-disable-next-line
       console.log(`[ INFO ] page: ${value}`)
     }
   },

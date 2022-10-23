@@ -21,16 +21,21 @@ export default class VerifyOfficialReleasesHandler extends Handler {
   }
 
   async fetchReleases() {
-    this.send('window:log:info', `fetching ${this.url}`)
-    const response = await axios({
-      method: 'get',
-      url: this.url,
-      headers: this.headers
-    })
-    if (response.status === 200) {
-      return response.data
-    } else {
-      throw new Error(`${this.url} returned ${response.status} code`)
+    try {
+      this.send('window:log:info', `fetching ${this.url}`)
+      const response = await axios({
+        method: 'get',
+        url: this.url,
+        headers: this.headers
+      })
+      if (response.status === 200) {
+        return response.data
+      } else {
+        throw new Error(`${this.url} returned ${response.status} code`)
+      }
+    } catch (error) {
+      this.send('window:log:info', error)
+      this.send('official:releases:get:error', error)
     }
   }
 

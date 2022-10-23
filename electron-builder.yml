@@ -19,28 +19,17 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-appId: com.electron.krux
-productName: Krux Installer
-copyright: MIT LICENSE
+appId: selfcustody.installer.krux
+productName: KruxInstaller
+copyright: LICENSE.md
+electronVersion: 21.0.1
+extends: null
+files: 
+  - ./src/background.js
 linux:
-  extraResources:
-    from: ../resources
-    to: $HOME/.krux-installer
-    filter:
-      - ktool-linux
-      - maixpy_*/firmware.bin
-      - maixpy_*/kboot.kfpkg
-mac:
-  extraResources:
-    from: ../resources
-    filter:
-      - ktool-mac
-      - maixpy_*/firmware.bin
-      - maixpy_*/kboot.kfpkg
+  icon: icon.png
 win:
-  extraResources:
-    from: ../resources
-    filter:
-      - ktool-windows
-      - maixpy_*/firmware.bin
-      - maixpy_*/kboot.kfpkg
+  icon: icon.ico
+mac:
+  icon: icon.icns
+

@@ -136,6 +136,9 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   onVerifyOfficialReleases(callback) {
     ipcRenderer.on('official:releases:get', callback)
   },
+  onVerifyOfficialReleasesError(callback) {
+    ipcRenderer.on('official:releases:get:error', callback)
+  },
   onVerifiedHash(callback) {
     ipcRenderer.on('official:releases:verified:hash', callback)
   },

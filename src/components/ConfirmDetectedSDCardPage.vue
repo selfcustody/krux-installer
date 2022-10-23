@@ -132,13 +132,10 @@ export default {
         sdcard = this.info.mountpoint
       }
       if (this.info.description !== '') {
-        console.log(this.info.description)
         sdcard = this.info.description.split('(')[1]
-        console.log(sdcard)
         sdcard = sdcard.split(')')[0]
       }
 
-      console.log(sdcard)
       await window.kruxAPI.set_sdcard(sdcard)
 
       // eslint-disable-next-line no-unused-vars

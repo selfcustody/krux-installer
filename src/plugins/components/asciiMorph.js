@@ -237,6 +237,7 @@ var AsciiMorph = (function() {
   function main(element, canvasSize) {
 
     if( !element || !canvasSize ) {
+      // eslint-disable-next-line
       console.log("sorry, I need an element and a canvas size");
       return;
     }

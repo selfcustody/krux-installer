@@ -74,6 +74,12 @@ export default {
       })
       this.isChecking = this.versions.length === 0
     })
+
+    // eslint-disable-next-line no-unused-vars
+    window.kruxAPI.onVerifyOfficialReleasesError((_event, value) => {
+      alert(value)
+      this.$emit('onSuccess', { page: 'MainPage' })
+    })
   },
   methods: {
     async select () {

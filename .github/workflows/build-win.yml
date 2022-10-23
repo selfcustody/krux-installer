@@ -1,4 +1,4 @@
-name: Linux Build
+name: Windows Build
 
 on:
   push:
@@ -9,17 +9,17 @@ on:
         - main
 
 jobs:
-  build:
-    name: Build executables (AppImage) for linux
+  build-on-linux:
+    name: Build executable for windows (NSIS) on linux
     strategy:
       matrix:
         os: [ubuntu-22.04, ubuntu-20.04]
-        targetos: [linux]
-        target: [AppImage]
+        targetos: [win]
+        target: [nsis]
         node_version: ['16.18.0']
 
     runs-on: ${{ matrix.os }}
-    
+ 
     steps:
       - name: Checkout Git repository
         uses: actions/checkout@v2
@@ -36,3 +36,5 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.github_token }}
         run: DEBUG=electron-builder yarn run electron:build --${{ matrix.targetos }} ${{ matrix.target }}
+
+

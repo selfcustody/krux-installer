@@ -26,8 +26,10 @@ jobs:
 
       - name: Install WINE
         run: |
+          dpkg --add-architecture i386
+          apt-get update
           sudo apt-get install wine64
-
+          sudo apt-get install wine32
       - name: Setup node.js
         uses: actions/setup-node@v1
         with:

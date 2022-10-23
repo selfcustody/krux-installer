@@ -28,10 +28,10 @@ jobs:
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
-          wget -qO- https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
-          sudo apt-add-repository "deb http://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -cs) main"
+          wget -qO- https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor | sudo tee /usr/share/keyrings/winehq.key > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/winehq.key] https://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/winehq.list
           sudo apt-get update
-          sudo apt install --install-recommends winehq-stable
+          sudo apt-get install --install-recommends winehq-stable
 
       - name: Setup node.js
         uses: actions/setup-node@v1

@@ -31,7 +31,7 @@ jobs:
           wget -qO- https://dl.winehq.org/wine-builds/winehq.key | gpg --dearmor | sudo tee /usr/share/keyrings/winehq.key > /dev/null
           echo "deb [signed-by=/usr/share/keyrings/winehq.key] https://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/winehq.list
           sudo apt-get update
-          sudo apt-get install --install-recommends wine-devel winehq-devel
+          sudo apt-get install --install-recommends nginx wine-devel wine-devel-amd6 4inehq-devel
 
       - name: Setup node.js
         uses: actions/setup-node@v1

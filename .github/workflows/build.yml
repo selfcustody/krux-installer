@@ -1,0 +1,79 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  build:
+    name: Build executables (AppImage) for Linux and Windows
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            platform: linux
+            target: AppImage
+            node_version: '16.18.0'
+
+          - os: ubuntu-20.04
+            platform: linux
+            target: AppImage
+            node_version: '16.18.0'
+          
+          - os: windows-latest
+            platform: win
+            target: nsis
+            node_version: '16.18.0'
+
+          - os: windows-latest
+            platform: win
+            target: portable
+            node_version: '16.18.0'
+
+          - os: windows-latest
+            platform: win
+            target: msi
+            node_version: '16.18.0'
+
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v2
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node_version }}
+
+      - name: Install Node.js dependencies
+        run: yarn install
+
+      - name: Generate icons for linux
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
+          yarn run icon:svg
+          yarn run icon:png
+          yarn run icon:resize
+          rm ./build/*.svg
+          rm ./build/krux.png
+
+      - name: Generate icons for windows
+        if: ${{ matrix.platform == 'win' }}
+        run: |
+          yarn run icon:svg
+          yarn run icon:png
+          yarn run icon:resize
+          yarn run icon:ico
+          rm ./build/*.svg
+          rm ./build/*.png
+
+      - name: Build KruxInstaller
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+          DEBUG: electron-builder
+        run: yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}

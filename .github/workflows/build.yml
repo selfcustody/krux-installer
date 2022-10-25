@@ -120,7 +120,7 @@ jobs:
       - name: Adequate icons for MacOS
         if: ${{ matrix.platform == 'macos' }}
         run: |
-          yar run icon:icns
+          yarn run icon:icns
           rm ./build/*.svg
           rm ./build/*.png
 

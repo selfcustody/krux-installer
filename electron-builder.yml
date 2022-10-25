@@ -28,6 +28,7 @@ files:
   - ./src/background.js
 linux:
   icon: icon.png
+  maintainer: "qlrd <106913782+qlrd@users.noreply.github.com>"
 win:
   icon: icon.ico
 mac:

@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build executables (AppImage) for Linux and Windows
+    name: Build executables (AppImage, deb) for Linux - Ubuntu[22.04/20.04], Windows[2022,2019] (nsis, portable, msi) and MacOS[12, 11, 10.5] (dmg)
     strategy:
       matrix:
         include:
@@ -22,6 +22,16 @@ jobs:
           - os: ubuntu-20.04
             platform: linux
             target: AppImage
+            node_version: '16.18.0'
+          
+          - os: ubuntu-22.04
+            platform: linux
+            target: deb
+            node_version: '16.18.0'
+
+          - os: ubuntu-20.04
+            platform: linux
+            target: deb
             node_version: '16.18.0'
           
           - os: windows-latest
@@ -39,6 +49,36 @@ jobs:
             target: msi
             node_version: '16.18.0'
 
+          - os: windows-2019
+            platform: win
+            target: nsis
+            node_version: '16.18.0'
+
+          - os: windows-2019
+            platform: win
+            target: portable
+            node_version: '16.18.0'
+
+          - os: windows-2019
+            platform: win
+            target: msi
+            node_version: '16.18.0'
+
+          - os: macos-12
+            platform: macos
+            target: dmg
+            node_version: '16.18.0'
+
+          - os: macos-11
+            platform: macos
+            target: dmg
+            node_version: '16.18.0'
+
+          - os: macos-10.15
+            platform: macos
+            target: dmg
+            node_version: '16.18.0'
+    
     runs-on: ${{ matrix.os }}
     
     steps:
@@ -50,25 +90,37 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
 
-      - name: Install Node.js dependencies
-        run: yarn install
+      - name: Install Node.js dependencies (Linux or Windows)
+        if: ${{ matrix.platform != 'macos' }}
+        run: yarn install --omit=optional
 
-      - name: Generate icons for linux
-        if: ${{ matrix.platform == 'linux' }}
+      - name: Install Node.js dependencies (MacOS)
+        if: ${{ matrix.platform == 'macos' }}
+        run: yarn install
+      
+      - name: Prepare icons
         run: |
           yarn run icon:svg
           yarn run icon:png
           yarn run icon:resize
+
+      - name: Adequate icons for linux
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
           rm ./build/*.svg
           rm ./build/krux.png
 
-      - name: Generate icons for windows
+      - name: Adequate icons for windows
         if: ${{ matrix.platform == 'win' }}
         run: |
-          yarn run icon:svg
-          yarn run icon:png
-          yarn run icon:resize
           yarn run icon:ico
+          rm ./build/*.svg
+          rm ./build/*.png
+
+      - name: Adequate icons for MacOS
+        if: ${{ matrix.platform == 'macos' }}
+        run: |
+          yar run icon:icns
           rm ./build/*.svg
           rm ./build/*.png
 

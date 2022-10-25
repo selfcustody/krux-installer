@@ -1,6 +1,6 @@
 {
   "name": "krux-installer",
-  "version": "0.0.1",
+  "version": "0.0.1-alpha-1",
   "author": [
     "qlrd <106913782+qlrd@users.noreply.github.com>"
   ],
@@ -47,19 +47,23 @@
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
+    "aasvg": "^0.3.2",
     "electron": "21.0.1",
     "electron-builder": "^23.6.0",
     "electron-devtools-installer": "^3.1.0",
     "electron-rebuild": "^3.2.9",
     "eslint": "^8.26.0",
     "eslint-plugin-vue": "^9.6.0",
+    "make-icns": "^1.1.4",
+    "png-to-ico": "^2.1.8",
+    "resize-img-cli": "^1.0.0",
+    "svgexport": "^0.4.2",
     "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4",
     "vue-cli-plugin-vuetify": "^2.5.8",
-    "webpack-plugin-vuetify": "^2.0.0",
-    "aasvg": "^0.3.2",
-    "svgexport": "^0.4.2",
-    "png-to-ico": "^2.1.8",
-    "make-icns": "^1.1.4",
-    "resize-img-cli": "^1.0.0"
+    "webpack-plugin-vuetify": "^2.0.0"
+  },
+  "optionalDependencies": { 
+    "dmg-license": "^1.0.11",
+    "dmg-builder": "^24.0.0-alpha.1"
   }
 }

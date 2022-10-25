@@ -2,11 +2,11 @@
 
 import bufferedSpawn from 'buffered-spawn'
 import { join } from 'path'
-import debug from 'debug'
+import createDebug from 'debug'
 import Handler from './base'
 import sudo from 'sudo-prompt'
 
-const _debug = debug('flash')
+const debug = createDebug('krux:flash')
 
 export default class FlashHandler extends Handler {
 
@@ -55,10 +55,10 @@ export default class FlashHandler extends Handler {
         //It is always better to reset the permission before assigning
         await bufferedSpawn('icalcs.exe', ['.\\ktool-win.exe', '/RESET'], { cwd: __cwd__ })
       }
-      _debug(`[${__cwd__}]: ${__cmd__} ${__args__.join(' ')}`)
+      debug(`[${__cwd__}]: ${__cmd__} ${__args__.join(' ')}`)
       await bufferedSpawn(__cmd__, __args__, { cwd: __cwd__ })
     } catch (error) {
-      _debug(error)
+      debug(error)
       this.send('window:log:info', error)
       this.send('flash:writing:error', error)
     }
@@ -78,11 +78,11 @@ export default class FlashHandler extends Handler {
       };
       sudo.exec(script, options, function (err, stdout, stderr){
         if (err) {
-          _debug(err)
+          debug(err)
           reject(err);
         }
         if (stderr) {
-          _debug(stderr)
+          debug(stderr)
           reject(stderr);
         }
         resolve(stdout);
@@ -149,24 +149,25 @@ export default class FlashHandler extends Handler {
           `${__cwd__}\\${device}\\kboot.kfpkg`
         ].join(' ')
       }
-      _debug(__cmd__)
+      debug(__cmd__)
       let output = await FlashHandler.sudoPromptAsync(__cmd__)
-      _debug(output)
+      debug(output)
       output = Buffer.from(output, 'utf-8').toString()
       this.send('flash:writing:done', output)
       this.send('window:log:info', output)
     } catch (err) {
-      _debug(err)
+      debug(err)
       if (err.code === 'ECMDERR') {
-        let msg = err.stdout.split('\x1B[0m ')[1]
-        msg = msg.replace('\x1B[32m', ' ')
-        msg = msg.replace('`', '')
-        msg = msg.replace('`', '')
-        const e = new Error(msg)
-        this.send('window:log:info', e)
-        this.send('flash:writing:error', e)
+        let msg = Buffer.from(err.stdout, 'utf-8').toString()
+        //split('\x1B[0m ')[1]
+        //msg = msg.replace('\x1B[32m', ' ')
+        //msg = msg.replace('`', '')
+        //msg = msg.replace('`', '')
+        //const e = new Error(msg)
+        this.send('window:log:info', msg)
+        this.send('flash:writing:done', msg)
       } else {
-        console.log(err)
+        debug(err)
         this.send('window:log:info', err)
         this.send('flash:writing:error', err)
       }

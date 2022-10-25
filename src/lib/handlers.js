@@ -1,10 +1,18 @@
 import { map } from 'lodash'
+import createDebug from 'debug'
 import DownloadHandler from './download'
 // import SDCardHandler from './sdcard'
 // import SerialportHandler from './serialport'
 import VerifyOfficialReleasesHandler from './verify-official-releases'
 import UnzipHandler from './unzip'
 import FlashHandler from './flash'
+
+const debug = createDebug('handlers')
+
+function info(win, msg) {
+  debug(msg)
+  win.webContents.send('window:log:ingo', msg)
+}
 
 /**
  * Function to handle when
@@ -17,8 +25,8 @@ export function handleWindowStarted (win, store) {
   // eslint-disable-next-line no-unused-vars
   return function (_event, action) {
     const version = store.get('appVersion')
-    win.webContents.send('window:log:info', `Krux installer ${version} running`)
-    win.webContents.send('window:log:info', 'page: MainPage')
+    info(win, `Krux installer ${version} running`)
+    info(win, 'window:log:info', 'page: MainPage')
   }
 }
 

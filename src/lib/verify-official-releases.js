@@ -5,9 +5,12 @@ import { createHash } from 'crypto'
 
 import axios from 'axios'
 import bufferedSpawn from 'buffered-spawn'
+import createDebug from 'debug'
 
 import { readFileAsync, existsAsync } from './utils/fs-async'
 import Handler from './base'
+
+const debug = createDebug('verify-official-releases')
 
 export default class VerifyOfficialReleasesHandler extends Handler {
 
@@ -20,21 +23,27 @@ export default class VerifyOfficialReleasesHandler extends Handler {
     this.store = store
   }
 
+  _info(msg) {
+    debug(msg)
+    this.send('window:log:info', msg)
+  }
+
   async fetchReleases() {
     try {
-      this.send('window:log:info', `fetching ${this.url}`)
+      this._info(`fetching ${this.url}`)
       const response = await axios({
         method: 'get',
         url: this.url,
         headers: this.headers
       })
       if (response.status === 200) {
+        this._info(response.data)
         return response.data
       } else {
         throw new Error(`${this.url} returned ${response.status} code`)
       }
     } catch (error) {
-      this.send('window:log:info', error)
+      this._info(error)
       this.send('official:releases:get:error', error)
     }
   }
@@ -86,7 +95,7 @@ export default class VerifyOfficialReleasesHandler extends Handler {
               `${result[0].name} has a ${result[1].value} hash`,
               `and ${result[1].name} summed a hash ${result[1].value}.`
             ].join(' ')
-            this.send('window:log:info', msg)
+            this._info(msg)
             this.send('official:releases:verified:hash', result)
           } else {
             const msg = [
@@ -95,17 +104,18 @@ export default class VerifyOfficialReleasesHandler extends Handler {
               `and ${result[1].name} summed a hash of ${result[1].value}`
             ].join(' ')
             const error = new Error(msg)
-            this.send('window:log:info', error)
+            this._info(error)
             this.send('official:releases:verified:hash:error', error)
           }
           clearInterval(interval)
         }
       } catch (error) {
-        this.send('window:log:info', error)
+        this._info(error)
         this.send('official:releases:verified:hash:error', error)
         console.log(error)
       }
     }
+    this._info(`Verifying with ${shaFilePath}`)
     const interval = setInterval(verify, 1000, shaFilePath)
   }
 

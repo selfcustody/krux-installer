@@ -11,6 +11,18 @@ import { join } from 'path'
 import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
+import createDebug from 'debug'
+
+/*
+ * Debugger
+ *
+ * If the environment variable DEBUG is attributed to 'background'
+ * (DEBUG=background yarn run electron:<serve|build>),
+ * any of the messages will be displayed
+ * only for this module
+ */
+
+const debug = createDebug('krux:background')
 
 /*
  * Import local libraries section
@@ -40,11 +52,18 @@ import dotenv from 'dotenv'
 /*
  * Environment variables setup section
  */
+debug('Checking NODE_ENV...')
 if (!process.env.NODE_ENV) {
+  debug('No NODE_ENV variable assigned')
   const env_path = join(__dirname, '..', '.env')
+
+  debug(`Checking if a '${env_path}' file exists`)
   if (existsAsync(env_path)) {
+    debug(`Assign envioronment files with '${env_path}'`)
     dotenv.config({ path: env_path })
   }
+} else {
+  debug(`NODE_ENV=${process.env.NODE_ENV}`)
 }
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
@@ -53,9 +72,13 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
  * Protocol configuration:
  * Scheme must be registered before the app is ready
  */
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true } }
-])
+
+const schemas = [{ scheme: 'app', privileges: { secure: true, standard: true } }]
+debug('Assign privileged protocol schema:')
+debug(`  scheme: ${schemas[0].scheme}`)
+debug(`  privileges.secure: ${schemas[0].privileges.secure}`)
+debug(`  privileges.standard: ${schemas[0].privileges.standard}`)
+protocol.registerSchemesAsPrivileged(schemas)
 
 /*
  * Toplevel variables definition:
@@ -65,13 +88,13 @@ protocol.registerSchemesAsPrivileged([
  *   - `<configpath>` is defined in `src/lib/store.js` by `electron-store` lib
  */
 let win
-let store
 
 /*
  * Create the browser window
  */
 async function createWindow() {
-  win = new BrowserWindow({
+
+  const winOptions = {
     width: process.env.ELECTRON_NODE_WIDTH || 840,
     height: process.env.ELECTRON_NODE_HEIGHT || 608,
     webPreferences: {
@@ -84,7 +107,21 @@ async function createWindow() {
       // eslint-disable-next-line no-undef
       preload: join(__static, 'preload.js')
     }
-  })
+  }
+
+  debug('Creating window:')
+  for (let opt in winOptions) {
+    if (opt !== 'webPreferences') {
+      debug(`  ${opt}: ${winOptions[opt]}`)
+    } else {
+      for (let p in winOptions[opt]) {
+        debug(`  ${opt}.${p}: ${winOptions[opt][p]}`)
+      }
+    }
+  }
+
+  win = new BrowserWindow(winOptions)
+  const store = await createStore(app)
 
   // This IPC will be called everytime when the method
   // `window.kruxAPI.isStarted()` is executed inside App.vue
@@ -153,7 +190,6 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    store = createStore(app)
     createWindow()
   }
 })
@@ -170,9 +206,6 @@ app.on('ready', async () => {
       console.error('Vue Devtools failed to install:', e.toString())
     }
   }
-
-  // Now create store
-  store = createStore(app)
 
   // Now create window
   createWindow()

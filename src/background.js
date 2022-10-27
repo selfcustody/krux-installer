@@ -125,6 +125,7 @@ async function createWindow() {
 
   // This IPC will be called everytime when the method
   // `window.kruxAPI.isStarted()` is executed inside App.vue
+  debug('Configuring Handlers')
   ipcMain.handle('window:started', handleWindowStarted(win, store))
 
   // This IPC will be called everytime when the method

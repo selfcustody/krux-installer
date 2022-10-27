@@ -1,8 +1,11 @@
 import { join } from 'path'
 import { createWriteStream } from 'fs'
 import { open } from 'yauzl'
+import createDebug from 'debug'
 import { mkdirAsync } from './utils/fs-async'
 import Handler from './base'
+
+const debug = createDebug('krux:unzip')
 
 /**
  * unzipAsync
@@ -35,7 +38,7 @@ function unzipAsync (handler, options) {
           await mkdirAsync(folder)
           zipfile.readEntry();
         } else {
-          handler.send('window:log:info', `extracting ${entry.fileName}`)
+          handler._info(`extracting ${entry.fileName}`)
 
           // create the destination file
           const writeStreamPath = join(options.destination, options.resource, entry.fileName)
@@ -102,19 +105,23 @@ export default class UnzipHandler extends Handler {
     this.store = store
   }
 
+  _info (msg) {
+    debug(msg)
+    this.send('window:log:info', msg)
+  }
+
   async unzip (options) {
     const destination = this.store.get('resources')
     try {
-      this.send('window:log:info', `extracting ${join(options.resource, options.file)}`)
+      this._info(`extracting ${join(options.resource, options.file)}`)
       await unzipAsync(this, {
         resource: options.resource,
         file: options.file,
         destination: destination
       })
     } catch (error) {
-      this.send('window:log:info', error)
+      this._info(error)
       this.send('zip:extract:error', error)
-      console.log(error)
     }
   }
 }

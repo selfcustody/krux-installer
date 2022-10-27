@@ -1,11 +1,12 @@
 import { join } from 'path'
 import { createWriteStream } from 'fs'
 import axios from 'axios'
+import createDebug from 'debug'
 import Handler from './base'
 import { mkdirAsync, existsAsync } from './utils/fs-async'
 import { formatBytes } from './utils/format'
 
-
+const debug = createDebug('krux:download')
 
 /**
  * Class to handle downloads
@@ -23,6 +24,11 @@ class DownloadHandler extends Handler {
     this.destinationFilename = join(this.destinationResource, this.originFilename)
   }
 
+  _info (msg) {
+    debug(msg)
+    this.send('window:log:info', msg)
+  }
+
   /**
    * Checks if full path of resource exists
    */
@@ -31,15 +37,15 @@ class DownloadHandler extends Handler {
     this.isDestinationExists = await existsAsync(this.destinationFilename)
 
     if (this.isResourceExists && this.isDestinationExists) {
-      this.send('window:log:info', `${this.destinationFilename} already downloaded`)
+      this._info(`${this.destinationFilename} already downloaded`)
       this.send('download:status', '100.00')
       this.send('download:status:done', this.destinationFilename)
     }
 
     if (!this.isResourceExists) {
-      this.send('window:log:info', `creating directory ${this.destinationResource}`)
+      this._info(`creating directory ${this.destinationResource}`)
       await mkdirAsync(this.destinationResource)
-      this.send('window:log:info', `directory ${this.destinationResource} created`)
+      this._info(`directory ${this.destinationResource} created`)
     }
   }
 
@@ -54,7 +60,7 @@ class DownloadHandler extends Handler {
 
       try {
         const fullUrl = `${this.baseUrl}/${this.originResource}/${this.originFilename}`
-        this.send('window:log:info', `downloading ${fullUrl}`)
+        this._info(`downloading ${fullUrl}`)
 
         const file = createWriteStream(this.destinationFilename)
         const { data, headers } = await axios({
@@ -74,7 +80,7 @@ class DownloadHandler extends Handler {
         let percent = 0
         const totalLength = headers['content-length']
         percent = ((current/totalLength) * 100).toFixed(2)
-        this.send('window:log:info', `${fullUrl} has ${formatBytes(totalLength)}`)
+        this._info(`${fullUrl} has ${formatBytes(totalLength)}`)
         this.send('download:status', percent)
 
         data.on('data', (chunk) => {
@@ -82,8 +88,8 @@ class DownloadHandler extends Handler {
           percent = ((current/totalLength) * 100).toFixed(2)
           this.send('download:status', percent)
           if ( percent === '100.00') {
-            this.send('window:log:info', `${fullUrl} downloaded`)
-            this.send('window:log:info', `resource can be found in ${this.destinationFilename}`)
+            this._info(`${fullUrl} downloaded`)
+            this._info(`resource can be found in ${this.destinationFilename}`)
             this.send('download:status:done', this.destinationFilename)
           }
         })
@@ -93,13 +99,13 @@ class DownloadHandler extends Handler {
         })
 
         data.on('error', (error) => {
-          this.send('window:log:info', error.stack)
+          this._info(error)
           this.send('download:status:error', error.stack)
         })
 
         data.pipe(file)
       } catch (error) {
-        this.send('window:log:info', error.stack)
+        this._info(error)
         this.send('download:status:error', error.stack)
       }
     }

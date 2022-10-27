@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    name: Build executables (AppImage, deb) for Linux - Ubuntu[22.04/20.04], Windows[2022,2019] (nsis, portable, msi) and MacOS[12, 11, 10.5] (dmg)
+    name: Build executables 
     strategy:
       matrix:
         include:

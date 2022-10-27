@@ -7,12 +7,7 @@ import VerifyOfficialReleasesHandler from './verify-official-releases'
 import UnzipHandler from './unzip'
 import FlashHandler from './flash'
 
-const debug = createDebug('handlers')
-
-function info(win, msg) {
-  debug(msg)
-  win.webContents.send('window:log:ingo', msg)
-}
+const debug = createDebug('krux:handlers')
 
 /**
  * Function to handle when
@@ -22,11 +17,13 @@ function info(win, msg) {
  * @apram store
  */
 export function handleWindowStarted (win, store) {
+  debug('Configuring handleWindowStarted')
   // eslint-disable-next-line no-unused-vars
   return function (_event, action) {
     const version = store.get('appVersion')
-    info(win, `Krux installer ${version} running`)
-    info(win, 'window:log:info', 'page: MainPage')
+    const msg = `Krux installer ${version} running`
+    debug(msg)
+    win.webContents.send(msg)
   }
 }
 
@@ -39,6 +36,7 @@ export function handleWindowStarted (win, store) {
  * @apram store
  */
 export function handleVerifyOfficialReleases (win, store) {
+  debug('Configuring handleVerifyOfficialReleases')
   // eslint-disable-next-line no-unused-vars
   return async function (_event, action) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
@@ -68,6 +66,7 @@ export function handleVerifyOfficialReleases (win, store) {
  * @apram store
  */
 export function handleVerifyOfficialReleasesSign (win, store) {
+  debug('Configuring handleVerifyOfficialReleasesSign')
   return async function (_event, options) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
     options.platform = process.platform
@@ -84,6 +83,7 @@ export function handleVerifyOfficialReleasesSign (win, store) {
  * @apram store
  */
 export function handleVerifyOfficialReleasesHash (win, store) {
+  debug('Configuring handleVerifyOfficialReleasesHash')
   // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {
     const handler = new VerifyOfficialReleasesHandler(win, store)
@@ -99,6 +99,7 @@ export function handleVerifyOfficialReleasesHash (win, store) {
  * @apram store
  */
 export function handleUnzip (win, store) {
+  debug('Configuring handleUnzip')
   return async function (_event, options) {
     const handler = new UnzipHandler(win, store)
     handler.unzip(options)
@@ -112,6 +113,7 @@ export function handleUnzip (win, store) {
  * @param store
  */
 export function handleStoreSet (win, store) {
+  debug('Configuring handleStoreSet')
   return function (_event, action) {
     if (
       action.key !== 'appVersion' ||
@@ -135,6 +137,7 @@ export function handleStoreSet (win, store) {
  * @param store
  */
 export function handleStoreGet (win, store) {
+  debug('Configuring handleStoreGet')
   return function (_event, action) {
     const val = store.get(action.key)
     win.webContents.send('window:log:info', `store get: ${action.key} = '${val}'`)
@@ -150,6 +153,7 @@ export function handleStoreGet (win, store) {
 * @param fileanme: String
 */
 export function handleDownload (app, store) {
+  debug('Configuring handleDownload')
   return async function (_event, options) {
     const handler = new DownloadHandler(app, store, options)
 
@@ -170,6 +174,7 @@ export function handleDownload (app, store) {
  * @param store
  */
 export function handleFlash (win, store) {
+  debug('Configuring handleFlash')
   // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {
     const handler = new FlashHandler(win, store)

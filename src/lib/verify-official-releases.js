@@ -10,7 +10,7 @@ import createDebug from 'debug'
 import { readFileAsync, existsAsync } from './utils/fs-async'
 import Handler from './base'
 
-const debug = createDebug('verify-official-releases')
+const debug = createDebug('krux:verify-official-releases')
 
 export default class VerifyOfficialReleasesHandler extends Handler {
 
@@ -112,10 +112,9 @@ export default class VerifyOfficialReleasesHandler extends Handler {
       } catch (error) {
         this._info(error)
         this.send('official:releases:verified:hash:error', error)
-        console.log(error)
       }
     }
-    this._info(`Verifying with ${shaFilePath}`)
+    this._info(`Verifying ${zipFilePath} against ${shaFilePath}`)
     const interval = setInterval(verify, 1000, shaFilePath)
   }
 
@@ -127,6 +126,9 @@ export default class VerifyOfficialReleasesHandler extends Handler {
       const pemPath = join(resources, options.pem)
       const sigPath =  join(resources, options.sig)
 
+
+      this._info(`Verifying binary '${binPath}' against pem '${pemPath}' and signature '${sigPath}'`)
+
       // if platform is linux, use the same command
       // used in krux CLI. Else use sign-check package
       if (options.platform === 'linux' || options.platform === 'darwin') {
@@ -135,10 +137,10 @@ export default class VerifyOfficialReleasesHandler extends Handler {
           `openssl sha256 <${binPath} -binary | openssl pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
         ])
         if (stderr !== null && stderr !== '') {
-          this.send('window:log:info', stderr)
+          this._info(stderr)
           this.send('official:releases:verified:sign:error', stderr)
         } else {
-          this.send('window:log:info', stdout)
+          this._info(stdout)
           this.send('official:releases:verified:sign', stdout)
         }
       } else {
@@ -147,8 +149,7 @@ export default class VerifyOfficialReleasesHandler extends Handler {
         this.send('official:releases:verified:sign:error', err)
       }
     } catch (error) {
-      this.send('window:log:info', error)
-      console.log(error)
+      this._info(error)
     }
   }
 }

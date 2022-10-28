@@ -134,7 +134,7 @@ jobs:
         uses: polyseam/get-version-from-package-json@1.0.0
         id: version
         with:
-          path-to-file: ./package.json
+          path-to-package-json: ./package.json
 
       - name: Set name for application
         id: named

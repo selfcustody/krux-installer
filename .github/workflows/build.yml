@@ -131,7 +131,7 @@ jobs:
         run: yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
 
       - name: Get version from package.json
-        uses: polyseam/get-version-from-package-json@v.1.0.0
+        uses: polyseam/get-version-from-package-json@1.0.0
         id: version
         with:
           path-to-file: ./package.json

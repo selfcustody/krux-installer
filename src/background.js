@@ -109,7 +109,7 @@ async function createWindow() {
     }
   }
 
-  debug('Creating window:')
+  debug('Creating window')
   for (let opt in winOptions) {
     if (opt !== 'webPreferences') {
       debug(`  ${opt}: ${winOptions[opt]}`)
@@ -121,59 +121,32 @@ async function createWindow() {
   }
 
   win = new BrowserWindow(winOptions)
+
+  debug('Creating store')
   const store = await createStore(app)
 
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.isStarted()` is executed inside App.vue
   debug('Configuring Handlers')
   ipcMain.handle('window:started', handleWindowStarted(win, store))
-
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.list_serialport` is exected inside App.vue
-  // ipcMain.handle('serialport:list', handleSerialport(win, store))
-
-  // This IPCs will be called everytime when the method
-  // `window.kruxAPI.download_resource` is executed inside App.vue
   ipcMain.handle('download:resource', handleDownload(win, store))
-
-  // This IPCs will be called everytime when the method
-  // `window.kruxAPI.unzip` is executed inside App.vue
   ipcMain.handle('zip:extract', handleUnzip(win, store))
-
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.sdcard_action` is executed inside `App.vue`
-  // ipcMain.handle('sdcard:action', handleSDCard(win, store))
-
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.verify_official_releases` is executed inside `App.vue`
   ipcMain.handle('official:releases:set', handleVerifyOfficialReleases(win, store))
-
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.verify_official_releases` is executed inside `App.vue`
   ipcMain.handle('official:releases:verify:hash', handleVerifyOfficialReleasesHash(win, store))
-
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.verify_official_releases` is executed inside `App.vue`
   ipcMain.handle('official:releases:verify:sign', handleVerifyOfficialReleasesSign(win, store))
-
-  // These IPC will be act like Vuex store,
-  // called everytime when the methods
-  // `window.kruxAPI.set_version`
-  // are executed inside `App.vue`
   ipcMain.handle('store:set', handleStoreSet(win, store))
   ipcMain.handle('store:get', handleStoreGet(win, store))
-
-  // This IPC will be called everytime when the method
-  // `window.kruxAPI.flash_firmware_to_device` is executed inside `App.vue`
   ipcMain.handle('flash:firmware', handleFlash(win, store))
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
-    // Load the url of the dev server if in development mode
+    debug('Loading the url of the dev server in development mode')
     await win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
-    if (!process.env.IS_TEST) win.webContents.openDevTools()
+    if (!process.env.IS_TEST) {
+      debug('opening dev tools')
+      win.webContents.openDevTools()
+    }
   } else {
+    debug('Creating \'app\' protocol')
     createProtocol('app')
-    // Load the index.html when not in development
+    debug('Loading the index.html')
     win.loadURL('app://./index.html')
   }
 }
@@ -182,7 +155,9 @@ async function createWindow() {
 app.on('window-all-closed', () => {
   // On macOS it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
+  debug('All windows closed')
   if (process.platform !== 'darwin') {
+    debug('Quiting app')
     app.quit()
   }
 })
@@ -191,6 +166,7 @@ app.on('activate', () => {
   // On macOS it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
+    debug('Activating app')
     createWindow()
   }
 })
@@ -202,12 +178,14 @@ app.on('ready', async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
     try {
+      debug('Installing Vue Devtools')
       await installExtension(VUEJS3_DEVTOOLS)
     } catch (e) {
-      console.error('Vue Devtools failed to install:', e.toString())
+      debug(`Vue Devtools failed to install:, ${e.toString()}`)
     }
   }
 
+  debug('App ready')
   // Now create window
   createWindow()
 })
@@ -216,15 +194,18 @@ app.on('ready', async () => {
 if (isDevelopment) {
   if (process.platform === 'win32') {
     process.on('message', (data) => {
+      debug(data)
       if (data === 'graceful-exit') {
         app.quit()
       }
     })
   } else {
     process.on('SIGTERM', () => {
+      debug('SIGTERM')
       app.quit()
     })
     process.on('SIGINT', function() {
+      debug('SIGINT')
       process.exit(0)
     })
   }
@@ -232,5 +213,8 @@ if (isDevelopment) {
 
 
 process.on('unhandledRejection', (reason, p) => {
-  p.catch((error) => console.error(error.stack))
+  debug(reason)
+  p.catch(function(error) {
+    debug(error.toString())
+  })
 })

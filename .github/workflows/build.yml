@@ -125,7 +125,46 @@ jobs:
           rm ./build/*.png
 
       - name: Build KruxInstaller
+        id: buildKruxInstaller
         env:
           GH_TOKEN: ${{ secrets.github_token }}
-          DEBUG: electron-builder
         run: yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
+
+      - name: Get version from package.json
+        uses: polyseam/get-version-from-package-json@v.1.0.0
+        id: version
+        with:
+          path-to-file: ./package.json
+
+      - name: Set name for application
+        id: named
+        run: |
+          echo "::set-output name=app::${{ steps.version.outputs.version }}.${{ matrix.target }}"
+          echo "::set-output name=sha::${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt"
+
+      - name: Create a Hash Release (Linux)
+        if: ${{ matrix.platform == 'linux' }}
+        run: |
+          cd dist_electron
+          sha256sum ${{ steps.named.outputs.app }} > ${{ steps.named.outputs.sha }}
+
+      - name: Create a Hash Release (Windows)
+        if: ${{ matrix.platform == 'win' }}
+        run: |
+          dir dist_electron
+          CertUtil -hashfile ${{ steps.named.outputs.app }} SHA256 > ${{ steps.named.outputs.sha }}
+
+      - name: Create a Hash Release (MacOS)
+        if: ${{ matrix.platform == 'macos' }} 
+        run: |
+          cd dist_electron
+          shasum -a 256 ${{ steps.named.outputs.app }} > ${{ steps.named.outputs.sha }}
+
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ steps.named.outputs.app }} artifacts
+          path: |
+            dist_electron/${{ steps.named.outputs.app }} 
+            dist_electron/${{ steps.named.outputs.sha }}
+

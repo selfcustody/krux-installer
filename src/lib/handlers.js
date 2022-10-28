@@ -121,8 +121,10 @@ export function handleStoreSet (win, store) {
       action.key === 'state' ||
       action.key !== 'versions'
     ) {
+      const msg = `store set: ${action.key} = '${store.get(action.key)}'`
+      debug(msg)
       store.set(action.key, action.value)
-      win.webContents.send('window:log:info', `store set: ${action.key} = '${store.get(action.key)}'`)
+      win.webContents.send('window:log:info', msg)
       win.webContents.send(`store:set:${action.key}`, store.get(action.key) ? true : false)
     } else {
       throw new Error(`Forbidden: cannot set '${action.key}'`)
@@ -140,7 +142,9 @@ export function handleStoreGet (win, store) {
   debug('Configuring handleStoreGet')
   return function (_event, action) {
     const val = store.get(action.key)
-    win.webContents.send('window:log:info', `store get: ${action.key} = '${val}'`)
+    const msg = `store get: ${action.key} = '${val}'`
+    debug(msg)
+    win.webContents.send('window:log:info', msg)
     win.webContents.send(`store:get:${action.key}`, val)
   }
 }

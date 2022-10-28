@@ -25,7 +25,11 @@ export default class VerifyOfficialReleasesHandler extends Handler {
 
   _info(msg) {
     debug(msg)
-    this.send('window:log:info', msg)
+    if (typeof msg == 'object') {
+      this.send('window:log:info', JSON.stringify(msg))
+    } else {
+      this.send('window:log:info', msg)
+    }
   }
 
   async fetchReleases() {

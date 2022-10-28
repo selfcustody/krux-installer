@@ -44,6 +44,8 @@ import AnsiUp from 'ansi_up'
 export default {
   name: 'WriteFirmwareToDevicePage',
   async created () {  
+    await window.kruxAPI.test_sipeed_device()
+
     await window.kruxAPI.flash_firmware_to_device()
   
     // eslint-disable-next-line no-unused-vars

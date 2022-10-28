@@ -1,5 +1,6 @@
 import { join } from 'path'
 import createDebug from 'debug'
+import { each } from 'lodash'
 import Store from 'electron-store'
 import pjson from '../../package.json'
 import bufferedSpawn from 'buffered-spawn'
@@ -10,15 +11,14 @@ const debug = createDebug('krux:store')
  *
  * The KruxInstaller's persistent storage.
  * If the environment variable DEBUG is attributed to 'krux:store'
- * (DEBUG=store yarn run electron:<serve|build>),
+ * (DEBUG=krux:store yarn run electron:<serve|build>),
  * any of the messages will be displayed
  * only for this module
  * @param app: The electron application
  */
 export default async function (app) {
   try {
-    debug('Creating store')
-    const store = new Store({
+    const storeConfig = {
       appVersion: {
         type: 'string',
       },
@@ -48,18 +48,19 @@ export default async function (app) {
       sdcard: {
         type: 'string'
       }
-    })
+    }
 
-    debug(`  appversion: ${pjson.version}`)
-    store.set('appVersion', pjson.version)
+    const store = new Store(storeConfig)
 
+    /*
+     * Variables to set store
+     * For mac, will be necessary to check,
+     * with `sw_vers` command,
+     * if the `productName` is something like
+     * `10.*.*`. This will be necessary when using
+     * `ktook-*` command (where * is `mac` or `mac-10`).
+     */
     const resourcePath = join(app.getPath('documents'), pjson.name)
-    debug(`  resource: ${resourcePath}`)
-    store.set('resources', resourcePath)
-
-    debug(`  platform: ${process.platform}`)
-    store.set('os', process.platform)
-
     let isMac10 = false
     if (process.platform === 'darwin') {
       const output = await bufferedSpawn('sw_vers', ['-productName'], { cwd: '.' })
@@ -71,28 +72,26 @@ export default async function (app) {
         }
       }
     }
-    debug(`  isMac10: ${isMac10}`)
-    store.set('isMac10', isMac10)
-
     const versions = []
-    debug(`  versions: ${versions}`)
-    store.set('versions', versions)
-
     const version = 'Select version'
-    debug(`  version: ${version}`)
-    store.set('version', 'Select version')
-
     const action = 'Select action'
-    debug(`  action: ${action}`)
-    store.set('action', action)
-
     const device = 'Select device firmware'
-    debug(`  device: ${device}`)
-    store.set('device', device)
-
     const sdcard = ''
-    debug(`  sdcard: ${sdcard}`)
+
+    store.set('appVersion', pjson.version)
+    store.set('resources', resourcePath)
+    store.set('os', process.platform)
+    store.set('isMac10', isMac10)
+    store.set('versions', versions)
+    store.set('version', version)
+    store.set('action', action)
+    store.set('device', device)
     store.set('sdcard', sdcard)
+
+    each(Object.keys(storeConfig), function(key) {
+      const value = store.get(key)
+      debug(` ${key}: ${value}`)
+    })
 
     return store
   } catch (error) {

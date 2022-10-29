@@ -140,7 +140,7 @@ jobs:
         if: ${{ matrix.target != 'deb' }}
         env:
           APPNAME: dist_electron/KruxInstaller
-        run: mv $APPNAME-${{ steps.version.outputs.version }}.${{ matrix.target }} $APPNAME-v${{ steps.version.outputs.version.${{ matrix.target }}
+        run: mv $APPNAME-${{ steps.version.outputs.version }}.${{ matrix.target }} $APPNAME-v${{ steps.version.outputs.version }}.${{ matrix.target }}
         
       - name: Rename executable (deb)
         if: ${{matrix.target  == "deb" }}

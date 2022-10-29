@@ -137,7 +137,8 @@ jobs:
           path-to-package-json: ./package.json
 
       - name: Move binary to root (relative to project)
-        run: mv dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.${{ matrix.target }}  KruxInstaller-v${{ steps.version.outputs.version}}.${{ matrix.target }}
+        run: |
+          mv ${{ github.workspace }}/dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.${{ matrix.target }}  ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version}}.${{ matrix.target }}
 
       - name: Hash executable
         uses: qlrd/sha256sum-action@v1.0.0
@@ -147,11 +148,13 @@ jobs:
             KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
       
       - name: Check hash
-        run: cat ${{ steps.sha256.outputs.hash-file }}
+        run: cat ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt
 
       - name: Upload Release Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform }} (${{ matrix.os }})
-          path: ${{ github.workspace }}/KruxInstaller-.*
+          path: |
+            ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
+            ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt
           retention-days: 1

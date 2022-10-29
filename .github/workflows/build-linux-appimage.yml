@@ -41,15 +41,20 @@ jobs:
           path-to-package-json: ./package.json
 
       - name: Build KruxInstaller
-        id: buildKruxInstaller
         env:
           GH_TOKEN: ${{ secrets.github_token }}
         run: |
           yarn run electron:build --linux AppImage
-          mv dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage dist_electron/KruxInstaller-v${{ steps.version.outputs.version }}.AppImage
       
-      - name: Upload Release Artifacts
+      - name: Hash executable
+        uses: qlrd/sha256sum-action@v1.0.0
+        with:
+          path-to-file: dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage
+
+      - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: KruxInstaller version ${{ steps.version.outputs.version }} as AppImage built with ${{ matrix.os }}
-          path: dist_electron/KruxInstaller-v${{ steps.version.outputs.version }}.AppImage
+          name: KruxInstaller-v${{ steps.version.outputs.version }}.AppImage
+          path: |
+            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage
+            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage.sha256sum.txt

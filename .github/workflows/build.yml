@@ -134,15 +134,16 @@ jobs:
         id: buildKruxInstaller
         env:
           GH_TOKEN: ${{ secrets.github_token }}
-        run: yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
-
+        run: |
+          yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
+      
       - name: Upload Release Artifacts (non deb)
         if: ${{ matrix.target != 'deb' }}
         uses: actions/upload-artifact@v3
         with:
           name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform }} (${{ matrix.os }})
           path: |
-            ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
+            ${{ github.workspace }}/dist_electron/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
           retention-days: 1
 
       - name: Upload Release Artifacts (deb)
@@ -151,5 +152,5 @@ jobs:
         with:
           name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform }} (${{ matrix.os }})
           path: |
-            ${{ github.workspace }}/krux_installer_v${{ steps.version.outputs.version }}_amd64.deb
+            ${{ github.workspace }}/dist_electron/krux_installer_v${{ steps.version.outputs.version }}_amd64.deb
           retention-days: 1

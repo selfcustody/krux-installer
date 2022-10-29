@@ -1,9 +1,11 @@
+[![Build](https://github.com/qlrd/krux-installer/actions/workflows/build.yml/badge.svg)](https://github.com/qlrd/krux-installer/actions/workflows/build.yml)
+
 # Krux Installer
 
-Krux Installer (Work In Progress) aims to be a GUI based tool to build, flash and debug [Krux](https://github.com/selfcustody/krux)
-to devices.
+Krux Installer (Work In Progress) aims to be a GUI based tool to build, flash and debug [Krux](https://github.com/selfcustody/krux) to Kendryte K210 devices
+(m5stickV, Sipeed Amigo, Sipeed Bit and Sipeed Dock).
 
-As it now, the generated application only runs a "Home" interface with some links.
+As it now, the generated application execute [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
 
 ## Download
 
@@ -19,63 +21,28 @@ yarn install
 
 For windows builds on linux, you will need to install [Wine](https://www.winehq.org/)
 
-### Compiles and hot-reloads for development
+### Compiles and hot-reloads for development in browser
 
 ```bash
 # This runs on browser
-yarn serve
+yarn run serve
+```
 
+### Compiles to a development electron application
+
+```bash
 # This runs on dedicated chrome instance
-yarn electron:serve
+yarn run electron:serve
 ```
 
 ### Compiles and minifies for production
 
-* Linux:   `yarn electron:build --linux`
-* Windows: `DISPLAY=:0 yarn electron:build --win`
-* Mac:     `yarn electron:build --mac`
+* Linux:   `yarn run electron:build --linux <target>`
+* Windows: `yarn run electron:build --win <target>`
+* Mac:     `yarn run electron:build --mac <target>`
 
-### Lints and fixes files
+Where target can be:
 
-```bash
-yarn lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
-
-
-### Dockerization
-
-This repository provides a docker image, with the aim to compile in a fresh environment.
-At the moment, works only to generate `.AppImage`. For windows, needs an better wine configuration.
-
-* docker
-* docker-compose
-
-#### build docker image:
-
-```bash
-docker-compose build installer
-```
-
-#### Execute instances
-
-
-* Linux: generates an `Krux Installer v*.AppImage` and a `Krux Installer v*.snap`
-
-```bash
-docker-compose run installer --linux
-```
-
-* Windows: generates an `Krux Installer v*.exe`
-
-```bash
-docker-compose run installer --win
-```
-
-* Mac: generates an `Krux Installer v*.dmg`
-
-```bash
-docker-compose run installer --mac
-```
+* Linux: AppImage, deb or snap
+* Windows: nsis, msi, portable
+* Mac: dmg, pkg

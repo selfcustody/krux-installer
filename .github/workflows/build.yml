@@ -124,37 +124,68 @@ jobs:
           rm ./build/*.svg
           rm ./build/*.png
 
-      - name: Build KruxInstaller
-        id: buildKruxInstaller
-        env:
-          GH_TOKEN: ${{ secrets.github_token }}
-        run: yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
-
       - name: Get version from package.json
         uses: polyseam/get-version-from-package-json@1.0.0
         id: version
         with:
           path-to-package-json: ./package.json
 
-      - name: Move binary to root (relative to project)
+      - name: Build KruxInstaller
+        id: buildKruxInstaller
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+        run: yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
+
+      - name: Move executable (non .deb)
+        if: ${{ matrix.target != 'deb' }}
         run: |
           mv ${{ github.workspace }}/dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.${{ matrix.target }}  ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version}}.${{ matrix.target }}
 
-      - name: Hash executable
+      - name: Move executable (deb)
+        if: ${{ matrix.target == 'deb' }}
+        run: |
+          mv ${{ github.workspace }}/dist_electron/krux_installer_${{ steps.version.outputs.version }}_amd64.deb  ${{ github.workspace }}/krux_installer_v${{ steps.version.outputs.version}}.deb
+      
+      - name: Hash executable (non deb)
         uses: qlrd/sha256sum-action@v1.0.0
+        if: ${{ matrix.target != 'deb' }}
         id: sha256sum
         with:
           path-to-file:
-            KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
+            ${{ github.workflow }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
+     
+      - name: Hash executable (deb)
+        uses: qlrd/sha256sum-action@v1.0.0
+        if: ${{ matrix.target == 'deb' }}
+        id: sha256sum
+        with:
+          path-to-file:
+            ${{ github.workflow }}/krux_installer_v${{ steps.version.outputs.version }}_amd64.deb
       
-      - name: Check hash
-        run: cat ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt
+      - name: Check hash (non deb)
+        if: ${{ matrix.target != 'deb' }}
+        run: cat ${{ stepsgithub.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt
 
-      - name: Upload Release Artifacts
+      - name: Check hash (deb)
+        if: ${{ matrix.target == 'deb' }}
+        run: cat ${{ github.workspace }}/krux_installer_v${{ steps.version.outputs.version }}_amd64.deb.sha256sum.txt
+
+      - name: Upload Release Artifacts (non deb)
+        if: ${{ matrix.target != 'deb' }}
         uses: actions/upload-artifact@v3
         with:
           name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform }} (${{ matrix.os }})
           path: |
             ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
             ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt
+          retention-days: 1
+
+      - name: Upload Release Artifacts (deb)
+        if: ${{ matrix.target == 'deb' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform }} (${{ matrix.os }})
+          path: |
+            ${{ github.workspace }}/krux_installer_v${{ steps.version.outputs.version }}_amd64.deb
+            ${{ github.workspace }}/krux_installer_v${{ steps.version.outputs.version }}.amd64.deb.sha256sum.txt
           retention-days: 1

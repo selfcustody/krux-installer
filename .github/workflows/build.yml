@@ -145,12 +145,13 @@ jobs:
         with:
           path-to-file:
             KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
-          
+      
+      - name: Check hash
+        run: cat ${{ steps.sha256.outputs.hash-file }}
+
       - name: Upload Release Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: ${{ steps.named.outputs.app }} artifacts
-          path: |
-            KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
-            ${{ steps.sha256sum.outputs.hash-file }}
-
+          name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform } (${{ matrix.os }})
+          path: ${{ github.workspace }}/KruxInstaller-.*
+          retention-days: 1

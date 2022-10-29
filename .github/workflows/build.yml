@@ -164,7 +164,7 @@ jobs:
       
       - name: Check hash (non deb)
         if: ${{ matrix.target != 'deb' }}
-        run: cat ${{ stepsgithub.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt
+        run: cat ${{ github.workspace }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}.sha256sum.txt
 
       - name: Check hash (deb)
         if: ${{ matrix.target == 'deb' }}

@@ -152,6 +152,6 @@ jobs:
       - name: Upload Release Artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform } (${{ matrix.os }})
+          name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform }} (${{ matrix.os }})
           path: ${{ github.workspace }}/KruxInstaller-.*
           retention-days: 1

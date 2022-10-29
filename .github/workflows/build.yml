@@ -140,7 +140,7 @@ jobs:
         run: mv dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.${{ matrix.target }}  KruxInstaller-v${{ steps.version.outputs.version}}.${{ matrix.target }}
 
       - name: Hash executable
-        uses: qlrd/sha256sum-action
+        uses: qlrd/sha256sum-action@v1.0.0
         id: sha256sum
         with:
           path-to-file:

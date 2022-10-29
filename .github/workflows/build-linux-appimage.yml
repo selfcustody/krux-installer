@@ -1,0 +1,58 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  build:
+    name: Build executables 
+    strategy:
+      matrix:
+        os: [ubuntu-22.04, ubuntu-20.04]
+          
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v2
+
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.18.0'
+
+      - name: Install Node.js dependencies (Linux or Windows)
+        run: yarn install --omit=optional
+
+      - name: Make icons
+        run: |
+          yarn run icon:svg
+          yarn run icon:png
+          yarn run icon:resize
+          rm ./build/*.svg
+          rm ./build/krux.png
+
+      - name: Get version from package.json
+        uses: polyseam/get-version-from-package-json@1.0.0
+        id: version
+        with:
+          path-to-package-json: ./package.json
+
+      - name: Build KruxInstaller
+        id: buildKruxInstaller
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+        run: |
+          yarn run electron:build --linux AppImage
+          mv dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage dist_electron/KruxInstaller-v${{ steps.version.outputs.version }}.AppImage
+      
+      - name: Upload Release Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: KruxInstaller version ${{ steps.version.outputs.version }} as AppImage built with ${{ matrix.os }}
+          path: dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage

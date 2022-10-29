@@ -149,7 +149,6 @@ jobs:
       - name: Hash executable (non deb)
         uses: qlrd/sha256sum-action@v1.0.0
         if: ${{ matrix.target != 'deb' }}
-        id: sha256sum
         with:
           path-to-file:
             ${{ github.workflow }}/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
@@ -157,7 +156,6 @@ jobs:
       - name: Hash executable (deb)
         uses: qlrd/sha256sum-action@v1.0.0
         if: ${{ matrix.target == 'deb' }}
-        id: sha256sum
         with:
           path-to-file:
             ${{ github.workflow }}/krux_installer_v${{ steps.version.outputs.version }}_amd64.deb

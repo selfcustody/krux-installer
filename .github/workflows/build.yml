@@ -134,8 +134,19 @@ jobs:
         id: buildKruxInstaller
         env:
           GH_TOKEN: ${{ secrets.github_token }}
-        run: |
-          yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
+        run: yarn run electron:build --${{ matrix.platform }} ${{ matrix.target }}
+     
+      - name: Rename executable (non deb)
+        if: ${{ matrix.target != 'deb' }}
+        env:
+          APPNAME: dist_electron/KruxInstaller
+        run: mv $APPNAME-${{ steps.version.outputs.version }}.${{ matrix.target }} $APPNAME-v${{ steps.version.outputs.version.${{ matrix.target }}
+        
+      - name: Rename executable (deb)
+        if: ${{matrix.target  == "deb" }}
+        env:  
+          APPNAME: dist_electron/krux_installer
+        run: mv $APPNAME_${{ steps.version.outputs.version }}_amd64.deb $APPNAME_v${{ steps.version.outputs.version }}_amd64.deb
       
       - name: Upload Release Artifacts (non deb)
         if: ${{ matrix.target != 'deb' }}
@@ -143,7 +154,7 @@ jobs:
         with:
           name: KruxInstaller version ${{ steps.version.outputs.version }} as ${{ matrix.target }} for ${{ matrix.platform }} (${{ matrix.os }})
           path: |
-            ${{ github.workspace }}/dist_electron/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
+              dist_electron/KruxInstaller-v${{ steps.version.outputs.version }}.${{ matrix.target }}
           retention-days: 1
 
       - name: Upload Release Artifacts (deb)

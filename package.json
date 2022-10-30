@@ -34,7 +34,7 @@
     "debug": "^4.3.4",
     "electron-store": "^8.1.0",
     "roboto-fontface": "*",
-    "sudo-prompt": "^9.2.1",
+    "@balena/sudo-prompt": "^9.2.1-workaround-windows-amperstand-in-username-0849e215b947987a643fe5763902aea201255534",
     "vue": "^3.2.13",
     "vue-uuid": "^3.0.0",
     "vuetify": "^3.0.0-beta.0",

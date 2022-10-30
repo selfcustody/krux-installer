@@ -12,7 +12,7 @@
             {{ text }}
           </v-card-text>
         </v-card-content>
-        <v-card-actions v-if="isConnected">
+        <v-card-actions>
           <v-btn @click.prevent="$emit('onSuccess', { page: 'WriteFirmwareToDevicePage' })">
             Flash
           </v-btn>
@@ -33,7 +33,6 @@ export default {
     return {
       version: '',
       device: '',
-      isConnected: false,
       texts: [
         'Flash to device is required when you intend to install krux for the first time on your device (or for development and testing purposes).',
         'Once you plugged an powered it, click on "flash" button',

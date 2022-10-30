@@ -14,6 +14,9 @@
             DO NOT UNPLUG DEVICE OR SHUTDOWN COMPUTER!
           </v-card-text>
         </v-card-content>
+        <v-card-actions class="text-center">
+          <v-progress-circular indeterminate color="red" :size="70" :width="7" />
+        </v-card-actions>
       </v-card>
       <v-card
         v-if="isWritten"
@@ -44,7 +47,6 @@ import AnsiUp from 'ansi_up'
 export default {
   name: 'WriteFirmwareToDevicePage',
   async created () {  
-    await window.kruxAPI.test_sipeed_device()
 
     await window.kruxAPI.flash_firmware_to_device()
   

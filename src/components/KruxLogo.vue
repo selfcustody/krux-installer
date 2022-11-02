@@ -3,13 +3,14 @@
     <v-row>
       <v-col
         class="pa-4 mx-auto my-auto"
+        color="white"
       >
-        <AsciiMorph :ascii="krux" x=16 y=16 />
+        <AsciiMorph class="logo" :ascii="krux" x=16 y=16 />
       </v-col>
     </v-row>
     <v-row class="text-center">
       <v-col class="mb-4">
-        <h1 class="display-2 font-weight-bold mb-3">
+        <h1 class="logo display-2 font-weight-bold mb-3" color="white">
           {{ title }}
         </h1>
       </v-col>
@@ -27,10 +28,10 @@ export default {
         "     ██        ",
         "     ██        ",
         "     ██        ",
-        "   ██████      ", 
+        "   ██████      ",
         "     ██        ",
         "     ██  ██    ",
-        "     ██ ██     ", 
+        "     ██ ██     ",
         "     ████      ",
         "     ██ ██     ",
         "     ██  ██    ",

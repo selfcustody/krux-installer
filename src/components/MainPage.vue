@@ -102,10 +102,13 @@ export default {
 
 <style>
 .v-main{
-  background: rgba(242, 169, 0);
+  background: rgba(0, 0, 0);
 } 
 .v-btn{
-  background:  rgba(0, 150, 255);
-  color:       rgba(255, 255, 255);
+  background:  rgba(0, 0, 0);
+  color: rgba(255, 255, 255) !important;
+}
+.logo {
+  color: rgba(255,255,255);
 }
 </style>

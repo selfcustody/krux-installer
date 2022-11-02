@@ -7,24 +7,9 @@
       >
         <v-card-title>Flashing...</v-card-title>
         <v-card-subtitle>
-          <b>Wait a moment</b>
-        </v-card-subtitle>
-        <v-card-content>
-          <v-card-text>
-            DO NOT UNPLUG DEVICE OR SHUTDOWN COMPUTER!
-          </v-card-text>
-        </v-card-content>
-        <v-card-actions class="text-center">
-          <v-progress-circular indeterminate color="red" :size="70" :width="7" />
-        </v-card-actions>
-      </v-card>
-      <v-card
-        v-if="isWritten"
-        class="ma-5 pa-5"
-      >
-        <v-card-title>Flashing done</v-card-title>
-        <v-card-subtitle>
-          Now your device should be rebooting! Enjoy!
+          <b v-if="!done">Do not unpulg device or shutdown computer!</b>
+          <b v-if="done">Output </b>
+          <b v-if="done">(toogle developer tools to see all outputs).</b>
         </v-card-subtitle>
         <v-card-content>
           <v-card-text>
@@ -32,8 +17,16 @@
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
-            Back
+          <v-progress-linear 
+            v-if="!done"
+            :indeterminate="true"
+            color="red"
+          />
+          <v-btn 
+            v-if="done"
+            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+          >
+              Back
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -45,33 +38,38 @@
 import AnsiUp from 'ansi_up'
 
 export default {
-  name: 'WriteFirmwareToDevicePage',
+  name: 'WriteFirmwareToDevicePage', 
+  data () {
+    return {
+      done: false,
+      html: ''
+    }
+  },
   async created () {  
 
     await window.kruxAPI.flash_firmware_to_device()
-  
+ 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onFlashingDone((_event, value) => {
-      this.$nextTick(() => {
-        // see 
-        // https://www.appsloveworld.com/vuejs/100/8/stream-shell-output-to-web-front-end
-        const ansi = new AnsiUp()
-        value = value.replace(/%\s/, "\n")
-        value = value.replace(/kiB\/s/g, "kiB/s\n")
-        this.html = ansi.ansi_to_html(value).replace(/\n/gm, '<br>')
-        this.isWritten = true
-      })
+    window.kruxAPI.onFlashing((_event, value) => { 
+      this.html = this.parse(value)
     })
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onFlashingError((_event, value) => { 
-      this.$emit('onError', { error: value })
+    window.kruxAPI.onFlashingDone((_event, value) => {
+      this.$nextTick(() => {
+        this.done = true 
+      })
     })
   },
-  data () {
-    return {
-      isWritten: false,
-      html: ''
+  methods: {
+    // see 
+    // https://www.appsloveworld.com/vuejs/100/8/stream-shell-output-to-web-front-end
+    parse (msg) { 
+      msg = msg.replace(/%\s/, "\n")
+      msg = msg.replace(/kiB\/s/g, "kiB/s\n")
+      
+      const ansi = new AnsiUp()
+      return ansi.ansi_to_html(msg).replace(/\n/gm, '<br>')
     }
   }
 }

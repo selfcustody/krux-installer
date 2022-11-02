@@ -4,7 +4,7 @@ import bufferedSpawn from 'buffered-spawn'
 import { join } from 'path'
 import createDebug from 'debug'
 import Handler from './base'
-import sudoer from '@balena/sudo-prompt'
+import Sudoer from '@nathanielks/electron-sudo'
 
 const debug = createDebug('krux:flash')
 
@@ -72,27 +72,6 @@ export default class FlashHandler extends Handler {
     }
   }
 
-  /*
-   * Shows a dialog requiring the
-   * system's administrador password to
-   * execute privileged tasks (mounting)
-   *
-   * @param script<String>: the main script to run with sudo prompt
-   */
-  sudoPromptAsync (script) {
-    return new Promise((resolve, reject) => {
-      const options = {
-        name: 'KruxInstaller'
-      };
-      this.log('Calling sudo module')
-      sudoer.exec(script, options, function (err, stdout, stderr){
-        if (err) reject(err)
-        if (stderr) reject(stderr)
-        resolve(stdout)
-      })
-    });
-  }
-
   async flash () {
     const resources = this.store.get('resources')
     const version = this.store.get('version')
@@ -100,76 +79,54 @@ export default class FlashHandler extends Handler {
     const os = this.store.get('os')
     const isMac10 = this.store.get('isMac10')
 
-    let __version__ = version
     let __cwd__ = ''
-    let __cmd__ = ''
+    const __args__ = ['-B', 'goE', '-b', '1500000']
 
     if (version.match(/selfcustody/g)) {
-      __version__ = version.split('tag/')[1]
+      const __version__ = version.split('tag/')[1]
       __cwd__ = join(resources, __version__, `krux-${__version__}`)
     }
 
     if (version.match(/odudex/g)) {
-      __version__ = join(version, 'raw', 'main')
+      const __version__ = join(version, 'raw', 'main')
       __cwd__ = join(resources, __version__)
     }
 
-    try {
-      if (os === 'linux') {
-        __cmd__ = [
-          `${__cwd__}/ktool-linux`,
-          '-B',
-          'goE',
-          '-b',
-          '1500000',
-          `${__cwd__}/${device}/kboot.kfpkg`
-        ].join(' ')
-      } else if (os === 'darwin' && isMac10) {
-        __cmd__ = [
-          `${__cwd__}/ktool-mac-10`,
-          '-B',
-          'goE',
-          '-b',
-          '1500000',
-          `${__cwd__}/${device}/kboot.kfpkg`
-        ].join(' ')
-      } else if (os === 'darwin' && !isMac10) {
-        __cmd__ = [
-          `${__cwd__}/ktool-mac`,
-          '-B',
-          'goE',
-          '-b',
-          '1500000',
-          `${__cwd__}/${device}/kboot.kfpkg`
-        ].join(' ')
-      } else if (os === 'win32') {
-        __cmd__ = [
-          `${__cwd__}\\ktool-win.exe`,
-          '-B',
-          'goE',
-          '-b',
-          '1500000',
-          `${__cwd__}\\${device}\\kboot.kfpkg`
-        ].join(' ')
-      }
-      this.log(__cmd__)
-      let output = await this.sudoPromptAsync(__cmd__)
-      output = Buffer.from(output, 'utf-8').toString()
-      this.log(output)
-      this.send('flash:writing:done', output)
-    } catch (err) {
-      this.log(err)
-      if (err.code === 'ECMDERR') {
-        let msg = Buffer.from(err.stdout, 'utf-8').toString()
-        //split('\x1B[0m ')[1]
-        //msg = msg.replace('\x1B[32m', ' ')
-        //msg = msg.replace('`', '')
-        //msg = msg.replace('`', '')
-        //const e = new Error(msg)
-        this.send('flash:writing:done', msg)
-      } else {
-        this.send('flash:writing:error', err)
-      }
+    __args__.push(join(__cwd__, device, 'kboot.kfpkg'))
+
+    let __ktool__ = ''
+    if (os === 'linux') {
+      __ktool__ = join(__cwd__, 'ktool-linux')
+    } else if (os === 'darwin' && isMac10) {
+      __ktool__ = join(__cwd__, 'ktool-mac-10')
+    } else if (os === 'darwin' && !isMac10) {
+      __ktool__ = join(__cwd__, 'ktool-mac')
+    } else if (os === 'win32') {
+      __ktool__ = join(__cwd__, 'ktool-win.exe')
     }
+
+    const options = { name: 'KruxInstaller' }
+    const sudoer = new Sudoer(options)
+    const command = `${__ktool__} ${__args__.join(' ')}`
+    this.log(command)
+
+    const flash = await sudoer.spawn(command)
+
+    flash.stdout.on('data', (data) => {
+      const out = Buffer.from(data, 'utf-8').toString()
+      this.log(out)
+      this.send('flash:writing', out)
+    })
+
+    flash.stderr.on('data', (data) => {
+      const out = Buffer.from(data, 'utf-8').toString()
+      this.log(out)
+      this.send('flash:writing', out)
+    })
+
+    // eslint-disable-next-line no-unused-vars
+    flash.on('close', (data) => {
+      this.send('flash:writing:done')
+    })
   }
 }

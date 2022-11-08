@@ -21,9 +21,7 @@
 import KruxLogo from './components/KruxLogo.vue'
 import MainPage from './components/MainPage.vue'
 import SelectVersionPage from './components/SelectVersionPage.vue'
-import SelectActionPage from './components/SelectActionPage.vue'
-import SelectFirmwarePage from './components/SelectFirmwarePage.vue'
-import ExecutePage from './components/ExecutePage.vue'
+import SelectDevicePage from './components/SelectDevicePage.vue'
 import BeforeFlashDevicePage from './components/BeforeFlashDevicePage.vue'
 import DetectSDCardPage from './components/DetectSDCardPage.vue'
 import CheckResourcesPage from './components/CheckResourcesPage.vue'
@@ -47,9 +45,7 @@ export default {
     KruxLogo,
     MainPage,
     SelectVersionPage,
-    SelectActionPage, 
-    SelectFirmwarePage,
-    ExecutePage, 
+    SelectDevicePage,
     BeforeFlashDevicePage,  
     DetectSDCardPage,
     CheckResourcesPage,

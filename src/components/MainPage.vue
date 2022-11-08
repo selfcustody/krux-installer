@@ -6,21 +6,11 @@
           <v-col cols="12"> 
             <v-card class="ma-5 pa-5">
               <v-card-subtitle>
-                Select device firmware
+                Select Device
               </v-card-subtitle>
               <v-card-actions>
-                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectFirmwarePage' })">
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectDevicePage' })">
                   {{ device }}
-                </v-btn>
-              </v-card-actions>
-            </v-card> 
-            <v-card class="ma-5 pa-5">
-              <v-card-subtitle>
-                Select betweeen "Flash firmware onto device" or "Write firmware to microSD"
-              </v-card-subtitle>
-              <v-card-actions>
-                <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectActionPage' })">
-                  {{ action }}
                 </v-btn>
               </v-card-actions>
             </v-card>
@@ -35,12 +25,9 @@
               </v-card-actions>
             </v-card>
             <v-card class="ma-5 pa-5">
-              <v-card-subtitle>
-                Execute the selected action combined with the select firmware's version
-              </v-card-subtitle>
               <v-card-actions>
-                <v-btn @click.prevent="$emit('onSuccess', { page: 'ExecutePage' })">
-                  Execute
+                <v-btn @click.prevent="$emit('onSuccess', { page: 'BeforeFlashDevicePage' })">
+                  Flash firmware to device
                 </v-btn>
               </v-card-actions>
             </v-card>

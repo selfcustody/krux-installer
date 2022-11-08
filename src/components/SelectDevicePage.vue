@@ -32,7 +32,7 @@
 
 <script>
 export default {
-  name: 'SelectFirmwarePage', 
+  name: 'SelectDevicePage', 
   data () {
     return {
       device: '',

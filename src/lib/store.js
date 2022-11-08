@@ -38,9 +38,6 @@ export default async function (app) {
         type: 'string',
         regex: /(?:^odudex\/krux_binaries|selfcustody\/krux\/releases\/tag\/v\d+\.\d+\.\d+)/g
       },
-      action: {
-        type: 'string'
-      },
       device: {
         type: 'string',
         regex: /maixpy_(m5stickv5|amigo|dock|bit)/g
@@ -74,8 +71,7 @@ export default async function (app) {
     }
     const versions = []
     const version = 'Select version'
-    const action = 'Select action'
-    const device = 'Select device firmware'
+    const device = 'Select device'
     const sdcard = ''
 
     store.set('appVersion', pjson.version)
@@ -84,7 +80,6 @@ export default async function (app) {
     store.set('isMac10', isMac10)
     store.set('versions', versions)
     store.set('version', version)
-    store.set('action', action)
     store.set('device', device)
     store.set('sdcard', sdcard)
 

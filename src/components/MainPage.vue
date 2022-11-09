@@ -44,7 +44,6 @@ export default {
   data () {
     return {
       version: '',
-      action: '',
       device: ''
     }
   },
@@ -61,18 +60,6 @@ export default {
   watch: {
     async version (v) {
       if (v !== '') { 
-        await window.kruxAPI.get_action()
-    
-        // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onGetAction((_event, value) => {
-          this.$nextTick(() => {
-            this.action = value
-          })
-        })
-      }
-    },
-    async action (a) {
-      if (a !== '') {
         await window.kruxAPI.get_device()
 
         // eslint-disable-next-line no-unused-vars

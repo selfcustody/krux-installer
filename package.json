@@ -4,9 +4,7 @@
   "author": [
     "qlrd <106913782+qlrd@users.noreply.github.com>"
   ],
-  "license": "LICENSE.md",
   "description": "An imager installer for Krux firmwares",
-  "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -22,11 +20,12 @@
     "lint": "yarn run lint:server && yarn run lint:public && yarn run lint:client",
     "electron:build": "vue-cli-service electron:build",
     "electron:serve": "yarn run lint && DEBUG=krux:* vue-cli-service electron:serve --trace-warnings",
-    "postinstall": "electron-builder install-app-deps && electron-rebuild",
-    "postuninstall": "electron-builder install-app-deps && electron-rebuild"
+    "postinstall": "electron-builder install-app-deps",
+    "postuninstall": "electron-builder install-app-deps"
   },
   "dependencies": {
-    "@mdi/font": "5.9.55",
+    "@mdi/font": "^7.0.96",
+    "@nathanielks/electron-sudo": "^4.0.15",
     "ansi_up": "^5.1.0",
     "axios": "^0.27.2",
     "buffered-spawn": "^3.3.2",
@@ -34,11 +33,10 @@
     "debug": "^4.3.4",
     "electron-store": "^8.1.0",
     "roboto-fontface": "*",
-    "@nathanielks/electron-sudo": "^4.0.15",
-    "vue": "^3.2.13",
+    "vue": "^3.2.44",
     "vue-uuid": "^3.0.0",
-    "vuetify": "^3.0.0-beta.0",
-    "webfontloader": "^1.0.0",
+    "vuetify": "^3.0.0",
+    "webfontloader": "^1.6.28",
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
@@ -51,19 +49,19 @@
     "electron": "21.0.1",
     "electron-builder": "^23.6.0",
     "electron-devtools-installer": "^3.1.0",
-    "electron-rebuild": "^3.2.9",
     "eslint": "^8.26.0",
     "eslint-plugin-vue": "^9.6.0",
     "make-icns": "^1.1.4",
     "png-to-ico": "^2.1.8",
+    "replace": "^1.2.2",
     "resize-img-cli": "^1.0.0",
     "svgexport": "^0.4.2",
     "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4",
     "vue-cli-plugin-vuetify": "^2.5.8",
     "webpack-plugin-vuetify": "^2.0.0"
   },
-  "optionalDependencies": { 
-    "dmg-license": "^1.0.11",
-    "dmg-builder": "^24.0.0-alpha.1"
+  "optionalDependencies": {
+    "dmg-builder": "^24.0.0-alpha.1",
+    "dmg-license": "^1.0.11"
   }
 }

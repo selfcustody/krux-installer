@@ -10,24 +10,24 @@
               </v-card-subtitle>
               <v-card-actions>
                 <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectDevicePage' })">
-                  {{ device }}
+                  <v-icon>mdi-devices</v-icon> {{ device }}
                 </v-btn>
               </v-card-actions>
             </v-card>
             <v-card class="ma-5 pa-5">
               <v-card-subtitle>
-                Select between available official (selfcustody) or test (odudex) releases,
+                Select between <b>selfcustody</b> or <b>odudex</b> releases
               </v-card-subtitle>
               <v-card-actions>
                 <v-btn @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })">
-                  {{ version }}
+                   <v-icon>mdi-cube-outline</v-icon> {{ version }}
                 </v-btn>
               </v-card-actions>
             </v-card>
             <v-card class="ma-5 pa-5">
-              <v-card-actions>
+              <v-card-actions> 
                 <v-btn @click.prevent="$emit('onSuccess', { page: 'BeforeFlashDevicePage' })">
-                  Flash firmware to device
+                  <v-icon>mdi-lightning-bolt-outline</v-icon> Flash to device
                 </v-btn>
               </v-card-actions>
             </v-card>

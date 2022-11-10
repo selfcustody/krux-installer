@@ -17,7 +17,8 @@
         <v-card-title
           v-if="!isChecking"
         >
-          Choose between official or test release
+          <v-icon>mdi-cube-outline</v-icon>
+          Select between <b>selfcustody</b> or <b>odudex</b> releases
         </v-card-title>
         <v-card-subtitle>
           <b>Official</b>: selfcustody/krux/releases/tag/v*

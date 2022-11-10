@@ -8,6 +8,7 @@
     <v-flex xs12 sm4>
       <v-card class="ma-5 pa-5">
         <v-card-title>
+          <v-icon>mdi-devices</v-icon>
           Choose the firmware's device that you want install
         </v-card-title>
         <v-card-content>

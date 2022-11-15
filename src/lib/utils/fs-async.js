@@ -1,4 +1,4 @@
-import { copyFile, readFile, mkdir, exists } from 'fs'
+import { copyFile, readFile, mkdir, exists, unlink } from 'fs'
 import { promisify } from 'util'
 
 /**
@@ -26,6 +26,16 @@ export const readFileAsync = promisify(readFile)
  * @return Boolean
  */
 export const existsAsync = promisify(exists)
+
+/*
+ * Function to check if file or folder exists
+ * in async/await approach. Always resoulves to
+ * a boolean value.
+ *
+ * @param p<String>: path of the file
+ * @return Boolean
+ */
+export const rmAsync = promisify(unlink)
 
 /*
  * Function to create folder recursively

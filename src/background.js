@@ -12,6 +12,7 @@ import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import installExtension, { VUEJS3_DEVTOOLS } from 'electron-devtools-installer'
 import createDebug from 'debug'
+import dotenv from 'dotenv'
 
 /*
  * Debugger
@@ -32,22 +33,17 @@ const debug = createDebug('krux:background')
  * windows and macos OS.
  */
 import createStore from './lib/store'
-import {
-  handleWindowStarted,
-  handleVerifyOfficialReleases,
-  handleVerifyOfficialReleasesHash,
-  handleVerifyOfficialReleasesSign,
-  handleUnzip,
-  handleStoreSet,
-  handleStoreGet,
-  handleDownload,
-  // handleSDCard,
-  // handleSerialport,
-  handleFlash
-} from './lib/handlers'
-
+import windowStarted from './lib/window-started'
+import downloadResource from './lib/download-resource'
+import checkResource from './lib/check-resource'
+import unzipResource from './lib/unzip-resource'
+import verifyOfficialReleasesFetch from './lib/verify-official-releases-fetch'
+import verifyOfficialReleasesHash from './lib/verify-official-releases-hash'
+import verifyOfficialReleasesSign from './lib/verify-official-releases-sign'
+import storeSet from './lib/store-set'
+import storeGet from './lib/store-get'
+import flash from './lib/flash'
 import { existsAsync } from './lib/utils/fs-async'
-import dotenv from 'dotenv'
 
 /*
  * Environment variables setup section
@@ -126,15 +122,16 @@ async function createWindow() {
   const store = await createStore(app)
 
   debug('Configuring Handlers')
-  ipcMain.handle('window:started', handleWindowStarted(win, store))
-  ipcMain.handle('download:resource', handleDownload(win, store))
-  ipcMain.handle('zip:extract', handleUnzip(win, store))
-  ipcMain.handle('official:releases:set', handleVerifyOfficialReleases(win, store))
-  ipcMain.handle('official:releases:verify:hash', handleVerifyOfficialReleasesHash(win, store))
-  ipcMain.handle('official:releases:verify:sign', handleVerifyOfficialReleasesSign(win, store))
-  ipcMain.handle('store:set', handleStoreSet(win, store))
-  ipcMain.handle('store:get', handleStoreGet(win, store))
-  ipcMain.handle('flash:firmware', handleFlash(win, store))
+  ipcMain.handle('window-started', windowStarted(win, store))
+  ipcMain.handle('download-resource', downloadResource(win, store))
+  ipcMain.handle('check-resource', checkResource(win, store))
+  ipcMain.handle('unzip-resource', unzipResource(win, store))
+  ipcMain.handle('verify-official-releases-fetch', verifyOfficialReleasesFetch(win, store))
+  ipcMain.handle('verify-official-releases-hash', verifyOfficialReleasesHash(win, store))
+  ipcMain.handle('verify-official-releases-sign', verifyOfficialReleasesSign(win, store))
+  ipcMain.handle('store-set', storeSet(win, store))
+  ipcMain.handle('store-get', storeGet(win, store))
+  ipcMain.handle('flash', flash(win, store))
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     debug('Loading the url of the dev server in development mode')

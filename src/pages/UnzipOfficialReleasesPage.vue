@@ -77,54 +77,58 @@ export default {
     }
   },
   async created () {
-    window.kruxAPI.get_resources_path()
+    window.KruxInstaller.resourcesPath.get()
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetResourcesPath(async (_event, value) => {
-      this.resourcesPath = value
+    window.KruxInstaller.resourcesPath.onGet((_event, value) => {
+      this.$nextTick(() => {
+        this.resourcesPath = value
+      })
     })
 
-    window.kruxAPI.get_version()
-
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetVersion(async (_event, value) => {
-      this.version = value
+    window.KruxInstaller.version.onGet((_event, value) => {
+      this.$nextTick(() => {
+        this.version = value
+      })
     })
 
-    window.kruxAPI.get_action()
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.unzip.onData((_event, value) => {
+      this.$nextTick(() => {
+        if (this.currentFile !== value.file) {
+          this.currentFile = value.file
+        }
+        this.progress = value.progress
+      })
+    })
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetAction(async (_event, value) => {
-      this.action = value
+    window.KruxInstaller.unzip.onSuccess((_event, value) => { 
+      this.$nextTick(() => {
+        this.unzipped = value.length > 0
+        this.files = value  
+      })
+    })
+
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.unzip.onError((_event, value) => {
+      this.$emit('onError', value)
     })
   },
   watch: {
+    async resourcesPath (value) {
+      if (value !== '') {
+        await window.KruxInstaller.version.get()
+      }
+    },
     async version (value) {
       if (value !== '') {
-        const resource = value.split('tag/')[1]
-        this.currentFile = `krux-${resource}.zip`
-        window.kruxAPI.unzip({
-          resource: resource,
+        const v = value.split('tag/')[1]
+        this.currentFile = `krux-${v}.zip`
+        await window.KruxInstaller.unzip.resource({
+          resource: v,
           file: this.currentFile
-        })
-
-        // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onUnzipProgress((_event, value) => {
-          if (this.currentFile !== value.file) {
-            this.currentFile = value.file
-          }
-          this.progress = value.progress
-        })
-
-        // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onUnzipped((_event, value) => { 
-          this.unzipped = value.length > 0
-          this.files = value  
-        })
-    
-        // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onUnzipError((_event, value) => {
-          this.$emit('onError', value)
         })
       }
     }

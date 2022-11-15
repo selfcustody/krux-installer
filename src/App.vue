@@ -19,25 +19,32 @@
 
 <script>
 import KruxLogo from './components/KruxLogo.vue'
-import MainPage from './components/MainPage.vue'
-import SelectVersionPage from './components/SelectVersionPage.vue'
-import SelectDevicePage from './components/SelectDevicePage.vue'
-import BeforeFlashDevicePage from './components/BeforeFlashDevicePage.vue'
-import DetectSDCardPage from './components/DetectSDCardPage.vue'
-import CheckResourcesPage from './components/CheckResourcesPage.vue'
-import DownloadOfficialReleasePage from './components/DownloadOfficialReleasePage.vue'
-import DownloadOfficialReleaseSHA256Page from './components/DownloadOfficialReleaseSHA256Page.vue'
-import DownloadOfficialReleaseSigPage from './components/DownloadOfficialReleaseSigPage.vue'
-import DownloadOfficialReleasePemPage from './components/DownloadOfficialReleasePemPage.vue'
-import DownloadTestFirmwarePage from './components/DownloadTestFirmwarePage.vue'
-import DownloadTestKtoolPage from './components/DownloadTestKtoolPage.vue'
-import DownloadTestKbootPage from './components/DownloadTestKbootPage.vue'
-import VerifyOfficialReleasesPage from './components/VerifyOfficialReleasesPage.vue'
-import UnzipOfficialReleasesPage from './components/UnzipOfficialReleasesPage.vue'
-import ConfirmDetectedDevicePage from './components/ConfirmDetectedDevicePage.vue'
-import ConfirmDetectedSDCardPage from './components/ConfirmDetectedSDCardPage.vue'
-import WriteFirmwareToSDCardPage from './components/WriteFirmwareToSDCardPage.vue'
-import WriteFirmwareToDevicePage from './components/WriteFirmwareToDevicePage.vue'
+import MainPage from './pages/MainPage.vue'
+import SelectVersionPage from './pages/SelectVersionPage.vue'
+import SelectDevicePage from './pages/SelectDevicePage.vue'
+import BeforeFlashDevicePage from './pages/BeforeFlashDevicePage.vue'
+import DetectSDCardPage from './pages/DetectSDCardPage.vue'
+import CheckResourcesPage from './pages/CheckResourcesPage.vue'
+import CheckResourcesOfficialReleasePage from './pages/CheckResourcesOfficialReleasePage.vue'
+import CheckResourcesOfficialReleaseSHA256Page from './pages/CheckResourcesOfficialReleaseSHA256Page.vue'
+import CheckResourcesOfficialReleaseSigPage from './pages/CheckResourcesOfficialReleaseSigPage.vue'
+import CheckResourcesOfficialReleasePemPage from './pages/CheckResourcesOfficialReleasePemPage.vue'
+import CheckResourcesTestFirmwarePage from './pages/CheckResourcesTestFirmwarePage.vue'
+import CheckResourcesTestKbootPage from './pages/CheckResourcesTestKbootPage.vue'
+import CheckResourcesTestKtoolPage from './pages/CheckResourcesTestKtoolPage.vue'
+import DownloadOfficialReleasePage from './pages/DownloadOfficialReleasePage.vue'
+import DownloadOfficialReleaseSHA256Page from './pages/DownloadOfficialReleaseSHA256Page.vue'
+import DownloadOfficialReleaseSigPage from './pages/DownloadOfficialReleaseSigPage.vue'
+import DownloadOfficialReleasePemPage from './pages/DownloadOfficialReleasePemPage.vue'
+import DownloadTestFirmwarePage from './pages/DownloadTestFirmwarePage.vue'
+import DownloadTestKtoolPage from './pages/DownloadTestKtoolPage.vue'
+import DownloadTestKbootPage from './pages/DownloadTestKbootPage.vue'
+import VerifyOfficialReleasesPage from './pages/VerifyOfficialReleasesPage.vue'
+import UnzipOfficialReleasesPage from './pages/UnzipOfficialReleasesPage.vue'
+import ConfirmDetectedDevicePage from './pages/ConfirmDetectedDevicePage.vue'
+import ConfirmDetectedSDCardPage from './pages/ConfirmDetectedSDCardPage.vue'
+import WriteFirmwareToSDCardPage from './pages/WriteFirmwareToSDCardPage.vue'
+import WriteFirmwareToDevicePage from './pages/WriteFirmwareToDevicePage.vue'
 
 export default {
   name: 'App',
@@ -49,6 +56,13 @@ export default {
     BeforeFlashDevicePage,  
     DetectSDCardPage,
     CheckResourcesPage,
+    CheckResourcesOfficialReleasePage,
+    CheckResourcesOfficialReleaseSHA256Page, 
+    CheckResourcesOfficialReleaseSigPage,
+    CheckResourcesOfficialReleasePemPage,
+    CheckResourcesTestFirmwarePage,
+    CheckResourcesTestKbootPage,
+    CheckResourcesTestKtoolPage,
     DownloadOfficialReleasePage,
     DownloadOfficialReleaseSHA256Page,
     DownloadOfficialReleaseSigPage,
@@ -67,10 +81,10 @@ export default {
     page: 'MainPage'
   }),
   created () {
-    window.kruxAPI.window_started()
+    window.KruxInstaller.client.started()
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onLogLevelInfo(function(_event, value) {
+    window.KruxInstaller.client.onLog(function(_event, value) {
       // eslint-disable-next-line
       console.log(`[ INFO ] ${value}`)
     })

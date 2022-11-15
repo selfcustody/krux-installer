@@ -77,10 +77,10 @@ export default {
     }
   },
   async created () {
-    await window.kruxAPI.get_version()
+    await window.KruxInstaller.version.get()
     
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetVersion(async (_event, value) => { 
+    window.KruxInstaller.version.onGet(async (_event, value) => { 
       this.$nextTick(() => {
         this.version = value
       })
@@ -89,14 +89,14 @@ export default {
   watch: {
     async version (value) {
       if (value !== '') {
-        const resource = value.split('tag/')[1]
-        window.kruxAPI.verify_hash(
-          `${resource}/krux-${resource}.zip`,
-          `${resource}/krux-${resource}.zip.sha256.txt`
+        const v = value.split('tag/')[1]
+        window.KruxInstaller.hash.verify(
+          `${v}/krux-${v}.zip`,
+          `${v}/krux-${v}.zip.sha256.txt`
         )
 
         // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onVerifiedHash((_event, value) => { 
+        window.KruxInstaller.hash.onSuccess((_event, value) => { 
           this.$nextTick(() => {
             this.verifiedHash = value.length > 0
             this.hashes = value
@@ -104,7 +104,7 @@ export default {
         })
     
         // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onVerifiedHashError((_event, value) => {
+        window.KruxInstaller.hash.onError((_event, value) => {
           alert(value)
           this.$emit('onSuccess', { page: 'MainPage' })
         })
@@ -112,15 +112,15 @@ export default {
     },
     async hashes (value) {
       if (value.length == 2) { 
-        const resource = this.version.split('tag/')[1]
-        window.kruxAPI.verify_signature({ 
-          bin: `${resource}/krux-${resource}.zip`,
+        const v = this.version.split('tag/')[1]
+        window.KruxInstaller.signature.verify({ 
+          bin: `${v}/krux-${v}.zip`,
           pem: `main/selfcustody.pem`,
-          sig: `${resource}/krux-${resource}.zip.sig`,
+          sig: `${v}/krux-${v}.zip.sig`,
         })
 
         // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onVerifiedSign((_event, value) => {
+        window.KruxInstaller.signature.onSuccess((_event, value) => {
           this.$nextTick(() => {
             this.verifiedSign = value.match(new RegExp('Signature Verified Successfully')) ? true : false
             this.signed = value
@@ -128,7 +128,7 @@ export default {
         })
     
         // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onVerifiedSignError((_event, value) => {
+        window.KruxInstaller.signature.onError((_event, value) => {
           alert(value)
           this.$emit('onSuccess', { page: 'MainPage' })
         })

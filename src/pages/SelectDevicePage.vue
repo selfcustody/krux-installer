@@ -48,11 +48,13 @@ export default {
   },
   methods: {
     async select () {
-      await window.kruxAPI.set_device(this.device)
+      await window.KruxInstaller.device.set(this.device)
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onSetDevice((_event, value) => {
-        this.$emit('onSuccess', { page: 'MainPage' })
+      window.KruxInstaller.device.onSet((_event, value) => {
+        this.$nextTick(() => {
+          this.$emit('onSuccess', { page: 'MainPage' })
+        })
       })
     }
   }

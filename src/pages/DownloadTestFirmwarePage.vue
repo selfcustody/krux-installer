@@ -8,18 +8,19 @@
     <v-flex xs12>
       <v-card flat>
         <v-card-title>
+          <v-icon>mdi-monitor-arrow-down</v-icon>
           Downloading...
         </v-card-title>
         <v-card-subtitle>
-          firmware: {{ device }}
+          device: {{ device }}
         </v-card-subtitle>
         <v-card-actions>
           <v-progress-linear
-            v-model="model"
+            v-model="progress"
             height="25"
             color="blue-grey"
           >
-            <strong>{{ model }}%</strong>
+            <strong>{{ progress }}%</strong>
           </v-progress-linear>
         </v-card-actions>
       </v-card>
@@ -32,46 +33,47 @@ export default {
   name: 'DownloadTestFirmwarePage',
   data () {
     return {
-      model: 0,
-      device: ''
+      progress: 0,
+      device: '',
+      download: false
     }
   },
   async created () {
-    await window.kruxAPI.get_device()
+    await window.KruxInstaller.device.get()
 
-    window.kruxAPI.onGetDevice((_event, value) => {
+    window.KruxInstaller.device.onGet((_event, value) => {
       this.$nextTick(() => {
         this.device = value
       })
     })
   },
   watch: {
-    device (value) {
+    async device (value) {
       if (value !== '') {
-        this.download()
+        await this.download_resource({
+          baseUrl: 'https://github.com',
+          resource: `odudex/krux_binaries/raw/main/${value}`, 
+          filename: 'firmware.bin'
+        })
       }
     }
   },
   methods: {
-    async download () { 
-      await window.kruxAPI.download_resource({
-        baseUrl: 'https://github.com',
-        resource: `odudex/krux_binaries/raw/main/${this.device}`,
-        filename: 'firmware.bin'
-      })
+    async download_resource (options) {
+      await window.KruxInstaller.download.resource(options)
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDownloadStatus((_event, value) => {
-        this.model = value
+      window.KruxInstaller.download.onData((_event, value) => {
+        this.progress = value
       })
         
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDownloadDone((_event, value) => {
-        this.$emit('onSuccess', { page: 'DownloadTestKbootPage' })
+      window.KruxInstaller.download.onSuccess((_event, value) => {
+        this.$emit('onSuccess', { page: 'CheckResourcesTestKbootPage' })
       })
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDownloadError((_event, value) => {
+      window.KruxInstaller.download.onError((_event, value) => {
         alert(value)
         this.$emit('onSuccess', { page: 'MainPage' })
       })

@@ -1,11 +1,8 @@
 import { join } from 'path'
 import { createWriteStream } from 'fs'
 import { open } from 'yauzl'
-import createDebug from 'debug'
 import { mkdirAsync } from './utils/fs-async'
 import Handler from './base'
-
-const debug = createDebug('krux:unzip')
 
 /**
  * unzipAsync
@@ -19,6 +16,8 @@ const debug = createDebug('krux:unzip')
 function unzipAsync (handler, options) {
   return new Promise(function (resolve, reject) {
     const zipFilePath = join(options.destination, options.resource, options.file)
+
+    handler.log(`Opening ${zipFilePath}`)
     open(zipFilePath, { lazyEntries: true }, function (err, zipfile) {
       if (err) reject(err)
       zipfile.readEntry()
@@ -35,10 +34,11 @@ function unzipAsync (handler, options) {
           // Note that entries for directories themselves are optional.
           // An entry's fileName implicitly requires its parent directories to exist.
           const folder = join(options.destination, options.resource, entry.fileName)
+          handler.log(`Creating ${folder}`)
           await mkdirAsync(folder)
           zipfile.readEntry();
         } else {
-          handler._info(`extracting ${entry.fileName}`)
+          handler.log(`Extracting ${entry.fileName}`)
 
           // create the destination file
           const writeStreamPath = join(options.destination, options.resource, entry.fileName)
@@ -50,7 +50,7 @@ function unzipAsync (handler, options) {
           let currentSize = 0
 
           // reset progress on client
-          handler.send('zip:extract:progress', {
+          handler.send(`${handler.name}:data`, {
             file: entry.fileName,
             progress: 0
           })
@@ -65,14 +65,14 @@ function unzipAsync (handler, options) {
             readStream.on('data',function (chunk) {
               currentSize += chunk.length
               const percent = ((currentSize/uncompressedSize) * 100).toFixed(2)
-              handler.send('zip:extract:progress', {
+              handler.send(`${handler.name}:data`, {
                 file: entry.fileName,
                 progress: percent
               })
             })
 
             readStream.on('end', function () {
-              handler.send('window:log:info', `extracted to ${writeStreamPath}`)
+              handler.log(`Extracted to ${writeStreamPath}`)
               zipfile.readEntry()
             })
 
@@ -87,7 +87,7 @@ function unzipAsync (handler, options) {
 
       zipfile.on('end', function () {
         zipfile.close()
-        handler.send('zip:extract:done', entries)
+        handler.send(`${handler.name}:success`, entries)
         resolve()
       })
 
@@ -98,30 +98,40 @@ function unzipAsync (handler, options) {
   })
 }
 
-export default class UnzipHandler extends Handler {
+class UnzipResourceHandler extends Handler {
 
   constructor (win, store) {
-    super(win)
-    this.store = store
-  }
-
-  _info (msg) {
-    debug(msg)
-    this.send('window:log:info', msg)
+    super('unzip-resource', win, store)
   }
 
   async unzip (options) {
     const destination = this.store.get('resources')
     try {
-      this._info(`extracting ${join(options.resource, options.file)}`)
+      this.log(`Extracting ${join(options.resource, options.file)}`)
       await unzipAsync(this, {
         resource: options.resource,
         file: options.file,
         destination: destination
       })
     } catch (error) {
-      this._info(error)
-      this.send('zip:extract:error', error)
+      this.log(error)
+      this.send(`${this.name}:error`, error)
     }
+  }
+}
+
+
+/**
+ * Function to handle when
+ * wants to unzip official releases
+ *
+ * @param win
+ * @apram store
+ */
+export default function (win, store) {
+  // eslint-disable-next-line no-unused-vars
+  return async function (_event, options) {
+    const handler = new UnzipResourceHandler(win, store)
+    handler.unzip(options)
   }
 }

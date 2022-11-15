@@ -39,18 +39,23 @@ export default {
       ]
     }
   },
+  watch: {
+    async version (value) {
+      if (value !== '') {
+        await window.KruxInstaller.device.get()
+      }
+    }
+  },
   async created () {
-    await window.kruxAPI.get_version()
+    await window.KruxInstaller.version.get()
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetVersion((_event, value) => {
+    window.KruxInstaller.version.onGet((_event, value) => {
       this.version = value
     })
 
-    await window.kruxAPI.get_device()
-
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetDevice((_event, value) => {
+    window.KruxInstaller.device.onGet((_event, value) => {
       this.device = value
     })
   }

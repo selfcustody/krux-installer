@@ -1,11 +1,151 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('kruxAPI',{
-  async window_started () {
-    await ipcRenderer.invoke('window:started', { state: 'running' })
+contextBridge.exposeInMainWorld('KruxInstaller',{
+  client: {
+    async started () {
+      await ipcRenderer.invoke('window-started')
+    },
+    onLog(callback) {
+      ipcRenderer.on('window:log:info', callback)
+    }
   },
-  async download_resource (options) {
-    await ipcRenderer.invoke('download:resource', options)
+  download: {
+    async resource (options) {
+      await ipcRenderer.invoke('download-resource', options)
+    },
+    onData(callback) {
+      ipcRenderer.on('download-resource:data', callback)
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('download-resource:success', callback)
+    },
+    onError(callback) {
+      ipcRenderer.on('download-resource:error', callback)
+    }
+  },
+  check: {
+    async resource (options) {
+      await ipcRenderer.invoke('check-resource', options)
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('check-resource:success', callback)
+    },
+    onError(callback) {
+      ipcRenderer.on('check-resource:error', callback)
+    }
+  },
+  unzip: {
+    async resource (options) {
+      await ipcRenderer.invoke('unzip-resource', options)
+    },
+    onData(callback) {
+      ipcRenderer.on('unzip-resource:data', callback)
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('unzip-resource:success', callback)
+    },
+    onError(callback) {
+      ipcRenderer.on('unzip-resource:error', callback)
+    }
+  },
+  version: {
+    async set(value) {
+      await ipcRenderer.invoke('store-set', { key: 'version', value: value })
+    },
+    async get() {
+      await ipcRenderer.invoke('store-get', { key: 'version' })
+    },
+    onSet(callback) {
+      ipcRenderer.on('store-set:version', callback)
+    },
+    onGet(callback) {
+      ipcRenderer.on('store-get:version', callback)
+    }
+  },
+  device: {
+    async set(value) {
+      await ipcRenderer.invoke('store-set', { key: 'device', value: value })
+    },
+    async get() {
+      await ipcRenderer.invoke('store-get', { key: 'device' })
+    },
+    onSet(callback) {
+      ipcRenderer.on('store-set:device', callback)
+    },
+    onGet(callback) {
+      ipcRenderer.on('store-get:device', callback)
+    }
+  },
+  os: {
+    async get() {
+      await ipcRenderer.invoke('store-get', { key: 'os' })
+    },
+    onGet(callback) {
+      ipcRenderer.on('store-get:os', callback)
+    }
+  },
+  resources: {
+    async check(resource) {
+      await ipcRenderer.invoke('check-resource', resource)
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('check-resource:success', callback)
+    }
+  },
+  resourcesPath: {
+    async get() {
+      await ipcRenderer.invoke('store-get', { key: 'resources' })
+    },
+    onGet(callback) {
+      ipcRenderer.on('store-get:resources', callback)
+    }
+  },
+  hash: {
+    async verify() {
+      await ipcRenderer.invoke('verify-official-releases-hash')
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('verify-official-releases-hash:success', callback)
+    },
+    onError(callback) {
+      ipcRenderer.on('verify-official-releases-hash:error', callback)
+    }
+  },
+  signature: {
+    async verify(options) {
+      await ipcRenderer.invoke('verify-official-releases-sign', options)
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('verify-official-releases-sign:success', callback)
+    },
+    onError(callback) {
+      ipcRenderer.on('verify-official-releases-sign:error', callback)
+    }
+  },
+  official_releases: {
+    async fetch() {
+      await ipcRenderer.invoke('verify-official-releases-fetch')
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('verify-official-releases-fetch:success', callback)
+    },
+    onError(callback) {
+      ipcRenderer.on('verify-official-releases-fetch:error', callback)
+    }
+  },
+  flash: {
+    async firmware () {
+      await ipcRenderer.invoke('flash')
+    },
+    onData(callback) {
+      ipcRenderer.on('flash:data', callback)
+    },
+    onError(callback) {
+      ipcRenderer.on('flash:error', callback)
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('flash:success', callback)
+    }
   },
   // async list_serialport () {
   //  await ipcRenderer.invoke('serialport:list')
@@ -13,63 +153,12 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   // async sdcard_action (options) {
   //  await ipcRenderer.invoke('sdcard:action', options)
   // },
-  async set_version(value) {
-    await ipcRenderer.invoke('store:set', { key: 'version', value: value })
-  },
-  async get_version() {
-    await ipcRenderer.invoke('store:get', { key: 'version' })
-  },
-  async set_action(value) {
-    await ipcRenderer.invoke('store:set', { key: 'action', value: value })
-  },
-  async get_action() {
-    await ipcRenderer.invoke('store:get', { key: 'action' })
-  },
-  async set_device(value) {
-    await ipcRenderer.invoke('store:set', { key: 'device', value: value })
-  },
-  async get_device() {
-    await ipcRenderer.invoke('store:get', { key: 'device' })
-  },
   // async set_sdcard(value) {
   //   await ipcRenderer.invoke('store:set', { key: 'sdcard', value: value })
   // },
   // async get_sdcard() {
   //   await ipcRenderer.invoke('store:get', { key: 'sdcard' })
   //},
-  async get_os() {
-    await ipcRenderer.invoke('store:get', { key: 'os' })
-  },
-  async get_resources_path() {
-    await ipcRenderer.invoke('store:get', { key: 'resources' })
-  },
-  async verify_hash() {
-    await ipcRenderer.invoke('official:releases:verify:hash')
-  },
-  async verify_signature(options) {
-    await ipcRenderer.invoke('official:releases:verify:sign', options)
-  },
-  async verify_official_releases() {
-    await ipcRenderer.invoke('official:releases:set')
-  },
-  async unzip (options) {
-    await ipcRenderer.invoke('zip:extract', options)
-  },
-  async flash_firmware_to_device() {
-    await ipcRenderer.invoke('flash:firmware')
-  },
-  onLogLevelInfo(callback) {
-    ipcRenderer.on('window:log:info', callback)
-  },
-  onDownloadStatus(callback) {
-    ipcRenderer.on('download:status', callback)
-  },
-  onDownloadDone(callback) {
-    ipcRenderer.on('download:status:done', callback)
-  },
-  onDownloadError(callback) {
-    ipcRenderer.on('download:status:error', callback)
-  },
   // onListSerialport(callback) {
   //   ipcRenderer.on('serialport:list', callback)
   // },
@@ -88,76 +177,16 @@ contextBridge.exposeInMainWorld('kruxAPI',{
   // onMountActionError(callback) {
   //   ipcRenderer.on('sdcard:mount:error', callback)
   // },
-  onFirmwareCopied(callback) {
-    ipcRenderer.on('sdcard:action:copy_firmware_bin:done', callback)
-  },
-  onFlashing(callback) {
-    ipcRenderer.on('flash:writing', callback)
-  },
-  onFlashingError(callback) {
-    ipcRenderer.on('flash:writing:error', callback)
-  },
-  onFlashingDone(callback) {
-    ipcRenderer.on('flash:writing:done', callback)
-  },
-  onVerifiedOS(callback) {
-    ipcRenderer.on('os:verify:done', callback)
-  },
-  onSetVersion(callback) {
-    ipcRenderer.on('store:set:version', callback)
-  },
-  onGetVersion(callback) {
-    ipcRenderer.on('store:get:version', callback)
-  },
-  onSetAction(callback) {
-    ipcRenderer.on('store:set:action', callback)
-  },
-  onGetAction(callback) {
-    ipcRenderer.on('store:get:action', callback)
-  },
-  onSetDevice(callback) {
-    ipcRenderer.on('store:set:device', callback)
-  },
-  onGetDevice(callback) {
-    ipcRenderer.on('store:get:device', callback)
-  },
+  //onFirmwareCopied(callback) {
+  //  ipcRenderer.on('sdcard:action:copy_firmware_bin:done', callback)
+  //},
+  //onVerifiedOS(callback) {
+  //  ipcRenderer.on('os:verify:done', callback)
+  //},
   // onSetSdcard(callback) {
   //   ipcRenderer.on('store:set:sdcard', callback)
   // },
   // onGetSdcard(callback) {
   //   ipcRenderer.on('store:get:sdcard', callback)
   // },
-  onGetOS(callback) {
-    ipcRenderer.on('store:get:os', callback)
-  },
-  onGetResourcesPath(callback) {
-    ipcRenderer.on('store:get:resources', callback)
-  },
-  onVerifyOfficialReleases(callback) {
-    ipcRenderer.on('official:releases:get', callback)
-  },
-  onVerifyOfficialReleasesError(callback) {
-    ipcRenderer.on('official:releases:get:error', callback)
-  },
-  onVerifiedHash(callback) {
-    ipcRenderer.on('official:releases:verified:hash', callback)
-  },
-  onVerifiedHashError(callback) {
-    ipcRenderer.on('official:releases:verified:hash:error', callback)
-  },
-  onVerifiedSign(callback) {
-    ipcRenderer.on('official:releases:verified:sign', callback)
-  },
-  onVerifiedSignError(callback) {
-    ipcRenderer.on('official:releases:verified:sign:error', callback)
-  },
-  onUnzipped(callback) {
-    ipcRenderer.on('zip:extract:done', callback)
-  },
-  onUnzipProgress(callback) {
-    ipcRenderer.on('zip:extract:progress', callback)
-  },
-  onUnzipError(callback) {
-    ipcRenderer.on('zip:extract:error', callback)
-  }
 })

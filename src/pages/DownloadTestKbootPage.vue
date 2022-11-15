@@ -8,6 +8,7 @@
     <v-flex xs12 sm4>
       <v-card flat class="ma-5 pa-5">
         <v-card-title>
+          <v-icon>mdi-monitor-arrow-down</v-icon>
           Downloading...
         </v-card-title>
         <v-card-subtitle>
@@ -15,11 +16,11 @@
         </v-card-subtitle>
         <v-card-actions>
           <v-progress-linear
-            v-model="model"
+            v-model="progress"
             height="25"
             color="blue-grey"
           >
-            <strong>{{ model }}%</strong>
+            <strong>{{ progress }}%</strong>
           </v-progress-linear>
         </v-card-actions>
       </v-card>
@@ -32,14 +33,14 @@ export default {
   name: 'DownloadTestKbootPage',
   data () {
     return {
-      model: 0,
+      progress: 0,
       device: ''
     }
   },
   async created () {
-    await window.kruxAPI.get_device()
+    await window.KruxInstaller.device.get()
 
-    window.kruxAPI.onGetDevice((_event, value) => {
+    window.KruxInstaller.device.onGet((_event, value) => {
       this.device = value
       this.$nextTick(() => {
         this.download()
@@ -48,24 +49,24 @@ export default {
   },
   methods: {
     async download () {
-      await window.kruxAPI.download_resource({
+      await window.KruxInstaller.download.resource({
         baseUrl: 'https://github.com',
         resource: `odudex/krux_binaries/raw/main/${this.device}`,
         filename: 'kboot.kfpkg'
       })
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDownloadStatus((_event, value) => {
-        this.model = value
+      window.KruxInstaller.download.onData((_event, value) => {
+        this.progress = value
       })
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDownloadDone((_event, value) => {
-        this.$emit('onSuccess', { page: 'DownloadTestKtoolPage' })
+      window.KruxInstaller.download.onSuccess((_event, value) => {
+        this.$emit('onSuccess', { page: 'CheckResourcesTestKtoolPage' })
       })
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onDownloadError((_event, value) => {
+      window.KruxInstaller.download.onError((_event, value) => {
         alert(value)
         this.$emit('onSuccess', { page: 'MainPage' })
       })

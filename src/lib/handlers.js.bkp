@@ -1,0 +1,43 @@
+// import SDCardHandler from './sdcard'
+// import SerialportHandler from './serialport'
+
+
+/**
+ * Function to handle usbDetection
+ * of implmented devices
+ *
+ * @param app<ElectronApp>
+ *
+export function handleSerialport (win, store) {
+  // eslint-disable-next-line no-unused-vars
+  return function (_event, options) {
+    const handler = new SerialportHandler(win, store)
+    handler.list()
+  }
+}
+*/
+
+
+/**
+ * Function to handle mount,
+ * umount and copy files to SDCard
+ *
+ * @param app<ElectronApp>
+ *
+export function handleSDCard (app, store) {
+  return async function (_event, args) {
+
+    const handler = new SDCardHandler(app, store, process.platform)
+    handler.send('window:log:info', `Starting sdcard '${args.action}' action`)
+    if (args.action === 'detect') {
+      await handler.onDetection()
+    } else if (args.action === 'mount' || args.action === 'umount') {
+      await handler.onAction(args.action)
+    } else if (args.action === 'copy_firmware_bin') {
+      await handler.onCopyFirmwareBin()
+    } else {
+      throw new Error(`SDCardHandler ${args.action} not implemented`)
+    }
+  }
+}
+*/

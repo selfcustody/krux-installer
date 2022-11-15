@@ -1,6 +1,17 @@
 <template>
-  <v-layout>
-    Proxy page... 
+  <v-layout
+    align-start
+    justify-start
+    row
+    fill-height
+  >
+    <v-flex xs12>
+      <v-card flat>
+        <v-card-title>
+          Checking...
+        </v-card-title>
+      </v-card>
+    </v-flex>
   </v-layout>
 </template>
 
@@ -14,17 +25,17 @@ export default {
    * - a firmware: change the button 'firmware' with the selected string
    */
   async created () {
-    await window.kruxAPI.get_version()
+    await window.KruxInstaller.version.get()
     
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetVersion((_event, value) => {
+    window.KruxInstaller.version.onGet(async (_event, value) => {
       const regexp_selfcustody = /selfcustody\/.*/g
       const regexp_odudex = /odudex\/.*/g
 
       if (value.match(regexp_selfcustody)) {
-        this.$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })
+        this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleasePage' })
       } else if (value.match(regexp_odudex)) {
-        this.$emit('onSuccess', { page: 'DownloadTestFirmwarePage' })
+        this.$emit('onSuccess', { page: 'CheckResourcesTestFirmwarePage' })
       } else {
         this.$emit('onError', { error: new Error(`Invalid action '${value}'`) })
       }

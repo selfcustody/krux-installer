@@ -2,22 +2,13 @@
 
 import bufferedSpawn from 'buffered-spawn'
 import { join } from 'path'
-import createDebug from 'debug'
 import Handler from './base'
 import Sudoer from '@nathanielks/electron-sudo'
 
-const debug = createDebug('krux:flash')
-
-export default class FlashHandler extends Handler {
+class FlashHandler extends Handler {
 
   constructor (app, store) {
-    super(app)
-    this.store = store
-  }
-
-  log (msg) {
-    debug(msg)
-    this.send('window:log:info', msg)
+    super('flash', app, store)
   }
 
   async chmod () {
@@ -59,16 +50,15 @@ export default class FlashHandler extends Handler {
 
         // It is always better to reset
         // the permission before assigning
-        await bufferedSpawn('icalcs.exe', [
-          join(__cwd__, 'ktool-win.exe'),
-          '/RESET'
-        ])
+        const a = join(__cwd__, 'ktool-win.exe')
+        this.log(`${__cmd__} ${a} /RESET`)
+        await bufferedSpawn(__cmd__, [a, '/RESET'])
       }
-      this.log(`  ${__cmd__} ${__args__.join(' ')}`)
+      this.log(`${__cmd__} ${__args__.join(' ')}`)
       await bufferedSpawn(__cmd__, __args__)
     } catch (error) {
       this.log(error)
-      this.send('flash:writing:error', error)
+      this.send(`${this.name}:error`, error)
     }
   }
 
@@ -115,18 +105,34 @@ export default class FlashHandler extends Handler {
     flash.stdout.on('data', (data) => {
       const out = Buffer.from(data, 'utf-8').toString()
       this.log(out)
-      this.send('flash:writing', out)
+      this.send(`${this.name}:data`, out)
     })
 
     flash.stderr.on('data', (data) => {
       const out = Buffer.from(data, 'utf-8').toString()
       this.log(out)
-      this.send('flash:writing', out)
+      this.send(`${this.name}:data`, out)
     })
 
     // eslint-disable-next-line no-unused-vars
     flash.on('close', (data) => {
-      this.send('flash:writing:done')
+      this.send(`${this.name}:success`)
     })
+  }
+}
+
+/**
+ * Function to handle the
+ * Flashing (write krux firmware direct onto device) process
+ *
+ * @param win
+ * @param store
+ */
+export default function (win, store) {
+  // eslint-disable-next-line no-unused-vars
+  return async function (_event, options) {
+    const handler = new FlashHandler(win, store)
+    handler.chmod()
+    handler.flash()
   }
 }

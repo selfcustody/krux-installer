@@ -37,6 +37,8 @@
 <script>
 import AnsiUp from 'ansi_up'
 
+let tmpHtml = ''
+
 export default {
   name: 'WriteFirmwareToDevicePage', 
   data () {
@@ -47,18 +49,26 @@ export default {
   },
   async created () {  
 
-    await window.kruxAPI.flash_firmware_to_device()
+    await window.KruxInstaller.flash.firmware()
  
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onFlashing((_event, value) => { 
-      this.html = this.parse(value)
+    window.KruxInstaller.flash.onData((_event, value) => { 
+      const output = this.parse(value)
+      tmpHtml += output
+      this.html = output
     })
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onFlashingDone((_event, value) => {
+    window.KruxInstaller.flash.onSuccess((_event, value) => {
       this.$nextTick(() => {
-        this.done = true 
+        this.html = tmpHtml
+        this.done = true
       })
+    })
+
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.flash.onError((_event, value) => {
+      this.$emit('onError', value)
     })
   },
   methods: {

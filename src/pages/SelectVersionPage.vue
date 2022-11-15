@@ -66,10 +66,10 @@ export default {
     }
   },
   created () {
-    window.kruxAPI.verify_official_releases()
+    window.KruxInstaller.official_releases.fetch()
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onVerifyOfficialReleases((_event, value) => {
+    window.KruxInstaller.official_releases.onSuccess((_event, value) => {
       value.releases.forEach((release) => {
         this.versions.push(release)
       })
@@ -77,17 +77,17 @@ export default {
     })
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onVerifyOfficialReleasesError((_event, value) => {
+    window.KruxInstaller.official_releases.onError((_event, value) => {
       alert(value)
       this.$emit('onSuccess', { page: 'MainPage' })
     })
   },
   methods: {
     async select () {
-      await window.kruxAPI.set_version(this.version)
+      await window.KruxInstaller.version.set(this.version)
 
       // eslint-disable-next-line no-unused-vars
-      window.kruxAPI.onSetVersion((_event, data) => {
+      window.KruxInstaller.version.onSet((_event, data) => {
         this.$emit('onSuccess', { page: 'CheckResourcesPage' })
       })
     }

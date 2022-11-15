@@ -48,10 +48,10 @@ export default {
     }
   },
   async created () {
-    await window.kruxAPI.get_version()
+    await window.KruxInstaller.version.get()
 
     // eslint-disable-next-line no-unused-vars
-    window.kruxAPI.onGetVersion((_event, value) => {
+    window.KruxInstaller.version.onGet((_event, value) => {
       this.$nextTick(() => {
         this.version = value
       })
@@ -60,10 +60,10 @@ export default {
   watch: {
     async version (v) {
       if (v !== '') { 
-        await window.kruxAPI.get_device()
+        await window.KruxInstaller.device.get()
 
         // eslint-disable-next-line no-unused-vars
-        window.kruxAPI.onGetDevice((_event, value) => {
+        window.KruxInstaller.device.onGet((_event, value) => {
           this.$nextTick(() => {
             this.device = value
           })

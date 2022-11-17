@@ -1,6 +1,6 @@
 'use strict'
 
-import bufferedSpawn from 'buffered-spawn'
+import { spawn } from 'child_process'
 import { join } from 'path'
 import Handler from './base'
 import Sudoer from '@nathanielks/electron-sudo'
@@ -11,7 +11,7 @@ class FlashHandler extends Handler {
     super('flash', app, store)
   }
 
-  async chmod () {
+  chmod () {
     const resources = this.store.get('resources')
     const version = this.store.get('version')
     const os = this.store.get('os')
@@ -32,34 +32,60 @@ class FlashHandler extends Handler {
       __cwd__ = join(resources, __version__)
     }
 
-    try {
-      if (os === 'linux') {
-        __cmd__ = 'chmod'
-        __args__ = ['+x', join(__cwd__, 'ktool-linux')]
-      } else if (os === 'darwin' && isMac10) {
-        __cmd__ = 'chmod'
-        __args__ = ['+x', join(__cwd__, 'ktool-mac-10')]
-      } else if (os === 'darwin' && !isMac10) {
-        __cmd__ = 'chmod'
-        __args__ = ['+x', join(__cwd__, 'ktool-mac')]
-      } else if (os === 'win32') {
-        // SEE
-        // https://ourtechroom.com/tech/windows-equivalent-to-chmod-command/
-        __cmd__ = 'icalcs.exe'
-        __args__ = [join(__cwd__, 'ktool-win.exe'), '/GRANT', 'USER:RX']
-
-        // It is always better to reset
-        // the permission before assigning
-        const a = join(__cwd__, 'ktool-win.exe')
-        this.log(`${__cmd__} ${a} /RESET`)
-        await bufferedSpawn(__cmd__, [a, '/RESET'])
-      }
-      this.log(`${__cmd__} ${__args__.join(' ')}`)
-      await bufferedSpawn(__cmd__, __args__)
-    } catch (error) {
-      this.log(error)
-      this.send(`${this.name}:error`, error)
+    if (os === 'linux') {
+      __cmd__ = 'chmod'
+      __args__ = ['+x', join(__cwd__, 'ktool-linux')]
+    } else if (os === 'darwin' && isMac10) {
+      __cmd__ = 'chmod'
+      __args__ = ['+x', join(__cwd__, 'ktool-mac-10')]
+    } else if (os === 'darwin' && !isMac10) {
+      __cmd__ = 'chmod'
+      __args__ = ['+x', join(__cwd__, 'ktool-mac')]
+    } else if (os === 'win32') {
+      // SEE
+      // https://ourtechroom.com/tech/windows-equivalent-to-chmod-command/
+      __cmd__ = 'icalcs.exe'
+      __args__ = [join(__cwd__, 'ktool-win.exe'), '/GRANT', 'USER:RX']
     }
+
+    // If running in windows, according the previous
+    // mentioned comment (issued in link above),
+    // It is always better to reset
+    // the permission before assigning
+    if (__cmd__ === 'icalcs.exe') {
+      const __icalcs_reset_args__ = [ join(__cwd__, 'ktool-win.exe'), '/RESET']
+      this.log(`${__cmd__} ${__icalcs_reset_args__.join(" ")}`)
+      const icalcs_reset = spawn(__cmd__, __icalcs_reset_args__)
+
+      icalcs_reset.on('data', (data) => {
+        this.log(data)
+      })
+
+      icalcs_reset.on('error', (err) => {
+        this.log(err)
+        this.send(`${this.name}:error`, err)
+      })
+
+      icalcs_reset.on('close', (data) => {
+        this.log(data)
+      })
+    }
+
+    const chmod = spawn(__cmd__, __args__)
+
+    chmod.on('data', (data) => {
+      this.log(data)
+    })
+
+    chmod.on('error', (err) => {
+      this.log(err)
+      this.send(`${this.name}:error`, err)
+    })
+
+    chmod.on('close', (data) => {
+      this.log(data)
+    })
+
   }
 
   async flash () {
@@ -133,6 +159,6 @@ export default function (win, store) {
   return async function (_event, options) {
     const handler = new FlashHandler(win, store)
     handler.chmod()
-    handler.flash()
+    await handler.flash()
   }
 }

@@ -1,7 +1,7 @@
 'use strict'
 
 import { join } from 'path'
-import bufferedSpawn from 'buffered-spawn'
+import { spawn } from 'child_process'
 import Handler from './base'
 
 class VerifyOfficialReleasesSignHandler extends Handler {
@@ -10,40 +10,84 @@ class VerifyOfficialReleasesSignHandler extends Handler {
     super('verify-official-releases-sign', win, store)
   }
 
-  async sign (options) {
-    try {
-      const resources = this.store.get('resources')
+  sign (options) {
+    const resources = this.store.get('resources')
 
-      const binPath = join(resources, options.bin)
-      const pemPath = join(resources, options.pem)
-      const sigPath =  join(resources, options.sig)
+    const binPath = join(resources, options.bin)
+    const pemPath = join(resources, options.pem)
+    const sigPath =  join(resources, options.sig)
 
-      this.log(`Verifying binary '${binPath}' against pem '${pemPath}' and signature '${sigPath}'`)
+    this.log(`Verifying binary '${binPath}' against pem '${pemPath}' and signature '${sigPath}'`)
 
-      const platform = this.store.get('os')
-      // if platform is linux, use the same command
-      // used in krux CLI. Else use sign-check package
-      if (platform === 'linux' || platform === 'darwin') {
-        const { stdout, stderr } = await bufferedSpawn('sh', [
-          '-c',
-          `openssl sha256 <${binPath} -binary | openssl pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
-        ])
-        if (stderr !== null && stderr !== '') {
-          this.log(stderr)
-          this.send(`${this.name}:error`, stderr)
-        } else {
-          this.log(stdout)
-          this.send(`${this.name}:success`, stdout)
-        }
-      } else {
-        const err = new Error(`${options.platform} not implemented`)
+    const platform = this.store.get('os')
+
+    // if platform is linux, use the same command
+    // used in krux CLI. Else use sign-check package
+    let shell = ''
+    let opensslBin = ''
+    const env = { PATH: '' }
+    const __args__ = []
+
+    if (platform === 'linux') {
+      shell = "/bin/bash"
+      __args__.push("-c")
+      opensslBin = "openssl"
+      env.PATH = "/bin:/usr/bin:/usr/local/bin"
+    } else if (platform === 'darwin') {
+      // see
+      // https://stackoverflow.com/questions/35129977/how-to-install-latest-version-of-openssl-mac-os-x-el-capitan/46179272#46179272
+      shell = "/bin/zsh"
+      env.PATH = "/usr/local/opt/openssl/bin:/System/Library/OpenSSL"
+      __args__.push("-c")
+      opensslBin = "openssl"
+    } else {
+      shell = "powershell.exe"
+      __args__.push("-Command")
+      env.PATH = "C:\\Program Files\\Git\\usr\\bin"
+      opensslBin = "openssl.exe"
+    }
+
+    //  you can still omit the quotes
+    //  and everything will execute correctly
+    //  through openssl,
+    //  since child_process will pass it as a single argument:
+    // See:
+    // https://stackoverflow.com/questions/27670686/ssh-with-nodejs-child-process-command-not-found-on-server
+    __args__.push(`${opensslBin} sha256 <${binPath} -binary | ${opensslBin} pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`)
+
+    this.log(`${shell} ${__args__.join(' ')}`)
+    let stdout = Buffer.alloc(0)
+    let isErr = false
+    const openssl = spawn(shell, __args__, { cwd: '.', env: env })
+
+    openssl.stdout.on('data', (chunk) => {
+      this.log(`stdout: ${chunk}`)
+      stdout = Buffer.concat([stdout, chunk])
+    })
+
+    openssl.stderr.on('data', (chunk) => {
+      this.log(`stderr: ${chunk}`)
+      stdout = Buffer.concat([stdout, chunk])
+      isErr = true
+    })
+
+    openssl.on('error', (err) => {
+      this.log(err)
+      this.send(`${this.name}:error`, err)
+    })
+
+    openssl.on('close', (code) => {
+      this.log(`${opensslBin} exited with code ${code}`)
+      stdout = stdout.toString()
+      if (isErr) {
+        const err = new Error(stdout.toString())
         this.log(err)
         this.send(`${this.name}:error`, err)
+      } else {
+        this.log(stdout)
+        this.send(`${this.name}:success`, stdout)
       }
-    } catch (error) {
-      this.log(error)
-      this.send(`${this.name}:error`, error)
-    }
+    })
   }
 }
 
@@ -56,7 +100,7 @@ class VerifyOfficialReleasesSignHandler extends Handler {
  */
 export default function (win, store) {
   //eslint-disable-next-line no-unused-vars
-  return async function (_event, options) {
+  return function (_event, options) {
     const handler = new VerifyOfficialReleasesSignHandler(win, store)
     handler.sign(options)
   }

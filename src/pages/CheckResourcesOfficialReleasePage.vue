@@ -11,7 +11,17 @@
     >
       <v-card flat>
         <v-card-title>
-          Checking...
+          <v-layout row wrap>
+            <v-flex xs4 sm12>
+              <v-progress-circular
+                indeterminate
+                color="green"
+              />
+            </v-flex>
+            <v-flex xs8 sm12>
+              Checking...
+            </v-flex>
+          </v-layout>
         </v-card-title>
       </v-card>
     </v-flex>
@@ -21,7 +31,7 @@
     >
       <v-card flat>
         <v-card-title>
-          {{ title }}
+          <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
         <v-card-subtitle>
           Already downloaded

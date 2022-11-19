@@ -10,8 +10,18 @@
       xs12
     >
       <v-card flat>
-        <v-card-title>
-          Checking...
+        <v-card-title> 
+          <v-layout column wrap>
+            <v-flex xs4 sm12>
+              <v-progress-circular
+                indeterminate
+                color="green"
+              />
+            </v-flex>
+            <v-flex xs8 sm12>
+              Checking...
+            </v-flex>
+          </v-layout>
         </v-card-title>
       </v-card>
     </v-flex>
@@ -20,8 +30,8 @@
       xs12
     >
       <v-card flat>
-        <v-card-title>
-          {{ title }}
+        <v-card-title class="odudex"> 
+          <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
         <v-card-subtitle>
           Already downloaded
@@ -84,3 +94,8 @@ export default {
   }
 }
 </script>
+<style>
+.odudex {
+  font-size: 16px;
+}
+</style>

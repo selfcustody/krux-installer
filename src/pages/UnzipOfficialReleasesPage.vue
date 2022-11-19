@@ -11,7 +11,7 @@
     >
       <v-card flat>
         <v-card-title>
-          Unzipping...
+          <v-icon>mdi-folder-zip-outline</v-icon>&ensp;Unzipping...
         </v-card-title>
         <v-card-subtitle>
           <b>file:</b> {{ currentFile }}
@@ -33,7 +33,7 @@
     >
       <v-card flat class="ma-2 pa-2">
         <v-card-title>
-          Extracted files
+          <v-icon>mdi-eye-outline</v-icon>&ensp;Extracted files
         </v-card-title>
         <v-card-subtitle>
           Relative to: {{ resourcesPath }}

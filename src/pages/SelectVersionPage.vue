@@ -12,7 +12,17 @@
         <v-card-title
           v-if="isChecking"
         >
-          Checking...
+          <v-layout column wrap>
+            <v-flex xs4 sm12>
+              <v-progress-circular
+                indeterminate
+                color="green"
+              />
+            </v-flex>
+            <v-flex xs8 sm12>
+              Checking...
+            </v-flex>
+          </v-layout>
         </v-card-title>
         <v-card-title
           v-if="!isChecking"

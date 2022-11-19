@@ -53,7 +53,14 @@ class VerifyOfficialReleasesSignHandler extends Handler {
     //  since child_process will pass it as a single argument:
     // See:
     // https://stackoverflow.com/questions/27670686/ssh-with-nodejs-child-process-command-not-found-on-server
-    __args__.push(`${opensslBin} sha256 <${binPath} -binary | ${opensslBin} pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`)
+    const sigcmd = [
+      `${opensslBin} sha256 <${binPath} -binary `,
+      '|',
+      `${opensslBin} pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
+    ]
+
+    this.store.set(`signature-command`, sigcmd)
+    __args__.push(sigcmd.join(' '))
 
     this.log(`${shell} ${__args__.join(' ')}`)
     let stdout = Buffer.alloc(0)

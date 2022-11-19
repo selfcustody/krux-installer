@@ -10,8 +10,18 @@
       xs12
     >
       <v-card flat>
-        <v-card-title>
-          Checking...
+        <v-card-title> 
+          <v-layout column wrap>
+            <v-flex xs4 sm12>
+              <v-progress-circular
+                indeterminate
+                color="green"
+              />
+            </v-flex>
+            <v-flex xs8 sm12>
+              Checking...
+            </v-flex>
+          </v-layout>
         </v-card-title>
       </v-card>
     </v-flex>
@@ -21,7 +31,7 @@
     > 
       <v-card flat class="ma-5 pa-5">
         <v-card-title>
-          Choose ktool-mac flavor
+          <v-icon>mdi-apple</v-icon>&ensp;Choose ktool-mac flavor
         </v-card-title>
         <v-card-content>
           <v-select
@@ -42,8 +52,8 @@
       xs12
     >
       <v-card flat>
-        <v-card-title>
-          {{ title }}
+        <v-card-title> 
+          <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
         <v-card-subtitle>
           Already downloaded

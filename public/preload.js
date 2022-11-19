@@ -84,6 +84,14 @@ contextBridge.exposeInMainWorld('KruxInstaller',{
       ipcRenderer.on('store-get:os', callback)
     }
   },
+  isMac10: {
+    async get() {
+      await ipcRenderer.invoke('store-get', { key: 'isMac10' })
+    },
+    onGet(callback) {
+      ipcRenderer.on('store-get:isMac10', callback)
+    }
+  },
   resources: {
     async check(resource) {
       await ipcRenderer.invoke('check-resource', resource)
@@ -120,6 +128,14 @@ contextBridge.exposeInMainWorld('KruxInstaller',{
     },
     onError(callback) {
       ipcRenderer.on('verify-official-releases-sign:error', callback)
+    }
+  },
+  signature_command: {
+    async get() {
+      await ipcRenderer.invoke('store-get', { key: 'signature-command' })
+    },
+    onGet(callback) {
+      ipcRenderer.on('store-get:signature-command', callback)
     }
   },
   official_releases: {

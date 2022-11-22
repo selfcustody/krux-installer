@@ -41,10 +41,11 @@ class VerifyOfficialReleasesSignHandler extends Handler {
       __args__.push("-c")
       opensslBin = "openssl"
     } else {
-      shell = "powershell.exe"
-      __args__.push("-Command")
-      env.PATH = "C:\\Program Files\\Git\\usr\\bin"
-      opensslBin = "openssl.exe"
+      shell = "cmd"
+      __args__.push("/c")
+      // see
+      // https://stackoverflow.com/questions/892555/how-do-i-specify-c-program-files-without-a-space-in-it-for-programs-that-cant
+      opensslBin = "%ProgramFiles%\\Git\\usr\\bin\\openssl.exe"
     }
 
     //  you can still omit the quotes

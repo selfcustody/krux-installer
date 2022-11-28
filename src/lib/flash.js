@@ -2,6 +2,7 @@
 
 import { spawn } from 'child_process'
 import { join } from 'path'
+import { userInfo } from 'os'
 import Handler from './base'
 import Sudoer from '@nathanielks/electron-sudo'
 
@@ -9,141 +10,154 @@ class FlashHandler extends Handler {
 
   constructor (app, store) {
     super('flash', app, store)
-  }
 
-  chmod () {
     const resources = this.store.get('resources')
     const version = this.store.get('version')
     const os = this.store.get('os')
     const isMac10 = this.store.get('isMac10')
-
-    let __version__ = version
-    let __cwd__ = ''
-    let __cmd__ = ''
-    let __args__ = []
-
+    const device = this.store.get('device')
+  
     if (version.match(/selfcustody/g)) {
-      __version__ = version.split('tag/')[1]
-      __cwd__ = join(resources, __version__, `krux-${__version__}`)
+      this.version = version.split('tag/')[1]
+      this.cwd = join(resources, this.version, `krux-${this.version}`)
     }
 
     if (version.match(/odudex/g)) {
-      __version__ = join(version, 'raw', 'main')
-      __cwd__ = join(resources, __version__)
+      this.version = join(version, 'raw', 'main')
+      this.cwd = join(resources, this.version)
     }
 
-    if (os === 'linux') {
-      __cmd__ = 'chmod'
-      __args__ = ['+x', join(__cwd__, 'ktool-linux')]
+    if (os === 'linux' ) {
+      this.chmod = {
+        command: 'chmod',
+        args: ['+x', join(this.cwd, 'ktool-linux')]
+      }
+      this.flash = {
+        command: join(this.cwd, 'ktool-linux'),
+        args: ['-B', 'goE', '-b', '1500000', join(this.cwd, device, 'kboot.kfpkg')]
+      }
     } else if (os === 'darwin' && isMac10) {
-      __cmd__ = 'chmod'
-      __args__ = ['+x', join(__cwd__, 'ktool-mac-10')]
+      this.chmod = {
+        command: 'chmod',
+        args: ['+x', join(this.cwd, 'ktool-mac-10')]
+      }
+      this.flash = {
+        command: join(this.cwd, 'ktool-mac-10'),
+        args: ['-B', 'goE', '-b', '1500000', join(this.cwd, device, 'kboot.kfpkg')]
+      }
     } else if (os === 'darwin' && !isMac10) {
-      __cmd__ = 'chmod'
-      __args__ = ['+x', join(__cwd__, 'ktool-mac')]
+      this.chmod = {
+        command: 'chmod',
+        args: ['+x', join(this.cwd, 'ktool-mac')]
+      }
+      this.flash = {
+        command: join(this.cwd, 'ktool-mac'),
+        args: ['-B', 'goE', '-b', '1500000', join(this.cwd, device, 'kboot.kfpkg')]
+      }
     } else if (os === 'win32') {
       // SEE
-      // https://ourtechroom.com/tech/windows-equivalent-to-chmod-command/
-      __cmd__ = 'icalcs.exe'
-      __args__ = [join(__cwd__, 'ktool-win.exe'), '/GRANT', 'USER:RX']
+      // https://stackoverflow.com/questions/2928738/how-to-grant-permission-to-users-for-a-directory-using-command-line-in-windows 
+      this.chmod = {
+        command: 'icacls.exe',
+        args: [join(this.cwd, 'ktool-win.exe'), '/grant', `${userInfo().username}:F`]
+      }
+      this.flash = {
+        command: join(this.cwd, 'ktool-win.exe'),
+        args: ['-B', 'goE', '-b', '1500000', join(this.cwd, device, 'kboot.kfpkg')]
+      }
     }
-
-    // If running in windows, according the previous
-    // mentioned comment (issued in link above),
-    // It is always better to reset
-    // the permission before assigning
-    if (__cmd__ === 'icalcs.exe') {
-      const __icalcs_reset_args__ = [ join(__cwd__, 'ktool-win.exe'), '/RESET']
-      this.log(`${__cmd__} ${__icalcs_reset_args__.join(" ")}`)
-      const icalcs_reset = spawn(__cmd__, __icalcs_reset_args__)
-
-      icalcs_reset.on('data', (data) => {
-        this.log(data)
-      })
-
-      icalcs_reset.on('error', (err) => {
-        this.log(err)
-        this.send(`${this.name}:error`, err)
-      })
-
-      icalcs_reset.on('close', (data) => {
-        this.log(data)
-      })
-    }
-
-    const chmod = spawn(__cmd__, __args__)
-
-    chmod.on('data', (data) => {
-      this.log(data)
-    })
-
-    chmod.on('error', (err) => {
-      this.log(err)
-      this.send(`${this.name}:error`, err)
-    })
-
-    chmod.on('close', (data) => {
-      this.log(data)
-    })
-
   }
 
-  async flash () {
-    const resources = this.store.get('resources')
-    const version = this.store.get('version')
-    const device = this.store.get('device')
-    const os = this.store.get('os')
-    const isMac10 = this.store.get('isMac10')
+  createSpawn(command, args) {
+    return new Promise((resolve, reject) => {
+      let error = null
 
-    let __cwd__ = ''
-    const __args__ = ['-B', 'goE', '-b', '1500000']
+      const message = `${command} ${args.join(' ')}`
+      this.log(message)
+      
+      const cmd = spawn(command, args)
 
-    if (version.match(/selfcustody/g)) {
-      const __version__ = version.split('tag/')[1]
-      __cwd__ = join(resources, __version__, `krux-${__version__}`)
-    }
-
-    if (version.match(/odudex/g)) {
-      const __version__ = join(version, 'raw', 'main')
-      __cwd__ = join(resources, __version__)
-    }
-
-    __args__.push(join(__cwd__, device, 'kboot.kfpkg'))
-
-    let __ktool__ = ''
-    if (os === 'linux') {
-      __ktool__ = join(__cwd__, 'ktool-linux')
-    } else if (os === 'darwin' && isMac10) {
-      __ktool__ = join(__cwd__, 'ktool-mac-10')
-    } else if (os === 'darwin' && !isMac10) {
-      __ktool__ = join(__cwd__, 'ktool-mac')
-    } else if (os === 'win32') {
-      __ktool__ = join(__cwd__, 'ktool-win.exe')
-    }
-
-    const options = { name: 'KruxInstaller' }
-    const sudoer = new Sudoer(options)
-    const command = `${__ktool__} ${__args__.join(' ')}`
-    this.log(command)
-
-    const flash = await sudoer.spawn(command)
-
-    flash.stdout.on('data', (data) => {
-      const out = Buffer.from(data, 'utf-8').toString()
-      this.log(out)
-      this.send(`${this.name}:data`, out)
+      cmd.on('data', (data) => {
+        this.log(data)
+      })
+  
+      cmd.on('error', (err) => {
+        error = err
+      })
+  
+      cmd.on('close', (code) => {
+        this.log(`${message} exit code: ${code}`)
+        if (error) reject(error)
+        resolve()
+      })
     })
+  }
 
-    flash.stderr.on('data', (data) => {
-      const out = Buffer.from(data, 'utf-8').toString()
-      this.log(out)
-      this.send(`${this.name}:data`, out)
+  createSudoSpawn(command, args) {
+    return new Promise((resolve) => {
+      const _cmd_ = `${command} ${args.join(' ')}`
+      this.log(_cmd_)
+      
+      const onData = (data) => {
+        const out = Buffer.from(data, 'utf-8').toString()
+        this.log(out)
+        this.send(`${this.name}:data`, out)
+      }
+
+      const onClose = (code) => {
+        this.log(`${_cmd_} exit code: ${code}`)
+        resolve(code)
+      }
+
+      // In Windows, if USERNAME is not provided,
+      // it will return code 1332: "No Mapping between account names and Security Id was done".
+      // lets resolve this attaching the process.env.USERNAME
+      // see:
+      // https://answers.microsoft.com/en-us/windows/forum/all/what-is-meant-by-no-mapping-between-account-names/dcccb1bb-1c4d-4bd5-91a7-832cabf9c86b)
+      // https://www.techinpost.com/no-mapping-between-account-names-and-security-ids-was-done/
+      if (this.store.get('os') === 'win32') {
+        const flash = spawn(command, args)
+        flash.stdout.on('data', onData)
+        flash.stderr.on('data', onData)
+        flash.on('close', onClose)
+      } else {
+        const options = { name: 'KruxInstaller' }
+        const sudoer =  new Sudoer(options)
+        return sudoer.spawn(command, args).then((flash) => {
+          flash.stdout.on('data', onData)
+          flash.stderr.on('data', onData)
+          flash.on('close', onClose)
+        })
+      }
     })
+  }
 
-    // eslint-disable-next-line no-unused-vars
-    flash.on('close', (data) => {
+  async run () {
+    // Windows:
+    // according Diwas Poudel
+    // (see https://ourtechroom.com/tech/windows-equivalent-to-chmod-command/)
+    // "It is always better to reset the permission before assigning."
+    const promises = []
+    try {
+      if (this.chmod.command === 'icacls.exe') {
+        const __icalcs_pre_args__ = [
+          [join(this.cwd, 'ktool-win.exe'), '/inheritance:r'],
+          [join(this.cwd, 'ktool-win.exe'), '/reset']
+        ]
+      
+        for (let i in __icalcs_pre_args__) {
+          promises.push(this.createSpawn(this.chmod.command, __icalcs_pre_args__[i]))
+        }
+      }
+      promises.push(this.createSpawn(this.chmod.command, this.chmod.args))
+      promises.push(this.createSudoSpawn(this.flash.command, this.flash.args))
+
+      await Promise.all(promises)
       this.send(`${this.name}:success`)
-    })
+    } catch (error) {
+      this.log(error)
+      this.send(`${this.name}:error`, error)
+    }
   }
 }
 
@@ -158,7 +172,6 @@ export default function (win, store) {
   // eslint-disable-next-line no-unused-vars
   return async function (_event, options) {
     const handler = new FlashHandler(win, store)
-    handler.chmod()
-    await handler.flash()
+    await handler.run()
   }
 }

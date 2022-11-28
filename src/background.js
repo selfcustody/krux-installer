@@ -40,6 +40,7 @@ import unzipResource from './lib/unzip-resource'
 import verifyOfficialReleasesFetch from './lib/verify-official-releases-fetch'
 import verifyOfficialReleasesHash from './lib/verify-official-releases-hash'
 import verifyOfficialReleasesSign from './lib/verify-official-releases-sign'
+import verifyOpenssl from './lib/verify-openssl'
 import storeSet from './lib/store-set'
 import storeGet from './lib/store-get'
 import flash from './lib/flash'
@@ -129,6 +130,7 @@ async function createWindow() {
   ipcMain.handle('verify-official-releases-fetch', verifyOfficialReleasesFetch(win, store))
   ipcMain.handle('verify-official-releases-hash', verifyOfficialReleasesHash(win, store))
   ipcMain.handle('verify-official-releases-sign', verifyOfficialReleasesSign(win, store))
+  ipcMain.handle('verify-openssl', verifyOpenssl(win, store))
   ipcMain.handle('store-set', storeSet(win, store))
   ipcMain.handle('store-get', storeGet(win, store))
   ipcMain.handle('flash', flash(win, store))

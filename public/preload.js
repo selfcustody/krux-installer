@@ -163,6 +163,17 @@ contextBridge.exposeInMainWorld('KruxInstaller',{
       ipcRenderer.on('flash:success', callback)
     }
   },
+  openssl: {
+    async check () {
+      await ipcRenderer.invoke('verify-openssl')
+    },
+    onError(callback) {
+      ipcRenderer.on('verify-openssl:error', callback)
+    },
+    onSuccess(callback) {
+      ipcRenderer.on('verify-openssl:success', callback)
+    }
+  }
   // async list_serialport () {
   //  await ipcRenderer.invoke('serialport:list')
   // },

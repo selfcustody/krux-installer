@@ -84,6 +84,21 @@ export default {
         if (value) this.ktool += '-10'
       })
     })
+
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.openssl.check((_event, value) => {
+      this.$nextTick(() => {
+        if (value === '1') {
+          const message = [
+            'Windows users:',
+            'During download of official releases, we use Openssl delivered by Git team to check the signature of file.',
+            'So we will require that you download the Git-SCM GUI at https://git-scm.com/download/win.',
+            'Once installed, you can back to KruxInstaller'
+          ]
+          alert(message.join('\n'))
+        }
+      })
+    })
   },
   watch: {
     async version (v) {
@@ -97,6 +112,9 @@ export default {
       } 
     },
     async ktool (v) {
+      if (v === 'ktool-win.exe') {
+        await window.KruxInstaller.openssl.check()
+      }
       if (v === 'ktool-mac') {
         await window.KruxInstaller.isMac10.get()
       }

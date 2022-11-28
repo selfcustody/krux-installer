@@ -19,9 +19,11 @@
     "icon": "yarn run icon:svg && yarn run icon:png && yarn run icon:resize && yarn run icon:ico && yarn run icon:icns",
     "lint": "yarn run lint:server && yarn run lint:public && yarn run lint:client",
     "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "yarn run lint && DEBUG=krux:* vue-cli-service electron:serve --trace-warnings",
-    "platform:deps": "node src/lib/dependent_platform_dependencies.js",
-    "postinstall": "yarn run platform:deps && electron-builder install-app-deps",
+    "electron:serve": "yarn run lint && DEBUG=krux:* vue-cli-service electron:serve",
+    "electron:serve:win": "yarn run lint && SET DEBUG=krux:* && vue-cli-service electron:serve",
+    "postinstall:platform": "node ./bin/platform-dependencies.js",
+    "postinstall:electron": "electron-builder install-app-deps",
+    "postinstall": "yarn run postinstall:platform && yarn run postinstall:electron",
     "postuninstall": "electron-builder install-app-deps"
   },
   "dependencies": {

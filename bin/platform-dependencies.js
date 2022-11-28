@@ -8,7 +8,7 @@ const dependencies = {
 
 const platform = process.platform;
 
-if (platform === 'darwin') {
+if (dependencies[platform]) {
   console.log(`  \x1b[34m\u2022\x1b[0m installing dependent platform dependencies for ${platform}`)
 
   const onData = function (chunk) {

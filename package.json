@@ -34,6 +34,7 @@
     "core-js": "^3.26.1",
     "debug": "^4.3.4",
     "electron-store": "^8.1.0",
+    "hasbin": "^1.2.3",
     "roboto-fontface": "^0.10.0",
     "vue": "^3.2.45",
     "vuetify": "^3.0.1",

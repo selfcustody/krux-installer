@@ -1,66 +1,41 @@
 'use strict'
 
-import { spawn } from 'child_process'
+//import { spawn } from 'child_process'
 import Handler from './base'
-
+import hasbin from 'hasbin'
 class VerifyOpenssl extends Handler {
 
   constructor (win, store) {
     super('verify-openssl', win, store)
+
+    const platform = this.store.get('os')
+
+    if (platform === 'linux') {
+      this.executable = 'openssl'
+    }
+    if (platform === 'darwin') {
+      this.executable = 'openssl'
+      process.env.PATH = `${process.env.PATH}:/usr/local/opt/openssl/bin:/System/Library/OpenSSL`
+    }
+    if (platform === 'win32') {
+      this.executable = 'openssl.exe'
+      process.env.PATH = `${process.env.PATH};C:\\PROGRA~1\\Git\\usr\\bin`
+    }
   }
 
   verify () {
-    const platform = this.store.get('platform')
-    let shell = ''
-    const env = { PATH: process.PATH }
-    const args = []
-    if (platform === 'linux' ) {
-      shell = 'bash'
-      args.push('-c')
-      args.push('"if type openssl 2>/dev/null; then echo 1 else echo 0 fi"')
-    } else if (platform === 'darwin' ) {
-      shell = 'zsh'
-      args.push('-c')
-      args.push('"if type openssl 2>/dev/null; then echo 1 else echo 0 fi"')
-    } else if (platform === 'win32') {
-      shell = 'cmd'
-      args.push('/c')
-      // eslint-disable-next-line no-useless-escape
-      args.push('IF EXISTS C:\\PROGRA~1\\Git\\usr\\bin\openssl.exe ECHO 1')
-    } else {
-      throw new Error(`${platform} do not supported`)
-    }
-
-    
-    const verify = spawn(shell, args, env)
-    let stdout = Buffer.alloc(0)
-    let isErr = false
-
-    verify.stdout.on('data', function(chunk) {
-      stdout = Buffer.concat([stdout, chunk])
-    })
-
-    verify.stderr.on('data', function(chunk) {
-      isErr = true
-      stdout = Buffer.concat([stdout, chunk])
-    })
-
-    verify.on('error', (err) => {
-      this.log(err)
-      this.send(`${this.name}:error`, err)
-    })
-
-    verify.on('close', (code) => {
-      this.log(`${shell} ${args.join(' ')} exited with code ${code}`)
-      stdout = stdout.toString()
-      if (isErr) {
-        const err = new Error(stdout.toString())
-        this.log(err)
-        this.send(`${this.name}:error`, err)
-      } else {
-        this.log(stdout)
-        this.send(`${this.name}:success`, stdout)
-      }
+    return new Promise((resolve, reject) => {
+      hasbin(this.executable, (result) => {
+        this.log(`Openssl exists in PATH: ${result}`)
+        if (result) {
+          this.send(`${this.name}:success`, result)
+          resolve()
+        } else {
+          const error = new Error(`No opessl found in PATH (${process.env.PATH})`)
+          this.send(`${this.name}:error`, error)
+          reject(error)
+        }
+      })
     })
   }
 }
@@ -74,8 +49,8 @@ class VerifyOpenssl extends Handler {
  */
  export default function (win, store) {
   //eslint-disable-next-line no-unused-vars
-  return function (_event, options) {
+  return async function (_event, options) {
     const handler = new VerifyOpenssl(win, store)
-    handler.verify(options)
+    await handler.verify()
   }
 }

@@ -95,13 +95,20 @@ class FlashHandler extends Handler {
   }
 
   async write () {
-    const options = { name: 'KruxInstaller' }
-    const sudoer = new Sudoer(options)
+    const os = this.store.get('os')
     const message = `${this.flash.command} ${this.flash.args.join(' ')}`
-
     this.log(message)
-    const flash = await sudoer.spawn(message)
 
+    let flash = null
+
+    if (os !== 'win32') {
+      const options = { name: 'KruxInstaller' }
+      const sudoer = new Sudoer(options)
+      flash = await sudoer.spawn(message)
+    } else {
+      flash = spawn(this.flash.command, this.flash.args)
+    }
+    
     flash.stdout.on('data', (data) => {
       const out = Buffer.from(data, 'utf-8').toString()
       this.log(out)

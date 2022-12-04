@@ -1,8 +1,8 @@
 'use strict'
 
-//import { spawn } from 'child_process'
 import Handler from './base'
-import hasbin from 'hasbin'
+import commandExists from 'command-exists'
+
 class VerifyOpenssl extends Handler {
 
   constructor (win, store) {
@@ -19,25 +19,20 @@ class VerifyOpenssl extends Handler {
     }
     if (platform === 'win32') {
       this.executable = 'openssl.exe'
-      process.env.PATH = `${process.env.PATH};C:\\PROGRA~1\\Git\\usr\\bin`
+      process.env.PATH = `${process.env.PATH};${process.env.ProgramFiles}\\Git\\usr\\bin`
     }
   }
 
-  verify () {
-    return new Promise((resolve, reject) => {
-      hasbin(this.executable, (result) => {
-        this.log(`Openssl exists in PATH: ${result}`)
-        if (result) {
-          this.send(`${this.name}:success`, result)
-          resolve()
-        } else {
-          const error = new Error(`No opessl found in PATH (${process.env.PATH})`)
-          this.send(`${this.name}:error`, error)
-          reject(error)
-        }
-      })
-    })
+  async verify () {
+    const exists = await commandExists(this.executable)
+    this.log(`Openssl exists in ${process.env.PATH}`)
+    if (exists) {
+      this.send(`${this.name}:success`, exists)
+    } else {
+      this.send(`${this.name}:error`, new Error(`${this.executable} not found in ${process.env.PATH}`))
+    }
   }
+
 }
 
 /**

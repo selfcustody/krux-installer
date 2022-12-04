@@ -2,10 +2,10 @@
 
 # Krux Installer
 
-Krux Installer (Work In Progress) aims to be a GUI based tool to build, flash and debug [Krux](https://github.com/selfcustody/krux) to Kendryte K210 devices
+Krux Installer (alpha versions) aims to be a GUI based tool to build, flash and debug [Krux](https://github.com/selfcustody/krux) Kendryte K210 devices
 (m5stickV, Sipeed Amigo, Sipeed Bit and Sipeed Dock).
 
-As it now, the generated application execute [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
+As it now, the generated application execute, without typing any command in terminal,[flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device), for Linux and Windows.
 
 ## Download
 
@@ -19,7 +19,7 @@ git clone https://github.com/qlrd/krux-installer.git
 yarn install
 ```
 
-For windows builds on linux, you will need to install [Wine](https://www.winehq.org/)
+## Develop
 
 ### Compiles and hot-reloads for development in browser
 
@@ -30,9 +30,18 @@ yarn run serve
 
 ### Compiles to a development electron application
 
+#### Linux and MacOS
+
 ```bash
 # This runs on dedicated chrome instance
 yarn run electron:serve
+```
+
+#### Windows
+
+```bash
+# This runs on dedicated chrome instance
+yarn run electron:serve:win
 ```
 
 ### Compiles and minifies for production
@@ -46,3 +55,5 @@ Where target can be:
 * Linux: AppImage, deb or snap
 * Windows: nsis, msi, portable
 * Mac: dmg, pkg
+
+Any generated binary will be placed at `dist_electron` folder.

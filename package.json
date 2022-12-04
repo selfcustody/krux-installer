@@ -1,9 +1,7 @@
 {
   "name": "krux-installer",
   "version": "0.0.1-alpha-1",
-  "author": [
-    "qlrd <106913782+qlrd@users.noreply.github.com>"
-  ],
+  "author": "qlrd <106913782+qlrd@users.noreply.github.com>",
   "description": "An imager installer for Krux firmwares",
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -31,10 +29,10 @@
     "@nathanielks/electron-sudo": "^4.0.15",
     "ansi_up": "^5.1.0",
     "axios": "^0.27.2",
+    "command-exists": "^1.2.9",
     "core-js": "^3.26.1",
     "debug": "^4.3.4",
     "electron-store": "^8.1.0",
-    "hasbin": "^1.2.3",
     "roboto-fontface": "^0.10.0",
     "vue": "^3.2.45",
     "vuetify": "^3.0.1",

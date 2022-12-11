@@ -184,6 +184,29 @@ app.on('ready', async () => {
     }
   }
 
+  // Check if platform (darwin or win32)
+  // needs and additional configuration
+  // to add openssl binary
+  debug(`Adding openssl in ${process.platform} environment variable PATH`)
+  const openssls = []
+  let separator = ''
+  
+  if (process.platform === 'linux') {
+    debug('  no need for add')
+  } else if (process.platform === 'darwin' ) {
+    openssls.push('/usr/local/opt/openssl/bin')
+    openssls.push('/System/Library/OpenSSL')
+    separator = ':'
+  } else if (process.platform === 'win32') {
+    openssls.push(`${process.env.ProgramFiles}\\Git\\usr\\bin`)
+    openssls.push(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`)
+    separator = ';'
+  }
+  for (let i in openssls) {
+    debug(`  ${openssls[i]} added`)
+    process.env.PATH += `;${openssls[i]}`
+  }
+
   debug('App ready')
   // Now create window
   createWindow()

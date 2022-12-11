@@ -10,16 +10,11 @@ class VerifyOpenssl extends Handler {
 
     const platform = this.store.get('os')
 
-    if (platform === 'linux') {
+    if (platform === 'linux' || platform === 'darwin') {
       this.executable = 'openssl'
-    }
-    if (platform === 'darwin') {
-      this.executable = 'openssl'
-      process.env.PATH = `${process.env.PATH}:/usr/local/opt/openssl/bin:/System/Library/OpenSSL`
     }
     if (platform === 'win32') {
       this.executable = 'openssl.exe'
-      process.env.PATH = `${process.env.PATH};${process.env.ProgramFiles}\\Git\\usr\\bin`
     }
   }
 

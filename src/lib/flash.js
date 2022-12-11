@@ -49,16 +49,17 @@ class FlashHandler extends Handler {
       // https://answers.microsoft.com/en-us/windows/forum/all/what-is-meant-by-no-mapping-between-account-names/dcccb1bb-1c4d-4bd5-91a7-832cabf9c86b)
       // https://www.techinpost.com/no-mapping-between-account-names-and-security-ids-was-done/
       // https://ourtechroom.com/tech/windows-equivalent-to-chmod-command/)
-      this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/inheritance:r'] })
-      this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/reset'] })
-      this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/grant', `${userInfo().username}:F`] })
+      // this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/inheritance:r'] })
+      // this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/reset'] })
+      // this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/grant:r', `${userInfo().username}:F`] })
+      // this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/grant:r', 'Everyone:F'] })
     }
 
     const kboot = join(this.cwd, this.device, 'kboot.kfpkg')
     this.flash.args = ['-B', 'goE', '-b', '1500000', kboot]
   }
 
-  async enable () {
+  enable () {
     const promises = this.chmod.commands.map((cmd) => {
       return new Promise((resolve, reject) => {
         const message = `${cmd.command} ${cmd.args.join(' ')}`
@@ -68,6 +69,7 @@ class FlashHandler extends Handler {
         this.log(message)
 
         const script = spawn(cmd.command, cmd.args)
+
         script.stdout.on('data', (data) => {
           buffer = Buffer.concat([buffer, data])
         })
@@ -87,41 +89,49 @@ class FlashHandler extends Handler {
         })
       })
     })
-    try {
-      await Promise.all(promises)
-    } catch (error) {
-      this.send(`${this.name}:error`, error)
+    return Promise.all(promises)
+  }
+
+  createFlash () {
+    const os = this.store.get('os')
+    const result = { message: `${this.flash.command} ${this.flash.args.join(' ')}` } 
+
+    if (os === 'linux' || os === 'darwin') {
+      const options = { name: 'KruxInstaller' }
+      const sudoer = new Sudoer(options)
+      result.spawn = async () => {
+        return await sudoer.spawn(result.message)
+      }
+    } else if (os === 'win32') {
+      result.spawn = () => {
+        return new Promise((resolve) => {
+          resolve(spawn(this.flash.command, this.flash.args))
+        })
+      }
+    } else {
+      throw new Error(`${os} not implemented`)
     }
+    return result
   }
 
   async write () {
-    const os = this.store.get('os')
-    const message = `${this.flash.command} ${this.flash.args.join(' ')}`
-    this.log(message)
+    const flash = this.createFlash()
+    const message = flash.message
+    const runner = await flash.spawn()
 
-    let flash = null
-
-    if (os !== 'win32') {
-      const options = { name: 'KruxInstaller' }
-      const sudoer = new Sudoer(options)
-      flash = await sudoer.spawn(message)
-    } else {
-      flash = spawn(this.flash.command, this.flash.args)
-    }
-    
-    flash.stdout.on('data', (data) => {
+    runner.stdout.on('data', (data) => {
       const out = Buffer.from(data, 'utf-8').toString()
       this.log(out)
       this.send(`${this.name}:data`, out)
     })
 
-    flash.stderr.on('data', (data) => {
+    runner.stderr.on('data', (data) => {
       const out = Buffer.from(data, 'utf-8').toString()
       this.log(out)
       this.send(`${this.name}:data`, out)
     })
 
-    flash.on('close', (code) => {
+    runner.on('close', (code) => {
       this.log(`${message} exit code: ${code}`)
       this.send(`${this.name}:success`)
     })

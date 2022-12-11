@@ -21,39 +21,44 @@ yarn install
 
 ## Develop
 
-### Compiles and hot-reloads for development in browser
+### Lint
 
 ```bash
-# This runs on browser
-yarn run serve
+yarn run lint
+```
+
+### Generate icons
+
+```bash
+yarn run icon
 ```
 
 ### Compiles to a development electron application
 
-#### Linux and MacOS
-
 ```bash
 # This runs on dedicated chrome instance
-yarn run electron:serve
-```
-
-#### Windows
-
-```bash
-# This runs on dedicated chrome instance
-yarn run electron:serve:win
+yarn run serve
 ```
 
 ### Compiles and minifies for production
 
-* Linux:   `yarn run electron:build --linux <target>`
-* Windows: `yarn run electron:build --win <target>`
-* Mac:     `yarn run electron:build --mac <target>`
+```bash
+yarn run build <target> 
+```
 
-Where target can be:
+The `<target>` depends depends on the running platform (i.e., linux, darwin, win32):
 
-* Linux: AppImage, deb or snap
-* Windows: nsis, msi, portable
-* Mac: dmg, pkg
+* Linux:   
+    * `AppImage`
+    * `deb`
+    * `snap`
 
-Any generated binary will be placed at `dist_electron` folder.
+* Windows: 
+    * `nsis`
+    * `portable`
+    * `AppX`
+
+* Mac:
+    * `dmg`
+    * `pkg`
+    * `mas`

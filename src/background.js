@@ -190,7 +190,7 @@ app.on('ready', async () => {
   debug(`Adding openssl in ${process.platform} environment variable PATH`)
   const openssls = []
   let separator = ''
-  
+
   if (process.platform === 'linux') {
     debug('  no need for add')
   } else if (process.platform === 'darwin' ) {
@@ -204,7 +204,7 @@ app.on('ready', async () => {
   }
   for (let i in openssls) {
     debug(`  ${openssls[i]} added`)
-    process.env.PATH += `;${openssls[i]}`
+    process.env.PATH += `${separator}${openssls[i]}`
   }
 
   debug('App ready')

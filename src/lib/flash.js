@@ -2,7 +2,7 @@
 
 import { spawn } from 'child_process'
 import { join } from 'path'
-import { userInfo } from 'os'
+// import { userInfo } from 'os'
 import Handler from './base'
 import Sudoer from '@nathanielks/electron-sudo'
 
@@ -94,7 +94,7 @@ class FlashHandler extends Handler {
 
   createFlash () {
     const os = this.store.get('os')
-    const result = { message: `${this.flash.command} ${this.flash.args.join(' ')}` } 
+    const result = { message: `${this.flash.command} ${this.flash.args.join(' ')}` }
 
     if (os === 'linux' || os === 'darwin') {
       const options = { name: 'KruxInstaller' }

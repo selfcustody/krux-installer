@@ -2,7 +2,7 @@
   "name": "krux-installer",
   "version": "0.0.1-alpha-2",
   "author": "qlrd <106913782+qlrd@users.noreply.github.com>",
-  "description": "An imager installer for Krux firmwares",
+  "description": "GUI installer of Krux´s firmware to use Kendryte K210 hardwares as Bitcoin Signature Device",
   "scripts": {
     "lint": "node ./bin/krux-installer.js lint",
     "icon": "node ./bin/krux-installer.js icon",

@@ -7,27 +7,37 @@ class VerifyOpenssl extends Handler {
 
   constructor (win, store) {
     super('verify-openssl', win, store)
+    this.platform = this.store.get('os')
+  }
 
-    const platform = this.store.get('os')
-
-    if (platform === 'linux' || platform === 'darwin') {
-      this.executable = 'openssl'
-    }
-    if (platform === 'win32') {
-      this.executable = 'openssl.exe'
-    }
+  opensslExists () {
+    return commandExists('openssl').then((exists) => {
+      if (exists) {
+        return `"openssl" found in ${process.env.PATH} for ${this.platform}`
+      } else {
+        throw new Error()
+      }
+    }).catch((error) => {
+      return commandExists('openssl.exe').then((existsExe) => {
+        if (exists) {
+          return `"openssl.exe" found in ${process.env.PATH} for ${this.platform}`
+        } else {
+          throw new Error(`neither "openssl" or "openssl.exe" found in ${process.env.PATH} for ${this.platform}`)
+        }
+      })
+    })
   }
 
   async verify () {
-    const exists = await commandExists(this.executable)
-    this.log(`Openssl exists in ${process.env.PATH}`)
-    if (exists) {
-      this.send(`${this.name}:success`, exists)
-    } else {
-      this.send(`${this.name}:error`, new Error(`${this.executable} not found in ${process.env.PATH}`))
+    try {
+      const msg = await this.opensslExists()
+      this.log(msg)
+      this.send(`${this.name}:success`, msg)
+    } catch (error) {
+      this.log(error)
+      this.send(`${this.name}:error`, error)
     }
   }
-
 }
 
 /**

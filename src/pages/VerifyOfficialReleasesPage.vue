@@ -52,19 +52,27 @@
         <v-card-subtitle v-id="verifiedSign">
           <v-icon>mdi-draw-pen</v-icon>&ensp;Openssl signature check:
         </v-card-subtitle>
-        <v-card-content> 
-          <v-card-text>
-            Command: 
-            <div class="console-openssl">
-              $> {{ sign_cmd }}
-            </div>
-          </v-card-text>
-          <v-card-text>
-            Result:
-              <v-chip class="ma-2" color="primary" text-color="white">
-                {{ signed }}
-              </v-chip>
-          </v-card-text>
+        <v-card-content>
+          <v-flex v-if="!verifiedSign">
+            <v-progress-circular
+              color="green"
+              indeterminate
+            />
+          </v-flex>
+          <v-flex v-else>
+            <v-card-text>
+              Command: 
+              <div class="console-openssl">
+                $> {{ sign_cmd }}
+              </div>
+            </v-card-text>
+            <v-card-text>
+              Result:
+                <v-chip class="ma-2" color="primary" text-color="white">
+                  {{ signed }}
+                </v-chip>
+            </v-card-text>
+          </v-flex>
         </v-card-content>
         <v-card-actions>
           <v-btn
@@ -112,7 +120,12 @@ export default {
     window.KruxInstaller.hash.onSuccess((_event, value) => { 
       this.$nextTick(() => {
         this.verifiedHash = value.length > 0
-        this.hashes = value
+
+        // TODO fix this ugly hack
+        // in windows, if user already downloaded .zip binary
+        // the `value` can be an Array with length > 2
+        // and we need that the `value` to be an Array with length === 2
+        this.hashes = [value[0], value[1]]
       })
     })
 

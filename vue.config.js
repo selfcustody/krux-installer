@@ -19,7 +19,7 @@ module.exports = defineConfig({
         electronVersion: pkg.devDependencies.electron,
         linux: {
           icon: 'icon.png',
-          maintainer: pkg.author[0]
+          maintainer: pkg.author
         },
         win: {
           icon: 'icon.ico'
@@ -28,21 +28,21 @@ module.exports = defineConfig({
           icon: 'icon.icns'
         },
         files: [
-          '!**/{LICENSE,README.md,.github,.browserslistrc,.eslintrc.js,vue.config.js,jsconfig.js,babel.config.js}',
-          '!./bin/{electron-serve.js,platform-dependencies.js}'
+          '!**/{README.md,.github,.browserslistrc,.eslintrc.js,vue.config.js,jsconfig.js,babel.config.js,yarn.lock}',
+          '!./bin/{electron-serve.js}'
         ],
         // See
         // 'Can't load fonts in production build, vue-cli@5.0.0-alpha.6'
         // https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/1286
-        beforeBuild: async function (context) {
+        beforeBuild: function (context) {
           const workDir = path.join(context.appDir, "css")
           const files = fs.readdirSync(workDir);
             replace({
-            regex: "app:///fonts",
-            replacement: "app://./fonts",
-            paths: files.map(val => path.join(workDir, val)),
-            recursive: false,
-            silent: false,
+              regex: "app:///fonts",
+              replacement: "app://./fonts",
+              paths: files.map(val => path.join(workDir, val)),
+              recursive: false,
+              silent: false,
           })
 
           return true

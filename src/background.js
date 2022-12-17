@@ -194,16 +194,27 @@ app.on('ready', async () => {
   if (process.platform === 'linux') {
     debug('  no need for add')
   } else if (process.platform === 'darwin' ) {
-    openssls.push('/usr/local/opt/openssl/bin')
-    openssls.push('/System/Library/OpenSSL')
     separator = ':'
+    const _env = process.env.PATH.split(separator)
+    if (_env.indexOf('/usr/local/opt/openssl/bin') === -1) {
+      openssls.push('/usr/local/opt/openssl/bin')
+    }
+    if (_env.indexOf('/System/Library/OpenSSL') === -1) {
+      openssls.push('/System/Library/OpenSSL')
+    }
   } else if (process.platform === 'win32') {
-    openssls.push(`${process.env.ProgramFiles}\\Git\\usr\\bin`)
-    openssls.push(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`)
     separator = ';'
+    const _env = process.env.PATH.split(separator)
+
+    if (_env.indexOf(`${process.env.ProgramFiles}\\Git\\usr\\bin`) === -1) {
+      openssls.push(`${process.env.ProgramFiles}\\Git\\usr\\bin`)
+    }
+    if (_env.indexOf(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`) === -1) {
+      openssls.push(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`)
+    }  
   }
   for (let i in openssls) {
-    debug(`  ${openssls[i]} added`)
+    debug(`  adding ${openssls[i]} to PATH`)
     process.env.PATH += `${separator}${openssls[i]}`
   }
 

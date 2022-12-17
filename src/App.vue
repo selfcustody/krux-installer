@@ -45,6 +45,7 @@ import ConfirmDetectedDevicePage from './pages/ConfirmDetectedDevicePage.vue'
 import ConfirmDetectedSDCardPage from './pages/ConfirmDetectedSDCardPage.vue'
 import WriteFirmwareToSDCardPage from './pages/WriteFirmwareToSDCardPage.vue'
 import WriteFirmwareToDevicePage from './pages/WriteFirmwareToDevicePage.vue'
+import VerifyOpensslErrorPage from './pages/VerifyOpensslErrorPage.vue'
 
 export default {
   name: 'App',
@@ -75,7 +76,8 @@ export default {
     ConfirmDetectedDevicePage,
     ConfirmDetectedSDCardPage,
     WriteFirmwareToSDCardPage,
-    WriteFirmwareToDevicePage,    
+    WriteFirmwareToDevicePage,
+    VerifyOpensslErrorPage 
   },
   data: () => ({
     page: 'MainPage'

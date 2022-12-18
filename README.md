@@ -19,6 +19,12 @@ git clone https://github.com/qlrd/krux-installer.git
 yarn install
 ```
 
+If you´re developing for Windows or MacOs, run:
+
+```bash
+yarn run platform-install
+```
+
 ## Develop
 
 ### Lint
@@ -43,7 +49,7 @@ yarn run serve
 ### Compiles and minifies for production
 
 ```bash
-yarn run build --<target> 
+yarn run build <target> 
 ```
 
 The `<target>` depends depends on the running platform (i.e., linux, darwin, win32):

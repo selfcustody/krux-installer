@@ -1,7 +1,8 @@
 const { exec, spawn } = require('child_process');
+const { existsSync } = require('fs');
 const { platform } = require('os');
 const { join } = require('path');
-const { name, version } = require('../package.json')
+const { name, version, platformDependencies } = require('../package.json')
 
 const action = process.argv[2]
 const executable = {}
@@ -26,10 +27,11 @@ function runner (cmd, args, env) {
 
     let service
     let bin
-
-    if (bin !== 'yarn') {
+    
+    if (cmd !== 'yarn') {
       bin = join(__dirname, '..', 'node_modules', '.bin', cmd)
-    } else {
+    } 
+    if (cmd === `yarn${process.platform === 'win32' ? '.cmd' : '' }`) {
       bin = cmd
     }
 
@@ -152,28 +154,21 @@ async function main() {
   }
 
 
-  if (action === 'postinstall') {
-    const dependencies = {
-      'win32': [
-        'png-to-ico@2.1.8'
-      ],
-      'darwin': [
-        'dmg-builder@24.0.0-alpha.3',
-        'dmg-license@1.011',
-        'make-icns@1.1.4'
-      ]
-    };
+  if (action === 'platform-install') {
+    const dependencies = platformDependencies[process.platform]
 
-    if (dependencies[process.platform]) {
-      console.log(`  \x1b[34m\u2022\x1b[0m installing dependent platform dependencies for ${process.platform}`)
-      runner('yarn', ['add', dependencies[process.platform].join(' ')])
-    } else {
-      console.log(`  \x1b[34m\u2022\x1b[0m skipping dependent platform dependencies for ${process.platform}`)
+    const pkgs = Object.keys(dependencies)
+    for (let i in pkgs){
+      const name = pkgs[i];
+      const version = dependencies[name];
+      const module = join(__dirname, '..', 'node_modules', name)
+      console.log(`  \x1b[34m\u2022\x1b[0m installing platform dependency ${name} for ${process.platform}`)
+      runner(`yarn${process.platform === 'win32' ? '.cmd' : '' }`, ['add', `${name}@${version}`])
     }
   }
 
   if (action === 'install-app-deps') {
-    runner(`electron-builder${process.platform === 'win32' ? '.cmd' : ''}`, [action])
+    runner(`electron-builder${process.platform === 'win32' ? '.cmd' : '' }`, [action])
   }
 
   try {

@@ -8,7 +8,7 @@ const action = process.argv[2]
 const executable = {}
 const env = {}
 
-const delay = 500
+const delay = 1000
 let index = 0
 
 let onClose = null

@@ -84,6 +84,13 @@ export default {
         if (value) this.ktool += '-10'
       })
     })
+
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.openssl.onError((_event, value) => {
+      this.$nextTick(() => {
+        this.$emit('onSuccess', { page: 'VerifyOpensslErrorPage' })
+      })
+    })
   },
   watch: {
     async version (v) {
@@ -97,6 +104,9 @@ export default {
       } 
     },
     async ktool (v) {
+      if (v === 'ktool-win.exe') {
+        await window.KruxInstaller.openssl.check()
+      }
       if (v === 'ktool-mac') {
         await window.KruxInstaller.isMac10.get()
       }

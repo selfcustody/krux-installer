@@ -40,6 +40,7 @@ import unzipResource from './lib/unzip-resource'
 import verifyOfficialReleasesFetch from './lib/verify-official-releases-fetch'
 import verifyOfficialReleasesHash from './lib/verify-official-releases-hash'
 import verifyOfficialReleasesSign from './lib/verify-official-releases-sign'
+import verifyOpenssl from './lib/verify-openssl'
 import storeSet from './lib/store-set'
 import storeGet from './lib/store-get'
 import flash from './lib/flash'
@@ -129,6 +130,7 @@ async function createWindow() {
   ipcMain.handle('verify-official-releases-fetch', verifyOfficialReleasesFetch(win, store))
   ipcMain.handle('verify-official-releases-hash', verifyOfficialReleasesHash(win, store))
   ipcMain.handle('verify-official-releases-sign', verifyOfficialReleasesSign(win, store))
+  ipcMain.handle('verify-openssl', verifyOpenssl(win, store))
   ipcMain.handle('store-set', storeSet(win, store))
   ipcMain.handle('store-get', storeGet(win, store))
   ipcMain.handle('flash', flash(win, store))
@@ -180,6 +182,40 @@ app.on('ready', async () => {
     } catch (e) {
       debug(`Vue Devtools failed to install:, ${e.toString()}`)
     }
+  }
+
+  // Check if platform (darwin or win32)
+  // needs and additional configuration
+  // to add openssl binary
+  debug(`Adding openssl in ${process.platform} environment variable PATH`)
+  const openssls = []
+  let separator = ''
+
+  if (process.platform === 'linux') {
+    debug('  no need for add')
+  } else if (process.platform === 'darwin' ) {
+    separator = ':'
+    const _env = process.env.PATH.split(separator)
+    if (_env.indexOf('/usr/local/opt/openssl/bin') === -1) {
+      openssls.push('/usr/local/opt/openssl/bin')
+    }
+    if (_env.indexOf('/System/Library/OpenSSL') === -1) {
+      openssls.push('/System/Library/OpenSSL')
+    }
+  } else if (process.platform === 'win32') {
+    separator = ';'
+    const _env = process.env.PATH.split(separator)
+
+    if (_env.indexOf(`${process.env.ProgramFiles}\\Git\\usr\\bin`) === -1) {
+      openssls.push(`${process.env.ProgramFiles}\\Git\\usr\\bin`)
+    }
+    if (_env.indexOf(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`) === -1) {
+      openssls.push(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`)
+    }  
+  }
+  for (let i in openssls) {
+    debug(`  adding ${openssls[i]} to PATH`)
+    process.env.PATH += `${separator}${openssls[i]}`
   }
 
   debug('App ready')

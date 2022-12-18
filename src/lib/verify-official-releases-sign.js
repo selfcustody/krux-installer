@@ -31,19 +31,21 @@ class VerifyOfficialReleasesSignHandler extends Handler {
     if (platform === 'linux') {
       shell = "/bin/bash"
       __args__.push("-c")
+      env.PATH = `${process.env.PATH}:/bin:/usr/bin:/usr/local/bin`
       opensslBin = "openssl"
-      env.PATH = "/bin:/usr/bin:/usr/local/bin"
     } else if (platform === 'darwin') {
       // see
       // https://stackoverflow.com/questions/35129977/how-to-install-latest-version-of-openssl-mac-os-x-el-capitan/46179272#46179272
       shell = "/bin/zsh"
-      env.PATH = "/usr/local/opt/openssl/bin:/System/Library/OpenSSL"
+      env.PATH = `${process.env.PATH}:/usr/local/opt/openssl/bin:/System/Library/OpenSSL` 
       __args__.push("-c")
       opensslBin = "openssl"
     } else {
-      shell = "powershell.exe"
-      __args__.push("-Command")
-      env.PATH = "C:\\Program Files\\Git\\usr\\bin"
+      shell = "cmd"
+      __args__.push("/c")
+      // see
+      // https://stackoverflow.com/questions/892555/how-do-i-specify-c-program-files-without-a-space-in-it-for-programs-that-cant
+      env.PATH = `${process.env.PATH};C:\\PROGRA~1\\Git\\usr\\bin`
       opensslBin = "openssl.exe"
     }
 

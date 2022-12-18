@@ -1,33 +1,24 @@
 {
   "name": "krux-installer",
-  "version": "0.0.1-alpha-1",
-  "author": [
-    "qlrd <106913782+qlrd@users.noreply.github.com>"
-  ],
-  "description": "An imager installer for Krux firmwares",
+  "version": "0.0.1-alpha-2",
+  "author": "qlrd <106913782+qlrd@users.noreply.github.com>",
+  "description": "GUI installer of Krux´s firmware to use Kendryte K210 hardwares as Bitcoin Signature Device",
   "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "lint:client": "vue-cli-service lint",
-    "lint:public": "eslint public/",
-    "lint:server": "eslint src/",
-    "icon:svg": "aasvg < ./build/krux.txt > ./build/krux.svg",
-    "icon:png": "svgexport ./build/krux.svg ./build/krux.png",
-    "icon:resize": "resize-img --width 256 --height 256 ./build/krux.png > ./build/icon.png",
-    "icon:ico": "png-to-ico ./build/icon.png > ./build/icon.ico",
-    "icon:icns": "mk-icns ./build/icon.png ./build",
-    "icon": "yarn run icon:svg && yarn run icon:png && yarn run icon:resize && yarn run icon:ico && yarn run icon:icns",
-    "lint": "yarn run lint:server && yarn run lint:public && yarn run lint:client",
-    "electron:build": "vue-cli-service electron:build",
-    "electron:serve": "yarn run lint && DEBUG=krux:* vue-cli-service electron:serve --trace-warnings",
-    "postinstall": "electron-builder install-app-deps",
-    "postuninstall": "electron-builder install-app-deps"
+    "lint": "node ./bin/krux-installer.js lint",
+    "icon": "node ./bin/krux-installer.js icon",
+    "serve": "node ./bin/krux-installer.js serve",
+    "build": "node ./bin/krux-installer.js build",
+    "postinstall:platform": "node ./bin/krux-installer.js postinstall",
+    "postinstall:electron": "node ./bin/krux-installer.js install-app-deps",
+    "postinstall": "yarn run postinstall:platform && yarn run postinstall:electron",
+    "postuninstall": "yarn run postinstall:electron"
   },
   "dependencies": {
     "@mdi/font": "^7.0.96",
     "@nathanielks/electron-sudo": "^4.0.15",
     "ansi_up": "^5.1.0",
     "axios": "^0.27.2",
+    "command-exists": "^1.2.9",
     "core-js": "^3.26.1",
     "debug": "^4.3.4",
     "electron-store": "^8.1.0",
@@ -38,28 +29,22 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.19.6",
+    "@babel/core": "^7.20.2",
     "@babel/eslint-parser": "^7.19.1",
     "@vue/cli-plugin-babel": "^5.0.8",
     "@vue/cli-plugin-eslint": "^5.0.8",
     "@vue/cli-service": "^5.0.8",
-    "aasvg": "^0.3.2",
-    "electron": "21.0.1",
+    "aasvg": "^0.3.3",
+    "electron": "22.0.0",
     "electron-builder": "^23.6.0",
-    "electron-devtools-installer": "^3.1.0",
-    "eslint": "^8.26.0",
-    "eslint-plugin-vue": "^9.6.0",
-    "make-icns": "^1.1.4",
-    "png-to-ico": "^2.1.8",
+    "electron-devtools-installer": "^3.2.0",
+    "eslint": "^8.28.0",
+    "eslint-plugin-vue": "^9.7.0",
     "replace": "^1.2.2",
     "resize-img-cli": "^1.0.0",
     "svgexport": "^0.4.2",
     "vue-cli-plugin-electron-builder": "^3.0.0-alpha.4",
     "vue-cli-plugin-vuetify": "^2.5.8",
     "webpack-plugin-vuetify": "^2.0.0"
-  },
-  "optionalDependencies": {
-    "dmg-builder": "^24.0.0-alpha.1",
-    "dmg-license": "^1.0.11"
   }
 }

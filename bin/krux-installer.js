@@ -123,7 +123,7 @@ async function main() {
   }
 
   if (action === 'build') {
-    
+
     const target = process.argv[3]
     let args = null
 
@@ -157,16 +157,16 @@ async function main() {
       ]
     };
 
-    if (dependencies[platform]) {
-      console.log(`  \x1b[34m\u2022\x1b[0m installing dependent platform dependencies for ${platform}`)
-      runner('yarn', ['add', dependencies[platform].join(' ')])
+    if (dependencies[process.platform]) {
+      console.log(`  \x1b[34m\u2022\x1b[0m installing dependent platform dependencies for ${process.platform}`)
+      runner(`yarn${process.platform === 'win32' ? '.cmd' : '' }`, ['add', dependencies[process.platform].join(' ')])
     } else {
-      console.log(`  \x1b[34m\u2022\x1b[0m skipping dependent platform dependencies for ${platform}`)
+      console.log(`  \x1b[34m\u2022\x1b[0m skipping dependent platform dependencies for ${process.platform}`)
     }
   }
 
   if (action === 'install-app-deps') {
-    runner('electron-builder', [action])
+    runner(`electron-builder${process.platform === 'win32' ? '.cmd' : ''}`, [action])
   }
 
   try {

@@ -49,12 +49,12 @@ jobs:
       - name: Hash executable
         uses: qlrd/sha256sum-action@v1.0.0
         with:
-          path-to-file: dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.exe
+          path-to-file: .\dist_electron\KruxInstaller-${{ steps.version.outputs.version }}.exe
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: KruxInstaller-v${{ steps.version.outputs.version }}.exe
           path: |
-            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.exe
-            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.exe.sha256sum.txt
+            .\dist_electron\KruxInstaller-${{ steps.version.outputs.version }}.exe
+            .\dist_electron\KruxInstaller-${{ steps.version.outputs.version }}.exe.sha256sum.txt

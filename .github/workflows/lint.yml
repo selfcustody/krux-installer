@@ -21,16 +21,10 @@ jobs:
       - name: Setup node.js
         uses: actions/setup-node@v1
         with:
-          node-version: 16.16.0
+          node-version: '16.18.0'
 
       - name: Install Node.js dependencies
         run: yarn install
 
-      - name: Run src/**.js linting
-        run: yarn run lint:server
-
-      - name: Run public/*.js linting
-        run: yarn run lint:public
-
-      - name: Run src/**.vue linting
-        run: yarn run lint:client
+      - name: Run src/pages/*.vue, public/**.js and src/**.js  linting
+        run: yarn run lint

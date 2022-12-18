@@ -1,4 +1,4 @@
-name: Build AppImage for Linux
+name: Build NSIS installer for windows
 
 on:
   push:
@@ -10,9 +10,9 @@ on:
 
 jobs:
   build:
-    name: Build AppImage executable
+    name: Build NSIS installer for windows
           
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
       - name: Checkout Git repository
@@ -23,14 +23,14 @@ jobs:
         with:
           node-version: '16.18.0'
 
-      - name: Install Node.js dependencies (Linux)
+      - name: Install Node.js dependencies (Windows)
         run: yarn install
 
       - name: Make icons
         run: |
           yarn run icon
           rm ./build/*.svg
-          rm ./build/krux.png
+          rm ./build/*.png
 
       - name: Get version from package.json
         uses: polyseam/get-version-from-package-json@1.0.0
@@ -42,17 +42,17 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.github_token }}
         run: |
-          yarn run build AppImage
+          yarn run build nsis
       
       - name: Hash executable
         uses: qlrd/sha256sum-action@v1.0.0
         with:
-          path-to-file: dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage
+          path-to-file: dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.exe
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: KruxInstaller-v${{ steps.version.outputs.version }}.AppImage
+          name: KruxInstaller-v${{ steps.version.outputs.version }}.exe
           path: |
-            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage
-            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage.sha256sum.txt
+            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.exe
+            dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.exe.sha256sum.txt

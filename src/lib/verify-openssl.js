@@ -17,9 +17,10 @@ class VerifyOpenssl extends Handler {
       } else {
         throw new Error()
       }
+    // eslint-disable-next-line no-unused-vars
     }).catch((error) => {
       return commandExists('openssl.exe').then((existsExe) => {
-        if (exists) {
+        if (existsExe) {
           return `"openssl.exe" found in ${process.env.PATH} for ${this.platform}`
         } else {
           throw new Error(`neither "openssl" or "openssl.exe" found in ${process.env.PATH} for ${this.platform}`)

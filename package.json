@@ -48,6 +48,7 @@
     "webpack-plugin-vuetify": "^2.0.0"
   },
   "platformDependencies": {
+    "linux": {},
     "win32": {
       "png-to-ico": "2.1.8"
     },

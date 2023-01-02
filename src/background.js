@@ -206,12 +206,10 @@ app.on('ready', async () => {
     separator = ';'
     const _env = process.env.PATH.split(separator)
 
-    if (_env.indexOf(`${process.env.ProgramFiles}\\Git\\usr\\bin`) === -1) {
-      openssls.push(`${process.env.ProgramFiles}\\Git\\usr\\bin`)
+    const vendor = join(__dirname, '..', 'vendor', 'OpenSSL', 'bin')
+    if (_env.indexOf(vendor === -1) {
+      openssls.push(vendor)
     }
-    if (_env.indexOf(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`) === -1) {
-      openssls.push(`${process.env.ProgramFiles}\\OpenSSL-Win64\\bin`)
-    }  
   }
   for (let i in openssls) {
     debug(`  adding ${openssls[i]} to PATH`)

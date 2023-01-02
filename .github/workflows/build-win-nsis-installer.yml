@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - win32-builtin-openssl
     pull_request:
       branches:
         - main
@@ -17,6 +18,25 @@ jobs:
     steps:
       - name: Checkout Git repository
         uses: actions/checkout@v2
+
+      - name: Setup output variables helpers
+        id: setup
+        shell: pwsh
+        run: |
+          $loc = Get-Location
+          $vendor = $loc\vendor
+          $prefix = $vendor\OpenSSL
+          $openssldir = $prefix\CommonFiles
+          echo "prefix=$prefix" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
+          echo "openssldir=$openssldir" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+             
+      - name: Configure, build, test and install openssl
+        uses: qlrd/compile-openssl-windows-action@v0.0.1
+        with:
+          version: openssl-3.0.7
+          prefix: ${{ steps.setup.outputs.prefix }}
+          openssldir: ${{ steps.setup.outputs.openssldir }}
+          build-type: 'minimal'
 
       - name: Setup node.js
         uses: actions/setup-node@v1

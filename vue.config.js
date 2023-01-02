@@ -1,8 +1,39 @@
-const { defineConfig } = require('@vue/cli-service')
-const path = require('path')
-const replace = require('replace')
-const fs = require('fs')
-const pkg = require('./package.json')
+const { defineConfig } = require('@vue/cli-service');
+const path = require('path');
+const replace = require('replace');
+const fs = require('fs');
+const pkg = require('./package.json');
+
+const files = []
+files.push('!README.md');
+files.push('!.github');
+files.push('!.browserslistrc');
+files.push('!.eslintrc.js');
+files.push('!vue.config.js');
+files.push('!jsconfig.js');
+files.push('!babel.config.js');
+files.push('!yarn.lock');
+files.push('!bin/krux-installer.js');
+files.push('!build/krux.txt');
+
+if (process.platform === 'linux') {
+  files.push('!build/*.ico');
+  files.push('!build/*.icns');
+}
+if (process.platform === 'darwin') {
+  files.push('!build/*.png');
+  files.push('!build/*.svg');
+  files.push('!build/*.ico');
+}
+if (process.platform === 'win32') {
+  files.push('!build/*.png');
+  files.push('!build/*.svg');
+  files.push('!vendor/OpenSSL/html/*');
+  files.push('vendor/OpenSSL/bin/openssl.exe');
+  files.push('vendor/OpenSSL/include/*');
+  files.push('vendor/OpenSSL/lib/*');
+  files.push('vendor/OpenSSL/CommonFiles/*');
+}
 
 module.exports = defineConfig({
   configureWebpack: {
@@ -27,10 +58,7 @@ module.exports = defineConfig({
         mac: {
           icon: 'icon.icns'
         },
-        files: [
-          '!**/{README.md,.github,.browserslistrc,.eslintrc.js,vue.config.js,jsconfig.js,babel.config.js,yarn.lock}',
-          '!./bin/{electron-serve.js}'
-        ],
+        files: files,
         // See
         // 'Can't load fonts in production build, vue-cli@5.0.0-alpha.6'
         // https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/1286
@@ -50,4 +78,4 @@ module.exports = defineConfig({
       }
     }
   }
-})
+});

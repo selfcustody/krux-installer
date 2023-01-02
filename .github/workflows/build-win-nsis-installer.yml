@@ -24,11 +24,9 @@ jobs:
         shell: pwsh
         run: |
           $loc = Get-Location
-          $vendor = $loc\vendor
-          $prefix = $vendor\OpenSSL
-          $openssldir = $prefix\CommonFiles
-          echo "prefix=$prefix" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
-          echo "openssldir=$openssldir" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          mkdir $loc\vendor
+          echo "prefix=$loc\vendor\OpenSSL" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
+          echo "openssldir=$loc\vendor\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
              
       - name: Configure, build, test and install openssl
         uses: qlrd/compile-openssl-windows-action@v0.0.1

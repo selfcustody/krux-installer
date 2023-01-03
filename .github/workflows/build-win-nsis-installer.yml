@@ -31,12 +31,12 @@ jobs:
           $release_url = "https://github.com/selfcustody/krux/releases/download"
           $raw_url = "https://raw.githubusercontent.com/selfcustody/krux/main/$pemname"
           mkdir $loc\vendor
-          echo "zipname=$zipname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append  
-          echo "signame=$signame" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
-          echo "pemname=$pemname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
-          echo "release_zip=$release_url/$version/$zipname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
-          echo "release_sig=$release_url/$version/$signame" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append
-          echo "release_pem=$raw_url/$pemname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append
+          echo "zipname=$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append  
+          echo "signame=$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
+          echo "pemname=$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
+          echo "release_zip=$release_url/$version/$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
+          echo "release_sig=$release_url/$version/$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append
+          echo "release_pem=$raw_url/$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append
           echo "prefix=$loc\vendor\OpenSSL" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
           echo "openssldir=$loc\vendor\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           

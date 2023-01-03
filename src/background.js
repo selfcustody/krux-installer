@@ -207,7 +207,7 @@ app.on('ready', async () => {
     const _env = process.env.PATH.split(separator)
 
     const vendor = join(__dirname, '..', 'vendor', 'OpenSSL', 'bin')
-    if (_env.indexOf(vendor === -1) {
+    if (_env.indexOf(vendor === -1)) {
       openssls.push(vendor)
     }
   }

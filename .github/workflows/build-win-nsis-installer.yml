@@ -27,7 +27,7 @@ jobs:
           mkdir $loc\vendor
           echo "prefix=$loc\vendor\OpenSSL" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
           echo "openssldir=$loc\vendor\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-             
+
       - name: Configure, build, test and install openssl
         uses: qlrd/compile-openssl-windows-action@v0.0.1
         with:
@@ -35,6 +35,18 @@ jobs:
           prefix: ${{ steps.setup.outputs.prefix }}
           openssldir: ${{ steps.setup.outputs.openssldir }}
           build-type: 'minimal'
+
+      - name: Pre-test builtin openssl
+        shell: pwsh
+        run:
+          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe version
+          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe rand -hex 16
+          $loc = Get-Location
+          $version = "v22.08.2"
+          curl.exe -LO https://github.com/selfcustody/krux/releases/download/$version/krux-$version.zip
+          curl.exe -LO https://github.com/selfcustody/krux/releases/download/$version/krux-$version.zip.sig
+          curl.exe -LO https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem
+          ${{ steps.setup.output.prefix }}\bin\openssl.exe sha256 <$loc\krux-$version.zip -binary | ${{ steps.setup.output.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey $loc\selfcustody.pem -sigfile $loc\krux-$version.zip.sig
 
       - name: Setup node.js
         uses: actions/setup-node@v1

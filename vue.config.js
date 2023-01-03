@@ -28,11 +28,11 @@ if (process.platform === 'darwin') {
 if (process.platform === 'win32') {
   files.push('!build/*.png');
   files.push('!build/*.svg');
-  files.push('!vendor/OpenSSL/html/*');
-  files.push('vendor/OpenSSL/bin/openssl.exe');
-  files.push('vendor/OpenSSL/include/*');
-  files.push('vendor/OpenSSL/lib/*');
-  files.push('vendor/OpenSSL/CommonFiles/*');
+  files.push('!vendor/OpenSSL/html/**');
+  files.push('!vendor/OpenSSL/include/**');
+  files.push('vendor/OpenSSL/bin/**');
+  files.push('vendor/OpenSSL/lib/**');
+  files.push('vendor/OpenSSL/CommonFiles/**');
 }
 
 module.exports = defineConfig({

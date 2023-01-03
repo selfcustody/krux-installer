@@ -24,10 +24,22 @@ jobs:
         shell: pwsh
         run: |
           $loc = Get-Location
+          $version = "v22.08.2"
+          $zipname = "krux-$version.zip"
+          $signame = "krux-$version.zip.sig"
+          $pemname = "selfcustody.pem"
+          $release_url = "https://github.com/selfcustody/krux/releases/download"
+          $raw_url = "https://raw.githubusercontent.com/selfcustody/krux/main/$pemname"
           mkdir $loc\vendor
+          echo "zipname=$zipname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append  
+          echo "signame=$signame" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
+          echo "pemname=$pemname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
+          echo "release_zip=$release_url/$version/$zipname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append 
+          echo "release_sig=$release_url/$version/$signame" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append
+          echo "release_pem=$raw_url/$pemname" | OutFile -FilePath $Env:GITHUB_OUTPUT -Encoding ut8 -Append
           echo "prefix=$loc\vendor\OpenSSL" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
           echo "openssldir=$loc\vendor\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-
+          
       - name: Configure, build, test and install openssl
         uses: qlrd/compile-openssl-windows-action@v0.0.1
         with:
@@ -38,15 +50,15 @@ jobs:
 
       - name: Pre-test builtin openssl
         shell: pwsh
-        run:
-          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe version
-          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe rand -hex 16
+        run: |
           $loc = Get-Location
-          $version = "v22.08.2"
-          curl.exe -LO https://github.com/selfcustody/krux/releases/download/$version/krux-$version.zip
-          curl.exe -LO https://github.com/selfcustody/krux/releases/download/$version/krux-$version.zip.sig
-          curl.exe -LO https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem
-          ${{ steps.setup.output.prefix }}\bin\openssl.exe sha256 <$loc\krux-$version.zip -binary | ${{ steps.setup.output.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey $loc\selfcustody.pem -sigfile $loc\krux-$version.zip.sig
+          $zip = "${{ steps.setup.outputs.zipname }}"
+          $sig = "${{ steps.setup.outputs.signame }}"
+          $pem = "${{ steps.setup.outputs.pemname }}"
+          curl.exe -LO ${{ steps.setup.outputs.release_zip }}
+          curl.exe -LO ${{ steps.setup.outputs.release_sig }}
+          curl.exe -LO ${{ steps.setup.outputs.release_pem }}
+          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 < $zip -binary | ${{ steps.setup.output.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey $pem -sigfile $sig
 
       - name: Setup node.js
         uses: actions/setup-node@v1

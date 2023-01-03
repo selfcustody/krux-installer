@@ -54,7 +54,7 @@ jobs:
           curl.exe -L -O ${{ steps.setup.outputs.zip }} ${{ steps.setup.outputs.release_zip }}
           curl.exe -L -O ${{ steps.setup.outputs.sig }} ${{ steps.setup.outputs.release_sig }}
           curl.exe -L -O ${{ steps.setup.outputs.pem }} ${{ steps.setup.outputs.release_pem }}
-          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 <${{ steps.setup.outputs.zip }} -binary | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.pem }}
+          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 <${{ steps.setup.outputs.zip }} -binary | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
 
       - name: Setup node.js
         uses: actions/setup-node@v1

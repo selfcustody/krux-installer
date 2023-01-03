@@ -1,4 +1,4 @@
-cost { defineConfig } = require('@vue/cli-service');
+const { defineConfig } = require('@vue/cli-service');
 const path = require('path');
 const replace = require('replace');
 const fs = require('fs');

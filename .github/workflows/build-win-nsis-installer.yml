@@ -59,14 +59,14 @@ jobs:
 
       - name: Pre-test builtin openssl with krux binaries and signature files
         shell: cmd
-        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 -binary ${{ steps.setup.outputs.zip }} | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
+        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 -binary krux-v22.08.2.zip | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey selfcustody.pem -sigfile krux-v22.08.2.zip.sig
 
       - name: Clean built openssl and pre-test files
         shell: pwsh
         run: |
           rm ${{ steps.setup.outputs.zip }}
           rm ${{ steps.setup.outputs.sig }}
-          rm ${{ steps.setup.outputs.pem }}
+          rm ${{ steps.setup.outputs.zip }}
           rm -rf openssl
 
       - name: Setup node.js

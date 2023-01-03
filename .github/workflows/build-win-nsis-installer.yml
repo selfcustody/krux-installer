@@ -48,13 +48,26 @@ jobs:
           openssldir: ${{ steps.setup.outputs.openssldir }}
           build-type: 'minimal'
 
-      - name: Pre-test builtin openssl
-        shell: cmd
+      - name: Download krux binaries and signature file before pre-test
+        shell: pwsh
         run: |
-          curl.exe -L -O ${{ steps.setup.outputs.zip }} ${{ steps.setup.outputs.release_zip }}
-          curl.exe -L -O ${{ steps.setup.outputs.sig }} ${{ steps.setup.outputs.release_sig }}
-          curl.exe -L -O ${{ steps.setup.outputs.pem }} ${{ steps.setup.outputs.release_pem }}
-          ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 <${{ steps.setup.outputs.zip }} -binary | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
+          $loc = Get-Location
+          curl.exe -LO ${{ steps.setup.outputs.release_zip }}
+          curl.exe -LO ${{ steps.setup.outputs.release_sig }}
+          curl.exe -LO ${{ steps.setup.outputs.release_pem }}
+          ls $loc
+
+      - name: Pre-test builtin openssl with krux binaries and signature files
+        shell: cmd
+        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 -binary ${{ steps.setup.outputs.zip }} | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
+
+      - name: Clean built openssl and pre-test files
+        shell: pwsh
+        run: |
+          rm ${{ steps.setup.outputs.zip }}
+          rm ${{ steps.setup.outputs.sig }}
+          rm ${{ steps.setup.outputs.pem }}
+          rm -rf openssl
 
       - name: Setup node.js
         uses: actions/setup-node@v1

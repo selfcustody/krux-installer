@@ -49,6 +49,7 @@ jobs:
           build-type: 'minimal'
 
       - name: Pre-test builtin openssl
+        shell: cmd
         run: |
           curl.exe -L -O ${{ steps.setup.outputs.zip }} ${{ steps.setup.outputs.release_zip }}
           curl.exe -L -O ${{ steps.setup.outputs.sig }} ${{ steps.setup.outputs.release_sig }}

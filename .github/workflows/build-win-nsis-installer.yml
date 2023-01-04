@@ -34,6 +34,7 @@ jobs:
           echo "zip=$loc\$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
           echo "sig=$loc\$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
           echo "pem=$loc\$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "openssl_build_dir=$loc\openssl" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           echo "release_zip=$release_url/$version/$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
           echo "release_sig=$release_url/$version/$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           echo "release_pem=$raw_url/$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
@@ -51,23 +52,24 @@ jobs:
       - name: Download krux binaries and signature file before pre-test
         shell: pwsh
         run: |
-          $loc = Get-Location
           curl.exe -LO ${{ steps.setup.outputs.release_zip }}
           curl.exe -LO ${{ steps.setup.outputs.release_sig }}
           curl.exe -LO ${{ steps.setup.outputs.release_pem }}
-          ls $loc
+          ls ${{ steps.setup.outputs.zip }}
+          ls ${{ steps.setup.outputs.sig }}
+          ls ${{ steps.setup.outputs.pem }}
 
       - name: Pre-test builtin openssl with krux binaries and signature files
-        shell: cmd
-        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 -binary krux-v22.08.2.zip | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey selfcustody.pem -sigfile krux-v22.08.2.zip.sig
+        shell: pwsh
+        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 -binary krux-v22.08.2.zip | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
 
       - name: Clean built openssl and pre-test files
         shell: pwsh
         run: |
-          rm ${{ steps.setup.outputs.zip }}
-          rm ${{ steps.setup.outputs.sig }}
-          rm ${{ steps.setup.outputs.zip }}
-          rm -rf openssl
+          Remove-Item -Path ${{ steps.setup.outputs.zip }}
+          Remove-Item -Path ${{ steps.setup.outputs.sig }}
+          Remove-Item -Path  ${{ steps.setup.outputs.zip }}
+          Remove-Item -Recurse -Force ${{ steps.setup.outputs.openssl_build_dir }}
 
       - name: Setup node.js
         uses: actions/setup-node@v1
@@ -80,10 +82,8 @@ jobs:
           yarn run platform-install
 
       - name: Make icons
-        run: |
-          yarn run icon
-          rm ./build/*.svg
-          rm ./build/*.png
+        shell: pwsh
+        run: yarn run icon
 
       - name: Get version from package.json
         uses: polyseam/get-version-from-package-json@1.0.0
@@ -94,8 +94,7 @@ jobs:
       - name: Build KruxInstaller
         env:
           GH_TOKEN: ${{ secrets.github_token }}
-        run: |
-          yarn run build nsis
+        run: yarn run build nsis
       
       - name: Hash executable
         uses: qlrd/sha256sum-action@v1.0.0

@@ -58,8 +58,8 @@ jobs:
           Get-Content -Path ${{ steps.setup.outputs.pem }}
       
       - name: Pre-test builtin openssl with krux binaries and signature files
-        shell: pwsh
-        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 -binary krux-v22.08.2.zip | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
+        shell: cmd
+        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 <${{ steps.setup.outputs.zip }} -binary | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
 
       - name: Clean built openssl and pre-test files
         shell: pwsh

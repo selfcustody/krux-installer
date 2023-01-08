@@ -42,12 +42,12 @@ jobs:
           echo "openssldir=$loc\vendor\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           
       - name: Configure, build, test and install openssl
-        uses: qlrd/compile-openssl-windows-action@v0.0.1
+        uses: qlrd/compile-openssl-windows-action@v0.0.2
         with:
+          build-type: 'plain'
           version: openssl-3.0.7
           prefix: ${{ steps.setup.outputs.prefix }}
           openssldir: ${{ steps.setup.outputs.openssldir }}
-          build-type: 'minimal'
 
       - name: Download krux binaries and signature file before pre-test
         shell: pwsh

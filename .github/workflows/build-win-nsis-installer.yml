@@ -61,14 +61,6 @@ jobs:
         shell: cmd
         run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 <${{ steps.setup.outputs.zip }} -binary | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
 
-      - name: Clean built openssl and pre-test files
-        shell: pwsh
-        run: |
-          Remove-Item -Path ${{ steps.setup.outputs.zip }}
-          Remove-Item -Path ${{ steps.setup.outputs.sig }}
-          Remove-Item -Path  ${{ steps.setup.outputs.zip }}
-          Remove-Item -Recurse -Force ${{ steps.setup.outputs.openssl_build_dir }}
-
       - name: Setup node.js
         uses: actions/setup-node@v1
         with:

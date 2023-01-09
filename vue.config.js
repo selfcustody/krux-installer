@@ -30,8 +30,7 @@ module.exports = defineConfig({
         files: [
           '!**/{README.md,.github,.browserslistrc,.eslintrc.js,vue.config.js,jsconfig.js,babel.config.js,yarn.lock}',
           '!**/bin/{krux-installer.js}',
-          '!**/build/{krux.txt}',
-          '!**/vendor/{OpenSSL/html,OpenSSL/include}'
+          '!**/build/{krux.txt,vendor/OpenSSL/html,vendor/OpenSSL/include}',
         ],
         // See
         // 'Can't load fonts in production build, vue-cli@5.0.0-alpha.6'

@@ -36,9 +36,9 @@ jobs:
           echo "pem=$loc\$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           echo "extraResources=$extraResources" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           echo "openssl_build_dir=$loc\openssl" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-          echo "release_zip=$release_url\$version\$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
-          echo "release_sig=$release_url\$version\$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-          echo "release_pem=$raw_url\$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "release_zip=$release_url/$version/$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "release_sig=$release_url/$version/$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "release_pem=$raw_url/$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           echo "prefix=$extraResources\OpenSSL" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
           echo "openssldir=$extraResources\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
       

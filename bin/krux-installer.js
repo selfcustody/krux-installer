@@ -27,10 +27,10 @@ function runner (cmd, args, env) {
 
     let service
     let bin
-    
+
     if (cmd !== 'yarn') {
       bin = join(__dirname, '..', 'node_modules', '.bin', cmd)
-    } 
+    }
     if (cmd === `yarn${process.platform === 'win32' ? '.cmd' : '' }`) {
       bin = cmd
     }
@@ -148,7 +148,6 @@ async function main() {
       args = [`electron:${action}`, '--win', target]
     }
 
-    const platform = `--${process.platform}`
     const cmd = `vue-cli-service${process.platform === 'win32' ? '.cmd' : '' }`
     runner(cmd, args)
   }

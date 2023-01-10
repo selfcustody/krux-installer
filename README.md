@@ -69,23 +69,14 @@ The `<target>` depends depends on the running platform (i.e., linux, darwin, win
     * `pkg`
     * `mas`
 
-#### Openssl for windows
+#### Builtin OpenSSL for windows in KruxInstaller
 
-If a user is installing this software for Windows OS, it must have installed a openssl. It be achieved with:
+When downloading official krux firmware versions, it is necessary to verify the signature through the OpenSSL tool, as a way to verify the authenticity of the downloaded binaries.
 
-* [Git-SCM GUI](https://git-scm.com/download/win) (RECOMENDED FOR DEVELOPERS);
-* [OpenSSL for windows](https://wiki.openssl.org/index.php/Binaries);
+On linux release, verification is easily done since such tool exists natively in operating system.
 
-If openssl isn´t installed, a message will appear requestig that user install before proceed.
+In windows releasewe are faced with the peculiarity of the operating system in question not having such a tool (see this [issue](https://github.com/qlrd/krux-installer/issues/2)).
 
-##### OpenSSL Git-SCM GUI
+So, we packaged a stable version of OpenSSL, compiled from the [source](https://github.com/openssl/openssl). The compilation process is done entirely in a reproducible virtual environment and, therefore, not locally, with the github-action [compile-openssl-windows-action](https://github.com/qlrd/compile-openssl-windows-action/actions).
 
-Git-SCM provides a complete solution for developers. If you think that you will be develop for `krux` or `krux-installer`, this is the ideal solution.
-
-##### OpenSSL for Windows
-
-If you do not think develop, the OpenSSL v3.0.7 Light will be enough.
-
-Tested versions:
-
-* [`Shining Light Productions Win64 OpenSSL v3.0.7`](https://slproweb.com/products/Win32OpenSSL.html): Win64 OpenSSL v3.0.7 Light
+Since it is compiled in a virtual environment on github, it is expected to be fully verifiable and free of malicious code. You can check the build steps in [actions](https://github.com/qlrd/krux-installer/actions).

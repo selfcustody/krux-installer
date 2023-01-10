@@ -1,8 +1,8 @@
-const { defineConfig } = require('@vue/cli-service')
-const path = require('path')
-const replace = require('replace')
-const fs = require('fs')
-const pkg = require('./package.json')
+const { defineConfig } = require('@vue/cli-service');
+const path = require('path');
+const replace = require('replace');
+const fs = require('fs');
+const pkg = require('./package.json');
 
 module.exports = defineConfig({
   configureWebpack: {
@@ -29,7 +29,11 @@ module.exports = defineConfig({
         },
         files: [
           '!**/{README.md,.github,.browserslistrc,.eslintrc.js,vue.config.js,jsconfig.js,babel.config.js,yarn.lock}',
-          '!./bin/{electron-serve.js}'
+          '!**/bin/{krux-installer.js}',
+          '!**/build/{krux.txt}',
+        ],
+        extraResources: [
+          "./extraResources"
         ],
         // See
         // 'Can't load fonts in production build, vue-cli@5.0.0-alpha.6'
@@ -50,4 +54,4 @@ module.exports = defineConfig({
       }
     }
   }
-})
+});

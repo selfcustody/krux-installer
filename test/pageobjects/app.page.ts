@@ -9,15 +9,18 @@ class App extends Page {
     this._sidePage = '#side-page'
   }
 
-  get application () {
+  get application () { 
+    // eslint-disable-next-line no-undef
     return $(this._app)
   }
 
   get sideBanner () {
+    // eslint-disable-next-line no-undef
     return $(this._sideBanner)
   }
 
   get sidePage () {
+    // eslint-disable-next-line no-undef
     return $(this._sidePage)
   }
 

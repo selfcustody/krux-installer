@@ -5,6 +5,7 @@ export default class Page {
   }
 
   get title () {
+    // eslint-disable-next-line no-undef
     return $('title')
   }
 

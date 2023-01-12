@@ -19,16 +19,6 @@ jobs:
       - name: Checkout Git repository
         uses: actions/checkout@v2
 
-      - name: Setup node.js
-        uses: actions/setup-node@v1
-        with:
-          node-version: '16.18.0'
-
-      - name: Install Node.js dependencies (Linux)
-        run: |
-          yarn install
-          yarn platform-install
-
       # See 'Testing on Headless CI Systems'
       # https://github.com/electron/electron/blob/main/docs/tutorial/testing-on-headless-ci.md
       - name: Setup Xvfb for headless tests
@@ -37,26 +27,38 @@ jobs:
           export DISPLAY=':99.0'
           Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
       
+      - name: Setup node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: '16.18.0'
 
+      - name: Install dependencies
+        run: |
+          yarn install
+          yarn platform-install
+      
       - name: Make icons
         run: |
           yarn run icon
           rm ./build/*.svg
           rm ./build/krux.png
 
-      - name: Get version from package.json
+      - name: Get version
         uses: polyseam/get-version-from-package-json@1.0.0
         id: version
         with:
           path-to-package-json: ./package.json
 
-      - name: Build KruxInstaller
+      - name: Lint
+        run: yarn run lint
+
+      - name: Build
         env:
           GH_TOKEN: ${{ secrets.github_token }}
         run: yarn run build AppImage
     
-      - name: E2E Test KruxInstaller
-        run: xvfb-maybe yarn run test
+      - name: E2E Test
+        run: yarn run test
 
       - name: Hash executable
         uses: qlrd/sha256sum-action@v1.0.0

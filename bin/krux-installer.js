@@ -90,6 +90,8 @@ async function main() {
     runner(`vue-cli-service${process.platform === 'win32' ? '.cmd' : '' }`, ['lint'])
     runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ join(__dirname, '..', 'public') ])
     runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ join(__dirname, '..', 'src') ])
+    runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ '--ext', 'ts', join(__dirname, '..', 'test/pageobjects') ])
+    runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ '--ext', 'ts', join(__dirname, '..', 'test/specs') ])
   }
 
   if (action === 'icon') {

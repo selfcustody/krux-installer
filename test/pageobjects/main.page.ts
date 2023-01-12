@@ -13,31 +13,38 @@ class Main extends Page {
     this._selectWriteCardSubtitle = '#select-write-card-subtitle'
   }
 
-  get page () {
+  get page () { 
+    // eslint-disable-next-line no-undef
     return $(this._main)
   }
 
-  get selectDeviceCard () {
+  get selectDeviceCard () { 
+    // eslint-disable-next-line no-undef
     return $(this._selectDeviceCard)
   }
 
-  get selectVersionCard () {
+  get selectVersionCard () { 
+    // eslint-disable-next-line no-undef
     return $(this._selectVersionCard)
   }
 
-  get selectWriteCard () {
+  get selectWriteCard () { 
+    // eslint-disable-next-line no-undef
     return $(this._selectWriteCard)
   }
  
-  get selectDeviceCardSubtitle () {
+  get selectDeviceCardSubtitle () { 
+    // eslint-disable-next-line no-undef
     return $(this._selectDeviceCardSubtitle)
   }
 
-  get selectVersionCardSubtitle () {
+  get selectVersionCardSubtitle () { 
+    // eslint-disable-next-line no-undef
     return $(this._selectVersionCardSubtitle)
   }
 
-  get selectWriteCardSubtitle () {
+  get selectWriteCardSubtitle () { 
+    // eslint-disable-next-line no-undef
     return $(this._selectWriteCardSubtitle)
   }
 }

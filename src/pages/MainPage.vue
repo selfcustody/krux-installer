@@ -14,7 +14,7 @@
                 </v-btn>
               </v-card-actions>
             </v-card>
-            <v-card class="select-version-card" class="ma-5 pa-5">
+            <v-card id="select-version-card" class="ma-5 pa-5">
               <v-card-subtitle id="select-version-card-subtitle">
                 Select between <b>selfcustody</b> (official) or <b>odudex</b> (test) releases
               </v-card-subtitle>

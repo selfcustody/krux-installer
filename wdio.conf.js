@@ -1,5 +1,5 @@
 const { join } = require('path');
-const { name, version } = require('./package.json')
+const { name } = require('./package.json')
 
 exports.config = {
     //

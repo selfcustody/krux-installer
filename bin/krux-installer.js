@@ -162,12 +162,30 @@ async function main() {
       const version = dependencies[name];
       const module = join(__dirname, '..', 'node_modules', name)
       console.log(`  \x1b[34m\u2022\x1b[0m installing platform dependency ${name} for ${process.platform}`)
-      runner(`yarn${process.platform === 'win32' ? '.cmd' : '' }`, ['add', `${name}@${version}`])
+      runner(`yarn${process.platform === 'win32' ? '.cmd' : '' }`, ['add', '--dev', `${name}@${version}`])
     }
   }
 
   if (action === 'install-app-deps') {
     runner(`electron-builder${process.platform === 'win32' ? '.cmd' : '' }`, [action])
+  }
+
+  if (action === 'test') {
+    const wdioconf = join(__dirname, '..', 'wdio.conf.js')
+
+    if (process.platform === 'linux') {
+      runner('xvfb-maybe', ['wdio', 'run', wdioconf ], {
+        ...process.env,
+        NODE_ENV: 'test',
+        DEBUG: 'krux:*'
+      })
+    } else {
+      runner(`wdio${process.platform === 'win32' ? '.cmd' : '' }`, ['run', wdioconf], {
+        ...process.env,
+        NODE_ENV: 'test',
+        DEBUG: 'krux:*'
+      })
+    }
   }
 
   try {

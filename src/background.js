@@ -45,7 +45,6 @@ import storeSet from './lib/store-set'
 import storeGet from './lib/store-get'
 import flash from './lib/flash'
 import { existsAsync } from './lib/utils/fs-async'
-
 /*
  * Environment variables setup section
  */
@@ -103,7 +102,8 @@ async function createWindow() {
       enableRemoteModule: process.env.ELECTRON_NODE_INTEGRATION || false,
       // eslint-disable-next-line no-undef
       preload: join(__static, 'preload.js')
-    }
+    },
+    show: process.env.NODE_ENV === 'test'
   }
 
   debug('Creating window')

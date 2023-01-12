@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - linux-appimage-wdio
     pull_request:
       branches:
         - main
@@ -24,7 +25,18 @@ jobs:
           node-version: '16.18.0'
 
       - name: Install Node.js dependencies (Linux)
-        run: yarn install
+        run: |
+          yarn install
+          yarn platform-install
+
+      # See 'Testing on Headless CI Systems'
+      # https://github.com/electron/electron/blob/main/docs/tutorial/testing-on-headless-ci.md
+      - name: Setup Xvfb for headless tests
+        run: |
+          sudo apt-get install -y xvfb
+          export DISPLAY=':99.0'
+          Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+      
 
       - name: Make icons
         run: |
@@ -41,13 +53,16 @@ jobs:
       - name: Build KruxInstaller
         env:
           GH_TOKEN: ${{ secrets.github_token }}
-        run: |
-          yarn run build AppImage
-      
+        run: yarn run build AppImage
+    
+      - name: E2E Test KruxInstaller
+        run: xvfb-maybe yarn run test
+
       - name: Hash executable
         uses: qlrd/sha256sum-action@v1.0.0
         with:
           path-to-file: dist_electron/KruxInstaller-${{ steps.version.outputs.version }}.AppImage
+
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

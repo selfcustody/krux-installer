@@ -1,11 +1,11 @@
 <template>
-  <v-layout row>
+  <v-layout id="main-page" row>
     <v-flex xs12 sm12>
       <v-container>
         <v-row dense>
           <v-col cols="12"> 
-            <v-card class="ma-5 pa-5">
-              <v-card-subtitle>
+            <v-card id="select-device-card" class="ma-5 pa-5">
+              <v-card-subtitle id="select-device-card-subtitle">
                 Select between available devices (m5stickV, amigo, bit, dock)
               </v-card-subtitle>
               <v-card-actions>
@@ -14,8 +14,8 @@
                 </v-btn>
               </v-card-actions>
             </v-card>
-            <v-card class="ma-5 pa-5">
-              <v-card-subtitle>
+            <v-card class="select-version-card" class="ma-5 pa-5">
+              <v-card-subtitle id="select-version-card-subtitle">
                 Select between <b>selfcustody</b> (official) or <b>odudex</b> (test) releases
               </v-card-subtitle>
               <v-card-actions>
@@ -24,8 +24,8 @@
                 </v-btn>
               </v-card-actions>
             </v-card>
-            <v-card class="ma-5 pa-5">
-              <v-card-subtitle>
+            <v-card id="select-write-card" class="ma-5 pa-5">
+              <v-card-subtitle id="select-write-card-subtitle">
                 Flash to device with <b>{{ ktool }}</b>
               </v-card-subtitle>
               <v-card-actions> 

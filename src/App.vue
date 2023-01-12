@@ -2,10 +2,20 @@
   <v-app>
     <v-main>
       <v-layout column wrap>
-        <v-flex xs2 sm2 class="mx-auto my-auto">
-          <KruxLogo />
+        <v-flex
+          xs2
+          sm2
+          id="side-banner"
+          class="mx-auto my-auto"
+        >
+          <KruxLogo id="krux-banner" />
         </v-flex>
-        <v-flex xs10 sm10 class="mx-auto my-auto">
+        <v-flex
+          xs10
+          sm10
+          class="mx-auto my-auto"
+          id="side-page"
+        >
           <component
             :is="page"
             @onSuccess="handleSuccess"

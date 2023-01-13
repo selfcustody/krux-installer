@@ -102,8 +102,7 @@ async function createWindow() {
       enableRemoteModule: process.env.ELECTRON_NODE_INTEGRATION || false,
       // eslint-disable-next-line no-undef
       preload: join(__static, 'preload.js')
-    },
-    show: process.env.NODE_ENV === 'test'
+    }
   }
 
   debug('Creating window')

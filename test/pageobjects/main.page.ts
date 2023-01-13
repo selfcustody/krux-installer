@@ -8,9 +8,14 @@ class Main extends Page {
     this._selectDeviceCard = '#select-device-card'
     this._selectVersionCard = '#select-version-card'
     this._selectWriteCard = '#select-write-card'
+    
     this._selectDeviceCardSubtitle = '#select-device-card-subtitle'
     this._selectVersionCardSubtitle = '#select-version-card-subtitle'
-    this._selectWriteCardSubtitle = '#select-write-card-subtitle'
+    this._selectWriteCardSubtitle = '#select-write-card-subtitle' 
+    
+    this._selectDeviceButton = '#select-device-button'
+    this._selectVersionButton = '#select-version-button'
+    this._selectWriteButton = '#select-write-button'
   }
 
   get page () { 
@@ -46,6 +51,21 @@ class Main extends Page {
   get selectWriteCardSubtitle () { 
     // eslint-disable-next-line no-undef
     return $(this._selectWriteCardSubtitle)
+  }
+
+  get selectDeviceButton () { 
+    // eslint-disable-next-line no-undef
+    return $(this._selectDeviceButton)
+  }
+
+  get selectVersionButton () { 
+    // eslint-disable-next-line no-undef
+    return $(this._selectVersionButton)
+  }
+
+  get selectWriteButton () { 
+    // eslint-disable-next-line no-undef
+    return $(this._selectWriteButton)
   }
 }
 

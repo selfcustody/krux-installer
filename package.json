@@ -41,6 +41,7 @@
     "@wdio/mocha-framework": "^8.1.2",
     "@wdio/spec-reporter": "^8.1.2",
     "aasvg": "^0.3.3",
+    "chai": "^4.3.7",
     "chromedriver": "^109.0.0",
     "electron": "22.0.0",
     "electron-builder": "^23.6.0",

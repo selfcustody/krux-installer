@@ -140,7 +140,7 @@ exports.config = {
         {
           appPath: join(__dirname, 'dist_electron'),
           appName: name,
-          appArgs: [],
+          appArgs: ['--enable-logging'],
           chromedriver: {
             port: 9519,
             logFileName: join(__dirname, 'wdio-chromedriver.log'),

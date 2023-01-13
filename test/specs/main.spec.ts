@@ -53,6 +53,7 @@ describe('KruxInstaller MainPage', () => {
     expectWDIO(Main.selectWriteButton).toBeDisplayed()
   })
 
+  // eslint-disable-next-line no-undef
   it('should subtitles have correct texts', () => {
 
     // eslint-disable-next-line no-undef
@@ -97,18 +98,27 @@ describe('KruxInstaller MainPage', () => {
     expectWDIO(Main.selectWriteButton).toBeClickable()
   })
 
+  // eslint-disable-next-line no-undef
   it('should \'select device\' button to be the correct initial text', async () => {
     const deviceButtonText = await Main.selectDeviceButton.$('span.v-btn__content').getText() 
+    
+    // eslint-disable-next-line no-undef
     expectChai(deviceButtonText).to.be.equal(' SELECT DEVICE')
   })
 
+  // eslint-disable-next-line no-undef
   it('should \'select version\' button to be the correct initial text', async () => {
     const versionButtonText = await Main.selectVersionButton.$('span.v-btn__content').getText() 
+
+    // eslint-disable-next-line no-undef
     expectChai(versionButtonText).to.be.equal(' SELECT VERSION')
   })
 
+  // eslint-disable-next-line no-undef
   it('should \'flash\' button to be the correct initial text', async () => {
     const writeButtonText = await Main.selectWriteButton.$('span.v-btn__content').getText() 
+    
+    // eslint-disable-next-line no-undef
     expectChai(writeButtonText).to.be.equal(' FLASH')
   })
 })

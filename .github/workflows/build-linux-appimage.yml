@@ -25,7 +25,7 @@ jobs:
         run: sudo apt-get install -y xvfb
       
       - name: Setup node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: '16.18.0'
 

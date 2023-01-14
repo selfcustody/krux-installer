@@ -1,5 +1,30 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
+if (process.env.WDIO_ELECTRON === 'true') {
+  const validChannels = [
+    'wdio-electron',
+    'wdio-electron.app'
+  ];
+  const invoke = async (channel, ...data) => {
+    if (!validChannels.includes(channel)) {
+        throw new Error(`Channel "${channel}" is invalid`);
+    }
+    if (!process.env.WDIO_ELECTRON) {
+        throw new Error('Electron APIs can not be invoked outside of WDIO');
+    }
+    return ipcRenderer.invoke(channel, data);
+  };
+
+  contextBridge.exposeInMainWorld('wdioElectron', {
+    custom: {
+      invoke: async (...args) => await invoke('wdio-electron', ...args)
+    },
+    app: {
+      invoke: async (funcName, ...args) => await invoke('wdio-electron.app', funcName, ...args)
+    }
+  })
+}
+
 contextBridge.exposeInMainWorld('KruxInstaller', {
   client: {
     async started () {

@@ -176,7 +176,7 @@ async function main() {
     const wdioconf = join(__dirname, '..', 'wdio.conf.js')
 
     if (process.platform === 'linux') {
-      runner('xvfb-maybe', ['wdio', 'run', wdioconf ])
+      runner('xvfb-maybe', ['wdio', 'run', wdioconf])
     } else {
       runner(`wdio${process.platform === 'win32' ? '.cmd' : '' }`, ['run', wdioconf])
     }

@@ -35,14 +35,14 @@ function runner (cmd, args, env) {
       bin = cmd
     }
 
-    console.log(`  \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m`);
+    console.log(`  running \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m`);
 
     if (args.indexOf('<') !== -1 || args.indexOf('>') !== -1) {
       resolve(await new Promise(function(res, rej) {
         exec(`${bin} ${args.join(' ')}`, function (error, stdout, stderr) {
           if (error) rej(error)
           if (stderr) rej(new Error(stderr))
-          res(`  \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: 0`);
+          res(`  finished \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: 0`);
         })
       }))
     } else {
@@ -58,7 +58,7 @@ function runner (cmd, args, env) {
         service.stderr.on('data', onData)
 
         service.on('close', function(code) {
-          res(`  \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: ${code}`);
+          res(`  finished \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: ${code}`);
         });
       }))
     }
@@ -176,17 +176,9 @@ async function main() {
     const wdioconf = join(__dirname, '..', 'wdio.conf.js')
 
     if (process.platform === 'linux') {
-      runner('xvfb-maybe', ['wdio', 'run', wdioconf ], {
-        ...process.env,
-        NODE_ENV: 'test',
-        DEBUG: 'krux:*'
-      })
+      runner('xvfb-maybe', ['wdio', 'run', wdioconf ])
     } else {
-      runner(`wdio${process.platform === 'win32' ? '.cmd' : '' }`, ['run', wdioconf], {
-        ...process.env,
-        NODE_ENV: 'test',
-        DEBUG: 'krux:*'
-      })
+      runner(`wdio${process.platform === 'win32' ? '.cmd' : '' }`, ['run', wdioconf])
     }
   }
 

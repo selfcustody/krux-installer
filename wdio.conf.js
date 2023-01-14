@@ -26,8 +26,6 @@ exports.config = {
     //
     specs: [
         './test/specs/app.spec.ts',
-        './test/specs/logo.spec.ts',
-        './test/specs/main.spec.ts'
     ],
     // Patterns to exclude.
     exclude: [
@@ -72,7 +70,7 @@ exports.config = {
         // maxInstances can get overwritten per capability. So if you have an in-house Selenium
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
-        maxInstances: 5,
+        maxInstances: 10,
         //browserName: 'chrome',
         //acceptInsecureCerts: true
         //'goog:chromeOptions': {

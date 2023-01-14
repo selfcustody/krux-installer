@@ -1,6 +1,6 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
-contextBridge.exposeInMainWorld('KruxInstaller',{
+contextBridge.exposeInMainWorld('KruxInstaller', {
   client: {
     async started () {
       await ipcRenderer.invoke('window-started')
@@ -216,4 +216,4 @@ contextBridge.exposeInMainWorld('KruxInstaller',{
   // onGetSdcard(callback) {
   //   ipcRenderer.on('store:get:sdcard', callback)
   // },
-})
+});

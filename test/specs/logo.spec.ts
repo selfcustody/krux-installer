@@ -1,4 +1,3 @@
-import { expect as expectChai } from 'chai'
 import { expect as expectWDIO } from '@wdio/globals'
 import Logo from '../pageobjects/logo.page'
 

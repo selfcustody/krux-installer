@@ -18,11 +18,13 @@ describe('KruxInstaller configuration', () => {
     expectChai(p).to.be.not.equal(undefined)
     expectChai(p).to.have.property('appData')
     expectChai(p.appData).to.be.a('string')
-      
+    console.log(p.appData)
+
     const existsAppData = await existsAsync(p.appData)
     expectChai(existsAppData).to.be.equal(true)
 
     const kruxPath = join(p.appData, name)
+    console.log(kruxPath)
     const existsKrux = await existsAsync(kruxPath)
     expectChai(existsKrux).to.be.equal(true)
   })
@@ -67,7 +69,7 @@ describe('KruxInstaller configuration', () => {
       
     const docs = 'Documents|Documentos|Documenten|Documenti|Unterlagen'
     if (process.platform === 'linux') {
-      const regexp = new RegExp(`/home/[a-zA-Z0-9\/]+/(${docs})/${name}`, 'g')
+      const regexp = new RegExp(`/home/[a-zA-Z0-9/]+/(${docs})/${name}`, 'g')
       expectChai(config.resources).to.match(regexp)
       expectChai(config).to.have.property('isMac10', false)
     }

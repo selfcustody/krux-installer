@@ -1,6 +1,5 @@
 import { expect as expectChai } from 'chai'
 import { expect as expectWDIO } from '@wdio/globals'
-import { name, version } from '../../package.json'
 import Main from '../pageobjects/main.page'
 
 // eslint-disable-next-line no-undef

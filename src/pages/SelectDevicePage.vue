@@ -14,18 +14,27 @@
           <v-icon>mdi-devices</v-icon>
           Choose the firmware's device that you want install
         </v-card-title>
-        <v-card-content>
+        <v-card-content
+          id="select-device-page-card-content"
+        >
           <v-select
             v-model="device"
             :items="devices"
             label="Device"
+            id="select-device-page-form-select"
           />
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="select">
+          <v-btn
+            @click.prevent="select"
+            id="select-device-page-form-select-button"
+          >
             Select
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
+          <v-btn 
+            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            id="select-device-page-form-back-button"
+          >
             Back
           </v-btn>
         </v-card-actions>

@@ -26,10 +26,11 @@ exports.config = {
     // will be called from there.
     //
     specs: [
+      './test/specs/config.spec.ts',
       './test/specs/app.spec.ts',
       './test/specs/logo.spec.ts',
       './test/specs/main.spec.ts',
-      './test/specs/config.spec.ts'
+      './test/specs/select-device.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [
@@ -215,7 +216,7 @@ exports.config = {
       // and then start to test
       return new Promise(function(resolve, reject) {
         const test = cid.split('-')[1]
-        if (test === '3') {
+        if (test === '0') {
           console.log('------------------------------------')
           console.log('INTERMEDIATE RUNNING TO CREATE STORE')
           if (process.platform === 'linux') {

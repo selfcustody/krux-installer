@@ -4,10 +4,13 @@
     justify-start
     row
     fill-height
+    id="select-device-page"
   >
     <v-flex xs12 sm4>
       <v-card class="ma-5 pa-5">
-        <v-card-title>
+        <v-card-title
+          id="select-device-page-card-title"
+        >
           <v-icon>mdi-devices</v-icon>
           Choose the firmware's device that you want install
         </v-card-title>

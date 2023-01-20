@@ -31,6 +31,7 @@ exports.config = {
       './test/specs/logo.spec.ts',
       './test/specs/main.spec.ts',
       './test/specs/select-device.spec.ts',
+      './test/specs/select-version.spec.ts'
     ],
     // Patterns to exclude.
     exclude: [

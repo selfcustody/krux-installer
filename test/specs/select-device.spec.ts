@@ -46,7 +46,6 @@ describe('SelectDevice page', () => {
     it('should have a form to select devices', async () => {
       expectWDIO(SelectDevice.cardContent).toExist()
       expectWDIO(SelectDevice.formSelect).toExist()
-      expectWDIO(SelectDevice.formSelect).toExist()
       expectWDIO(SelectDevice.formSelectLabel).toExist() 
       expectWDIO(SelectDevice.selectButton).toExist()
       expectWDIO(SelectDevice.backButton).toExist()

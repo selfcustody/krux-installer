@@ -11,6 +11,7 @@ class SelectDevice extends Page {
     this._overlayContainer = '#' 
     this._selectButton = '#select-device-page-form-select-button'
     this._backButton = '#select-device-page-form-back-button'
+    this._selected = '.v-select__selection-text'
   }
 
   get page () { 
@@ -55,14 +56,44 @@ class SelectDevice extends Page {
     return $('.v-overlay-container')
   }
 
+  get selected () { 
+    // eslint-disable-next-line no-undef
+    return $(this._selected)
+  }
+
+  get list_item_m5stickv () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[0]
+  }
+
+  get list_item_amigo_ips () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[1]
+  }
+
+  get list_item_amigo_tft () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[2]
+  }
+
+  get list_item_bit () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[3]
+  }
+
+  get list_item_dock () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[4]
+  }
+
   get selectButton () {
     // eslint-disable-next-line no-undef
-    return $(`${this._selectButton}`)
+    return $(this._selectButton)
   }
 
   get backButton () {
     // eslint-disable-next-line no-undef
-    return $(`${this._backButton}`)
+    return $(this._backButton)
   }
 }
 

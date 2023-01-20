@@ -215,8 +215,7 @@ exports.config = {
       // that create the store, kill it
       // and then start to test
       return new Promise(function(resolve, reject) {
-        const test = cid.split('-')[1]
-        if (test === '0') {
+        if (specs[0].indexOf('config.spec.ts') !== -1) {
           console.log('------------------------------------')
           console.log('INTERMEDIATE RUNNING TO CREATE STORE')
           if (process.platform === 'linux') {

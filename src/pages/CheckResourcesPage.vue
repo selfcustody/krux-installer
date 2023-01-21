@@ -4,11 +4,17 @@
     justify-start
     row
     fill-height
+    id="check-resources-page"
   >
     <v-flex xs12>
-      <v-card flat>
-        <v-card-title>
-          Checking...
+      <v-card
+        flat
+        id="check-resources-page-card"
+      >
+        <v-card-title
+          id="check-resources-page-card-title"
+        >
+          Checking between official or test resources...
         </v-card-title>
       </v-card>
     </v-flex>

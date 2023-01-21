@@ -102,7 +102,7 @@ describe('SelectDevice page', () => {
     it('click on arrow first time and expand list', async () => {
       expectWDIO(SelectDevice.formArrow).toBeDisplayed()
       expectWDIO(SelectDevice.formOverlayContainer).not.toBeDisplayed()
-      SelectDevice.formArrowWrapper.toHaveAttr('aria-expanded', 'false')
+      expectWDIO(SelectDevice.formArrowWrapper).toHaveAttr('aria-expanded', 'false')
       await SelectDevice.formArrow.click()
       await delay(1000)
       expectWDIO(SelectDevice.formOverlayContainer).toBeDisplayed()

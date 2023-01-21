@@ -4,13 +4,18 @@
     justify-start
     row
     fill-height
+    id="download-official-release-page"
   >
     <v-flex xs12>
       <v-card flat>
-        <v-card-title>
+        <v-card-title
+          id="download-official-release-page-card-title"
+        >
           Downloading...
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle
+          id="download-official-release-page-card-subtitle"
+        >
           <b>{{ baseUrl }}/{{ version }}/krux-{{ version }}.zip</b>
         </v-card-subtitle>
         <v-card-actions>

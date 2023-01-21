@@ -4,6 +4,7 @@
     justify-start
     row
     fill-height
+    id="check-resources-official-release-page"
   > 
     <v-flex
       v-if="!checked"
@@ -18,8 +19,11 @@
                 color="green"
               />
             </v-flex>
-            <v-flex xs8 sm12>
-              Checking...
+            <v-flex
+              xs8
+              sm12
+              id="check-resources-official-releases-page-card-title-checking">
+              Checking official release...
             </v-flex>
           </v-layout>
         </v-card-title>

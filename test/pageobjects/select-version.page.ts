@@ -12,7 +12,8 @@ class SelectVersion extends Page {
     this._cardSubtitleTest = '#select-version-page-card-subtitle-test'  
     this._formSelect = '#select-version-page-form-select-versions' 
     this._selectButton = '#select-version-page-form-select-versions-button'
-    this._backButton = '#select-device-page-form-select-versions-back-button'
+    this._backButton = '#select-device-page-form-select-versions-back-button' 
+    this._selected = '.v-select__selection-text'
   }
 
   get page () { 
@@ -71,6 +72,45 @@ class SelectVersion extends Page {
 
   get formArrowWrapper () {
     return this.formArrowContainer.$('div.v-input__control').$('div.v-field')
+  }
+
+  get formArrow () {
+    return this.formArrowWrapper.$('div.v-field__append-inner').$('i')
+  }
+
+  get formOverlayContainer () {
+    // eslint-disable-next-line no-undef
+    return $('.v-overlay-container')
+  }
+
+  get list_item_22_03_0 () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[0]
+  }
+
+  get list_item_22_08_0 () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[1]
+  }
+
+  get list_item_22_08_1 () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[2]
+  }
+
+  get list_item_22_08_2 () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[3]
+  }
+
+  get list_item_krux_binaries () { 
+    // eslint-disable-next-line no-undef
+    return $$('.v-list>.v-list-item')[4]
+  }
+
+  get selected () { 
+    // eslint-disable-next-line no-undef
+    return $(this._selected)
   }
 }
 

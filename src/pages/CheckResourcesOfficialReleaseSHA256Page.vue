@@ -4,6 +4,7 @@
     justify-start
     row
     fill-height
+    id="check-resources-official-release-sha256-page"
   > 
     <v-flex
       v-if="!checked"
@@ -18,8 +19,8 @@
                 color="green"
               />
             </v-flex>
-            <v-flex xs8 sm12>
-              Checking...
+            <v-flex xs8 sm12 id="check-resources-official-release-sha256-page-card-title-checking">
+              Checking official release sha256.txt...
             </v-flex>
           </v-layout>
         </v-card-title>
@@ -37,7 +38,9 @@
           Already downloaded
         </v-card-subtitle>
         <v-card-content>
-          <v-card-text>
+          <v-card-text
+            id="check-resources-official-release-sha256-page-card-title-checked"
+          >
             Click "OK" to dowload again or "Cancel" to proceed with the downloaded version.
           </v-card-text>
         </v-card-content>

@@ -24,7 +24,7 @@
             height="25"
             color="blue-grey"
           >
-            <strong>{{ progress }}%</strong>
+            <strong id="download-official-release-page-card-progress-linear-text">{{ progress }}%</strong>
           </v-progress-linear>
         </v-card-actions>
       </v-card>

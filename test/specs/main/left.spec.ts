@@ -1,18 +1,23 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import Logo from '../pageobjects/logo.page'
+import Logo from '../../pageobjects/logo.page'
 
 // eslint-disable-next-line no-undef
 describe('Sided logo', () => {
 
   // eslint-disable-next-line no-undef
-  it('should have banner', () => { 
-    expectWDIO(Logo.banner).toBeDisplayed()
+  it('should have banner', async () => { 
+    await expectWDIO(Logo.banner).toBeDisplayed()
   })
 
   // eslint-disable-next-line no-undef
-  it('should have asciiart', () => { 
-    expectWDIO(Logo.asciiart).toBeDisplayed()
-    expectWDIO(Logo.asciiart).toHaveText([ 
+  it('should have asciiart', async () => { 
+    await expectWDIO(Logo.asciiart).toBeDisplayed()
+  })
+
+  
+  // eslint-disable-next-line no-undef
+  it('should asciiart be correct', async () => { 
+    await expectWDIO(Logo.asciiart).toHaveText([ 
       "     ██        ",
       "     ██        ",
       "     ██        ",
@@ -28,8 +33,8 @@ describe('Sided logo', () => {
   })
 
   // eslint-disable-next-line no-undef
-  it('should have title text', () => {
-    expectWDIO(Logo.title).toBeDisplayed()
-    expectWDIO(Logo.title).toHaveText('Krux Installer')
+  it('should have title text', async () => {
+    await expectWDIO(Logo.title).toBeDisplayed()
+    await expectWDIO(Logo.title).toHaveText('Krux Installer')
   })
 })

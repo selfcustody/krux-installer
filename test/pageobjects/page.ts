@@ -9,4 +9,8 @@ export default class Page {
     return $('title')
   }
 
+  get page () {
+    // eslint-disable-next-line no-undef
+    return $(this._main)
+  }
 }

@@ -28,10 +28,23 @@ exports.config = {
     specs: [
       './test/specs/config.spec.ts',
       './test/specs/app.spec.ts',
-      './test/specs/logo.spec.ts',
-      './test/specs/main.spec.ts',
-      './test/specs/select-device.spec.ts',
-      './test/specs/select-version.spec.ts'
+      './test/specs/main/left.spec.ts',
+      './test/specs/main/right.spec.ts',
+      './test/specs/select-device/before-change.spec.ts',
+      './test/specs/select-device/on-change.spec.ts',
+      './test/specs/select-device/back-without-select.spec.ts',
+      './test/specs/select-device/expand-unexpand-list.spec.ts',
+      './test/specs/select-device/m5stickv.spec.ts',
+      './test/specs/select-device/amigo-ips.spec.ts',
+      './test/specs/select-device/amigo-tft.spec.ts',
+      './test/specs/select-device/bit.spec.ts',
+      './test/specs/select-device/dock.spec.ts',
+      './test/specs/select-version/before-change.spec.ts',
+      './test/specs/select-version/on-change.spec.ts',
+      './test/specs/select-version/back-without-select.spec.ts',
+      './test/specs/select-version/expand-unexpand-list.spec.ts',
+      './test/specs/select-version/select-v22.03.0.spec.ts',
+      './test/specs/select-version/download-v22.03.0.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [

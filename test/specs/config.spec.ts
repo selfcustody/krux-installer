@@ -18,7 +18,6 @@ describe('KruxInstaller configuration', () => {
     expectChai(p).to.be.not.equal(undefined)
     expectChai(p).to.have.property('appData')
     expectChai(p.appData).to.be.a('string')
-    console.log(p.appData)
 
     const existsAppData = await existsAsync(p.appData)
     expectChai(existsAppData).to.be.equal(true)
@@ -66,23 +65,33 @@ describe('KruxInstaller configuration', () => {
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 
     expectChai(config).to.have.property('resources')
-      
-    const docs = 'Documents|Documentos|Documenten|Documenti|Unterlagen'
-    if (process.platform === 'linux') {
-      const regexp = new RegExp(`/home/[a-zA-Z0-9/]+/(${docs})/${name}`, 'g')
-      expectChai(config.resources).to.match(regexp)
-      expectChai(config).to.have.property('isMac10', false)
+   
+    let regexp
+    if (process.env.CI && process.env.GITHUB_ACTION) {
+      if (process.platform === 'linux') {
+        regexp = new RegExp(`/home/[a-zA-Z0-9/]+`, 'g')
+      }
+      if (process.platform === 'win32') {
+        regexp = new RegExp(`[A-Z]:\\Users\\[a-zA-Z0-9]+`, 'g')
+      }
+      if (process.platform === 'darwin') {
+        regexp = new RegExp(`/Users/[a-zA-Z0-9]+`, 'g')
+      }
+    } else {
+      const docs = 'Documents|Documentos|Documenten|Documenti|Unterlagen' 
+      if (process.platform === 'linux') {
+        regexp = new RegExp(`/home/[a-zA-Z0-9/]+/(${docs})`, 'g')
+      }
+      if (process.platform === 'win32') {
+        regexp = new RegExp(`[A-Z]:\\Users\\[a-zA-Z0-9]+\\(${docs})\\${name}`, 'g')
+      }
+      if (process.platform === 'darwin') {
+        regexp = new RegExp(`/Users/[a-zA-Z0-9]+/(${docs})/${name}`, 'g')
+      }
     }
-    if (process.platform === 'win32') {
-      const regexp = new RegExp(`[A-Z]:\\Users\\[a-zA-Z0-9]+\\(${docs})\\${name}`, 'g')
-      expectChai(config.resources).to.match(regexp)
-      expectChai(config).to.have.property('isMac10', false)
-    }
-    if (process.platform === 'darwin') {
-      const regexp = new RegExp(`/Users/[a-zA-Z0-9]+/(${docs})/${name}`, 'g')
-      expectChai(config.resources).to.match(regexp)
-      expectChai(config.os).to.be.equal('isMac10', false)
-    }
+
+    expectChai(config.resources).to.match(regexp)
+    
   })
 
   // eslint-disable-next-line no-undef

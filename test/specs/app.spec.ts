@@ -3,19 +3,9 @@ import { expect as expectWDIO } from '@wdio/globals'
 import { name, version } from '../../package.json'
 import App from '../pageobjects/app.page'
 
-const waitFor = function(ms) {
-  return new Promise(function(resolve) {
-    setTimeout(resolve, ms)
-  })
-}
 
 // eslint-disable-next-line no-undef
 describe('KruxInstaller initialization', () => {
-
-  // eslint-disable-next-line no-undef
-  it('should wait', async () => {
-    await waitFor(10000)
-  })
 
   // eslint-disable-next-line no-undef
   it('should be ready', async () => {
@@ -40,8 +30,8 @@ describe('KruxInstaller initialization', () => {
   })
 
   // eslint-disable-next-line no-undef
-  it('should launch with correct title', () => { 
-    expectWDIO(App.title).toHaveText(name)
+  it('should launch with correct title', async () => { 
+    await expectWDIO(App.title).toHaveText(name)
   })
 })
 

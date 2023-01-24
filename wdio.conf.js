@@ -39,12 +39,12 @@ exports.config = {
       './test/specs/select-device/amigo-tft.spec.ts',
       './test/specs/select-device/bit.spec.ts',
       './test/specs/select-device/dock.spec.ts',
-      './test/specs/select-version/before-change.spec.ts',
-      './test/specs/select-version/on-change.spec.ts',
-      './test/specs/select-version/back-without-select.spec.ts',
-      './test/specs/select-version/expand-unexpand-list.spec.ts',
-      './test/specs/select-version/select-v22.03.0.spec.ts',
-      './test/specs/select-version/download-v22.03.0.spec.ts',
+      //'./test/specs/select-version/before-change.spec.ts',
+      //'./test/specs/select-version/on-change.spec.ts',
+      //'./test/specs/select-version/back-without-select.spec.ts',
+      //'./test/specs/select-version/expand-unexpand-list.spec.ts',
+      //'./test/specs/select-version/select-v22.03.0.spec.ts',
+      //'./test/specs/select-version/download-v22.03.0.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [

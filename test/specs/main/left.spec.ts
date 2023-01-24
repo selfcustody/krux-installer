@@ -1,10 +1,5 @@
-import { join } from 'path'
-import { writeFile } from 'fs'
-import { promisify } from 'util'
 import { expect as expectWDIO } from '@wdio/globals'
 import Logo from '../../pageobjects/logo.page'
-
-const write = promisify(writeFile)
 
 // eslint-disable-next-line no-undef
 describe('Sided logo', () => {

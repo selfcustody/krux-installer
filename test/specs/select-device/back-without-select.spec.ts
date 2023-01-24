@@ -5,7 +5,7 @@ import Main from '../../pageobjects/main.page'
 import SelectDevice from '../../pageobjects/select-device.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectDevice click \'SELECT DEVICE\' and back to main menu', () => {
+describe('SelectDevicePage: click \'SELECT DEVICE\' and back to MainPage', () => {
 
   // eslint-disable-next-line no-undef
   before(async () => {

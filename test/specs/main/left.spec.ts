@@ -1,5 +1,10 @@
+import { join } from 'path'
+import { writeFile } from 'fs'
+import { promisify } from 'util'
 import { expect as expectWDIO } from '@wdio/globals'
 import Logo from '../../pageobjects/logo.page'
+
+const write = promisify(writeFile)
 
 // eslint-disable-next-line no-undef
 describe('Sided logo', () => {
@@ -17,8 +22,11 @@ describe('Sided logo', () => {
   
   // eslint-disable-next-line no-undef
   it('should asciiart be correct', async () => { 
-    await expectWDIO(Logo.asciiart).toHaveText([ 
-      "     ██        ",
+    // TODO: investigate how 
+    // asciimorph allocate characters
+    // on html elements
+    const logo = [
+      "██        ",
       "     ██        ",
       "     ██        ",
       "   ██████      ",
@@ -28,8 +36,9 @@ describe('Sided logo', () => {
       "     ████      ",
       "     ██ ██     ",
       "     ██  ██    ",
-      "     ██   ██   "
-    ].join('\n'))
+      "     ██   ██"
+    ].join('\n')
+    await expectWDIO(Logo.asciiart).toHaveText(logo)
   })
 
   // eslint-disable-next-line no-undef

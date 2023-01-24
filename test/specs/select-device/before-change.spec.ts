@@ -3,7 +3,7 @@ import Main from '../../pageobjects/main.page'
 import SelectDevice from '../../pageobjects/select-device.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectDevice page before change', () => {
+describe('SelectDevicePage: before change', () => {
   
   // eslint-disable-next-line no-undef
   it('should be in MainPage', async () => { 

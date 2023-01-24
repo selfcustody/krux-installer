@@ -4,7 +4,7 @@ import Main from '../../pageobjects/main.page'
 import SelectDevice from '../../pageobjects/select-device.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectDevicePage click \'SELECT DEVICE\' button', () => {
+describe('SelectDevicePage: click \'SELECT DEVICE\' button', () => {
 
   // eslint-disable-next-line no-undef
   before(async () => {

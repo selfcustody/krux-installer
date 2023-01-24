@@ -4,10 +4,10 @@ import Main from '../../pageobjects/main.page'
 import SelectDevice from '../../pageobjects/select-device.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectDevice: expand/unexpand selection list', () => {
+describe('SelectDevicePage: expand/unexpand selection list', () => {
 
   // eslint-disable-next-line no-undef
-  describe('prepare', () => {
+  describe('check elements', () => {
   
     // eslint-disable-next-line no-undef
     before(async () => {

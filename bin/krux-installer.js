@@ -66,24 +66,20 @@ function runner (cmd, args, env) {
 }
 
 async function main() {
-  console.log("");
-  console.log(`   ${name} ${version}`);
-  console.log(" ████████████████████████████████");
-  console.log(" ██                            ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██         ██████             ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██  ██           ██");
-  console.log(" ██           ██ ██            ██");
-  console.log(" ██           ████             ██");
-  console.log(" ██           ██ ██            ██");
-  console.log(" ██           ██  ██           ██");
-  console.log(" ██           ██   ██          ██");
-  console.log(" ██                            ██");
-  console.log(" ████████████████████████████████");
+  console.log("                           ");
+  console.log("           ██              ");
+  console.log("           ██              ");
+  console.log("           ██              ");
+  console.log("         ██████            ");
+  console.log("           ██              ");
+  console.log("           ██  ██          ");
+  console.log("           ██ ██           ");
+  console.log("           ████            ");
+  console.log("           ██ ██           ");
+  console.log("           ██  ██          ");
+  console.log("           ██   ██         ");
+  console.log("                           ");
+  console.log(` ${name} ${version}`);
   console.log("");
 
   if (action === 'lint') {

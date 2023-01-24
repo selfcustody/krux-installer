@@ -9,8 +9,7 @@
     "serve": "node ./bin/krux-installer.js serve",
     "build": "node ./bin/krux-installer.js build",
     "platform-install": "node ./bin/krux-installer.js platform-install",
-    "postinstall": "node ./bin/krux-installer.js install-app-deps",
-    "postuninstall": "node ./bin/krux-installer.js install-app-deps",
+    "install-app-deps": "node ./bin/krux-installer.js install-app-deps",
     "test": "node ./bin/krux-installer.js test"
   },
   "dependencies": {

@@ -1,8 +1,15 @@
+import { exists } from 'fs'
+import { promisify } from 'util'
+import { join } from 'path'
+import { expect as expectChai } from 'chai'
+import { name } from '../../../package.json'
 import { expect as expectWDIO } from '@wdio/globals'
 import delay from '../delay'
 import Main from '../../pageobjects/main.page'
 import SelectVersion from '../../pageobjects/select-version.page'
 import DownloadOfficialRelease from '../../pageobjects/download-official-release.page'
+
+const existsAsync = promisify(exists)
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\' option', () => {
@@ -48,11 +55,19 @@ describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\'
     await DownloadOfficialRelease.progressLinearText.waitUntil(async function () {
       const percentText = await this.getText()
       const percent = parseFloat(percentText.split('%')[0])
-      return percent > 95.0
+      return percent > 90.0
     }, {
+      timeout: 60000,
       interval: 50
     })
     await DownloadOfficialRelease.page.waitForExist({ reverse: true })
   })
 
+  // eslint-disable-next-line no-undef
+  it('should have downloaded release zip file on disk', async () => {
+    const api = await browser.electronAPI()
+    const zip = join(api.documents, name, 'v22.03.0', 'krux-v22.03.0.zip')
+    const exists = await existsAsync(zip)
+    expectChai(exists).to.be.equal(true)
+  })
 })

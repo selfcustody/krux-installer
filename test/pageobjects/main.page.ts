@@ -58,11 +58,19 @@ class Main extends Page {
     return $(this._selectDeviceButton)
   }
 
+  get selectDeviceButtonContent () { 
+    return this.selectDeviceButton.$('.v-btn__content')
+  }
+
   get selectVersionButton () { 
     // eslint-disable-next-line no-undef
     return $(this._selectVersionButton)
   }
 
+  get selectVersionButtonContent () { 
+    return this.selectVersionButton.$('.v-btn__content')
+  }
+  
   get selectWriteButton () { 
     // eslint-disable-next-line no-undef
     return $(this._selectWriteButton)

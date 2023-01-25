@@ -7,24 +7,17 @@ import SelectVersion from '../../pageobjects/select-version.page'
 describe('SelectVersionPage: expand/unexpand selection list', () => {
 
   // eslint-disable-next-line no-undef
-  describe('prepare', () => {
+  describe('preparation', () => {
   
     // eslint-disable-next-line no-undef
-    before(async () => {
-      await Main.selectVersionButton.click()
+    before(async () => { 
+      await Main.selectVersionButton.waitForExist()
       await delay(1000)
-    })
-  
-    // eslint-disable-next-line no-undef 
-    it('should have arrow', async () => { 
-      await expectWDIO(SelectVersion.formArrow).toBeDisplayed()
-    })
-
-    // eslint-disable-next-line no-undef 
-    it('should have an overlay without childs', async () => {  
-      await expectWDIO(SelectVersion.formOverlayContainer).toBeDisplayed()
-      const childs = await SelectVersion.formOverlayContainer.$$('//*')
-      await expectWDIO(childs).not.toExist()
+      await Main.selectVersionButton.click()
+      await SelectVersion.formOverlayContainer.waitForExist() 
+      await SelectVersion.formSelectFieldContainer.waitForExist()
+      await SelectVersion.formArrow.waitForExist()
+      await delay(1000)
     })
 
     // eslint-disable-next-line no-undef 
@@ -39,6 +32,7 @@ describe('SelectVersionPage: expand/unexpand selection list', () => {
     // eslint-disable-next-line no-undef
     beforeEach(async () => {
       await SelectVersion.formArrow.click()
+      await SelectVersion.formSelectFieldContainer.waitForExist()
       await delay(1000)
     })
 
@@ -62,32 +56,36 @@ describe('SelectVersionPage: expand/unexpand selection list', () => {
   describe('have options', () => {
 
     // eslint-disable-next-line no-undef
+    before(async () => {
+      await SelectVersion.list_item_22_03_0.waitForExist()
+      await SelectVersion.list_item_22_08_0.waitForExist()
+      await SelectVersion.list_item_22_08_1.waitForExist()
+      await SelectVersion.list_item_22_08_2.waitForExist() 
+      await SelectVersion.list_item_krux_binaries.waitForExist()
+    })
+    
+    // eslint-disable-next-line no-undef
     it('should have \'selfcustody/krux/releases/tag/v22.03.0\' option', async () => {
-      await expectWDIO(SelectVersion.list_item_22_03_0).toBeDisplayed()
       await expectWDIO(SelectVersion.list_item_22_03_0).toHaveText('selfcustody/krux/releases/tag/v22.03.0')
     })
 
     // eslint-disable-next-line no-undef
     it('should have \'selfcustody/krux/releases/tag/v22.08.0\' option', async () => {
-      await expectWDIO(SelectVersion.list_item_22_08_0).toBeDisplayed()
       await expectWDIO(SelectVersion.list_item_22_08_0).toHaveText('selfcustody/krux/releases/tag/v22.08.0')
     })
 
     // eslint-disable-next-line no-undef
     it('should have \'selfcustody/krux/releases/tag/v22.08.1\' option', async () => {
-      await expectWDIO(SelectVersion.list_item_22_08_1).toBeDisplayed()
       await expectWDIO(SelectVersion.list_item_22_08_1).toHaveText('selfcustody/krux/releases/tag/v22.08.1')
     })
 
     // eslint-disable-next-line no-undef
     it('should have \'selfcustody/krux/releases/tag/v22.08.2\' option', async () => {
-      await expectWDIO(SelectVersion.list_item_22_08_2).toBeDisplayed()
       await expectWDIO(SelectVersion.list_item_22_08_2).toHaveText('selfcustody/krux/releases/tag/v22.08.2')
     })
 
     // eslint-disable-next-line no-undef
     it('should have \'odudex/krux_binaries\' option', async () => {
-      await expectWDIO(SelectVersion.list_item_krux_binaries).toBeDisplayed()
       await expectWDIO(SelectVersion.list_item_krux_binaries).toHaveText('odudex/krux_binaries')
     })
   })

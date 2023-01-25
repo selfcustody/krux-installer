@@ -34,23 +34,35 @@
       xs12
     >
       <v-card flat>
-        <v-card-title>
+        <v-card-title
+          id="check-resources-official-release-page-card-title-checked"
+        >
           <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle
+          id="check-resources-official-release-page-card-subtitle-checked"
+        >
           Already downloaded
         </v-card-subtitle>
-        <v-card-content>
+        <v-card-content
+          id="check-resources-official-release-page-card-content-checked"
+        >
           <v-card-text>
-            Click "OK" to dowload again or "Cancel" to proceed with the downloaded version.
+            Click "Download" to download again or "Proceed" to proceed with the downloaded version.
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })">
-            OK
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })"
+            id="check-resources-official-release-page-button-download-checked" 
+          >
+            Download
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSHA256Page' })">
-            Cancel
+          <v-btn 
+            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSHA256Page' })"
+            id="check-resources-official-release-page-button-proceed-checked"
+          >
+            Proceed
           </v-btn>
         </v-card-actions>
       </v-card>

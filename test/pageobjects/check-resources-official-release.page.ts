@@ -6,6 +6,11 @@ class CheckResourcesOfficialRelease extends Page {
     super()
     this._main = '#check-resources-official-release-page'
     this._cardTitleChecking = '#check-resources-official-release-page-card-title-checking'
+    this._cardTitleChecked = '#check-resources-official-release-page-card-title-checked'
+    this._cardSubtitleChecked = '#check-resources-official-release-page-card-subtitle-checked'
+    this._cardContentChecked = '#check-resources-official-release-page-card-content-checked' 
+    this._buttonDownload = '#check-resources-official-release-page-button-download-checked'
+    this._buttonProceed = '#check-resources-official-release-page-button-proceed-checked'
   }
  
   get page () { 
@@ -16,6 +21,31 @@ class CheckResourcesOfficialRelease extends Page {
   get cardTitleChecking () { 
     // eslint-disable-next-line no-undef
     return $(this._cardTitleChecking)
+  }
+
+  get cardTitleChecked () { 
+    // eslint-disable-next-line no-undef
+    return $(this._cardTitleChecked)
+  }
+
+  get cardSubtitleChecked () { 
+    // eslint-disable-next-line no-undef
+    return $(this._cardSubtitleChecked)
+  }
+
+  get cardContentChecked () { 
+    // eslint-disable-next-line no-undef
+    return $(this._cardContentChecked)
+  }
+
+  get buttonDownload () { 
+    // eslint-disable-next-line no-undef
+    return $(this._buttonDownload)
+  }
+
+  get buttonProceed () { 
+    // eslint-disable-next-line no-undef
+    return $(this._buttonProceed)
   }
 }
 

@@ -45,6 +45,7 @@ exports.config = {
       './test/specs/select-version/expand-unexpand-list.spec.ts',
       './test/specs/select-version/select-v22.03.0.spec.ts',
       './test/specs/select-version/download-v22.03.0.spec.ts',
+      './test/specs/select-version/already-downloaded-v22.03.0.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [
@@ -58,6 +59,7 @@ exports.config = {
     autoCompileOpts: {
       autoCompile: true,
       tsNodeOpts: {
+        parserOptions: "@babel/eslint-parser",
         transpileOnly: true,
         files: true,
         project: join(__dirname, 'tsconfig.json'),

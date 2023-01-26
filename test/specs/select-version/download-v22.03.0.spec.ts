@@ -51,25 +51,24 @@ describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\'
     await CheckResourcesOfficialRelease.page.waitForExist() 
     await CheckResourcesOfficialRelease.cardTitleChecking.waitForExist()
     await CheckResourcesOfficialRelease.cardTitleChecking.waitForExist({ reverse: true })
-    await DownloadOfficialRelease.page.waitForExist()
-    await DownloadOfficialRelease.cardTitle.waitForExist()
-    await DownloadOfficialRelease.cardSubtitle.waitForExist()
-    await DownloadOfficialRelease.progressLinearText.waitForExist()
-    await delay(1000)
   })
 
   // eslint-disable-next-line no-undef
-  it('should card title be \'Downloading...\'', async () => {
+  it('should card title be \'Downloading...\'', async () => { 
+    await DownloadOfficialRelease.page.waitForExist()
+    await DownloadOfficialRelease.cardTitle.waitForExist()
     await expectWDIO(DownloadOfficialRelease.cardTitle).toHaveText('Downloading...')
   })
 
   // eslint-disable-next-line no-undef
-  it('should card subtitle be \'selfcustody/krux/releases/download/v22.03.0/krux-v22.03.0.zip\'', async () => { 
+  it('should card subtitle be \'selfcustody/krux/releases/download/v22.03.0/krux-v22.03.0.zip\'', async () => {  
+    await DownloadOfficialRelease.cardSubtitle.waitForExist()
     await expectWDIO(DownloadOfficialRelease.cardSubtitle).toHaveText('selfcustody/krux/releases/download/v22.03.0/krux-v22.03.0.zip')
   })
 
   // eslint-disable-next-line no-undef
-  it('should download release zip file', async () => {
+  it('should download release zip file', async () => { 
+    await DownloadOfficialRelease.progressLinearText.waitForExist()
     await DownloadOfficialRelease.progressLinearText.waitUntil(async function () {
       const percentText = await this.getText()
       const percent = parseFloat(percentText.split('%')[0])

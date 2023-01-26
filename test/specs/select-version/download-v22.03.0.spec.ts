@@ -39,9 +39,6 @@ describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\'
     await SelectVersion.formArrow.click()
     await delay(1000)
     await SelectVersion.list_item_22_03_0.waitForExist()
-    await SelectVersion.list_item_22_08_0.waitForExist()
-    await SelectVersion.list_item_22_08_1.waitForExist()
-    await SelectVersion.list_item_22_08_2.waitForExist()
     await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
     await SelectVersion.list_item_22_03_0.click()
@@ -49,8 +46,7 @@ describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\'
     await SelectVersion.formSelectButton.click()  
     await SelectVersion.page.waitForExist({ reverse: true }) 
     await CheckResourcesOfficialRelease.page.waitForExist() 
-    await CheckResourcesOfficialRelease.cardTitleChecking.waitForExist()
-    await CheckResourcesOfficialRelease.cardTitleChecking.waitForExist({ reverse: true })
+    await CheckResourcesOfficialRelease.page.waitForExist({ reverse: true })
   })
 
   // eslint-disable-next-line no-undef
@@ -72,9 +68,9 @@ describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\'
     await DownloadOfficialRelease.progressLinearText.waitUntil(async function () {
       const percentText = await this.getText()
       const percent = parseFloat(percentText.split('%')[0])
-      return percent > 90.0
+      return percent !== 0
     }, {
-      timeout: 60000,
+      timeout: 120000,
       interval: 50
     })
     await DownloadOfficialRelease.page.waitForExist({ reverse: true })

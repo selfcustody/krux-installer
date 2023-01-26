@@ -58,7 +58,11 @@ function runner (cmd, args, env) {
         service.stderr.on('data', onData)
 
         service.on('close', function(code) {
-          res(`  finished \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: ${code}`);
+          if (code !== 0) {
+            rej(code);
+          } else {
+            res(`  finished \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: ${code}`);
+          }
         });
       }))
     }
@@ -183,8 +187,8 @@ async function main() {
     results.forEach(function(result) {
       console.log(result)
     })
-  } catch (error) {
-    console.log(error)
+  } catch (exitCode) {
+    process.exit(exitCode)
   }
 }
 

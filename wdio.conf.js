@@ -44,6 +44,7 @@ exports.config = {
       './test/specs/select-version/back-without-select.spec.ts',
       './test/specs/select-version/expand-unexpand-list.spec.ts',
       './test/specs/select-version/select-v22.03.0.spec.ts',
+      './test/specs/select-version/check-resources-v22.03.0.spec.ts',
       './test/specs/select-version/download-v22.03.0.spec.ts',
       './test/specs/select-version/already-downloaded-v22.03.0.spec.ts',
     ],

@@ -22,7 +22,7 @@
             <v-flex
               xs8
               sm12
-              id="check-resources-official-releases-page-card-title-checking">
+              id="check-resources-official-release-page-card-title-checking">
               Checking official release...
             </v-flex>
           </v-layout>
@@ -82,7 +82,9 @@ export default {
   watch: {
     async title (value) {
       if (value !== '') {
-        await window.KruxInstaller.check.resource(value)
+        setTimeout(async () => {
+          await window.KruxInstaller.check.resource(value)
+        }, 1000)
       }
     }
   },
@@ -109,7 +111,9 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.check.onError((_event, value) => {
-      this.$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })
+      this.$nextTick(() => {
+        this.$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })
+      })
     })
   }
 }

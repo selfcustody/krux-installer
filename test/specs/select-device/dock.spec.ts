@@ -38,7 +38,7 @@ describe('SelectDevicePage: page select \'dock\' option', () => {
   })
 
   // eslint-disable-next-line no-undef
-  it('should the \'select device\' changed to \'maixpy_bit\'', async () => {   
+  it('should the \'select device\' changed to \'maixpy_dock\'', async () => {   
     const deviceButtonContent = await Main.selectDeviceButton.$('span.v-btn__content')
     await expectWDIO(deviceButtonContent).not.toHaveText('SELECT_DEVICE')
     await expectWDIO(deviceButtonContent).toHaveText('MAIXPY_DOCK')

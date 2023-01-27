@@ -35,14 +35,14 @@ function runner (cmd, args, env) {
       bin = cmd
     }
 
-    console.log(`  running \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m`);
+    console.log(`running \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m`);
 
     if (args.indexOf('<') !== -1 || args.indexOf('>') !== -1) {
       resolve(await new Promise(function(res, rej) {
         exec(`${bin} ${args.join(' ')}`, function (error, stdout, stderr) {
           if (error) rej(error)
           if (stderr) rej(new Error(stderr))
-          res(`  finished \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: 0`);
+          res(0);
         })
       }))
     } else {
@@ -61,7 +61,7 @@ function runner (cmd, args, env) {
           if (code !== 0) {
             rej(code);
           } else {
-            res(`  finished \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: ${code}`);
+            res(code);
           }
         });
       }))
@@ -184,8 +184,8 @@ async function main() {
 
   try {
     const results = await Promise.all(promises)
-    results.forEach(function(result) {
-      console.log(result)
+    results.forEach(function(exitCode) {
+      process.exit(exitCode)
     })
   } catch (exitCode) {
     process.exit(exitCode)

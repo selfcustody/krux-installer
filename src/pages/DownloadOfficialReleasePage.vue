@@ -63,7 +63,11 @@ export default {
         
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.download.onSuccess((_event, value) => {
-      this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSHA256Page' })
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSHA256Page' })
+        }, 1000)
+      })
     })
 
     // eslint-disable-next-line no-unused-vars

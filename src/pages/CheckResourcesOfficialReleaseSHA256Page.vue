@@ -69,7 +69,9 @@ export default {
   watch: {
     async title (value) {
       if (value !== '') {
-        await window.KruxInstaller.check.resource(value)
+        setTimeout(async () => {
+          await window.KruxInstaller.check.resource(value)
+        }, 1000)
       }
     }
   },

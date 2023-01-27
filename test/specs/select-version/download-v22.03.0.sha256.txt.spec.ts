@@ -54,7 +54,6 @@ describe('SelectVersionPage: download \'v22.03.0/krux-v22.03.0.zip.sha256.txt\' 
 
   // eslint-disable-next-line no-undef
   it('should download release sha256.txt file', async () => { 
-    await DownloadOfficialReleaseSHA256.progressLinearText.waitForExist()
     await DownloadOfficialReleaseSHA256.progressLinearText.waitUntil(async function () {
       const percentText = await this.getText()
       const percent = parseFloat(percentText.split('%')[0])
@@ -62,6 +61,5 @@ describe('SelectVersionPage: download \'v22.03.0/krux-v22.03.0.zip.sha256.txt\' 
     }, {
       interval: 10
     })
-    await DownloadOfficialReleaseSHA256.page.waitForExist({ reverse: true })
   })
 })

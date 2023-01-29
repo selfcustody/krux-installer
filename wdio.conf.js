@@ -51,6 +51,8 @@ exports.config = {
       './test/specs/select-version/check-resources-v22.03.0.sha256.txt.spec.ts',
       './test/specs/select-version/download-v22.03.0.sha256.txt.spec.ts',
       './test/specs/select-version/check-download-v22.03.0.sha256.txt.spec.ts',
+      './test/specs/select-version/already-downloaded-v22.03.0.sha256.txt.spec.ts',
+      './test/specs/select-version/check-resources-v22.03.0.sig.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [

@@ -31,25 +31,35 @@
       xs12
     >
       <v-card flat>
-        <v-card-title>
+        <v-card-title
+          id="check-resources-official-release-sha256-page-card-title-checked"
+        >
           <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle
+          id="check-resources-official-release-sha256-page-card-subtitle-checked"
+        >
           Already downloaded
         </v-card-subtitle>
         <v-card-content>
           <v-card-text
-            id="check-resources-official-release-sha256-page-card-title-checked"
+            id="check-resources-official-release-sha256-page-card-content-checked"
           >
-            Click "OK" to dowload again or "Cancel" to proceed with the downloaded version.
+            Click "Download" to download again or "Proceed" to proceed with the downloaded version.
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleaseSHA256Page' })">
-            OK
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleaseSHA256Page' })"
+            id="check-resources-official-release-sha256-page-button-download-checked"
+          >
+            Download
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSigPage' })">
-            Cancel
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSigPage' })"
+            id="check-resources-official-release-sha256-page-button-proceed-checked"
+          >
+            Proceed
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -97,8 +107,10 @@ export default {
     })
 
     // eslint-disable-next-line no-unused-vars
-    window.KruxInstaller.check.onError((_event, value) => {
-      this.$emit('onSuccess', { page: 'DownloadOfficialReleaseSHA256Page' })
+    window.KruxInstaller.check.onError((_event, value) => { 
+      this.$nextTick(() => {
+        this.$emit('onSuccess', { page: 'DownloadOfficialReleaseSHA256Page' })
+      })
     })
   }
 }

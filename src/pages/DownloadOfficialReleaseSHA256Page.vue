@@ -64,7 +64,7 @@ export default {
       this.$nextTick(() => {
         setTimeout(() => {
           this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSigPage' })
-        })
+        }, 1000)
       })
     })
 

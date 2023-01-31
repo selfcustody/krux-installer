@@ -10,7 +10,7 @@ class CheckResourcesOfficialReleaseSig extends Page {
     this._cardSubtitleChecked = '#check-resources-official-release-sig-page-card-subtitle-checked' 
     this._cardContentChecked = '#check-resources-official-release-sig-page-card-content-checked' 
     this._buttonDownload = '#check-resources-official-release-sig-page-button-download-checked'
-    this._proceedDownload = '#check-resources-official-release-sig-page-button-proceed-checked'
+    this._buttonProceed = '#check-resources-official-release-sig-page-button-proceed-checked'
   }
  
   get cardTitleChecking () { 
@@ -25,7 +25,7 @@ class CheckResourcesOfficialReleaseSig extends Page {
 
   get cardSubtitleChecked () { 
     // eslint-disable-next-line no-undef
-    return $(this._cardSubitleChecked)
+    return $(this._cardSubtitleChecked)
   }
 
   get cardContentChecked () { 

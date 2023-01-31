@@ -58,6 +58,6 @@ describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\'
       timeout: 120000,
       interval: 50
     })
-    await DownloadOfficialRelease.page.waitForExist({ reverse: true })
+    await DownloadOfficialRelease.page.waitForExist({ reverse: true, timeout: 120000 })
   })
 })

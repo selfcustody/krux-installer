@@ -48,21 +48,21 @@
           id="check-resources-official-release-page-card-content-checked"
         >
           <v-card-text>
-            Click "Download" to download again or "Proceed" to proceed with the downloaded version.
+            Click "Proceed" to proceed with the downloaded version or "Download the file again".
           </v-card-text>
         </v-card-content>
-        <v-card-actions>
-          <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })"
-            id="check-resources-official-release-page-button-download-checked" 
-          >
-            Download
-          </v-btn>
+        <v-card-actions> 
           <v-btn 
             @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSHA256Page' })"
             id="check-resources-official-release-page-button-proceed-checked"
           >
             Proceed
+          </v-btn>
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleasePage' })"
+            id="check-resources-official-release-page-button-download-checked" 
+          >
+            Download the file again
           </v-btn>
         </v-card-actions>
       </v-card>

@@ -65,18 +65,18 @@ describe('SelectVersionPage: warn before download \'selfcustody/krux/releases/ta
   })
 
   // eslint-disable-next-line no-undef
-  it('should card content be \'Click "Download" to download again or "Proceed" to proceed with the downloaded version.\'', async () => {
+  it('should card content be \'Click "Proceed" to proceed with the downloaded version or "Download the file again".\'', async () => {
     await expectWDIO(CheckResourcesOfficialReleaseSHA256.cardContentChecked)
-      .toHaveText('Click "Download" to download again or "Proceed" to proceed with the downloaded version.')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should have a \'DOWNLOAD\' button', async () => { 
-    await expectWDIO(CheckResourcesOfficialReleaseSHA256.buttonDownload).toHaveText('DOWNLOAD')
+      .toHaveText('Click "Proceed" to proceed with the downloaded version or "Download the file again".')
   })
 
   // eslint-disable-next-line no-undef
   it('should have a \'PROCEED\' button', async () => { 
     await expectWDIO(CheckResourcesOfficialReleaseSHA256.buttonProceed).toHaveText('PROCEED')
+  })
+
+  // eslint-disable-next-line no-undef
+  it('should have a \'DOWNLOAD THE FILE AGAIN\' button', async () => { 
+    await expectWDIO(CheckResourcesOfficialReleaseSHA256.buttonDownload).toHaveText('DOWNLOAD THE FILE AGAIN')
   })
 })

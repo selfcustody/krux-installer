@@ -28,7 +28,7 @@ describe('check downloaded signature release on file system', () => {
   })
 
   // eslint-disable-next-line no-undef
-  it('should downloaded release zip file on disk have correct size', async () => {
+  it('should downloaded release sig file on disk have correct size', async () => {
     const sigStat = await statAsync(sig)
     const bytes = formatBytes(sigStat.size)
     expectChai(bytes).to.be.equal('70 Bytes')

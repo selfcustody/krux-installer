@@ -56,6 +56,10 @@ exports.config = {
       './test/specs/select-version/download-v22.03.0.sig.spec.ts',
       './test/specs/select-version/check-download-v22.03.0.sig.spec.ts',
       './test/specs/select-version/already-downloaded-v22.03.0.sig.spec.ts',
+      './test/specs/select-version/check-resources-pem.spec.ts',
+      './test/specs/select-version/download-pem.spec.ts',
+      './test/specs/select-version/check-download-pem.spec.ts',
+      './test/specs/select-version/already-downloaded-pem.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [

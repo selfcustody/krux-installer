@@ -60,6 +60,8 @@ exports.config = {
       './test/specs/select-version/download-pem.spec.ts',
       './test/specs/select-version/check-download-pem.spec.ts',
       './test/specs/select-version/already-downloaded-pem.spec.ts',
+      './test/specs/select-version/verify-official-release-v22.03.0.spec.ts',
+      './test/specs/select-version/verified-official-release-v22.03.0.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [

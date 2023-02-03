@@ -4,6 +4,7 @@
     justify-start
     row
     fill-height
+    id="verify-official-release-page"
   >
     <v-flex
       xs12
@@ -19,14 +20,15 @@
                 color="green"
               />
             </v-flex>
-            <v-flex xs8 sm12>
-              Verifying...
+            <v-flex
+              xs8
+              sm12
+              id="verify-official-release-page-card-title-checking"
+            >
+              Verifying release {{ version.split('tag/')[1] }}...
             </v-flex>
           </v-layout>
         </v-card-title>
-        <v-card-subtitle>
-          <b>file:</b> {{ version }}.zip
-        </v-card-subtitle>
       </v-card>
     </v-flex>
     <v-flex
@@ -36,21 +38,26 @@
     >
       <v-card>
         <v-card-title>
-          <v-icon>mdi-eye-outline</v-icon>&ensp;Verified
+          <v-icon>mdi-eye-outline</v-icon>&ensp;<b id="verify-official-release-page-card-title-checked">Verified</b>
         </v-card-title>
         <v-card-subtitle>
-          <v-icon>mdi-folder-pound-outline</v-icon>&ensp;Sha256 Sum results:
+          <v-icon>mdi-folder-pound-outline</v-icon>&ensp; <b id="verify-official-release-page-card-subtitle-sha256sum-checked">sha256sum results:</b>
         </v-card-subtitle>
-        <v-card-content>
-          <v-card-text v-for="hash in hashes" :key="hash.name">
-            Filename: {{ hash.name }} <br/>
+        <v-card-content
+          id="verify-official-release-page-card-content"
+        >
+          <v-card-text
+            v-for="hash in hashes"
+            :key="hash.name"
+          >
+            <b>Filename: {{ hash.name }}</b> <br/>
             <v-chip class="ma-2" color="primary" text-color="white">
               {{ hash.value }}
             </v-chip>
           </v-card-text>
         </v-card-content>
         <v-card-subtitle v-id="verifiedSign">
-          <v-icon>mdi-draw-pen</v-icon>&ensp;Openssl signature check:
+          <v-icon>mdi-draw-pen</v-icon>&ensp;<b id="verify-official-release-page-card-subtitle-sig-checked">Openssl signature check:</b>
         </v-card-subtitle>
         <v-card-content>
           <v-flex v-if="!verifiedSign">
@@ -62,19 +69,30 @@
           <v-flex v-else>
             <v-card-text>
               Command: 
-              <div class="console-openssl">
+              <div
+                class="console-openssl"
+                id="verify-official-release-page-console-command"
+              >
                 $> {{ sign_cmd }}
               </div>
             </v-card-text>
             <v-card-text>
               Result:
-                <v-chip class="ma-2" color="primary" text-color="white">
+                <v-chip
+                  class="ma-2"
+                  color="primary"
+                  text-color="white"
+                  id="verify-official-release-page-chip-sig-result"
+                >
                   {{ signed }}
                 </v-chip>
             </v-card-text>
           </v-flex>
         </v-card-content>
         <v-card-actions>
+          <v-card-text>
+            <b>WARN: You will need to unzip this release before flash.</b>
+          </v-card-text>
           <v-btn
             v-if="verifiedHash && verifiedSign"
             @click.prevent="$emit('onSuccess', { page: 'UnzipOfficialReleasesPage' })"
@@ -159,26 +177,32 @@ export default {
   watch: {
     async version (value) {
       if (value !== '') {
-        const v = value.split('tag/')[1]
-        await window.KruxInstaller.hash.verify(
-          `${v}/krux-${v}.zip`,
-          `${v}/krux-${v}.zip.sha256.txt`
-        ) 
+        setTimeout(async () => {
+          const v = value.split('tag/')[1]
+          await window.KruxInstaller.hash.verify(
+            `${v}/krux-${v}.zip`,
+            `${v}/krux-${v}.zip.sha256.txt`
+          ) 
+        }, 1000)
       }
     },
     async hashes (value) {
       if (value.length == 2) { 
-        const v = this.version.split('tag/')[1]
-        await window.KruxInstaller.signature.verify({ 
-          bin: `${v}/krux-${v}.zip`,
-          pem: `main/selfcustody.pem`,
-          sig: `${v}/krux-${v}.zip.sig`,
-        }) 
+        setTimeout(async () => {
+          const v = this.version.split('tag/')[1]
+          await window.KruxInstaller.signature.verify({ 
+            bin: `${v}/krux-${v}.zip`,
+            pem: `main/selfcustody.pem`,
+            sig: `${v}/krux-${v}.zip.sig`,
+          })
+        }, 1000)
       }
     },
     async signed (value) {
       if (value !== '') {
-        await window.KruxInstaller.signature_command.get()
+        setTimeout(async () => {
+          await window.KruxInstaller.signature_command.get()
+        }, 1000)
       }
     }
   }

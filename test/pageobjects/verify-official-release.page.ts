@@ -11,7 +11,10 @@ class VerifyOfficialRelease extends Page {
     this._cardSubtitleSigChecked = '#verify-official-release-page-card-subtitle-sig-checked' 
     this._cardContent = '#verify-official-release-page-card-content'
     this._signatureCommand = '#verify-official-release-page-console-command'
-    this._signatureResult = '#verify-official-release-page-chip-sig-result'
+    this._signatureResult = '#verify-official-release-page-chip-sig-result' 
+    this._cardActionWarn = '#verify-official-release-page-warn-unzip' 
+    this._cardActionButtonUnzip = '#verify-official-release-page-button-unzip'
+    this._cardActionButtonBack = '#verify-official-release-page-button-back'
   }
  
   get cardTitleChecking () { 
@@ -63,6 +66,21 @@ class VerifyOfficialRelease extends Page {
   get chipSignatureResult () { 
     // eslint-disable-next-line no-undef
     return $(this._signatureResult)
+  }
+
+  get cardActionWarn () {
+    // eslint-disable-next-line no-undef
+    return $(this._cardActionWarn)
+  }
+
+  get cardActionButtonUnzip () {
+    // eslint-disable-next-line no-undef
+    return $(this._cardActionButtonUnzip)
+  }
+
+  get cardActionButtonBack () {
+    // eslint-disable-next-line no-undef
+    return $(this._cardActionButtonBack)
   }
 }
 export default new VerifyOfficialRelease()

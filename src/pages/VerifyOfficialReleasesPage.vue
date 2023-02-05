@@ -90,18 +90,20 @@
           </v-flex>
         </v-card-content>
         <v-card-actions>
-          <v-card-text>
-            <b>WARN: You will need to unzip this release before flash.</b>
+          <v-card-text id="verify-official-release-page-warn-unzip">
+            <b>WARN:</b>&ensp;You need to UNZIP this release before flash
           </v-card-text>
           <v-btn
             v-if="verifiedHash && verifiedSign"
             @click.prevent="$emit('onSuccess', { page: 'UnzipOfficialReleasesPage' })"
+            id="verify-official-release-page-button-unzip"
           >
             Unzip
           </v-btn>
           <v-btn
             v-if="verifiedHash && verifiedSign"
             @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            id="verify-official-release-page-button-back"
           >
             Back
           </v-btn>

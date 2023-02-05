@@ -7,9 +7,10 @@ import CheckResourcesOfficialReleaseSHA256 from '../../pageobjects/check-resourc
 import CheckResourcesOfficialReleaseSig from '../../pageobjects/check-resources-official-release-sig.page'
 import CheckResourcesOfficialReleasePem from '../../pageobjects/check-resources-official-release-pem.page'
 import VerifyOfficialRelease from '../../pageobjects/verify-official-release.page'
+import UnzipOfficialRelease from '../../pageobjects/unzip-official-release.page'
 
 // eslint-disable-next-line no-undef
-describe('Verified \'v22.03.0/krux-v22.03.0.zip\' release sucessfully', () => {
+describe('Unzip \'v22.03.0/krux-v22.03.0.zip\' release', () => {
   
   // eslint-disable-next-line no-undef
   before(async () => {
@@ -91,84 +92,115 @@ describe('Verified \'v22.03.0/krux-v22.03.0.zip\' release sucessfully', () => {
     await VerifyOfficialRelease.cardActionWarn.waitForExist()
     await VerifyOfficialRelease.cardActionButtonUnzip.waitForExist()
     await VerifyOfficialRelease.cardActionButtonBack.waitForExist()
+    await VerifyOfficialRelease.cardActionButtonUnzip.click()
+    await VerifyOfficialRelease.page.waitForExist({ reverse: true })
+    await UnzipOfficialRelease.page.waitForExist()   
+    await UnzipOfficialRelease.cardTitleUnzipping.waitForExist()  
+    await UnzipOfficialRelease.cardSubtitleUnzipping.waitForExist()  
+    await UnzipOfficialRelease.cardProgressLinearTextUnzipping.waitForExist()
   })
 
   // eslint-disable-next-line no-undef
-  it('should card title be \'Verified\'', async () => {
-    await expectWDIO(VerifyOfficialRelease.cardTitleChecked).toHaveText('Verified')
+  it('should card title be \'Unzipping...\'', async () => {  
+    await expectWDIO(UnzipOfficialRelease.cardTitleUnzipping).toHaveText('Unzipping...')
   })
 
   // eslint-disable-next-line no-undef
-  it('should card have a subtitle with \'sha256sum results:\'', async () => {
-    await expectWDIO(VerifyOfficialRelease.cardSubtitleSha256sumChecked).toHaveText('sha256sum results:')
+  it('should subtitle be \'file:\'', async () => { 
+    await expectWDIO(UnzipOfficialRelease.cardSubtitleUnzipping).toHaveText('file:')
   })
 
   // eslint-disable-next-line no-undef
-  it('should card have a subtitle with \'Openssl signature check:\'', async () => {
-    await expectWDIO(VerifyOfficialRelease.cardSubtitleSigChecked).toHaveText('Openssl signature check:')
+  it('should progress be \'0%\'', async () => {  
+    await expectWDIO(UnzipOfficialRelease.cardProgressLinearTextUnzipping).toHaveText('0%')
+  })
+ 
+  // eslint-disable-next-line no-undef
+  it('should unzip files', async () => {
+    await UnzipOfficialRelease.cardProgressLinearTextUnzipping.waitUntil(async function () { 
+      const progress = parseFloat(await this.getText())
+      return progress !== 0
+    }, {
+      timeout: 120000,
+      interval: 5
+    })
+    await UnzipOfficialRelease.cardTitleUnzipping.waitForExist({ reverse: true })
   })
 
   // eslint-disable-next-line no-undef
-  it('should card have a text \'Filename: v22.03.0/krux-v22.03.0.zip.sha256.txt\'', async () => {
-    console.log(await VerifyOfficialRelease.cardContentFilenameTxt.getText())
-    await expectWDIO(VerifyOfficialRelease.cardContentFilenameTxt).toHaveText('Filename: v22.03.0/krux-v22.03.0.zip.sha256.txt')
+  it('should title be changed to \'Extracted files\'', async () => {
+    await UnzipOfficialRelease.cardTitleUnzipped.waitForExist()
+    await expectWDIO(UnzipOfficialRelease.cardTitleUnzipped).toHaveText('Extracted files')
   })
 
   // eslint-disable-next-line no-undef
-  it('should card have a text \'Filename: v22.03.0/krux-v22.03.0.zip\'', async () => {
-    await expectWDIO(VerifyOfficialRelease.cardContentFilenameSha256).toHaveText('Filename: v22.03.0/krux-v22.03.0.zip')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should card have txt chip with correct hash', async () => {
-    await expectWDIO(VerifyOfficialRelease.chipHashTxt).toHaveText('e928ed47d5123e25f11a180ca6b101b6c8d682df53157516ca2a5d4bb586a6ed')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should card have sha256sum chip with correct hash', async () => {
-    await expectWDIO(VerifyOfficialRelease.chipHashSha256).toHaveText('e928ed47d5123e25f11a180ca6b101b6c8d682df53157516ca2a5d4bb586a6ed')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should card have a console with complete command used to verify', async () => {
+  it('should subtitle be changed to \'Relative to: <some path>/krux-installer\'', async () => {
     // eslint-disable-next-line no-undef
     const api = await browser.electronAPI()
-    const docs = api.documents
-    await expectWDIO(VerifyOfficialRelease.consoleSignatureCommand).toHaveText([
-      '$>',
-      'openssl',
-      'sha256',
-      `<${docs}/krux-installer/v22.03.0/krux-v22.03.0.zip`,
-      '-binary',
-      '|',
-      'openssl',
-      'pkeyutl',
-      '-verify',
-      '-pubin',
-      '-inkey',
-      `${docs}/krux-installer/main/selfcustody.pem`,
-      '-sigfile',
-      `${docs}/krux-installer/v22.03.0/krux-v22.03.0.zip.sig`
-    ].join(' '))
+    await UnzipOfficialRelease.cardSubitleUnzipped.waitForExist()
+    await expectWDIO(UnzipOfficialRelease.cardSubitleUnzipped).toHaveText(`Relative to: ${api.documents}/krux-installer`)
   })
 
-  // eslint-disable-next-line no-undef
-  it('should card have a chip with \'Signature Verified Successfully\'', async () => {
-    await expectWDIO(VerifyOfficialRelease.chipSignatureResult).toHaveText('Signature Verified Successfully')
-  })
 
   // eslint-disable-next-line no-undef
-  it('should card have the warning \'WARN: You need to UNZIP this release before flash\'', async () => {
-    await expectWDIO(VerifyOfficialRelease.cardActionWarn).toHaveText('WARN: You need to UNZIP this release before flash')
-  })
+  describe('list items', () => {
+    
+    let childs
 
-  // eslint-disable-next-line no-undef
-  it('should card have a \'UNZIP\' button', async () => {
-    await expectWDIO(VerifyOfficialRelease.cardActionButtonUnzip).toHaveText('UNZIP')
-  })
+    // eslint-disable-next-line no-undef
+    before(async () => {
+      await UnzipOfficialRelease.cardContentTextUnzipped.waitForExist()
+      childs = await UnzipOfficialRelease.cardContentTextUnzipped.$$('div')
+    })
 
+    // eslint-disable-next-line no-undef
+    it('should have listed \'krux-v22.03.0/ktool-win.exe\'', async () => {
+      await expectWDIO(childs[0]).toHaveText('krux-v22.03.0/ktool-win.exe')
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should have listed \'krux-v22.03.0/ktool-mac\'', async () => {
+      await expectWDIO(childs[1]).toHaveText('krux-v22.03.0/ktool-mac')
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should have listed \'krux-v22.03.0/maixpy_m5stickv/firmware.bin.sig\'', async () => {
+      await expectWDIO(childs[2]).toHaveText('krux-v22.03.0/maixpy_m5stickv/firmware.bin.sig')
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should have listed \'krux-v22.03.0/maixpy_m5stickv/firmware.bin\'', async () => {
+      await expectWDIO(childs[3]).toHaveText('krux-v22.03.0/maixpy_m5stickv/firmware.bin')
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should have listed \'krux-v22.03.0/maixpy_m5stickv/kboot.kfpkg\'', async () => {
+      await expectWDIO(childs[4]).toHaveText('krux-v22.03.0/maixpy_m5stickv/kboot.kfpkg')
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should have listed \'krux-v22.03.0/ktool-linux\'', async () => {
+      await expectWDIO(childs[5]).toHaveText('krux-v22.03.0/ktool-linux')
+    })
+  })
+ 
   // eslint-disable-next-line no-undef
-  it('should card have a \'BACK\' button', async () => {
-    await expectWDIO(VerifyOfficialRelease.cardActionButtonBack).toHaveText('BACK')
+  describe('buttons', () => {
+
+    // eslint-disable-next-line no-undef
+    before(async () => {
+      await UnzipOfficialRelease.buttonDone.waitForExist()
+      await UnzipOfficialRelease.buttonBack.waitForExist()
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should have button \'DONE\'', async () => {
+      await expectWDIO(UnzipOfficialRelease.buttonDone).toHaveText('DONE')
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should have button \'BACK\'', async () => {
+      await expectWDIO(UnzipOfficialRelease.buttonBack).toHaveText('BACK')
+    })
   })
 })

@@ -394,19 +394,20 @@ exports.config = {
      * Hook that gets executed after the suite has ended
      * @param {Object} suite suite details
      */
+    // eslint-disable-next-line no-unused-vars
     afterSuite: function (suite) {
       let index = 0
       const promises = []
 
       if (process.platform === 'linux') {
         glob('/tmp/yarn--*', function(err, yarndirs) {
-          if (err) reject(err)
+          if (err) promises.push(Promise.reject(err))
           yarndirs.forEach(function(yarndir) {
             index += 1
             promises.push(new Promise(function(res) {
               setTimeout(res, 1000 * index)
             }))
-            promises.push(new Promise(function(res, rej) {
+            promises.push(new Promise(function(res) {
               console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${yarndir}\x1b[0m`)
               rimraf(yarndir, { preserveRoot: false }, function() {
                 res()
@@ -415,13 +416,13 @@ exports.config = {
           })
         })
         glob('/tmp/lighthouse.*', function(err, lighthousedirs) {
-          if (err) reject(err)
+          if (err) promises.push(Promise.reject(err))
           lighthousedirs.forEach(function(lighthousedir) {
             index += 1
             promises.push(new Promise(function(res) {
               setTimeout(res, 1000 * index)
             }))
-            promises.push(new Promise(function(res, rej) {
+            promises.push(new Promise(function(res) {
               console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${lighthousedir}\x1b[0m`)
               rimraf(lighthousedir, { preserveRoot: false }, function() {
                 res()

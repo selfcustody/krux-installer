@@ -1,6 +1,8 @@
 const { join } = require('path');
 const { name } = require('./package.json')
 const { exec } = require('child_process')
+const glob = require('glob')
+const rimraf = require('rimraf')
 
 exports.config = {
     //
@@ -26,8 +28,8 @@ exports.config = {
     // will be called from there.
     //
     specs: [
-      './test/specs/config.spec.ts',
-      './test/specs/app.spec.ts',
+      './test/specs/init/config.spec.ts',
+      './test/specs/init/app.spec.ts',
       './test/specs/main/left.spec.ts',
       './test/specs/main/right.spec.ts',
       './test/specs/select-device/before-change.spec.ts',
@@ -44,25 +46,70 @@ exports.config = {
       './test/specs/select-version/back-without-select.spec.ts',
       './test/specs/select-version/expand-unexpand-list.spec.ts',
       './test/specs/select-version/select-v22.03.0.spec.ts',
-      './test/specs/select-version/check-resources-v22.03.0.spec.ts',
-      './test/specs/select-version/download-v22.03.0.spec.ts',
-      './test/specs/select-version/check-download-v22.03.0.spec.ts',
-      './test/specs/select-version/already-downloaded-v22.03.0.spec.ts',
-      './test/specs/select-version/check-resources-v22.03.0.sha256.txt.spec.ts',
-      './test/specs/select-version/download-v22.03.0.sha256.txt.spec.ts',
-      './test/specs/select-version/check-download-v22.03.0.sha256.txt.spec.ts',
-      './test/specs/select-version/already-downloaded-v22.03.0.sha256.txt.spec.ts',
-      './test/specs/select-version/check-resources-v22.03.0.sig.spec.ts',
-      './test/specs/select-version/download-v22.03.0.sig.spec.ts',
-      './test/specs/select-version/check-download-v22.03.0.sig.spec.ts',
-      './test/specs/select-version/already-downloaded-v22.03.0.sig.spec.ts',
+      './test/specs/select-version/select-v22.08.0.spec.ts',
+      './test/specs/select-version/select-v22.08.1.spec.ts',
+      './test/specs/select-version/select-v22.08.2.spec.ts',
+      './test/specs/select-version/select-krux_binaries.spec.ts',
+      './test/specs/select-version/v22.03.0/check-resources.spec.ts',
+      './test/specs/select-version/v22.08.0/check-resources.spec.ts',
+      './test/specs/select-version/v22.08.1/check-resources.spec.ts',
+      './test/specs/select-version/v22.08.2/check-resources.spec.ts',
+      './test/specs/select-version/v22.03.0/download.spec.ts',
+      './test/specs/select-version/v22.08.0/download.spec.ts',
+      './test/specs/select-version/v22.08.1/download.spec.ts',
+      './test/specs/select-version/v22.08.2/download.spec.ts',
+      './test/specs/select-version/v22.03.0/check-download.spec.ts',
+      './test/specs/select-version/v22.08.0/check-download.spec.ts',
+      './test/specs/select-version/v22.08.1/check-download.spec.ts',
+      './test/specs/select-version/v22.08.2/check-download.spec.ts',
+      './test/specs/select-version/v22.03.0/already-downloaded.spec.ts',
+      './test/specs/select-version/v22.08.0/already-downloaded.spec.ts',
+      './test/specs/select-version/v22.08.1/already-downloaded.spec.ts',
+      './test/specs/select-version/v22.08.2/already-downloaded.spec.ts',
+      './test/specs/select-version/v22.03.0/check-resources-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.0/check-resources-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.1/check-resources-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.2/check-resources-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.03.0/download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.0/download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.1/download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.2/download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.03.0/check-download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.0/check-download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.1/check-download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.2/check-download-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.03.0/already-downloaded-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.0/already-downloaded-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.1/already-downloaded-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.08.2/already-downloaded-sha256-txt.spec.ts',
+      './test/specs/select-version/v22.03.0/check-resources-sig.spec.ts',
+      './test/specs/select-version/v22.08.0/check-resources-sig.spec.ts',
+      './test/specs/select-version/v22.08.1/check-resources-sig.spec.ts',
+      './test/specs/select-version/v22.08.2/check-resources-sig.spec.ts',
+      './test/specs/select-version/v22.03.0/download-sig.spec.ts',
+      './test/specs/select-version/v22.08.0/download-sig.spec.ts',
+      './test/specs/select-version/v22.08.1/download-sig.spec.ts',
+      './test/specs/select-version/v22.08.2/download-sig.spec.ts',
+      './test/specs/select-version/v22.03.0/already-downloaded-sig.spec.ts',
+      './test/specs/select-version/v22.08.0/already-downloaded-sig.spec.ts',
+      './test/specs/select-version/v22.08.1/already-downloaded-sig.spec.ts',
+      './test/specs/select-version/v22.08.2/already-downloaded-sig.spec.ts',
       './test/specs/select-version/check-resources-pem.spec.ts',
       './test/specs/select-version/download-pem.spec.ts',
       './test/specs/select-version/check-download-pem.spec.ts',
       './test/specs/select-version/already-downloaded-pem.spec.ts',
-      './test/specs/select-version/verify-official-release-v22.03.0.spec.ts',
-      './test/specs/select-version/verified-official-release-v22.03.0.spec.ts',
-      './test/specs/select-version/unzip-official-release-v22.03.0.spec.ts',
+      './test/specs/select-version/v22.03.0/verify.spec.ts',
+      './test/specs/select-version/v22.08.0/verify.spec.ts',
+      './test/specs/select-version/v22.08.1/verify.spec.ts',
+      './test/specs/select-version/v22.08.2/verify.spec.ts',
+      './test/specs/select-version/v22.03.0/verified.spec.ts',
+      './test/specs/select-version/v22.08.0/verified.spec.ts',
+      './test/specs/select-version/v22.08.1/verified.spec.ts',
+      './test/specs/select-version/v22.08.2/verified.spec.ts',
+      './test/specs/select-version/v22.03.0/unzip.spec.ts',
+      './test/specs/select-version/v22.08.0/unzip.spec.ts',
+      './test/specs/select-version/v22.08.1/unzip.spec.ts',
+      './test/specs/select-version/v22.08.2/unzip.spec.ts',
     ],
     // Patterns to exclude.
     exclude: [
@@ -323,7 +370,7 @@ exports.config = {
      * Hook that gets executed _before_ a hook within the suite starts (e.g. runs before calling
      * beforeEach in Mocha)
      */
-    // beforeHook: function (test, context) {
+    //beforeHook: function (test, context) {
     // },
     /**
      * Hook that gets executed _after_ a hook within the suite starts (e.g. runs after calling
@@ -343,14 +390,49 @@ exports.config = {
      */
     // afterTest: function(test, context, { error, result, duration, passed, retries }) {
     // },
-
-
     /**
      * Hook that gets executed after the suite has ended
      * @param {Object} suite suite details
      */
-    // afterSuite: function (suite) {
-    // },
+    afterSuite: function (suite) {
+      let index = 0
+      const promises = []
+
+      if (process.platform === 'linux') {
+        glob('/tmp/yarn--*', function(err, yarndirs) {
+          if (err) reject(err)
+          yarndirs.forEach(function(yarndir) {
+            index += 1
+            promises.push(new Promise(function(res) {
+              setTimeout(res, 1000 * index)
+            }))
+            promises.push(new Promise(function(res, rej) {
+              console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${yarndir}\x1b[0m`)
+              rimraf(yarndir, { preserveRoot: false }, function() {
+                res()
+              })
+            }))
+          })
+        })
+        glob('/tmp/lighthouse.*', function(err, lighthousedirs) {
+          if (err) reject(err)
+          lighthousedirs.forEach(function(lighthousedir) {
+            index += 1
+            promises.push(new Promise(function(res) {
+              setTimeout(res, 1000 * index)
+            }))
+            promises.push(new Promise(function(res, rej) {
+              console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${lighthousedir}\x1b[0m`)
+              rimraf(lighthousedir, { preserveRoot: false }, function() {
+                res()
+              })
+            }))
+          })
+        })
+      }
+
+      return Promise.all(promises)
+    },
     /**
      * Runs after a WebdriverIO command gets executed
      * @param {String} commandName hook command name
@@ -385,8 +467,8 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    //onComplete: function(exitCode, config, capabilities, results) {
-    //},
+    // onComplete: function(exitCode, config, capabilities, results) {
+    // },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session

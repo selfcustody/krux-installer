@@ -58,8 +58,20 @@ jobs:
           GH_TOKEN: ${{ secrets.github_token }}
         run: yarn run build AppImage
     
-      - name: E2E Test
-        run: yarn run test
+      - name: E2E Test - initialization
+        run: yarn run test init
+
+      - name: E2E Test - main page
+        run: yarn run test main
+
+      - name: E2E Test - select device
+        run: yarn run test select-device
+
+      - name: E2E Test - select version initialization
+        run: yarn run test select-version/init
+
+      - name: E2E Test - select version v22.03.0
+        run: yarn run test select-version/v22.03.0
 
       - name: Hash executable
         if: ${{ startsWith(github.ref, 'refs/tags/v') }}

@@ -5,9 +5,10 @@ import SelectVersion from '../../../pageobjects/select-version.page'
 import CheckResourcesOfficialRelease from '../../../pageobjects/check-resources-official-release.page'
 import CheckResourcesOfficialReleaseSHA256 from '../../../pageobjects/check-resources-official-release-sha256.page'
 import CheckResourcesOfficialReleaseSig from '../../../pageobjects/check-resources-official-release-sig.page'
+import CheckResourcesOfficialReleasePem from '../../../pageobjects/check-resources-official-release-pem.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectVersionPage: check if \'v22.08.2/krux-v22.08.2.zip.sig\' exists', () => {
+describe('SelectVersionPage: check if \'selfcustody.pem\' exists', () => {
  
   // eslint-disable-next-line no-undef
   before(async () => {
@@ -30,7 +31,7 @@ describe('SelectVersionPage: check if \'v22.08.2/krux-v22.08.2.zip.sig\' exists'
     await SelectVersion.list_item_22_08_2.waitForExist()
     await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
-    await SelectVersion.list_item_22_08_2.click()
+    await SelectVersion.list_item_22_03_0.click()
     await SelectVersion.formSelectButton.waitForExist()
     await SelectVersion.formSelectButton.click()
     await CheckResourcesOfficialRelease.page.waitForExist() 
@@ -48,13 +49,20 @@ describe('SelectVersionPage: check if \'v22.08.2/krux-v22.08.2.zip.sig\' exists'
     await CheckResourcesOfficialReleaseSHA256.buttonProceed.click()
     await CheckResourcesOfficialReleaseSHA256.page.waitForExist({ reverse: true }) 
     await CheckResourcesOfficialReleaseSig.page.waitForExist()
-    await CheckResourcesOfficialReleaseSig.cardTitleChecking.waitForExist()
+    await CheckResourcesOfficialReleaseSig.cardTitleChecking.waitForExist() 
+    await CheckResourcesOfficialReleaseSig.cardTitleChecking.waitForExist({ reverse: true })
+    await CheckResourcesOfficialReleaseSig.cardTitleChecked.waitForExist()
+    await CheckResourcesOfficialReleaseSig.cardSubtitleChecked.waitForExist()
+    await CheckResourcesOfficialReleaseSig.cardContentChecked.waitForExist()
+    await CheckResourcesOfficialReleaseSig.buttonProceed.waitForExist() 
+    await CheckResourcesOfficialReleaseSig.buttonDownload.waitForExist()
+    await CheckResourcesOfficialReleaseSig.buttonProceed.click()
   })
 
   // eslint-disable-next-line no-undef
   it('should check', async () => {   
-    await expectWDIO(CheckResourcesOfficialReleaseSig.cardTitleChecking)
-      .toHaveText('Checking official release signature...')
+    await expectWDIO(CheckResourcesOfficialReleasePem.cardTitleChecking)
+      .toHaveText('Checking selfcustody public key certificate...')
   })
 
 })

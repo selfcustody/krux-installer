@@ -4,9 +4,10 @@ import Main from '../../../pageobjects/main.page'
 import SelectVersion from '../../../pageobjects/select-version.page'
 import CheckResourcesOfficialRelease from '../../../pageobjects/check-resources-official-release.page'
 import CheckResourcesOfficialReleaseSHA256 from '../../../pageobjects/check-resources-official-release-sha256.page'
+import CheckResourcesOfficialReleaseSig from '../../../pageobjects/check-resources-official-release-sig.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectVersionPage: check if \'v22.08.1/krux-v22.08.1.zip.sha256.txt\' exists', () => {
+describe('SelectVersionPage: check if \'v22.03.0/krux-v22.03.0.zip.sig\' exists', () => {
  
   // eslint-disable-next-line no-undef
   before(async () => {
@@ -24,12 +25,8 @@ describe('SelectVersionPage: check if \'v22.08.1/krux-v22.08.1.zip.sha256.txt\' 
     await SelectVersion.formArrow.click()
     await delay(1000)
     await SelectVersion.list_item_22_03_0.waitForExist()
-    await SelectVersion.list_item_22_08_0.waitForExist()
-    await SelectVersion.list_item_22_08_1.waitForExist()
-    await SelectVersion.list_item_22_08_2.waitForExist()
-    await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
-    await SelectVersion.list_item_22_08_1.click()
+    await SelectVersion.list_item_22_03_0.click()
     await SelectVersion.formSelectButton.waitForExist()
     await SelectVersion.formSelectButton.click()
     await CheckResourcesOfficialRelease.page.waitForExist() 
@@ -37,13 +34,23 @@ describe('SelectVersionPage: check if \'v22.08.1/krux-v22.08.1.zip.sha256.txt\' 
     await CheckResourcesOfficialRelease.buttonProceed.click()
     await CheckResourcesOfficialRelease.page.waitForExist({ reverse: true }) 
     await CheckResourcesOfficialReleaseSHA256.page.waitForExist()
-    await CheckResourcesOfficialReleaseSHA256.cardTitleChecking.waitForExist()
+    await CheckResourcesOfficialReleaseSHA256.cardTitleChecking.waitForExist() 
+    await CheckResourcesOfficialReleaseSHA256.cardTitleChecking.waitForExist({ reverse: true })
+    await CheckResourcesOfficialReleaseSHA256.cardTitleChecked.waitForExist()
+    await CheckResourcesOfficialReleaseSHA256.cardSubtitleChecked.waitForExist()
+    await CheckResourcesOfficialReleaseSHA256.cardContentChecked.waitForExist() 
+    await CheckResourcesOfficialReleaseSHA256.buttonDownload.waitForExist()
+    await CheckResourcesOfficialReleaseSHA256.buttonProceed.waitForExist()
+    await CheckResourcesOfficialReleaseSHA256.buttonProceed.click()
+    await CheckResourcesOfficialReleaseSHA256.page.waitForExist({ reverse: true }) 
+    await CheckResourcesOfficialReleaseSig.page.waitForExist()
+    await CheckResourcesOfficialReleaseSig.cardTitleChecking.waitForExist()
   })
 
   // eslint-disable-next-line no-undef
-  it('should check', async () => {  
-    await expectWDIO(CheckResourcesOfficialReleaseSHA256.cardTitleChecking)
-      .toHaveText('Checking official release sha256.txt...')
+  it('should check', async () => {   
+    await expectWDIO(CheckResourcesOfficialReleaseSig.cardTitleChecking)
+      .toHaveText('Checking official release signature...')
   })
 
 })

@@ -9,28 +9,28 @@ const existsAsync = promisify(exists)
 const statAsync = promisify(stat)
 
 // eslint-disable-next-line no-undef
-describe('check downloaded v22.08.0 zip.sha256.txt release on file system', () => {
+describe('check downloaded v22.03.0 zip.sig release on file system', () => {
 
-  let api, dir, sha256
+  let api, dir, sig
 
   // eslint-disable-next-line no-undef
   before(async () => {
     // eslint-disable-next-line no-undef
     api = await browser.electronAPI()
-    dir = join(api.documents, name, 'v22.08.0') 
-    sha256 = join(dir, 'krux-v22.08.0.zip.sha256.txt')
+    dir = join(api.documents, name, 'v22.03.0') 
+    sig = join(dir, 'krux-v22.03.0.zip.sig')
   })
   
   // eslint-disable-next-line no-undef
   it('should have downloaded release zip file on disk', async () => {
-    const sha256Exists = await existsAsync(sha256)
-    expectChai(sha256Exists).to.be.equal(true)
+    const sigExists = await existsAsync(sig)
+    expectChai(sigExists).to.be.equal(true)
   })
 
   // eslint-disable-next-line no-undef
   it('should downloaded release zip file on disk have correct size', async () => {
-    const sha256stat = await statAsync(sha256)
-    const bytes = formatBytes(sha256stat.size)
-    expectChai(bytes).to.be.equal('65 Bytes')
+    const sigStat = await statAsync(sig)
+    const bytes = formatBytes(sigStat.size)
+    expectChai(bytes).to.be.equal('70 Bytes')
   })
 })

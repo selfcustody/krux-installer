@@ -1,6 +1,6 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import Main from '../../pageobjects/main.page'
-import SelectVersion from '../../pageobjects/select-version.page'
+import Main from '../../../pageobjects/main.page'
+import SelectVersion from '../../../pageobjects/select-version.page'
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: before change', () => {

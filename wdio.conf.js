@@ -4,6 +4,8 @@ const { exec } = require('child_process')
 const glob = require('glob')
 const rimraf = require('rimraf')
 
+const testSpecPath = `${join(__dirname, 'test', 'specs', process.argv[4])}/*.ts`
+
 exports.config = {
     //
     // ====================
@@ -27,7 +29,8 @@ exports.config = {
     // then the current working directory is where your `package.json` resides, so `wdio`
     // will be called from there.
     //
-    specs: [
+    specs: [ testSpecPath ]
+      /*[
       './test/specs/init/config.spec.ts',
       './test/specs/init/app.spec.ts',
       './test/specs/main/left.spec.ts',
@@ -110,7 +113,7 @@ exports.config = {
       './test/specs/select-version/v22.08.0/unzip.spec.ts',
       './test/specs/select-version/v22.08.1/unzip.spec.ts',
       './test/specs/select-version/v22.08.2/unzip.spec.ts',
-    ],
+    ]*/,
     // Patterns to exclude.
     exclude: [
         // 'path/to/excluded/files'
@@ -294,7 +297,7 @@ exports.config = {
       // that create the store, kill it
       // and then start to test
       return new Promise(function(resolve, reject) {
-        if (specs[0].indexOf('config.spec.ts') !== -1) {
+        if (specs[0].indexOf('001.config.spec.ts') !== -1) {
           console.log('------------------------------------')
           console.log('INTERMEDIATE RUNNING TO CREATE STORE')
           if (process.platform === 'linux') {
@@ -399,37 +402,25 @@ exports.config = {
       let index = 0
       const promises = []
 
+      function createPromises(err, dirs) {
+        if (err) promises.push(Promise.reject(err))
+        dirs.forEach(function(dir) {
+          index += 1
+          promises.push(new Promise(function(res) {
+            setTimeout(res, 1000 * index)
+          }))
+          promises.push(new Promise(function(res) {
+            console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
+            rimraf(dir, { preserveRoot: false }, function() {
+              res()
+            })
+          }))
+        })
+      }
+
       if (process.platform === 'linux') {
-        glob('/tmp/yarn--*', function(err, yarndirs) {
-          if (err) promises.push(Promise.reject(err))
-          yarndirs.forEach(function(yarndir) {
-            index += 1
-            promises.push(new Promise(function(res) {
-              setTimeout(res, 1000 * index)
-            }))
-            promises.push(new Promise(function(res) {
-              console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${yarndir}\x1b[0m`)
-              rimraf(yarndir, { preserveRoot: false }, function() {
-                res()
-              })
-            }))
-          })
-        })
-        glob('/tmp/lighthouse.*', function(err, lighthousedirs) {
-          if (err) promises.push(Promise.reject(err))
-          lighthousedirs.forEach(function(lighthousedir) {
-            index += 1
-            promises.push(new Promise(function(res) {
-              setTimeout(res, 1000 * index)
-            }))
-            promises.push(new Promise(function(res) {
-              console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${lighthousedir}\x1b[0m`)
-              rimraf(lighthousedir, { preserveRoot: false }, function() {
-                res()
-              })
-            }))
-          })
-        })
+        glob('/tmp/yarn--*', createPromises)
+        glob('/tmp/lighthouse.*', createPromises)
       }
 
       return Promise.all(promises)
@@ -468,8 +459,33 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
-    // onComplete: function(exitCode, config, capabilities, results) {
-    // },
+    onComplete: function(exitCode, config, capabilities, results) {
+      let index = 0
+      const promises = []
+
+      function createPromises(err, dirs) {
+        if (err) promises.push(Promise.reject(err))
+        dirs.forEach(function(dir) {
+          index += 1
+          promises.push(new Promise(function(res) {
+            setTimeout(res, 1000 * index)
+          }))
+          promises.push(new Promise(function(res) {
+            console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
+            rimraf(dir, { preserveRoot: false }, function() {
+              res()
+            })
+          }))
+        })
+      }
+
+      if (process.platform === 'linux') {
+        let docs
+        if (process.env.LANG.match(/en*/g)) docs = 'Documents'
+        if (process.env.LANG.match(/pt*/g)) docs = 'Documentos'
+        glob(`${process.env.HOME}/${docs}/krux-installer/*`, createPromises)
+      }
+    },
     /**
     * Gets executed when a refresh happens.
     * @param {String} oldSessionId session ID of the old session

@@ -459,6 +459,7 @@ exports.config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
+    // eslint-disable-next-line no-unused-vars
     onComplete: function(exitCode, config, capabilities, results) {
       let index = 0
       const promises = []

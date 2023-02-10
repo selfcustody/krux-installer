@@ -203,4 +203,22 @@ describe('Unzip \'v22.03.0/krux-v22.03.0.zip\' release', () => {
       await expectWDIO(UnzipOfficialRelease.buttonBack).toHaveText('BACK')
     })
   })
+
+  // eslint-disable-next-line no-undef
+  describe('click \'DONE\' and verify button on MainPage', () => {
+
+    // eslint-disable-next-line no-undef
+    before(async () => {
+      await UnzipOfficialRelease.buttonDone.click()
+      await delay(1000)
+      await UnzipOfficialRelease.page.waitForExist({ reverse: true })
+      await Main.page.waitForExist()
+      await Main.selectVersionButton.waitForExist()
+    })
+
+    // eslint-disable-next-line no-undef
+    it('should button changed from \'SELECT VERSION\' to \'SELFCUSTODY/KRUX/RELEASE/TAG/V22.03.0\' on MainPage', async () => {
+      await expectWDIO(Main.selectVersionButton).toHaveText('SELFCUSTODY/KRUX/RELEASES/TAG/V22.03.0')
+    })
+  })
 })

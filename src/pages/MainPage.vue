@@ -36,7 +36,7 @@
               </v-card-subtitle>
               <v-card-actions> 
                 <v-btn
-                  id="select-write-button"
+                  id="select-write-flash-button"
                   @click.prevent="$emit('onSuccess', { page: 'BeforeFlashDevicePage' })"
                 >
                   <v-icon>mdi-lightning-bolt-outline</v-icon>&ensp;Flash

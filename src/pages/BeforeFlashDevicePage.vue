@@ -1,12 +1,23 @@
 <template>
-  <v-layout row wrap>
+  <v-layout
+    row wrap
+    id="before-flash-device-page"
+  >
     <v-flex xs12>
       <v-card class="ma-5 pa-5">
-        <v-card-title>
+        <v-card-title id="before-flash-device-page-card-title">
           Flash to device
         </v-card-title>
-        <v-card-subtitle><b>version</b>: {{ version }}</v-card-subtitle> 
-        <v-card-subtitle><b>device</b>: {{ device }}</v-card-subtitle>
+        <v-card-subtitle
+          id="before-flash-device-page-card-subtitle-version"
+        >
+          <b>version</b>: {{ version }}
+        </v-card-subtitle> 
+        <v-card-subtitle
+          id="before-flash-device-page-card-subtitle-device"
+        >
+          <b>device</b>: {{ device }}
+        </v-card-subtitle>
         <v-card-content>
           <v-card-text v-for="(text, i) in texts" :key="i">
             {{ text }}

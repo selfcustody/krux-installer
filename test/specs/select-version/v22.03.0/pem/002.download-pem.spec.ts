@@ -1,12 +1,12 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import delay from '../../delay'
-import Main from '../../../pageobjects/main.page'
-import SelectVersion from '../../../pageobjects/select-version.page'
-import CheckResourcesOfficialRelease from '../../../pageobjects/check-resources-official-release.page'
-import CheckResourcesOfficialReleaseSHA256 from '../../../pageobjects/check-resources-official-release-sha256.page'
-import CheckResourcesOfficialReleaseSig from '../../../pageobjects/check-resources-official-release-sig.page'
-import CheckResourcesOfficialReleasePem from '../../../pageobjects/check-resources-official-release-pem.page'
-import DownloadOfficialReleasePem from '../../../pageobjects/download-official-release-pem.page'
+import delay from '../../../delay'
+import Main from '../../../../pageobjects/main.page'
+import SelectVersion from '../../../../pageobjects/select-version.page'
+import CheckResourcesOfficialRelease from '../../../../pageobjects/check-resources-official-release.page'
+import CheckResourcesOfficialReleaseSHA256 from '../../../../pageobjects/check-resources-official-release-sha256.page'
+import CheckResourcesOfficialReleaseSig from '../../../../pageobjects/check-resources-official-release-sig.page'
+import CheckResourcesOfficialReleasePem from '../../../../pageobjects/check-resources-official-release-pem.page'
+import DownloadOfficialReleasePem from '../../../../pageobjects/download-official-release-pem.page'
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: download \'selfcustody.pem\' option', () => {

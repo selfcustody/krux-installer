@@ -1,10 +1,10 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import delay from '../../delay'
-import Main from '../../../pageobjects/main.page'
-import SelectVersion from '../../../pageobjects/select-version.page'
-import CheckResourcesOfficialRelease from '../../../pageobjects/check-resources-official-release.page'
-import CheckResourcesOfficialReleaseSHA256 from '../../../pageobjects/check-resources-official-release-sha256.page'
-import DownloadOfficialReleaseSHA256 from '../../../pageobjects/download-official-release-sha256-txt.page'
+import delay from '../../../delay'
+import Main from '../../../../pageobjects/main.page'
+import SelectVersion from '../../../../pageobjects/select-version.page'
+import CheckResourcesOfficialRelease from '../../../../pageobjects/check-resources-official-release.page'
+import CheckResourcesOfficialReleaseSHA256 from '../../../../pageobjects/check-resources-official-release-sha256.page'
+import DownloadOfficialReleaseSHA256 from '../../../../pageobjects/download-official-release-sha256-txt.page'
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: download \'v22.03.0/krux-v22.03.0.zip.sha256.txt\' option', () => {

@@ -87,6 +87,7 @@ async function main() {
   console.log("");
 
   if (action === 'lint') {
+    runner(`yamllint${process.platform === 'win32' ? '.cmd' : ''}`, ['--schema=CORE_SCHEMA', '.github/workflows/*.yml'])
     runner(`vue-cli-service${process.platform === 'win32' ? '.cmd' : '' }`, ['lint'])
     runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ join(__dirname, '..', 'public') ])
     runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ join(__dirname, '..', 'src') ])
@@ -95,15 +96,15 @@ async function main() {
   }
 
   if (action === 'icon') {
-    const fromTxt = join(__dirname, '..', 'build', 'krux.txt')
-    const toSvg = join(__dirname, '..', 'build', 'krux.svg')
-    runner(`aasvg${process.platform === 'win32' ? '.cmd' : '' }`, ['<', fromTxt, '>', toSvg])
+    //const fromTxt = join(__dirname, '..', 'build', 'krux.txt')
+    //const toSvg = join(__dirname, '..', 'build', 'krux.svg')
+    //runner(`aasvg${process.platform === 'win32' ? '.cmd' : '' }`, ['<', fromTxt, '>', toSvg])
 
-    const toPng = join(__dirname, '..', 'build', 'krux.png')
-    runner(`svgexport${process.platform === 'win32' ? '.cmd' : '' }`, [toSvg, toPng])
+    //const toPng = join(__dirname, '..', 'build', 'krux.png')
+    //runner(`svgexport${process.platform === 'win32' ? '.cmd' : '' }`, [toSvg, toPng])
 
-    const toIconPng = join(__dirname, '..', 'build', 'icon.png')
-    runner(`resize-img${process.platform === 'win32' ? '.cmd' : '' }`, ['--width', '256', '--height', '256', toPng, '>', toIconPng])
+    //const toIconPng = join(__dirname, '..', 'build', 'krux.png')
+    //runner(`resize-img${process.platform === 'win32' ? '.cmd' : '' }`, ['--width', '256', '--height', '256', toPng, '>', toIconPng])
 
     if (process.platform === 'win32') {
       const toIcon = join(__dirname, '..', 'build', 'icon.ico')
@@ -173,13 +174,22 @@ async function main() {
   }
 
   if (action === 'test') {
-    const test = process.argv[3]
+    const test = process.argv.slice(3)
     const wdioconf = join(__dirname, '..', 'wdio.conf.js')
 
     if (process.platform === 'linux') {
-      runner('xvfb-maybe', ['wdio', 'run', wdioconf, test])
+      const __args__ = ['wdio', 'run', wdioconf]
+      test.forEach(function(t) {
+        __args__.push(t)
+      })
+
+      runner('xvfb-maybe', __args__)
     } else {
-      runner(`wdio${process.platform === 'win32' ? '.cmd' : '' }`, ['run', wdioconf])
+      const __args__ = ['run', wdioconf]
+      test.forEach(function(t) {
+        __args__.push(t)
+      })
+      runner(`wdio${process.platform === 'win32' ? '.cmd' : '' }`, __args__)
     }
   }
 

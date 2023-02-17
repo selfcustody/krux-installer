@@ -1,12 +1,15 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import delay from '../../delay'
-import Main from '../../../pageobjects/main.page'
-import SelectVersion from '../../../pageobjects/select-version.page'
-import CheckResourcesOfficialRelease from '../../../pageobjects/check-resources-official-release.page'
-import CheckResourcesOfficialReleaseSHA256 from '../../../pageobjects/check-resources-official-release-sha256.page'
-import CheckResourcesOfficialReleaseSig from '../../../pageobjects/check-resources-official-release-sig.page'
+import delay from '../../../delay'
+import Main from '../../../../pageobjects/main.page'
+import SelectVersion from '../../../../pageobjects/select-version.page'
+import CheckResourcesOfficialRelease from '../../../../pageobjects/check-resources-official-release.page'
+import CheckResourcesOfficialReleaseSHA256 from '../../../../pageobjects/check-resources-official-release-sha256.page'
+import CheckResourcesOfficialReleaseSig from '../../../../pageobjects/check-resources-official-release-sig.page'
+import CheckResourcesOfficialReleasePem from '../../../../pageobjects/check-resources-official-release-pem.page'
+import VerifyOfficialRelease from '../../../../pageobjects/verify-official-release.page'
+
 // eslint-disable-next-line no-undef
-describe('SelectVersionPage: warn before download \'selfcustody/krux/releases/tag/v22.03.0.sig\' again', () => {
+describe('Start verification of \'v22.03.0/krux-v22.03.0.zip\' release', () => {
   
   // eslint-disable-next-line no-undef
   before(async () => {
@@ -60,33 +63,26 @@ describe('SelectVersionPage: warn before download \'selfcustody/krux/releases/ta
     await CheckResourcesOfficialReleaseSig.cardTitleChecked.waitForExist()
     await CheckResourcesOfficialReleaseSig.cardSubtitleChecked.waitForExist()
     await CheckResourcesOfficialReleaseSig.cardContentChecked.waitForExist()
-    await delay(1000)
+    await CheckResourcesOfficialReleaseSig.buttonProceed.waitForExist()
+    await CheckResourcesOfficialReleaseSig.buttonProceed.click()
+    await CheckResourcesOfficialReleaseSig.page.waitForExist({ reverse: true }) 
+    await CheckResourcesOfficialReleasePem.page.waitForExist() 
+    await CheckResourcesOfficialReleasePem.cardTitleChecking.waitForExist()
+    await CheckResourcesOfficialReleasePem.cardTitleChecking.waitForExist({ reverse: true })
+    await CheckResourcesOfficialReleasePem.cardTitleChecked.waitForExist()
+    await CheckResourcesOfficialReleasePem.cardSubtitleChecked.waitForExist()
+    await CheckResourcesOfficialReleasePem.cardContentChecked.waitForExist() 
+    await CheckResourcesOfficialReleasePem.buttonProceed.waitForExist()
+    await CheckResourcesOfficialReleasePem.buttonDownload.waitForExist()
+    await CheckResourcesOfficialReleasePem.buttonProceed.click()
+    await VerifyOfficialRelease.page.waitForExist()
+    await VerifyOfficialRelease.cardTitleChecking.waitForExist()
   })
 
-    
-  // eslint-disable-next-line no-undef
-  it('should card title be \'v22.03.0/krux-v22.03.0.zip.sig\'', async () => {
-    await expectWDIO(CheckResourcesOfficialReleaseSig.cardTitleChecked).toHaveText('v22.03.0/krux-v22.03.0.zip.sig')
-  })
 
   // eslint-disable-next-line no-undef
-  it('should card subtitle be \'Already downloaded\'', async () => {
-    await expectWDIO(CheckResourcesOfficialReleaseSig.cardSubtitleChecked).toHaveText('Already downloaded')
+  it('should card title be \'Verifying release v22.03.0...\'', async () => {
+    await expectWDIO(VerifyOfficialRelease.cardTitleChecking).toHaveText('Verifying release v22.03.0...')
   })
-
-  // eslint-disable-next-line no-undef
-  it('should card content be \'Click "Proceed" to proceed with the downloaded version or "Download the file again".\'', async () => {
-    await expectWDIO(CheckResourcesOfficialReleaseSig.cardContentChecked)
-      .toHaveText('Click "Proceed" to proceed with the downloaded version or "Download the file again".')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should have a \'PROCEED\' button', async () => { 
-    await expectWDIO(CheckResourcesOfficialReleaseSig.buttonProceed).toHaveText('PROCEED')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should have a \'DOWNLOAD THE FILE AGAIN\' button', async () => { 
-    await expectWDIO(CheckResourcesOfficialReleaseSig.buttonDownload).toHaveText('DOWNLOAD THE FILE AGAIN')
-  })
+  
 })

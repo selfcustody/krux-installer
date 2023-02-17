@@ -4,7 +4,25 @@ const { exec } = require('child_process')
 const glob = require('glob')
 const rimraf = require('rimraf')
 
-const testSpecPath = `${join(__dirname, 'test', 'specs', process.argv[4])}/*.ts`
+const testSpecPaths = [ `${join(__dirname, 'test', 'specs', process.argv[4])}/*.ts` ]
+const excludeSpecPaths = []
+
+if (process.argv[5] === '--filter' && process.argv[6] !== '') {
+  const p = join(__dirname, 'test', 'specs', process.argv[4], process.argv[6])
+  excludeSpecPaths.push(p);
+}
+
+/*
+ if (testSpecPaths[0].match(/^.*sha256.*$/g)) {
+    excludeSpecPaths.push(`${join(__dirname, 'test', 'specs', process.argv[4])}/*.download-sha256-txt.spec.ts`)
+  }
+  if (testSpecPaths[0].match(/^.*sig.*$/g)) {
+    excludeSpecPaths.push(`${join(__dirname, 'test', 'specs', process.argv[4])}/*.download-sig.spec.ts`)
+  }
+  if (testSpecPaths[0].match(/^.*pem.*$/g)) {
+    excludeSpecPaths.push(`${join(__dirname, 'test', 'specs', process.argv[4])}/*.download-pem.spec.ts`)
+  }
+*/
 
 exports.config = {
     //
@@ -29,95 +47,9 @@ exports.config = {
     // then the current working directory is where your `package.json` resides, so `wdio`
     // will be called from there.
     //
-    specs: [ testSpecPath ]
-      /*[
-      './test/specs/init/config.spec.ts',
-      './test/specs/init/app.spec.ts',
-      './test/specs/main/left.spec.ts',
-      './test/specs/main/right.spec.ts',
-      './test/specs/select-device/before-change.spec.ts',
-      './test/specs/select-device/on-change.spec.ts',
-      './test/specs/select-device/back-without-select.spec.ts',
-      './test/specs/select-device/expand-unexpand-list.spec.ts',
-      './test/specs/select-device/m5stickv.spec.ts',
-      './test/specs/select-device/amigo-ips.spec.ts',
-      './test/specs/select-device/amigo-tft.spec.ts',
-      './test/specs/select-device/bit.spec.ts',
-      './test/specs/select-device/dock.spec.ts',
-      './test/specs/select-version/before-change.spec.ts',
-      './test/specs/select-version/on-change.spec.ts',
-      './test/specs/select-version/back-without-select.spec.ts',
-      './test/specs/select-version/expand-unexpand-list.spec.ts',
-      './test/specs/select-version/select-v22.03.0.spec.ts',
-      './test/specs/select-version/select-v22.08.0.spec.ts',
-      './test/specs/select-version/select-v22.08.1.spec.ts',
-      './test/specs/select-version/select-v22.08.2.spec.ts',
-      './test/specs/select-version/select-krux_binaries.spec.ts',
-      './test/specs/select-version/v22.03.0/check-resources.spec.ts',
-      './test/specs/select-version/v22.08.0/check-resources.spec.ts',
-      './test/specs/select-version/v22.08.1/check-resources.spec.ts',
-      './test/specs/select-version/v22.08.2/check-resources.spec.ts',
-      './test/specs/select-version/v22.03.0/download.spec.ts',
-      './test/specs/select-version/v22.08.0/download.spec.ts',
-      './test/specs/select-version/v22.08.1/download.spec.ts',
-      './test/specs/select-version/v22.08.2/download.spec.ts',
-      './test/specs/select-version/v22.03.0/check-download.spec.ts',
-      './test/specs/select-version/v22.08.0/check-download.spec.ts',
-      './test/specs/select-version/v22.08.1/check-download.spec.ts',
-      './test/specs/select-version/v22.08.2/check-download.spec.ts',
-      './test/specs/select-version/v22.03.0/already-downloaded.spec.ts',
-      './test/specs/select-version/v22.08.0/already-downloaded.spec.ts',
-      './test/specs/select-version/v22.08.1/already-downloaded.spec.ts',
-      './test/specs/select-version/v22.08.2/already-downloaded.spec.ts',
-      './test/specs/select-version/v22.03.0/check-resources-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.0/check-resources-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.1/check-resources-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.2/check-resources-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.03.0/download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.0/download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.1/download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.2/download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.03.0/check-download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.0/check-download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.1/check-download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.2/check-download-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.03.0/already-downloaded-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.0/already-downloaded-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.1/already-downloaded-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.08.2/already-downloaded-sha256-txt.spec.ts',
-      './test/specs/select-version/v22.03.0/check-resources-sig.spec.ts',
-      './test/specs/select-version/v22.08.0/check-resources-sig.spec.ts',
-      './test/specs/select-version/v22.08.1/check-resources-sig.spec.ts',
-      './test/specs/select-version/v22.08.2/check-resources-sig.spec.ts',
-      './test/specs/select-version/v22.03.0/download-sig.spec.ts',
-      './test/specs/select-version/v22.08.0/download-sig.spec.ts',
-      './test/specs/select-version/v22.08.1/download-sig.spec.ts',
-      './test/specs/select-version/v22.08.2/download-sig.spec.ts',
-      './test/specs/select-version/v22.03.0/already-downloaded-sig.spec.ts',
-      './test/specs/select-version/v22.08.0/already-downloaded-sig.spec.ts',
-      './test/specs/select-version/v22.08.1/already-downloaded-sig.spec.ts',
-      './test/specs/select-version/v22.08.2/already-downloaded-sig.spec.ts',
-      './test/specs/select-version/check-resources-pem.spec.ts',
-      './test/specs/select-version/download-pem.spec.ts',
-      './test/specs/select-version/check-download-pem.spec.ts',
-      './test/specs/select-version/already-downloaded-pem.spec.ts',
-      './test/specs/select-version/v22.03.0/verify.spec.ts',
-      './test/specs/select-version/v22.08.0/verify.spec.ts',
-      './test/specs/select-version/v22.08.1/verify.spec.ts',
-      './test/specs/select-version/v22.08.2/verify.spec.ts',
-      './test/specs/select-version/v22.03.0/verified.spec.ts',
-      './test/specs/select-version/v22.08.0/verified.spec.ts',
-      './test/specs/select-version/v22.08.1/verified.spec.ts',
-      './test/specs/select-version/v22.08.2/verified.spec.ts',
-      './test/specs/select-version/v22.03.0/unzip.spec.ts',
-      './test/specs/select-version/v22.08.0/unzip.spec.ts',
-      './test/specs/select-version/v22.08.1/unzip.spec.ts',
-      './test/specs/select-version/v22.08.2/unzip.spec.ts',
-    ]*/,
+    specs: testSpecPaths,
     // Patterns to exclude.
-    exclude: [
-        // 'path/to/excluded/files'
-    ],
+    exclude: excludeSpecPaths,
     // WebdriverIO will automatically detect if these dependencies are installed
     // and will compile your config and tests for you. Ensure to have a tsconfig.json
     // in the same directory as you WDIO config. If you need to configure how ts-node
@@ -305,10 +237,10 @@ exports.config = {
             const ki = exec(kiPath, (err) => {
               if (err) reject(err)
             })
-            console.log(`PID: ${ki.pid}`)
-            console.log('wait...')
+            console.log(`PID \x1b[32mrm ${ki.pid}\x1b[0m`)
+            console.log(`\x1b[33mwait\x1b[0m`)
             setTimeout(function(){
-              console.log(`killing process ${ki.pid}`)
+              console.log(`killing process \x1b[33m${ki.pid}\x1b[0m`)
               exec(`kill ${ki.pid}`, function(error) {
                 if (error) reject(error)
                 console.log('------------------------------------')
@@ -464,7 +396,7 @@ exports.config = {
       let index = 0
       const promises = []
 
-      function createPromises(err, dirs) {
+      function removePromises(err, dirs) {
         if (err) promises.push(Promise.reject(err))
         dirs.forEach(function(dir) {
           index += 1
@@ -472,7 +404,7 @@ exports.config = {
             setTimeout(res, 1000 * index)
           }))
           promises.push(new Promise(function(res) {
-            console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
+            console.log(`\x1b[32mremoving\x1b[0m \x1b[33m${dir}\x1b[0m`)
             rimraf(dir, { preserveRoot: false }, function() {
               res()
             })
@@ -480,11 +412,13 @@ exports.config = {
         })
       }
 
-      if (process.platform === 'linux') {
-        let docs
-        if (process.env.LANG.match(/en*/g)) docs = 'Documents'
-        if (process.env.LANG.match(/pt*/g)) docs = 'Documentos'
-        glob(`${process.env.HOME}/${docs}/krux-installer/*`, createPromises)
+      if (process.env.KI_DELETE_RESOURCES_ON_COMPLETE) {
+        if (process.platform === 'linux') {
+          let docs
+          if (process.env.LANG.match(/en*/g)) docs = 'Documents'
+          if (process.env.LANG.match(/pt*/g)) docs = 'Documentos'
+          glob(`${process.env.HOME}/${docs}/krux-installer/*`, removePromises)
+        }
       }
     },
     /**

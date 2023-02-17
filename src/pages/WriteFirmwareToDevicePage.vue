@@ -1,5 +1,9 @@
 <template>
-  <v-layout row wrap>
+  <v-layout
+    row
+    wrap
+    id="write-firmware-to-device-page"
+  >
     <v-flex xs12 sm12>
       <v-card
         v-if="!isWritten"
@@ -13,7 +17,7 @@
         </v-card-subtitle>
         <v-card-content>
           <v-card-text>
-            <div class="console" v-html="html" />
+            <div class="console" v-html="html" ref="console" />
           </v-card-text>
         </v-card-content>
         <v-card-actions>
@@ -24,9 +28,9 @@
           />
           <v-btn 
             v-if="done"
-            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            @click.prevent="onBack"
           >
-              Back
+            Back
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -47,15 +51,19 @@ export default {
       html: ''
     }
   },
-  async created () {  
-
+  beforeMount () {
+    this.$data.html = ''
+  },
+  async created () { 
     await window.KruxInstaller.flash.firmware()
  
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.flash.onData((_event, value) => { 
-      const output = this.parse(value)
-      tmpHtml += output
-      this.html = output
+      this.$nextTick(() => {
+        const output = this.parse(value)
+        tmpHtml += output
+        this.html = output
+      })
     })
 
     // eslint-disable-next-line no-unused-vars
@@ -68,6 +76,7 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.flash.onError((_event, value) => {
+      this.done = false
       this.$emit('onError', value)
     })
   },
@@ -80,6 +89,11 @@ export default {
       
       const ansi = new AnsiUp()
       return ansi.ansi_to_html(msg).replace(/\n/gm, '<br>')
+    },
+    onBack () {
+      this.$nextTick(() => {
+        this.$emit('onSuccess', { page: 'MainPage' })
+      })
     }
   }
 }
@@ -88,6 +102,7 @@ export default {
 <style>
 .console {
   font-family: monospace;
+  font-size: 10px;
   text-align: left;
   background-color: black;
   color: #fff;

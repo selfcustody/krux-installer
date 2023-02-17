@@ -59,7 +59,8 @@
     "wdio-chromedriver-service": "^8.0.1",
     "wdio-electron-service": "^3.5.1",
     "webpack-plugin-vuetify": "^2.0.1",
-    "xvfb-maybe": "0.2.1"
+    "xvfb-maybe": "0.2.1",
+    "yaml-lint": "^1.7.0"
   },
   "platformDependencies": {
     "linux": {

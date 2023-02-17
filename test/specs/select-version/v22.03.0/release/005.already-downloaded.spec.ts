@@ -1,8 +1,8 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import delay from '../../delay'
-import Main from '../../../pageobjects/main.page'
-import SelectVersion from '../../../pageobjects/select-version.page'
-import CheckResourcesOfficialRelease from '../../../pageobjects/check-resources-official-release.page'
+import delay from '../../../delay'
+import Main from '../../../../pageobjects/main.page'
+import SelectVersion from '../../../../pageobjects/select-version.page'
+import CheckResourcesOfficialRelease from '../../../../pageobjects/check-resources-official-release.page'
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: warn before download \'selfcustody/krux/releases/tag/v22.03.0\' again', () => {

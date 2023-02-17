@@ -33,6 +33,9 @@ describe('KruxInstaller configuration', () => {
     // eslint-disable-next-line no-undef 
     const p = await browser.electronAPI()
     const configPath = join(p.appData, name, 'config.json')
+    console.log('----------------------------------------')
+    console.log(`Config Path: ${configPath}`)
+    console.log('----------------------------------------')
     const configString = await readFileAsync(configPath, 'utf8')
     expectChai(configString).to.be.a('string')
   })
@@ -43,7 +46,11 @@ describe('KruxInstaller configuration', () => {
     const p = await browser.electronAPI()
     const configPath = join(p.appData, name, 'config.json') 
     const configString = await readFileAsync(configPath, 'utf8')
-    const config = JSON.parse(configString) 
+    const config = JSON.parse(configString)  
+    console.log('----------------------------------------')
+    console.log('Config:')
+    console.log(config)
+    console.log('----------------------------------------')
     expectChai(config).to.be.an('object')
   })
 

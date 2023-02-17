@@ -1,7 +1,7 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import delay from '../../delay'
-import Main from '../../../pageobjects/main.page'
-import SelectVersion from '../../../pageobjects/select-version.page'
+import delay from '../../../delay'
+import Main from '../../../../pageobjects/main.page'
+import SelectVersion from '../../../../pageobjects/select-version.page'
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: page select \'selfcustody/krux/releases/tag/v22.03.0\' option', () => {

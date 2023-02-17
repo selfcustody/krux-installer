@@ -1,9 +1,9 @@
 import { expect as expectWDIO } from '@wdio/globals'
-import delay from '../../delay'
-import Main from '../../../pageobjects/main.page'
-import SelectVersion from '../../../pageobjects/select-version.page'
-import CheckResourcesOfficialRelease from '../../../pageobjects/check-resources-official-release.page'
-import DownloadOfficialRelease from '../../../pageobjects/download-official-release.page'
+import delay from '../../../delay'
+import Main from '../../../../pageobjects/main.page'
+import SelectVersion from '../../../../pageobjects/select-version.page'
+import CheckResourcesOfficialRelease from '../../../../pageobjects/check-resources-official-release.page'
+import DownloadOfficialRelease from '../../../../pageobjects/download-official-release.page'
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\' option', () => {
@@ -27,6 +27,7 @@ describe('SelectVersionPage: download \'selfcustody/krux/releases/tag/v22.03.0\'
     await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
     await SelectVersion.list_item_22_03_0.click()
+    await delay(1000)
     await SelectVersion.formSelectButton.waitForExist()
     await SelectVersion.formSelectButton.click()  
     await SelectVersion.page.waitForExist({ reverse: true }) 

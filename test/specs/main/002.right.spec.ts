@@ -73,7 +73,7 @@ describe('Main page', () => {
     it('should to be displayed', async () => {
       await expectWDIO(Main.selectWriteCard).toBeDisplayed()
       await expectWDIO(Main.selectWriteCardSubtitle).toBeDisplayed()
-      await expectWDIO(Main.selectWriteButton).toBeDisplayed()
+      await expectWDIO(Main.selectFlashButton).toBeDisplayed()
     })
 
     // eslint-disable-next-line no-undef
@@ -90,13 +90,13 @@ describe('Main page', () => {
     })
     
     // eslint-disable-next-line no-undef
-    it('should have a clickable button', async () => {
-      await expectWDIO(Main.selectWriteButton).toBeClickable()
+    it('should have a clickable flash button', async () => {
+      await expectWDIO(Main.selectFlashButton).toBeClickable()
     })
 
     // eslint-disable-next-line no-undef
     it('should button have correct initial text', async () => {
-      const writeButtonText = await Main.selectWriteButton.$('span.v-btn__content').getText() 
+      const writeButtonText = await Main.selectFlashButton.$('span.v-btn__content').getText() 
       expectChai(writeButtonText).to.be.equal(' FLASH')
     })
   })

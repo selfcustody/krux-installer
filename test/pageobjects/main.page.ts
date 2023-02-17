@@ -15,7 +15,7 @@ class Main extends Page {
     
     this._selectDeviceButton = '#select-device-button'
     this._selectVersionButton = '#select-version-button'
-    this._selectWriteButton = '#select-write-button'
+    this._selectFlashButton = '#select-write-flash-button'
   }
 
   get page () { 
@@ -71,9 +71,9 @@ class Main extends Page {
     return this.selectVersionButton.$('.v-btn__content')
   }
   
-  get selectWriteButton () { 
+  get selectFlashButton () { 
     // eslint-disable-next-line no-undef
-    return $(this._selectWriteButton)
+    return $(this._selectFlashButton)
   }
 }
 

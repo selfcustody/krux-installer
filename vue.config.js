@@ -31,6 +31,7 @@ module.exports = defineConfig({
           '!**/{README.md,.github,.browserslistrc,.eslintrc.js,vue.config.js,jsconfig.js,babel.config.js,yarn.lock}',
           '!**/bin/{krux-installer.js}',
           '!**/build/{krux.txt}',
+          '!**/test'
         ],
         extraResources: [
           "./extraResources"

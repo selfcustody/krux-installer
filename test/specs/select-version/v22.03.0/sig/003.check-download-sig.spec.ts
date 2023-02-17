@@ -2,8 +2,8 @@ import { exists, stat } from 'fs'
 import { promisify } from 'util'
 import { join } from 'path'
 import { expect as expectChai } from 'chai'
-import { name } from '../../../../package.json'
-import formatBytes from '../../format-bytes'
+import { name } from '../../../../../package.json'
+import formatBytes from '../../../format-bytes'
 
 const existsAsync = promisify(exists)
 const statAsync = promisify(stat)

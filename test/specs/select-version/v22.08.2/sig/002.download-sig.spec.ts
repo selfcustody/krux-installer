@@ -5,11 +5,10 @@ import SelectVersion from '../../../../pageobjects/select-version.page'
 import CheckResourcesOfficialRelease from '../../../../pageobjects/check-resources-official-release.page'
 import CheckResourcesOfficialReleaseSHA256 from '../../../../pageobjects/check-resources-official-release-sha256.page'
 import CheckResourcesOfficialReleaseSig from '../../../../pageobjects/check-resources-official-release-sig.page'
-import CheckResourcesOfficialReleasePem from '../../../../pageobjects/check-resources-official-release-pem.page'
-import DownloadOfficialReleasePem from '../../../../pageobjects/download-official-release-pem.page'
+import DownloadOfficialReleaseSig from '../../../../pageobjects/download-official-release-sig.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectVersionPage: download \'selfcustody.pem\' option', () => {
+describe('SelectVersionPage: download \'v22.08.2/krux-v22.08.2.zip.sig\' option', () => {
 
   // eslint-disable-next-line no-undef
   before(async () => {
@@ -26,10 +25,10 @@ describe('SelectVersionPage: download \'selfcustody.pem\' option', () => {
     await delay(1000)
     await SelectVersion.formArrow.click()
     await delay(1000)
-    await SelectVersion.list_item_22_08_1.waitForExist()
+    await SelectVersion.list_item_22_08_2.waitForExist()
     await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
-    await SelectVersion.list_item_22_08_1.click()
+    await SelectVersion.list_item_22_08_2.click()
     await SelectVersion.formSelectButton.waitForExist()
     await SelectVersion.formSelectButton.click()   
     await CheckResourcesOfficialRelease.page.waitForExist() 
@@ -41,48 +40,39 @@ describe('SelectVersionPage: download \'selfcustody.pem\' option', () => {
     await CheckResourcesOfficialReleaseSHA256.buttonProceed.waitForExist()
     await CheckResourcesOfficialReleaseSHA256.buttonProceed.click()
     await CheckResourcesOfficialReleaseSHA256.page.waitForExist({ reverse: true })
-    await CheckResourcesOfficialReleaseSig.page.waitForExist()  
-    await CheckResourcesOfficialReleaseSig.cardTitleChecking.waitForExist() 
-    await CheckResourcesOfficialReleaseSig.cardTitleChecking.waitForExist({ reverse: true })
-    await CheckResourcesOfficialReleaseSig.cardTitleChecked.waitForExist()
-    await CheckResourcesOfficialReleaseSig.cardSubtitleChecked.waitForExist()
-    await CheckResourcesOfficialReleaseSig.cardContentChecked.waitForExist()
-    await CheckResourcesOfficialReleaseSig.buttonProceed.waitForExist() 
-    await CheckResourcesOfficialReleaseSig.buttonDownload.waitForExist()
-    await CheckResourcesOfficialReleaseSig.buttonProceed.click()
+    await CheckResourcesOfficialReleaseSig.page.waitForExist() 
     await CheckResourcesOfficialReleaseSig.page.waitForExist({ reverse: true })
-    await CheckResourcesOfficialReleasePem.page.waitForExist()
-    await CheckResourcesOfficialReleasePem.page.waitForExist({ reverse: true })
+    await DownloadOfficialReleaseSig.page.waitForExist()
     await delay(1000)
   })
 
   // eslint-disable-next-line no-undef
   it('should card title be \'Downloading...\'', async () => {  
-    await DownloadOfficialReleasePem.cardTitle.waitForExist()
-    await expectWDIO(DownloadOfficialReleasePem.cardTitle).toHaveText('Downloading...')
+    await DownloadOfficialReleaseSig.cardTitle.waitForExist()
+    await expectWDIO(DownloadOfficialReleaseSig.cardTitle).toHaveText('Downloading...')
   })
 
   // eslint-disable-next-line no-undef
-  it('should card subtitle be \'main/selfcustody.pem\'', async () => {  
-    await DownloadOfficialReleasePem.cardSubtitle.waitForExist()
-    await expectWDIO(DownloadOfficialReleasePem.cardSubtitle).toHaveText('main/selfcustody.pem...')
+  it('should card subtitle be \'selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sig\'', async () => {  
+    await DownloadOfficialReleaseSig.cardSubtitle.waitForExist()
+    await expectWDIO(DownloadOfficialReleaseSig.cardSubtitle).toHaveText('selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sig...')
   })
 
-  // TODO: the sha256.txt file is 
-  // very tiny (70 Bytes)
+  // TODO: the sig file is 
+  // very tiny (65 Bytes)
   // In local tests this pass and,
   // in github-action, fail (probably because
   // the github-action have a faster network)
   // so, disable until fix this
   // eslint-disable-next-line no-undef 
-  it('should download public key certificate file', async () => { 
-     await DownloadOfficialReleasePem.progressLinearText.waitUntil(async function () {
+  it('should download release signature file', async () => { 
+    await DownloadOfficialReleaseSig.progressLinearText.waitUntil(async function () {
       const percentText = await this.getText()
       const percent = parseFloat(percentText.split('%')[0])
       return percent !== 0
     }, {
       interval: 1
     })
-    await DownloadOfficialReleasePem.progressLinearText.waitForExist({ reverse: true })
+    await DownloadOfficialReleaseSig.progressLinearText.waitForExist({ reverse: true })
   })
 })

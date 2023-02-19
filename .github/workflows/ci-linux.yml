@@ -65,6 +65,25 @@ jobs:
             test: select-version/v22.08.0/verify 
 
           - build: AppImage
+            test: select-version/v22.08.1/release 
+            file: v22.08.1/krux-v22.08.1.zip
+          
+          - build: AppImage
+            test: select-version/v22.08.1/sha256 
+            file: v22.08.1/krux-v22.08.1.zip.sha256.txt
+
+          - build: AppImage
+            test: select-version/v22.08.1/sig
+            file: v22.08.1/krux-v22.08.1.zip.sig
+
+          - build: AppImage
+            test: select-version/v22.08.1/pem
+            file: main/selfcustody.pem
+          
+          - build: AppImage
+            test: select-version/v22.08.1/verify
+
+          - build: AppImage
             test: flash/init
 
     runs-on: ubuntu-latest

@@ -7,7 +7,7 @@ import CheckResourcesOfficialReleaseSHA256 from '../../../../pageobjects/check-r
 import DownloadOfficialReleaseSHA256 from '../../../../pageobjects/download-official-release-sha256-txt.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectVersionPage: download \'v22.08.0/krux-v22.08.0.zip.sha256.txt\' option', () => {
+describe('SelectVersionPage: download \'v22.08.1/krux-v22.08.1.zip.sha256.txt\' option', () => {
 
   // eslint-disable-next-line no-undef
   before(async () => {
@@ -27,7 +27,7 @@ describe('SelectVersionPage: download \'v22.08.0/krux-v22.08.0.zip.sha256.txt\' 
     await SelectVersion.list_item_22_08_0.waitForExist()
     await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
-    await SelectVersion.list_item_22_08_0.click()
+    await SelectVersion.list_item_22_08_1.click()
     await SelectVersion.formSelectButton.waitForExist()
     await SelectVersion.formSelectButton.click()   
     await CheckResourcesOfficialRelease.page.waitForExist() 
@@ -47,9 +47,9 @@ describe('SelectVersionPage: download \'v22.08.0/krux-v22.08.0.zip.sha256.txt\' 
   })
 
   // eslint-disable-next-line no-undef
-  it('should card subtitle be \'selfcustody/krux/releases/download/v22.08.0/krux-v22.08.0.zip.sha256.txt\'', async () => {  
+  it('should card subtitle be \'selfcustody/krux/releases/download/v22.08.1/krux-v22.08.1.zip.sha256.txt\'', async () => {  
     await DownloadOfficialReleaseSHA256.cardSubtitle.waitForExist()
-    await expectWDIO(DownloadOfficialReleaseSHA256.cardSubtitle).toHaveText('selfcustody/krux/releases/download/v22.08.0/krux-v22.08.0.zip.sha256.txt')
+    await expectWDIO(DownloadOfficialReleaseSHA256.cardSubtitle).toHaveText('selfcustody/krux/releases/download/v22.08.1/krux-v22.08.1.zip.sha256.txt')
   })
 
   // TODO: the sha256.txt file is 

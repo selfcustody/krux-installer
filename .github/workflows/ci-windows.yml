@@ -1,0 +1,145 @@
+name: Windows CI 
+
+on:
+  push:
+    branches:
+      - main
+      - win32* 
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  ci:
+    name: Build and test KruxInstaller on Widows
+
+    strategy:
+      matrix:
+        - build: nsis
+          tests: [init, main, select-device, select-version/init, select-version/v22.03.0, flash]
+    
+    runs-on: windows-latest
+    
+    steps:
+ 
+      - name: Checkout Git repository
+        uses: actions/checkout@v2
+
+      - name: Setup output variables helpers
+        id: setup
+        shell: pwsh
+        run: |
+          $loc = Get-Location
+          $version = "v22.08.2"
+          $zipname = "krux-$version.zip"
+          $signame = "krux-$version.zip.sig"
+          $pemname = "selfcustody.pem"
+          $extraResources = "$loc\extraResources"
+          $release_url = "https://github.com/selfcustody/krux/releases/download"
+          $raw_url = "https://raw.githubusercontent.com/selfcustody/krux/main"
+          echo "zip=$loc\$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
+          echo "sig=$loc\$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+           echo "pem=$loc\$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "extraResources=$extraResources" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "openssl_build_dir=$loc\openssl" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "release_zip=$release_url/$version/$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "release_sig=$release_url/$version/$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "release_pem=$raw_url/$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "prefix=$extraResources\OpenSSL" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
+          echo "openssldir=$extraResources\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+      
+      - name: Setup Windows - create extraResources directory
+        shell: pwsh
+        run: mkdir ${{ steps.setup.outputs.extraResources }}
+      
+      - name: Setup Windows - configure, build, test and install openssl 
+        uses: qlrd/compile-openssl-windows-action@v0.0.2
+        with:
+          build-type: 'plain'
+          version: openssl-3.0.7
+          prefix: ${{ steps.setup.outputs.prefix }}
+          openssldir: ${{ steps.setup.outputs.openssldir }}
+
+      - name: Setup Windows - download a krux release binary before pre-test 
+        shell: pwsh
+        run: curl.exe -L ${{ steps.setup.outputs.release_zip }} -o ${{ steps.setup.outputs.zip }}
+          
+      - name: Setup Windows - download a krux release signature file before pre-test 
+        shell: pwsh
+        run: curl.exe -L ${{ steps.setup.outputs.release_sig }} -o ${{ steps.setup.outputs.sig }}
+
+      - name: Setup Windows - download the krux public key certificate file before pre-test 
+        shell: pwsh
+        run: |
+          curl.exe -L -H "Accept-Charset: utf-8" ${{ steps.setup.outputs.release_pem }} -o ${{ steps.setup.outputs.pem }}
+      
+      - name: Setup Windows - Pre-test builtin openssl with krux binaries and signature files
+        shell: cmd
+        run: ${{ steps.setup.outputs.prefix }}\bin\openssl.exe sha256 <${{ steps.setup.outputs.zip }} -binary | ${{ steps.setup.outputs.prefix }}\bin\openssl.exe pkeyutl -verify -pubin -inkey ${{ steps.setup.outputs.pem }} -sigfile ${{ steps.setup.outputs.sig }}
+ 
+      - name: Node.js - Setup
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18.14.0'
+
+      - name: Node.js - Install dependencies
+        run: yarn install
+ 
+      - name: Node.js - Install platform dependencies
+        run: yarn run platform-install
+
+      - name: Node.js - Install app dependencies
+        run: yarn run install-app-deps
+
+      - name: Node.js - Make icons
+        run: yarn run icon
+ 
+      - name: Node.js - Lint
+        run: yarn run lint
+ 
+      - name: Node.js - build electron
+        env:
+          GH_TOKEN: ${{ secrets.github_token }}
+        run: yarn run build ${{ matrix.build }} 
+
+      - name: E2E Test - initialization
+        if: ${{ contains(matrix.tests, 'init') }}
+        run: yarn run test init
+
+      - name: E2E Test - main page
+        if: ${{ contains(matrix.tests, 'main') }}
+        run: yarn run test main
+
+      - name: E2E Test - select device
+        if: ${{ contains(matrix.tests, 'select-device') }}
+        run: yarn run test select-device
+
+      - name: E2E Test - select version initialization
+        if: ${{ contains(matrix.tests, 'select-version/init') }}
+        run: yarn run test select-version/init
+
+      - name: E2E Test - select version v22.03.0
+        if: ${{ contains(matrix.tests, 'select-version/v22.03.0') }}
+        run: yarn run test select-version/v22.03.0
+
+      - name: Get version 
+        if: ${{ startsWith(github.ref, 'main') }}
+        uses: polyseam/get-version-from-package-json@1.0.0
+        id: version
+        with:
+          path-to-package-json: ./package.json
+
+      - name: Hash NSIS installer
+        if: ${{ startsWith(github.ref, 'main') }}
+        uses: qlrd/sha256sum-action@v1.0.0
+        with:
+          path-to-file: .\dist_electron\KruxInstaller Setup ${{ steps.version.outputs.version }}.exe
+
+      - name: Upload artifacts
+        if: ${{ startsWith(github.ref, 'main') }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: KruxInstaller Setup v${{ steps.version.outputs.version }}.exe
+          path: |
+            .\dist_electron\KruxInstaller Setup ${{ steps.version.outputs.version }}.exe
+            .\dist_electron\KruxInstaller Setup ${{ steps.version.outputs.version }}.exe.sha256sum.txt

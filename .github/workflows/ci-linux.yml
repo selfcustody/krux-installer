@@ -44,7 +44,26 @@ jobs:
           
           - build: AppImage
             test: select-version/v22.03.0/verify
+        
+          - build: AppImage
+            test: select-version/v22.08.0/release 
+            file: v22.08.0/krux-v22.08.0.zip
           
+          - build: AppImage
+            test: select-version/v22.08.0/sha256 
+            file: v22.08.0/krux-v22.08.0.zip.sha256.txt
+
+          - build: AppImage
+            test: select-version/v22.08.0/sig
+            file: v22.08.0/krux-v22.08.0.zip.sig
+
+          - build: AppImage
+            test: select-version/v22.08.0/pem
+            file: main/selfcustody.pem
+          
+          - build: AppImage
+            test: select-version/v22.08.0/verify 
+
           - build: AppImage
             test: flash/init
 

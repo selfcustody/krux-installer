@@ -16,36 +16,25 @@ class VerifyOfficialReleasesSignHandler extends Handler {
     const binPath = join(resources, options.bin)
     const pemPath = join(resources, options.pem)
     const sigPath =  join(resources, options.sig)
-
-    this.log(`Verifying binary '${binPath}' against pem '${pemPath}' and signature '${sigPath}'`)
-
     const platform = this.store.get('os')
 
     // if platform is linux, use the same command
     // used in krux CLI. Else use sign-check package
     let shell = ''
+    let compileArg = ''
     let opensslBin = ''
-    const env = { PATH: '' }
-    const __args__ = []
 
     if (platform === 'linux') {
       shell = "/bin/bash"
-      __args__.push("-c")
-      env.PATH = `${process.env.PATH}:/bin:/usr/bin:/usr/local/bin`
+      compileArg = "-c"
       opensslBin = "openssl"
     } else if (platform === 'darwin') {
-      // see
-      // https://stackoverflow.com/questions/35129977/how-to-install-latest-version-of-openssl-mac-os-x-el-capitan/46179272#46179272
       shell = "/bin/zsh"
-      env.PATH = `${process.env.PATH}:/usr/local/opt/openssl/bin:/System/Library/OpenSSL` 
-      __args__.push("-c")
+      compileArg = "-c"
       opensslBin = "openssl"
     } else {
       shell = "cmd"
-      __args__.push("/c")
-      // see
-      // https://stackoverflow.com/questions/892555/how-do-i-specify-c-program-files-without-a-space-in-it-for-programs-that-cant
-      env.PATH = `${process.env.PATH};C:\\PROGRA~1\\Git\\usr\\bin`
+      compileArg = "/c"
       opensslBin = "openssl.exe"
     }
 
@@ -55,19 +44,13 @@ class VerifyOfficialReleasesSignHandler extends Handler {
     //  since child_process will pass it as a single argument:
     // See:
     // https://stackoverflow.com/questions/27670686/ssh-with-nodejs-child-process-command-not-found-on-server
-    const sigcmd = [
-      `${opensslBin} sha256 <${binPath} -binary `,
-      '|',
-      `${opensslBin} pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
-    ]
+    const signCmd = `${opensslBin} sha256 <${binPath} -binary | ${opensslBin} pkeyutl -verify -pubin -inkey ${pemPath} -sigfile ${sigPath}`
+    this.store.set(`signature-command`, signCmd)
+    this.log(`${shell} ${compileArg} ${signCmd}`)
 
-    this.store.set(`signature-command`, sigcmd)
-    __args__.push(sigcmd.join(' '))
-
-    this.log(`${shell} ${__args__.join(' ')}`)
     let stdout = Buffer.alloc(0)
     let isErr = false
-    const openssl = spawn(shell, __args__, { cwd: '.', env: env })
+    const openssl = spawn(shell, [compileArg, signCmd])
 
     openssl.stdout.on('data', (chunk) => {
       this.log(`stdout: ${chunk}`)

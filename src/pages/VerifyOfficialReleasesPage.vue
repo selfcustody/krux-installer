@@ -172,7 +172,7 @@ export default {
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.signature_command.onGet((_event, value) => {
       this.$nextTick(() => {
-        this.sign_cmd = value.join(' ')
+        this.sign_cmd = value
       })
     })
   },

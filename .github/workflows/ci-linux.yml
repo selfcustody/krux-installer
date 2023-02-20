@@ -103,6 +103,9 @@ jobs:
             test: select-version/v22.08.2/verify
 
           - build: AppImage
+            test: select-version/krux_binaries/m5stickv
+
+          - build: AppImage
             test: flash/init
 
     runs-on: ubuntu-latest

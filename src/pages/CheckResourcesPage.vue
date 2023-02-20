@@ -34,14 +34,18 @@ export default {
     await window.KruxInstaller.version.get()
     
     // eslint-disable-next-line no-unused-vars
-    window.KruxInstaller.version.onGet(async (_event, value) => {
+    window.KruxInstaller.version.onGet((_event, value) => {
       const regexp_selfcustody = /selfcustody\/.*/g
       const regexp_odudex = /odudex\/.*/g
-
+      
       if (value.match(regexp_selfcustody)) {
-        this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleasePage' })
+        setTimeout(() => {
+          this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleasePage' })
+        }, 1000)
       } else if (value.match(regexp_odudex)) {
-        this.$emit('onSuccess', { page: 'CheckResourcesTestFirmwarePage' })
+        setTimeout(() => {
+          this.$emit('onSuccess', { page: 'CheckResourcesTestFirmwarePage' })
+        }, 1000)
       } else {
         this.$emit('onError', { error: new Error(`Invalid action '${value}'`) })
       }

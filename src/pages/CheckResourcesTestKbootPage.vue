@@ -4,6 +4,7 @@
     justify-start
     row
     fill-height
+    id="check-resources-test-kboot-page"
   > 
     <v-flex
       v-if="!checked"
@@ -18,8 +19,8 @@
                 color="green"
               />
             </v-flex>
-            <v-flex xs8 sm12>
-              Checking...
+            <v-flex xs8 sm12 id="check-resources-test-kboot-page-card-title-checking">
+              Checking for {{ device }} kboot.kfpkg...
             </v-flex>
           </v-layout>
         </v-card-title>
@@ -30,23 +31,29 @@
       xs12
     >
       <v-card flat>
-        <v-card-title class="odudex"> 
+        <v-card-title class="odudex" id="check-resources-test-kboot-page-card-title-checked"> 
           <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle id="check-resources-test-kboot-page-card-subtitle-checked">
           Already downloaded
         </v-card-subtitle>
         <v-card-content>
-          <v-card-text>
-            Click "OK" to dowload again or "Cancel" to proceed with the downloaded version.
+          <v-card-text id="check-resources-test-kboot-page-card-content-checked">
+            Click "Proceed" to proceed with the downloaded version or "Download the file again".
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'DownloadTestKbootPage' })">
-            OK
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'DownloadTestKbootPage' })"
+            id="check-resources-test-kboot-page-button-proceed-checked'"
+          >
+            Proceed
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'CheckResourcesTestKtoolPage' })">
-            Cancel
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesTestKtoolPage' })"
+            id="check-resources-test-kboot-page-button-download-checked"
+          >
+            Download the file again
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -60,13 +67,16 @@ export default {
   data () {
     return {
       checked: false,
+      device: '',
       title: ''
     }
   },
   watch: {
-    async title (value) {
+    title (value) {
       if (value !== '') {
-        await window.KruxInstaller.check.resource(value)
+        setTimeout(async function () {
+          await window.KruxInstaller.check.resource(value)
+        }, 1000)
       }
     }
   },
@@ -76,6 +86,7 @@ export default {
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.device.onGet((_event, value) => {
       this.$nextTick(() => {
+        this.device = value
         this.title = `odudex/krux_binaries/raw/main/${value}/kboot.kfpkg`
       })
     })
@@ -89,7 +100,9 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.check.onError((_event, value) => {
-      this.$emit('onSuccess', { page: 'DownloadTestKbootPage' })
+      setTimeout(() => {
+        this.$emit('onSuccess', { page: 'DownloadTestKbootPage' })
+      }, 1000)
     })
   }
 }

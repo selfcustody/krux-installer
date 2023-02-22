@@ -4,14 +4,19 @@
     justify-start
     row
     fill-height
+    id="download-test-firmware-page"
   >
     <v-flex xs12>
       <v-card flat>
-        <v-card-title>
+        <v-card-title
+          id="download-test-firmware-page-card-title"
+        >
           <v-icon>mdi-monitor-arrow-down</v-icon>
-          Downloading...
+          Downloading <b>firmware.bin</b>...
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle
+          id="download-test-firmware-page-card-subtitle"
+        >
           device: {{ device }}
         </v-card-subtitle>
         <v-card-actions>
@@ -20,7 +25,7 @@
             height="25"
             color="blue-grey"
           >
-            <strong>{{ progress }}%</strong>
+            <strong id="download-test-firmware-page-card-progress-linear-test">{{ progress }}%</strong>
           </v-progress-linear>
         </v-card-actions>
       </v-card>

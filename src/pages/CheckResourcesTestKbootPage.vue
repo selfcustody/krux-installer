@@ -45,7 +45,7 @@
         <v-card-actions>
           <v-btn
             @click.prevent="$emit('onSuccess', { page: 'DownloadTestKbootPage' })"
-            id="check-resources-test-kboot-page-button-proceed-checked'"
+            id="check-resources-test-kboot-page-button-proceed-checked"
           >
             Proceed
           </v-btn>

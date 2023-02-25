@@ -9,29 +9,27 @@ const existsAsync = promisify(exists)
 const statAsync = promisify(stat)
 
 // eslint-disable-next-line no-undef
-describe('check downloaded v22.08.2 zip release on file system', () => {
+describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_m5stickv/firmware.bin\' on file system', () => {
 
-  let api, dir, zip
+  let api, firmware
 
   // eslint-disable-next-line no-undef
   before(async () => {
     // eslint-disable-next-line no-undef
     api = await browser.electronAPI()
-    dir = join(api.documents, name, 'v22.08.2') 
-    zip = join(dir, 'krux-v22.08.2.zip')
+    firmware = join(api.documents, name, 'odudex', 'krux_binaries', 'raw', 'main', 'maixpy_m5stickv', 'firmware.bin') 
   })
   
   // eslint-disable-next-line no-undef
   it('should have downloaded release zip file on disk', async () => {
-    const zipExists = await existsAsync(zip)
-    expectChai(zipExists).to.be.equal(true)
+    const firmwareExists = await existsAsync(firmware)
+    expectChai(firmwareExists).to.be.equal(true)
   })
 
   // eslint-disable-next-line no-undef
-  it('should downloaded release zip file on disk have correct size', async () => {
-    const zip = join(dir, 'krux-v22.08.2.zip')
-    const zipStat = await statAsync(zip)
-    const bytes = formatBytes(zipStat.size)
-    expectChai(bytes).to.be.equal('44.0 MB')
+  it('should downloaded firmware file on disk have correct size', async () => {
+    const firmwareStat = await statAsync(firmware)
+    const bytes = formatBytes(firmwareStat.size)
+    expectChai(bytes).to.be.equal('1.7 MB')
   })
 })

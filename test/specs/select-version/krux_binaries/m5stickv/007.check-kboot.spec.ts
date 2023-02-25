@@ -1,15 +1,15 @@
 import { expect as expectWDIO } from '@wdio/globals'
 import delay from '../../../delay'
 import Main from '../../../../pageobjects/main.page'
-import SelectDevice from '../../../../pageobjects/select-device.page' 
-import SelectVersion from '../../../../pageobjects/select-version.page' 
+import SelectDevice from '../../../../pageobjects/select-device.page'
+import SelectVersion from '../../../../pageobjects/select-version.page'
 import CheckResources from '../../../../pageobjects/check-resources.page'
 import CheckResourcesTestFirmware from '../../../../pageobjects/check-resources-test-firmware.page'
-import DownloadTestFirmware from '../../../../pageobjects/download-test-firmware.page'
+import CheckResourcesTestKboot from '../../../../pageobjects/check-resources-test-kboot.page'
 
 // eslint-disable-next-line no-undef
-describe('SelectVersionPage: download \'odudex/krux_binaries\' option', () => {
-
+describe('SelectVersionPage: check \'odudex/krux_binaries/raw/main/maixpy_m5stickv/kboot.kfpkg\'', () => {
+  
   // eslint-disable-next-line no-undef
   before(async () => { 
     await Main.selectDeviceButton.click()
@@ -46,33 +46,15 @@ describe('SelectVersionPage: download \'odudex/krux_binaries\' option', () => {
     await CheckResources.page.waitForExist()
     await CheckResources.page.waitForExist({ reverse: true })
     await CheckResourcesTestFirmware.page.waitForExist()
+    await CheckResourcesTestFirmware.buttonProceed.waitForExist()
+    await CheckResourcesTestFirmware.buttonProceed.click()
     await CheckResourcesTestFirmware.page.waitForExist({ reverse: true })
+    await CheckResourcesTestKboot.page.waitForExist()
   })
 
+    
   // eslint-disable-next-line no-undef
-  it('should card title be \'Downloading firmware.bin...\'', async () => { 
-    await DownloadTestFirmware.page.waitForExist()
-    await DownloadTestFirmware.cardTitle.waitForExist()
-    await expectWDIO(DownloadTestFirmware.cardTitle).toHaveText('Downloading firmware.bin...')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should card subtitle be \'device: maixpy_m5stickv\'', async () => {  
-    await DownloadTestFirmware.cardSubtitle.waitForExist()
-    await expectWDIO(DownloadTestFirmware.cardSubtitle).toHaveText('device: maixpy_m5stickv')
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should download firmware.bin', async () => { 
-    await DownloadTestFirmware.progressLinearText.waitForExist()
-    await DownloadTestFirmware.progressLinearText.waitUntil(async function () {
-      const percentText = await this.getText()
-      const percent = parseFloat(percentText.split('%')[0])
-      return percent !== 0
-    }, {
-      timeout: 120000,
-      interval: 10
-    })
-    await DownloadTestFirmware.page.waitForExist({ reverse: true })
+  it('should card title be \'Checking for maixpy_m5stickv kboot.kfpkg...\'', async () => {
+    await expectWDIO(CheckResourcesTestKboot.cardTitleChecking).toHaveText('Checking for maixpy_m5stickv kboot.kfpkg...')
   })
 })

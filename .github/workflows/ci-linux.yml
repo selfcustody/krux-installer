@@ -231,7 +231,7 @@ jobs:
         with:
           attempt_limit: 3
           attempt_delay: 3000
-          command: yarn run test ${{ matrix.test }} --filter 00[2-3].download*.spec.ts
+          command: yarn run test ${{ matrix.test }} --filter '0[0-9][0-9].download*.spec.ts'
 
       - name: E2E Test without resources 
         if: ${{ steps.cache-restore-resources.outputs.cache-hit != 'true' }}

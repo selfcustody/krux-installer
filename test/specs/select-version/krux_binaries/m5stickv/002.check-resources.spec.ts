@@ -4,7 +4,6 @@ import Main from '../../../../pageobjects/main.page'
 import SelectDevice from '../../../../pageobjects/select-device.page'
 import SelectVersion from '../../../../pageobjects/select-version.page'
 import CheckResources from '../../../../pageobjects/check-resources.page'
-import CheckResourcesTestFirmware from '../../../../pageobjects/check-resources-test-firmware.page'
 
 // eslint-disable-next-line no-undef
 describe('SelectVersionPage: check if exists \'odudex/krux_binaries\' resources for \'m5stickv\'', () => {
@@ -43,7 +42,7 @@ describe('SelectVersionPage: check if exists \'odudex/krux_binaries\' resources 
   })
 
   // eslint-disable-next-line no-undef
-  it('should be selected', async () => {    
+  it('\'odudex/krux_binaries\' should be selected', async () => {    
     await expectWDIO(SelectVersion.formSelected).toHaveText('odudex/krux_binaries')
   })
 
@@ -54,12 +53,6 @@ describe('SelectVersionPage: check if exists \'odudex/krux_binaries\' resources 
     await CheckResources.page.waitForExist() 
     await expectWDIO(CheckResources.cardTitle).toHaveText('Checking between official or test resources...')
     await CheckResources.page.waitForExist({ reverse: true }) 
-  })
-
-  // eslint-disable-next-line no-undef
-  it('should check for \'maixpy_m5stickv\' resources', async () => { 
-    await CheckResourcesTestFirmware.page.waitForExist()
-    await expectWDIO(CheckResourcesTestFirmware.cardTitleChecking).toHaveText('Checking for maixpy_m5stickv binaries...')
   })
 
 })

@@ -1,16 +1,16 @@
 import Page from './page'
 
-class CheckResourcesTestFirmware extends Page {
+class CheckResourcesTestKboot extends Page {
 
   constructor () {
     super()
-    this._main = '#check-resources-test-firmware-page'
-    this._cardTitleChecking = '#check-resources-test-firmware-page-card-title-checking'
-    this._cardTitleChecked = '#check-resources-test-firmware-page-card-title-checked'
-    this._cardSubtitleChecked = '#check-resources-test-firmware-page-card-subtitle-checked'
-    this._cardContentChecked = '#check-resources-test-firmware-page-card-content-checked' 
-    this._buttonDownload = '#check-resources-test-firmware-page-button-download-checked'
-    this._buttonProceed = '#check-resources-test-firmware-page-button-proceed-checked'
+    this._main = '#check-resources-test-kboot-page'
+    this._cardTitleChecking = '#check-resources-test-kboot-page-card-title-checking'
+    this._cardTitleChecked = '#check-resources-test-kboot-page-card-title-checked'
+    this._cardSubtitleChecked = '#check-resources-test-kboot-page-card-subtitle-checked'
+    this._cardContentChecked = '#check-resources-test-kboot-page-card-content-checked' 
+    this._buttonDownload = '#check-resources-test-kboot-page-button-download-checked'
+    this._buttonProceed = '#check-resources-test-kboot-page-button-proceed-checked'
   }
  
   get page () { 
@@ -49,4 +49,4 @@ class CheckResourcesTestFirmware extends Page {
   }
 }
 
-export default new CheckResourcesTestFirmware()
+export default new CheckResourcesTestKboot()

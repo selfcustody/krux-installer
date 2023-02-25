@@ -19,8 +19,8 @@
                 color="green"
               />
             </v-flex>
-            <v-flex xs8 sm12 id="check-resources-page-card-title-checking">
-              Checking for {{ device }} binaries...
+            <v-flex xs8 sm12 id="check-resources-test-firmware-page-card-title-checking">
+              Checking for {{ device }} firmware.bin...
             </v-flex>
           </v-layout>
         </v-card-title>
@@ -31,27 +31,27 @@
       xs12
     >
       <v-card flat>
-        <v-card-title class="odudex" id="check-resources-page-card-title-checked"> 
+        <v-card-title class="odudex" id="check-resources-test-firmware-page-card-title-checked"> 
           <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
-        <v-card-subtitle id="check-resources-page-card-subtitle-checked">
+        <v-card-subtitle id="check-resources-test-firmware-page-card-subtitle-checked">
           Already downloaded
         </v-card-subtitle>
         <v-card-content>
-          <v-card-text id="check-resources-page-card-content-checked">
+          <v-card-text id="check-resources-test-firmware-page-card-content-checked">
             Click "Proceed" to proceed with the downloaded version or "Download the file again".
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'DownloadTestFirmwarePage' })"
-            id="check-resources-page-button-proceed-checked"
+          <v-btn 
+            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesTestKbootPage' })"
+            id="check-resources-test-firmware-page-button-proceed-checked"
           >
             Proceed
           </v-btn>
-          <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesTestKbootPage' })"
-            id="check-resources-page-button-download-checked"
+          <v-btn 
+            @click.prevent="$emit('onSuccess', { page: 'DownloadTestFirmwarePage' })"
+            id="check-resources-test-firmware-page-button-download-checked"
           >
             Download the file again
           </v-btn>

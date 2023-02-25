@@ -4,15 +4,20 @@
     justify-start
     row
     fill-height
+    id="download-test-kboot-page"
   >
     <v-flex xs12 sm4>
       <v-card flat class="ma-5 pa-5">
-        <v-card-title>
+        <v-card-title
+          id="download-test-kboot-page-card-title"
+        >
           <v-icon>mdi-monitor-arrow-down</v-icon>
-          Downloading...
+          Downloading <b>kboot.kfpkg</b>...
         </v-card-title>
-        <v-card-subtitle>
-          <b>kboot.kfpkg</b>: {{ device }}
+        <v-card-subtitle
+          id="download-test-kboot-page-card-subtitle"
+        >
+          <b>device</b>: {{ device }}
         </v-card-subtitle>
         <v-card-actions>
           <v-progress-linear
@@ -20,7 +25,7 @@
             height="25"
             color="blue-grey"
           >
-            <strong>{{ progress }}%</strong>
+            <strong id="download-test-kboot-page-card-progress-linear-test">{{ progress }}%</strong>
           </v-progress-linear>
         </v-card-actions>
       </v-card>
@@ -43,34 +48,31 @@ export default {
     window.KruxInstaller.device.onGet((_event, value) => {
       this.device = value
       this.$nextTick(() => {
-        this.download()
+        setTimeout(async () => {
+          await window.KruxInstaller.download.resource({
+            baseUrl: 'https://github.com',
+            resource: `odudex/krux_binaries/raw/main/${this.device}`,
+            filename: 'kboot.kfpkg'
+          })
+        }, 1000)
       })
     })
-  },
-  methods: {
-    async download () {
-      await window.KruxInstaller.download.resource({
-        baseUrl: 'https://github.com',
-        resource: `odudex/krux_binaries/raw/main/${this.device}`,
-        filename: 'kboot.kfpkg'
-      })
 
-      // eslint-disable-next-line no-unused-vars
-      window.KruxInstaller.download.onData((_event, value) => {
-        this.progress = value
-      })
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.download.onData((_event, value) => {
+      this.progress = value
+    })
 
-      // eslint-disable-next-line no-unused-vars
-      window.KruxInstaller.download.onSuccess((_event, value) => {
-        this.$emit('onSuccess', { page: 'CheckResourcesTestKtoolPage' })
-      })
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.download.onSuccess((_event, value) => {
+      this.$emit('onSuccess', { page: 'CheckResourcesTestKtoolPage' })
+    })
 
-      // eslint-disable-next-line no-unused-vars
-      window.KruxInstaller.download.onError((_event, value) => {
-        alert(value)
-        this.$emit('onSuccess', { page: 'MainPage' })
-      })
-    }
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.download.onError((_event, value) => {
+      alert(value)
+      this.$emit('onSuccess', { page: 'MainPage' })
+    })
   }
 }
 </script>

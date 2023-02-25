@@ -216,13 +216,17 @@ jobs:
           key: ${{ runner.os }}-config
 
       - name: Restore cache resources
-        if: ${{ startsWith(matrix.test, 'select-version/v') }}
+        if: ${{ startsWith(matrix.test, 'select-version/v') || startsWith(matrix.test, 'select-version/krux_binaries') }}
         id: cache-restore-resources
         uses: actions/cache/restore@v3
         with:
           path: |
             /home/runner/krux-installer/main
             /home/runner/krux-installer/v22.03.0
+            /home/runner/krux-installer/v22.08.0
+            /home/runner/krux-installer/v22.08.1
+            /home/runner/krux-installer/v22.08.2
+            /home/runner/krux-installer/odudex
           key: ${{ runner.os }}-resources
 
       - name: E2E Test with resources 
@@ -241,13 +245,17 @@ jobs:
           attempt_delay: 3000
           command: yarn run test ${{ matrix.test }}
 
-      - name: Save cache resources 
-        if: ${{ success() && startsWith(matrix.test, 'select-version/v') }}
+      - name: Save cache resources  
+        if: ${{ startsWith(matrix.test, 'select-version/v') || startsWith(matrix.test, 'select-version/krux_binaries') }}
         uses: actions/cache/save@v3 
         with:  
-          path: |
+          path: |  
             /home/runner/krux-installer/main
             /home/runner/krux-installer/v22.03.0
+            /home/runner/krux-installer/v22.08.0
+            /home/runner/krux-installer/v22.08.1
+            /home/runner/krux-installer/v22.08.2
+            /home/runner/krux-installer/odudex
           key: ${{ runner.os }}-resources
       
             #      - name: Upload AppImage artifact

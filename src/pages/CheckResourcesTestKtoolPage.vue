@@ -4,9 +4,10 @@
     justify-start
     row
     fill-height
+    id="check-resources-test-ktool-page"
   > 
     <v-flex
-      v-if="!checked && checking_mac === -1"
+      v-if="!checked"
       xs12
     >
       <v-card flat>
@@ -18,33 +19,15 @@
                 color="green"
               />
             </v-flex>
-            <v-flex xs8 sm12>
-              Checking...
+            <v-flex
+              xs8
+              sm12
+              id="check-resources-test-ktool-page-card-title-checking"
+            >
+              Checking for {{ ktool }}...
             </v-flex>
           </v-layout>
         </v-card-title>
-      </v-card>
-    </v-flex>
-    <v-flex
-      v-if="!checking && checking_mac === 0"
-      xs12
-    > 
-      <v-card flat class="ma-5 pa-5">
-        <v-card-title>
-          <v-icon>mdi-apple</v-icon>&ensp;Choose ktool-mac flavor
-        </v-card-title>
-        <v-card-content>
-          <v-select
-            v-model="ktool"
-            :items="['ktool-mac', 'ktool-mac-10']"
-            label="Mac Flavour"
-          />
-        </v-card-content>
-        <v-card-actions>
-          <v-btn @click.prevent="ktool !== '' ? (checking_mac = 1) : checking_mac = 0">
-            Choose
-          </v-btn>
-        </v-card-actions>
       </v-card>
     </v-flex>
     <v-flex
@@ -52,23 +35,29 @@
       xs12
     >
       <v-card flat>
-        <v-card-title> 
+        <v-card-title id="check-resources-test-ktool-page-card-title-checked"> 
           <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle id="check-resources-test-ktool-page-card-subtitle-checked">
           Already downloaded
         </v-card-subtitle>
         <v-card-content>
-          <v-card-text>
-            Click "OK" to dowload again or "Cancel" to proceed with the downloaded version.
+          <v-card-text id="check-resources-test-ktool-page-card-content-checked">
+            Click "Proceed" to proceed with the downloaded version or "Download the file again".
           </v-card-text>
         </v-card-content>
-        <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'DownloadTestKtoolPage' })">
-            OK
+        <v-card-actions> 
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            id="check-resources-test-ktool-page-button-proceed-checked"
+          >
+            Proceed
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
-            Cancel
+          <v-btn
+            @click.prevent="$emit('onSuccess', { page: 'DownloadTestKtoolPage' })"
+            id="check-resources-test-ktool-page-button-download-checked"
+          >
+            Download the file again
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -78,11 +67,10 @@
 
 <script>
 export default {
-  name: 'CheckResourcesTestFirmwarePage',
+  name: 'CheckResourcesTestKtoolPage',
   data () {
     return {
       checked: false,
-      checking_mac: -1,
       ktool: '',
       title: ''
     }
@@ -93,14 +81,11 @@ export default {
         this.title = `odudex/krux_binaries/raw/main/${value}`
       }
     },
-    checking_mac (value) {
-      if (value === 1) {
-        this.checked = true
-      }
-    },
-    async title (value) {
+    title (value) {
       if (value !== '') {
-        await window.KruxInstaller.check.resource(value)
+        setTimeout(async () => {
+          await window.KruxInstaller.check.resource(value)
+        }, 1000)
       }
     }
   },
@@ -109,15 +94,24 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.os.onGet((_event, value) => {
-      this.$nextTick(() => {
+      this.$nextTick(async () => {
         if (value === 'linux') {
           this.ktool = 'ktool-linux'
-          this.checked = true
         } else if (value === 'darwin') {
-          this.checking_mac = 0
+          await window.KruxInstaller.isMac10.get()
         } else if (value === 'win32') {
           this.ktool = 'ktool-win.exe'
-          this.checked = true
+        }
+      })
+    })
+
+    // eslint-disable-next-line no-unused-vars
+    window.KruxInstaller.isMac10.onGet((_event, value) => {
+      this.$nextTick(() => {
+        if (value === true) {
+          this.ktool = 'ktool-mac-10'
+        } else {
+          this.ktool = 'ktool-mac'
         }
       })
     })

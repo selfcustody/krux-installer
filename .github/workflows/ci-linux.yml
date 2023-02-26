@@ -106,6 +106,9 @@ jobs:
             test: select-version/krux_binaries/m5stickv
 
           - build: AppImage
+            test: select-version/krux_binaries/amigo_ips
+          
+          - build: AppImage
             test: flash/init
 
     runs-on: ubuntu-latest

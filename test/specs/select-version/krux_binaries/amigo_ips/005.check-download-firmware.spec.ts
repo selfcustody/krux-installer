@@ -9,7 +9,7 @@ const existsAsync = promisify(exists)
 const statAsync = promisify(stat)
 
 // eslint-disable-next-line no-undef
-describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_m5stickv/firmware.bin\' on file system', () => {
+describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_amigo_ips/firmware.bin\' on file system', () => {
 
   let api, firmware
 
@@ -17,7 +17,7 @@ describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_m5stickv/firmw
   before(async () => {
     // eslint-disable-next-line no-undef
     api = await browser.electronAPI()
-    firmware = join(api.documents, name, 'odudex', 'krux_binaries', 'raw', 'main', 'maixpy_m5stickv', 'firmware.bin') 
+    firmware = join(api.documents, name, 'odudex', 'krux_binaries', 'raw', 'main', 'maixpy_amigo_ips', 'firmware.bin') 
   })
   
   // eslint-disable-next-line no-undef

@@ -64,14 +64,14 @@
         <v-card-actions>
           <v-btn
             v-if="version !== ''"
-            @click.prevent="select"
+            @click="select"
             id="select-version-page-form-select-versions-button"
           >
             Select
           </v-btn>
           <br/>
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            @click="$emit('onSuccess', { page: 'MainPage' })"
             id="select-device-page-form-select-versions-back-button"
           >
             Back

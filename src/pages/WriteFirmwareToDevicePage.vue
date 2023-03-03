@@ -28,7 +28,7 @@
           />
           <v-btn 
             v-if="done"
-            @click.prevent="onBack"
+            @click="onBack"
           >
             Back
           </v-btn>

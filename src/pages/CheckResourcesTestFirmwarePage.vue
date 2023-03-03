@@ -44,13 +44,13 @@
         </v-card-content>
         <v-card-actions>
           <v-btn 
-            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesTestKbootPage' })"
+            @click="$emit('onSuccess', { page: 'CheckResourcesTestKbootPage' })"
             id="check-resources-test-firmware-page-button-proceed-checked"
           >
             Proceed
           </v-btn>
           <v-btn 
-            @click.prevent="$emit('onSuccess', { page: 'DownloadTestFirmwarePage' })"
+            @click="$emit('onSuccess', { page: 'DownloadTestFirmwarePage' })"
             id="check-resources-test-firmware-page-button-download-checked"
           >
             Download the file again

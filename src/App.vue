@@ -51,7 +51,6 @@ import DownloadTestKtoolPage from './pages/DownloadTestKtoolPage.vue'
 import DownloadTestKbootPage from './pages/DownloadTestKbootPage.vue'
 import VerifyOfficialReleasesPage from './pages/VerifyOfficialReleasesPage.vue'
 import UnzipOfficialReleasesPage from './pages/UnzipOfficialReleasesPage.vue'
-import ConfirmDetectedDevicePage from './pages/ConfirmDetectedDevicePage.vue'
 import ConfirmDetectedSDCardPage from './pages/ConfirmDetectedSDCardPage.vue'
 import WriteFirmwareToSDCardPage from './pages/WriteFirmwareToSDCardPage.vue'
 import WriteFirmwareToDevicePage from './pages/WriteFirmwareToDevicePage.vue'
@@ -83,7 +82,6 @@ export default {
     DownloadTestKbootPage,  
     VerifyOfficialReleasesPage,
     UnzipOfficialReleasesPage,
-    ConfirmDetectedDevicePage,
     ConfirmDetectedSDCardPage,
     WriteFirmwareToSDCardPage,
     WriteFirmwareToDevicePage,

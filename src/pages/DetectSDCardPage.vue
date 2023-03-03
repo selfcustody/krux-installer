@@ -12,10 +12,10 @@
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'ConfirmDetectedSDCardPage' })">
+          <v-btn @click="$emit('onSuccess', { page: 'ConfirmDetectedSDCardPage' })">
             Start
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
+          <v-btn @click="$emit('onSuccess', { page: 'MainPage' })">
             Back
           </v-btn>
         </v-card-actions>

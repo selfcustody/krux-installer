@@ -9,7 +9,7 @@ const existsAsync = promisify(exists)
 const statAsync = promisify(stat)
 
 // eslint-disable-next-line no-undef
-describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_m5stickv/kboot.kfpkg\' on file system', () => {
+describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_amigo_tft/kboot.kfpkg\' on file system', () => {
 
   let api, kboot
 
@@ -17,7 +17,7 @@ describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_m5stickv/kboot
   before(async () => {
     // eslint-disable-next-line no-undef
     api = await browser.electronAPI()
-    kboot = join(api.documents, name, 'odudex', 'krux_binaries', 'raw', 'main', 'maixpy_m5stickv', 'kboot.kfpkg') 
+    kboot = join(api.documents, name, 'odudex', 'krux_binaries', 'raw', 'main', 'maixpy_amigo_tft', 'kboot.kfpkg') 
   })
   
   // eslint-disable-next-line no-undef
@@ -30,6 +30,6 @@ describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_m5stickv/kboot
   it('should downloaded kboot file on disk have correct size', async () => {
     const kbootStat = await statAsync(kboot)
     const bytes = formatBytes(kbootStat.size)
-    expectChai(bytes).to.be.equal('891.7 KB')
+    expectChai(bytes).to.be.equal('892.1 KB')
   })
 })

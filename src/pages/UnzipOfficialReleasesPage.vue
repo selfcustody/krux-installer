@@ -63,13 +63,13 @@
         </v-card-content>
         <v-card-actions>
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            @click="$emit('onSuccess', { page: 'MainPage' })"
             id="unzip-official-release-page-card-action-button-done-unzipped"
           >
             Done
           </v-btn>
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })"
+            @click="$emit('onSuccess', { page: 'SelectVersionPage' })"
             id="unzip-official-release-page-card-action-button-back-unzipped"
           >
             Back

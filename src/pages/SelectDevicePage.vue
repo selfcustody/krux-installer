@@ -26,13 +26,13 @@
         </v-card-content>
         <v-card-actions>
           <v-btn
-            @click.prevent="select"
+            @click="select"
             id="select-device-page-form-select-button"
           >
             Select
           </v-btn>
           <v-btn 
-            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            @click="$emit('onSuccess', { page: 'MainPage' })"
             id="select-device-page-form-back-button"
           >
             Back

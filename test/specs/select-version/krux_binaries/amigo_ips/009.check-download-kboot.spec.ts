@@ -30,6 +30,6 @@ describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_amigo_ips/kboo
   it('should downloaded kboot file on disk have correct size', async () => {
     const kbootStat = await statAsync(kboot)
     const bytes = formatBytes(kbootStat.size)
-    expectChai(bytes).to.be.equal('891.5 KB')
+    expectChai(bytes).to.be.equal('892.1 KB')
   })
 })

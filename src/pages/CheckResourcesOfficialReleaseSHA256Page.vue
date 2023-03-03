@@ -50,13 +50,13 @@
         </v-card-content>
         <v-card-actions> 
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSigPage' })"
+            @click="$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSigPage' })"
             id="check-resources-official-release-sha256-page-button-proceed-checked"
           >
             Proceed
           </v-btn>
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleaseSHA256Page' })"
+            @click="$emit('onSuccess', { page: 'DownloadOfficialReleaseSHA256Page' })"
             id="check-resources-official-release-sha256-page-button-download-checked"
           >
             Download the file again

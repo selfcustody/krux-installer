@@ -95,14 +95,14 @@
           </v-card-text>
           <v-btn
             v-if="verifiedHash && verifiedSign"
-            @click.prevent="$emit('onSuccess', { page: 'UnzipOfficialReleasesPage' })"
+            @click="$emit('onSuccess', { page: 'UnzipOfficialReleasesPage' })"
             id="verify-official-release-page-button-unzip"
           >
             Unzip
           </v-btn>
           <v-btn
             v-if="verifiedHash && verifiedSign"
-            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            @click="$emit('onSuccess', { page: 'MainPage' })"
             id="verify-official-release-page-button-back"
           >
             Back

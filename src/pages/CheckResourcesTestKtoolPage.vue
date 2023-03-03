@@ -48,13 +48,13 @@
         </v-card-content>
         <v-card-actions> 
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            @click="$emit('onSuccess', { page: 'MainPage' })"
             id="check-resources-test-ktool-page-button-proceed-checked"
           >
             Proceed
           </v-btn>
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'DownloadTestKtoolPage' })"
+            @click="$emit('onSuccess', { page: 'DownloadTestKtoolPage' })"
             id="check-resources-test-ktool-page-button-download-checked"
           >
             Download the file again

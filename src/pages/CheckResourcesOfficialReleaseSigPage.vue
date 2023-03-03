@@ -50,13 +50,13 @@
         </v-card-content>
         <v-card-actions> 
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleasePemPage' })"
+            @click="$emit('onSuccess', { page: 'CheckResourcesOfficialReleasePemPage' })"
             id="check-resources-official-release-sig-page-button-proceed-checked"
           >
             Proceed
           </v-btn>
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleaseSigPage' })"
+            @click="$emit('onSuccess', { page: 'DownloadOfficialReleaseSigPage' })"
             id="check-resources-official-release-sig-page-button-download-checked" 
           > 
             Download the file again

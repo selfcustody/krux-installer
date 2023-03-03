@@ -11,7 +11,7 @@
               <v-card-actions>
                 <v-btn 
                   id="select-device-button"
-                  @click.prevent="$emit('onSuccess', { page: 'SelectDevicePage' })"
+                  @click="$emit('onSuccess', { page: 'SelectDevicePage' })"
                 >
                   <v-icon>mdi-devices</v-icon>&ensp;{{ device }}
                 </v-btn>
@@ -24,7 +24,7 @@
               <v-card-actions>
                 <v-btn 
                   id="select-version-button"
-                  @click.prevent="$emit('onSuccess', { page: 'SelectVersionPage' })"
+                  @click="$emit('onSuccess', { page: 'SelectVersionPage' })"
                 >
                   <v-icon>mdi-cube-outline</v-icon>&ensp;{{ version }}
                 </v-btn>
@@ -37,7 +37,7 @@
               <v-card-actions> 
                 <v-btn
                   id="select-write-flash-button"
-                  @click.prevent="$emit('onSuccess', { page: 'BeforeFlashDevicePage' })"
+                  @click="$emit('onSuccess', { page: 'BeforeFlashDevicePage' })"
                 >
                   <v-icon>mdi-lightning-bolt-outline</v-icon>&ensp;Flash
                 </v-btn>

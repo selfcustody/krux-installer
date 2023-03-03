@@ -24,10 +24,10 @@
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'WriteFirmwareToDevicePage' })">
+          <v-btn @click="$emit('onSuccess', { page: 'WriteFirmwareToDevicePage' })">
             Flash
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
+          <v-btn @click="$emit('onSuccess', { page: 'MainPage' })">
             Back
           </v-btn>
         </v-card-actions>

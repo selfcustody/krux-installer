@@ -112,6 +112,9 @@ jobs:
             test: select-version/krux_binaries/amigo_tft
           
           - build: AppImage
+            test: select-version/krux_binaries/bit
+          
+          - build: AppImage
             test: select-version/krux_binaries/ktool
 
           - build: AppImage

@@ -148,7 +148,8 @@ jobs:
           IS_SELECT_VERSION_SIG_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'sig' && steps.restore-cache-sig.outputs.cache-hit != 'true' }}
           IS_SELECT_VERSION_SIG_NO_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'sig' && steps.restore-cache-sig.outputs.cache-hit == 'true' }}
           IS_SELECT_VERSION_PEM_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'pem' && steps.restore-cache-pem.outputs.cache-hit != 'true' }}
-          IS_SELECT_VERSION_PEM_NO_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'pem' && steps.restore-cache-pem.outputs.cache-hit == 'true' }}
+          IS_SELECT_VERSION_PEM_NO_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'pem' && steps.restore-cache-pem.outputs.cache-hit == 'true' }} 
+          IS_SELECT_VERSION_VERIFY: ${{ inputs.test == 'select-version' && inputs.sub-test == 'verify' }}
           IS_FLASH_INIT: ${{ inputs.test == 'flash' && inputs.sub-test == 'init' }}  
           IS_FLASH_VERSION: ${{ inputs.test == 'flash' && inputs.sub-test == 'version' }} 
         run: |-
@@ -164,7 +165,7 @@ jobs:
             yarn run test ${{ inputs.test }}/v${{ inputs.krux-version }}
           fi
 
-          if [[ ($IS_SELECT_VERSION_RELEASE_DOWNLOAD == true) || ($IS_SELECT_VERSION_SHA256_DOWNLOAD == true) || ($IS_SELECT_VERSION_SIG_DOWNLOAD == true) || ($IS_SELECT_VERSION_PEM_DOWNLOAD == true) ]]; then
+          if [[ ($IS_SELECT_VERSION_RELEASE_DOWNLOAD == true) || ($IS_SELECT_VERSION_SHA256_DOWNLOAD == true) || ($IS_SELECT_VERSION_SIG_DOWNLOAD == true) || ($IS_SELECT_VERSION_PEM_DOWNLOAD == true) || ($IS_SELECT_VERSION_VERIFY == true) ]]; then
             yarn run test ${{ inputs.test }}/v${{ inputs.krux-version }}/${{ inputs.sub-test }}
           fi
 

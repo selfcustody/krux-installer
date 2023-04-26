@@ -148,6 +148,7 @@ jobs:
             build: nsis
     
           - sub-test: verify
+   
     uses: ./.github/workflows/test-win.yml
     with:
       test: select-version

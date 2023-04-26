@@ -16,7 +16,7 @@ describe('check downloaded v22.08.2 zip release on file system', () => {
   // eslint-disable-next-line no-undef
   before(async () => {
     // eslint-disable-next-line no-undef
-    api = await browser.electronAPI()
+    api = await browser.electron.api()
     dir = join(api.documents, name, 'v22.08.2') 
     zip = join(dir, 'krux-v22.08.2.zip')
   })
@@ -32,6 +32,6 @@ describe('check downloaded v22.08.2 zip release on file system', () => {
     const zip = join(dir, 'krux-v22.08.2.zip')
     const zipStat = await statAsync(zip)
     const bytes = formatBytes(zipStat.size)
-    expectChai(bytes).to.be.equal('44.0 MB')
+    expectChai(bytes).to.be.equal('44.03 MB')
   })
 })

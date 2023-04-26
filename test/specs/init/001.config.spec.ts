@@ -14,7 +14,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should created a \'krux-installer\' folder in \'appData\' directory', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     expectChai(p).to.be.not.equal(undefined)
     expectChai(p).to.have.property('appData')
     expectChai(p.appData).to.be.a('string')
@@ -31,7 +31,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should created a config.json in \'krux-installer\' folder', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json')
     console.log('----------------------------------------')
     console.log(`Config Path: ${configPath}`)
@@ -43,7 +43,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json be initialized', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json') 
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString)  
@@ -57,7 +57,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json have \'appVersion\' property', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json')
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 
@@ -67,7 +67,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json have \'resources\' property', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json')
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 
@@ -79,7 +79,7 @@ describe('KruxInstaller configuration', () => {
         regexp = new RegExp(`/home/[a-zA-Z0-9/]+`, 'g')
       }
       if (process.platform === 'win32') {
-        regexp = new RegExp(`[A-Z]:\\Users\\[a-zA-Z0-9]+`, 'g')
+        regexp = /[A-Z]:[a-zA-Z\\-]+/g
       }
       if (process.platform === 'darwin') {
         regexp = new RegExp(`/Users/[a-zA-Z0-9]+`, 'g')
@@ -104,7 +104,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json have \'os\' property', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json')
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 
@@ -114,7 +114,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json have \'versions\' property', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json')
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 
@@ -126,7 +126,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json have \'version\' property', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json')
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 
@@ -136,7 +136,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json have \'device\' property', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json')
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 
@@ -146,7 +146,7 @@ describe('KruxInstaller configuration', () => {
   // eslint-disable-next-line no-undef
   it('should config.json have \'sdcard\' property', async () => {
     // eslint-disable-next-line no-undef 
-    const p = await browser.electronAPI()
+    const p = await browser.electron.api()
     const configPath = join(p.appData, name, 'config.json') 
     const configString = await readFileAsync(configPath, 'utf8')
     const config = JSON.parse(configString) 

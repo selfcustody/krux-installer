@@ -35,29 +35,14 @@ class SelectVersion extends SelectOptions {
     return $(this._cardSubtitleTest)
   }
 
-  get list_item_22_03_0 () { 
+  get list_item_22_08_2 () { 
     // eslint-disable-next-line no-undef
     return $$('.v-list>.v-list-item')[0]
   }
 
-  get list_item_22_08_0 () { 
-    // eslint-disable-next-line no-undef
-    return $$('.v-list>.v-list-item')[1]
-  }
-
-  get list_item_22_08_1 () { 
-    // eslint-disable-next-line no-undef
-    return $$('.v-list>.v-list-item')[2]
-  }
-
-  get list_item_22_08_2 () { 
-    // eslint-disable-next-line no-undef
-    return $$('.v-list>.v-list-item')[3]
-  }
-
   get list_item_krux_binaries () { 
     // eslint-disable-next-line no-undef
-    return $$('.v-list>.v-list-item')[4]
+    return $$('.v-list>.v-list-item')[1]
   }
 }
 

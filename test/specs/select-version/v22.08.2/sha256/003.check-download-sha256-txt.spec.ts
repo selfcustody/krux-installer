@@ -16,7 +16,7 @@ describe('check downloaded v22.08.2 zip.sha256.txt release on file system', () =
   // eslint-disable-next-line no-undef
   before(async () => {
     // eslint-disable-next-line no-undef
-    api = await browser.electronAPI()
+    api = await browser.electron.api()
     dir = join(api.documents, name, 'v22.08.2') 
     sha256 = join(dir, 'krux-v22.08.2.zip.sha256.txt')
   })

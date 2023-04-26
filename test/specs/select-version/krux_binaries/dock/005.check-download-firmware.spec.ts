@@ -30,6 +30,6 @@ describe('check downloaded \'odudex/krux_binaries/raw/main/maixpy_dock/firmware.
   it('should downloaded firmware file on disk have correct size', async () => {
     const firmwareStat = await statAsync(firmware)
     const bytes = formatBytes(firmwareStat.size)
-    expectChai(bytes).to.be.equal('1.7 MB')
+    expectChai(bytes).to.be.equal('1.73 MB')
   })
 })

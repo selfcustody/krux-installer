@@ -10,25 +10,20 @@ describe('SelectVersionPage: warn before download \'selfcustody/krux/releases/ta
   // eslint-disable-next-line no-undef
   before(async () => {
     await Main.selectVersionButton.waitForExist()
-    await delay(1000)
     await Main.selectVersionButton.click()
-    await SelectVersion.cardTitleChecking.waitForExist()
-    await delay(1000)
-    await SelectVersion.cardTitleChecked.waitForExist()  
+    await SelectVersion.cardTitleChecking.waitForExist() 
+    await SelectVersion.cardTitleChecked.waitForExist() 
     await SelectVersion.cardSubtitleOfficial.waitForExist()  
     await SelectVersion.cardSubtitleTest.waitForExist()  
     await SelectVersion.formArrow.waitForExist()
     await SelectVersion.formBackButton.waitForExist()  
-    await delay(1000)
     await SelectVersion.formArrow.click()
     await delay(1000)
-    await SelectVersion.list_item_22_03_0.waitForExist()
-    await SelectVersion.list_item_22_08_0.waitForExist()
-    await SelectVersion.list_item_22_08_1.waitForExist()
+    await SelectVersion.formSelectField.waitForExist()
     await SelectVersion.list_item_22_08_2.waitForExist()
     await SelectVersion.list_item_krux_binaries.waitForExist()
-    await delay(1000) 
     await SelectVersion.list_item_22_08_2.click()
+    await delay(1000)
     await SelectVersion.formSelectButton.waitForExist()
     await SelectVersion.formSelectButton.click()  
     await SelectVersion.page.waitForExist({ reverse: true }) 
@@ -40,10 +35,8 @@ describe('SelectVersionPage: warn before download \'selfcustody/krux/releases/ta
     await CheckResourcesOfficialRelease.cardContentChecked.waitForExist()
     await CheckResourcesOfficialRelease.buttonDownload.waitForExist()
     await CheckResourcesOfficialRelease.buttonProceed.waitForExist()
-    await delay(1000)
   })
 
-    
   // eslint-disable-next-line no-undef
   it('should card title be \'v22.08.2/krux-v22.08.2.zip\'', async () => {
     await expectWDIO(CheckResourcesOfficialRelease.cardTitleChecked).toHaveText('v22.08.2/krux-v22.08.2.zip')

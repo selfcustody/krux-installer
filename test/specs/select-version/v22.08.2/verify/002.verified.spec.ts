@@ -1,4 +1,5 @@
 import { expect as expectWDIO } from '@wdio/globals'
+import { join } from 'path'
 import delay from '../../../delay'
 import Main from '../../../../pageobjects/main.page'
 import SelectVersion from '../../../../pageobjects/select-version.page'
@@ -27,9 +28,6 @@ describe('Verified \'v22.08.2/krux-v22.08.2.zip\' release sucessfully', () => {
     await delay(1000)
     await SelectVersion.formArrow.click()
     await delay(1000)
-    await SelectVersion.list_item_22_03_0.waitForExist()
-    await SelectVersion.list_item_22_08_0.waitForExist()
-    await SelectVersion.list_item_22_08_1.waitForExist()
     await SelectVersion.list_item_22_08_2.waitForExist()
     await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
@@ -132,23 +130,24 @@ describe('Verified \'v22.08.2/krux-v22.08.2.zip\' release sucessfully', () => {
   // eslint-disable-next-line no-undef
   it('should card have a console with complete command used to verify', async () => {
     // eslint-disable-next-line no-undef
-    const api = await browser.electronAPI()
+    const api = await browser.electron.api()
     const docs = api.documents
+    
     await expectWDIO(VerifyOfficialRelease.consoleSignatureCommand).toHaveText([
       '$>',
-      'openssl',
+      `openssl${process.platform === 'win32' ? '.exe' : '' }`,
       'sha256',
-      `<${docs}/krux-installer/v22.08.2/krux-v22.08.2.zip`,
+      `<${join(docs, 'krux-installer', 'v22.08.2', 'krux-v22.08.2.zip')}`,
       '-binary',
-      '|',
-      'openssl',
+      '|', 
+      `openssl${process.platform === 'win32' ? '.exe' : '' }`,
       'pkeyutl',
       '-verify',
       '-pubin',
       '-inkey',
-      `${docs}/krux-installer/main/selfcustody.pem`,
+      `${join(docs, 'krux-installer', 'main', 'selfcustody.pem')}`,
       '-sigfile',
-      `${docs}/krux-installer/v22.08.2/krux-v22.08.2.zip.sig`
+      `${join(docs, 'krux-installer', 'v22.08.2', 'krux-v22.08.2.zip.sig')}`
     ].join(' '))
   })
 

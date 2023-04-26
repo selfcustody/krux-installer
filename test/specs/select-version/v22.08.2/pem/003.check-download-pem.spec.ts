@@ -17,7 +17,7 @@ describe('check downloaded public key certificate on file system', () => {
   // eslint-disable-next-line no-undef
   before(async () => {
     // eslint-disable-next-line no-undef
-    api = await browser.electronAPI()
+    api = await browser.electron.api()
     dir = join(api.documents, name, 'main') 
     pem = join(dir, 'selfcustody.pem')
   })

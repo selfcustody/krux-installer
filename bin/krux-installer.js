@@ -107,8 +107,9 @@ async function main() {
     //runner(`resize-img${process.platform === 'win32' ? '.cmd' : '' }`, ['--width', '256', '--height', '256', toPng, '>', toIconPng])
 
     if (process.platform === 'win32') {
+      const pngIcon = join(__dirname, '..', 'build', 'icon.png')
       const toIcon = join(__dirname, '..', 'build', 'icon.ico')
-      const ico = runner('png-to-ico.cmd', [ toIconPng, '>', toIcon ])
+      const ico = runner('png-to-ico.cmd', [ pngIcon, '>', toIcon ])
       promises.push(ico)
     }
 

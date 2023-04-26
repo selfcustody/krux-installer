@@ -24,10 +24,16 @@
           </v-card-text>
         </v-card-content>
         <v-card-actions>
-          <v-btn @click="$emit('onSuccess', { page: 'WriteFirmwareToDevicePage' })">
+          <v-btn
+            id="before-flash-device-page-flash-button"
+            @click="$emit('onSuccess', { page: 'WriteFirmwareToDevicePage' })"
+          >
             Flash
           </v-btn>
-          <v-btn @click="$emit('onSuccess', { page: 'MainPage' })">
+          <v-btn
+            id="before-flash-device-page-back-button"
+            @click="$emit('onSuccess', { page: 'MainPage' })"
+          >
             Back
           </v-btn>
         </v-card-actions>

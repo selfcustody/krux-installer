@@ -1,8 +1,11 @@
 const { join } = require('path');
-const { name } = require('./package.json')
 const { exec } = require('child_process')
-const glob = require('glob')
-const rimraf = require('rimraf')
+const { access, readFileSync } = require('fs')
+const { glob } = require('glob')
+const { rimraf } = require('rimraf')
+const { tmpdir } = require('os')
+const electronVersion = require('./package.json').devDependencies.electron
+
 
 const testSpecPaths = [ `${join(__dirname, 'test', 'specs', process.argv[4])}/*.ts` ]
 const excludeSpecPaths = []
@@ -23,6 +26,18 @@ if (process.argv[5] === '--filter' && process.argv[6] !== '') {
     excludeSpecPaths.push(`${join(__dirname, 'test', 'specs', process.argv[4])}/*.download-pem.spec.ts`)
   }
 */
+let APP_PATH
+
+if (process.platform === 'linux') {
+  APP_PATH = join(__dirname, 'dist_electron', 'linux-unpacked', 'krux-installer')
+} else if (process.platform === 'win32') {
+  APP_PATH = join(__dirname, 'dist_electron', 'win-unpacked', 'KruxInstaller.exe')
+} else if (process.platform === 'darwin') {
+  console.error(`Not implemented for ${process.platform}`)
+  process.exit(1)
+}
+
+console.log(`Using ${APP_PATH} with electron v${electronVersion}`)
 
 exports.config = {
     //
@@ -130,7 +145,7 @@ exports.config = {
     //
     // If you only want to run your tests until a specific amount of tests have failed use
     // bail (default is 0 - don't bail, run all tests).
-    bail: 0,
+    bail: 1,
     //
     // Set a base URL in order to shorten url command calls. If your `url` parameter starts
     // with `/`, the base url gets prepended, not including the path portion of your baseUrl.
@@ -156,12 +171,14 @@ exports.config = {
       [
         'electron',
         {
-          appPath: join(__dirname, 'dist_electron'),
-          appName: name,
+          //appPath: join(__dirname, 'dist_electron'),
+          //appName: __APPNAME__,
+          binaryPath: APP_PATH,
           chromedriver: {
             port: 9519,
             logFileName: join(__dirname, 'wdio-chromedriver.log'),
-          }
+          },
+          electronVersion: '24.1.2'
         }
       ]
     ],
@@ -230,29 +247,56 @@ exports.config = {
       // and then start to test
       return new Promise(function(resolve, reject) {
         if (specs[0].indexOf('001.config.spec.ts') !== -1) {
+          const shell = process.env.SHELL
           console.log('------------------------------------')
+          console.log(`platform: ${process.platform}`)
+          console.log(`shell: ${shell}`)
           console.log('INTERMEDIATE RUNNING TO CREATE STORE')
-          if (process.platform === 'linux') {
-            const kiPath = join(__dirname, 'dist_electron', 'linux-unpacked', name)
-            const ki = exec(kiPath, (err) => {
-              if (err) reject(err)
+
+          console.log(`exec \x1b[32m${APP_PATH}\x1b[0m`)
+
+          const __process__ = exec(APP_PATH, function(err) {
+            if (err) reject(err)
+          })
+
+          console.log(`PID \x1b[33m${__process__.pid}\x1b[0m in execution`)
+          setTimeout(function() {
+            let config
+
+            if (process.platform === 'linux') {
+              config = join(process.env.HOME, '.config', 'krux-installer', 'config.json')
+            } else if (process.platform === 'win32') {
+              config = join(process.env.APPDATA, 'krux-installer', 'config.json')
+            } else if (process.platform === 'darwin') {
+              config = join(process.env.HOME, 'Library', 'Application Support', 'krux-installer', 'config.json')
+            }
+
+            // eslint-disable-next-line no-unused-vars
+            access(config, function(error) {
+              if (error) reject(error)
+              const json = readFileSync(config, 'utf-8')
+              console.log(JSON.parse(json))
+              console.log(`killing process \x1b[33m${__process__.pid}\x1b[0m`)
+              console.log('DONE')
+              if (process.platform === 'linux') {
+                exec(`kill ${__process__.pid}`, function(err) {
+                  if (err) reject(err)
+                  console.log('------------------------------------')
+                  console.log('')
+                  resolve()
+                })
+              } else if (process.platform === 'win32' && shell === 'pwsh') {
+                exec(`Stop-Process -Id ${__process__.pid}`, function(err) {
+                  if (err) reject(err)
+                  console.log('------------------------------------')
+                  console.log('')
+                  resolve()
+                })
+              }
             })
-            console.log(`PID \x1b[32mrm ${ki.pid}\x1b[0m`)
-            console.log(`\x1b[33mwait\x1b[0m`)
-            setTimeout(function(){
-              console.log(`killing process \x1b[33m${ki.pid}\x1b[0m`)
-              exec(`kill ${ki.pid}`, function(error) {
-                if (error) reject(error)
-                console.log('------------------------------------')
-                resolve()
-              })
-            }, 3000)
-          } else {
-            resolve()
-          }
-        } else {
-          resolve()
+          }, 3000)
         }
+        resolve()
       })
     },
     /**
@@ -330,12 +374,13 @@ exports.config = {
      * @param {Object} suite suite details
      */
     // eslint-disable-next-line no-unused-vars
-    afterSuite: function (suite) {
+    /*
+    afterSuite: async function (suite) {
       let index = 0
       const promises = []
 
-      function createPromises(err, dirs) {
-        if (err) promises.push(Promise.reject(err))
+      /*
+      function createPromises(dir) {
         dirs.forEach(function(dir) {
           index += 1
           promises.push(new Promise(function(res) {
@@ -348,12 +393,28 @@ exports.config = {
             })
           }))
         })
+      }i
+
+      function removing(dir) {
+        index += 1
+        promises.push(new Promise(function(res) {
+          setTimeout(res, 1000 * index)
+        }))
+        promises.push(new Promise(function(res) {
+          console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
+          rimraf(dir, { preserveRoot: false }, function() {
+            res()
+          })
+        }))
       }
 
-      if (process.platform === 'linux') {
-        glob('/tmp/yarn--*', createPromises)
-        glob('/tmp/lighthouse.*', createPromises)
-      }
+      const tmp = tmpdir()
+      const yarnDir = join(tmp, 'yarn--*')
+      const lightDir = join(tmp, 'lighthouse.*')
+      const yarns = await glob(yarnDir)
+      const lights = await glob(lightDir)
+      yarns.map(removing)
+      lights.map(removing)
 
       return Promise.all(promises)
     },
@@ -392,34 +453,22 @@ exports.config = {
      * @param {<Object>} results object containing test results
      */
     // eslint-disable-next-line no-unused-vars
-    onComplete: function(exitCode, config, capabilities, results) {
-      let index = 0
-      const promises = []
+    onComplete: async function(exitCode, config, capabilities, results) {
 
-      function removePromises(err, dirs) {
-        if (err) promises.push(Promise.reject(err))
-        dirs.forEach(function(dir) {
-          index += 1
-          promises.push(new Promise(function(res) {
-            setTimeout(res, 1000 * index)
-          }))
-          promises.push(new Promise(function(res) {
-            console.log(`\x1b[32mremoving\x1b[0m \x1b[33m${dir}\x1b[0m`)
-            rimraf(dir, { preserveRoot: false }, function() {
-              res()
-            })
-          }))
+      function removing(dir) {
+        console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
+        rimraf(dir, { preserveRoot: false }, function() {
+          console.log(`  - ${dir} removed`)
         })
       }
 
-      if (process.env.KI_DELETE_RESOURCES_ON_COMPLETE) {
-        if (process.platform === 'linux') {
-          let docs
-          if (process.env.LANG.match(/en*/g)) docs = 'Documents'
-          if (process.env.LANG.match(/pt*/g)) docs = 'Documentos'
-          glob(`${process.env.HOME}/${docs}/krux-installer/*`, removePromises)
-        }
-      }
+      const tmp = tmpdir()
+      const yarnDir = join(tmp, 'yarn--*')
+      const lightDir = join(tmp, 'lighthouse.*')
+      const yarns = await glob(yarnDir)
+      const lights = await glob(lightDir)
+      yarns.map(removing)
+      lights.map(removing)
     },
     /**
     * Gets executed when a refresh happens.

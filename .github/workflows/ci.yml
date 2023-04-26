@@ -1,0 +1,195 @@
+name: CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - linux*
+      - win32*
+
+    pull_request:
+      - branches:
+        - main
+
+jobs:
+
+  lint:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    uses: ./.github/workflows/lint.yml
+    with:
+      os: ${{ matrix.os }}
+ 
+  build-linux:
+    needs: lint
+    strategy:
+      matrix:
+        build: [AppImage]
+    uses: ./.github/workflows/build-linux.yml
+    secrets: 
+      token: ${{ secrets.github_token }}
+    with:
+      build: ${{ matrix.build }}
+
+  build-win:
+    needs: lint
+    strategy:
+      matrix:
+        build: [nsis]
+    uses: ./.github/workflows/build-win.yml
+    secrets:
+      token: ${{ secrets.github_token }}
+    with:
+      build: ${{ matrix.build }}
+
+  config-linux:
+    needs: build-linux
+    strategy:
+      matrix:
+        build: [AppImage]
+    uses: ./.github/workflows/config-linux.yml
+    with:
+      build: ${{ matrix.build }}
+
+  config-win:
+    needs: build-win
+    uses: ./.github/workflows/config-win.yml
+
+  test-main-linux:
+    needs: config-linux
+    strategy:
+      matrix:
+        build: [AppImage]
+    uses: ./.github/workflows/test-linux.yml
+    with:
+      test: main
+      build: ${{ matrix.build }}
+
+  test-main-win:
+    needs: config-win
+    strategy:
+      matrix:
+        build: [nsis]
+    uses: ./.github/workflows/test-win.yml
+    with:
+      test: main
+      build: ${{ matrix.build }}
+
+  test-select-device-linux:
+    needs: test-main-linux
+    strategy:
+      matrix:
+        build: [AppImage]
+    uses: ./.github/workflows/test-linux.yml
+    with:
+      test: select-device
+      build: ${{ matrix.build }}
+
+  test-select-device-win:
+    needs: test-main-win
+    strategy:
+      matrix:
+        build: [nsis]
+    uses: ./.github/workflows/test-win.yml
+    with:
+      test: select-device
+      build: ${{ matrix.build }}
+
+  test-select-version-linux:
+    needs: test-select-device-linux
+    strategy:
+      max-parallel: 1
+      matrix:
+        include:
+          - sub-test: init
+            build: AppImage
+
+          - sub-test: release
+            build: AppImage
+          
+          - sub-test: sha256
+            build: AppImage
+          
+          - sub-test: sig
+            build: AppImage
+
+          - sub-test: pem
+            build: AppImage
+   
+          - sub-test: verify
+            build: AppImage
+
+    uses: ./.github/workflows/test-linux.yml
+    with:
+      test: select-version
+      sub-test: ${{ matrix.sub-test }}
+      build: ${{ matrix.build }}
+
+  test-select-version-win:
+    needs: test-select-device-win 
+    strategy:
+      max-parallel: 1
+      matrix:
+        include:
+          - sub-test: init
+            build: nsis
+
+          - sub-test: release
+            build: nsis
+          
+          - sub-test: sha256
+            build: nsis
+          
+          - sub-test: sig
+            build: nsis
+
+          - sub-test: pem
+            build: nsis
+    
+          - sub-test: verify
+    uses: ./.github/workflows/test-win.yml
+    with:
+      test: select-version
+      sub-test: ${{ matrix.sub-test }}
+      build: ${{ matrix.build }}
+
+
+  test-flash-linux:
+    needs: test-select-version-linux
+    strategy:
+      max-parallel: 1
+      matrix:
+        build: [AppImage]
+        sub-test: [init, version]
+    uses: ./.github/workflows/test-linux.yml
+    with:
+      test: flash
+      sub-test: ${{ matrix.sub-test }}
+      build: ${{ matrix.build }}
+
+  test-flash-win:
+    needs: test-select-version-win
+    strategy:
+      max-parallel: 1
+      matrix:
+        build: [nsis]
+        sub-test: [init, version]
+    uses: ./.github/workflows/test-win.yml
+    with:
+      test: flash
+      sub-test: ${{ matrix.sub-test }}
+      build: ${{ matrix.build }}
+
+  upload-linux:
+    needs: test-flash-linux
+    strategy:
+      matrix:
+        build: [AppImage]
+    uses: ./.github/workflows/upload-linux.yml
+    with:
+      build: ${{ matrix.build }}
+
+  upload-win:
+    needs: test-flash-win
+    uses: ./.github/workflows/upload-win.yml

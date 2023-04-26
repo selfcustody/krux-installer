@@ -1,4 +1,5 @@
 import { expect as expectWDIO } from '@wdio/globals'
+import { join } from 'path'
 import delay from '../../../delay'
 import Main from '../../../../pageobjects/main.page'
 import SelectVersion from '../../../../pageobjects/select-version.page'
@@ -28,9 +29,6 @@ describe('Unzip \'v22.08.2/krux-v22.08.2.zip\' release', () => {
     await delay(1000)
     await SelectVersion.formArrow.click()
     await delay(1000)
-    await SelectVersion.list_item_22_03_0.waitForExist()
-    await SelectVersion.list_item_22_08_0.waitForExist()
-    await SelectVersion.list_item_22_08_1.waitForExist()
     await SelectVersion.list_item_22_08_2.waitForExist()
     await SelectVersion.list_item_krux_binaries.waitForExist()
     await delay(1000) 
@@ -136,9 +134,9 @@ describe('Unzip \'v22.08.2/krux-v22.08.2.zip\' release', () => {
   // eslint-disable-next-line no-undef
   it('should subtitle be changed to \'Relative to: <some path>/krux-installer\'', async () => {
     // eslint-disable-next-line no-undef
-    const api = await browser.electronAPI()
+    const api = await browser.electron.api()
     await UnzipOfficialRelease.cardSubitleUnzipped.waitForExist()
-    await expectWDIO(UnzipOfficialRelease.cardSubitleUnzipped).toHaveText(`Relative to: ${api.documents}/krux-installer`)
+    await expectWDIO(UnzipOfficialRelease.cardSubitleUnzipped).toHaveText(`Relative to: ${join(api.documents, 'krux-installer')}`)
   })
 
 

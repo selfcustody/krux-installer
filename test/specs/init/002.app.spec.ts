@@ -10,7 +10,7 @@ describe('KruxInstaller initialization', () => {
   // eslint-disable-next-line no-undef
   it('should be ready', async () => {
     // eslint-disable-next-line no-undef 
-    const isReady = await browser.electronApp('isReady')
+    const isReady = await browser.electron.app('isReady')
     expectChai(isReady).to.be.equal(true)
   })
 
@@ -18,14 +18,15 @@ describe('KruxInstaller initialization', () => {
   it('should name be correct', async () => {
 
     // eslint-disable-next-line no-undef
-    const n = await browser.electronApp('getName')
+    const n = await browser.electron.app('getName')
+
     expectChai(n).to.be.equal(name)
   })
 
   // eslint-disable-next-line no-undef
   it('should version be correct', async () => {
     // eslint-disable-next-line no-undef
-    const v = await browser.electronApp('getVersion')
+    const v = await browser.electron.app('getVersion')
     expectChai(v).to.be.equal(version)
   })
 

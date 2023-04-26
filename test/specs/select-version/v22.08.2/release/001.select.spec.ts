@@ -8,19 +8,22 @@ describe('SelectVersionPage: page select \'selfcustody/krux/releases/tag/v22.08.
  
   // eslint-disable-next-line no-undef
   before(async () => {
+    await Main.page.waitForExist()
     await Main.selectVersionButton.click()
+    await Main.page.waitForExist({ reverse: true })
+    await SelectVersion.page.waitForExist()
     await SelectVersion.formArrow.waitForExist()
     await SelectVersion.formArrow.click()
-    await SelectVersion.list_item_22_08_2.waitForExist()
+    await SelectVersion.formSelectContainer.waitForExist() 
+    await SelectVersion.list_item_22_08_2.waitForExist() 
     await delay(1000)
   })
 
   // eslint-disable-next-line no-undef
-  it('should be selected', async () => {    
+  it('should be selected', async () => {     
     await SelectVersion.list_item_22_08_2.click()
-    await delay(1000)
+    await SelectVersion.formSelected.waitForExist()
     await expectWDIO(SelectVersion.formSelected).toHaveText('selfcustody/krux/releases/tag/v22.08.2')
-    await delay(1000)
   })
 
   // eslint-disable-next-line no-undef

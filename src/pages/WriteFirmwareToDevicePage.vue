@@ -9,15 +9,14 @@
         v-if="!isWritten"
         class="ma-5 pa-5"
       >
-        <v-card-title>Flashing...</v-card-title>
-        <v-card-subtitle>
-          <b v-if="!done">Do not unpulg device or shutdown computer!</b>
-          <b v-if="done">Output </b>
-          <b v-if="done">(toogle developer tools to see all outputs).</b>
+        <v-card-title id="write-firmware-to-device-page-card-title">Flashing...</v-card-title>
+        <v-card-subtitle id="write-firmware-to-device-page-card-subtitle">
+          <b v-if="!done">Do not unplug device or shutdown computer!</b>
+          <b v-if="done">Output (toogle developer tools to see all of them).</b>
         </v-card-subtitle>
-        <v-card-content>
+        <v-card-content id="write-firmware-to-device-page-card-content">
           <v-card-text>
-            <div class="console" v-html="html" ref="console" />
+            <div id="write-firmware-to-device-page-console" class="console" v-html="html" ref="console" />
           </v-card-text>
         </v-card-content>
         <v-card-actions>
@@ -54,9 +53,11 @@ export default {
   beforeMount () {
     this.$data.html = ''
   },
-  async created () { 
-    await window.KruxInstaller.flash.firmware()
- 
+  created () {
+    setTimeout(async function () {
+      await window.KruxInstaller.flash.firmware()
+    }, 1000)
+
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.flash.onData((_event, value) => { 
       this.$nextTick(() => {

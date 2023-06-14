@@ -1,30 +1,57 @@
-name: Lint
+name: Lint and create icon
 
 on:
-  push:
-    branches:
-      - main
-    pull_request:
-      branches:
-        - main
-
+  workflow_call:
+    inputs:
+      os:
+        description: 'The OS where lint will run'
+        type: string
+        required: true
 
 jobs:
   lint:
-    name: Run linter on src/**.js public/*.js and src/**.vue
-    runs-on: ubuntu-latest
-    
+    runs-on: ${{ inputs.os }}
+  
     steps:
+
       - name: Checkout Git repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
-      - name: Setup node.js
-        uses: actions/setup-node@v1
+      - name: Setup cached node.js with dependencies (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        uses: qlrd/setup-cached-node@main
         with:
-          node-version: '16.18.0'
+          node-version: '18.15.0'
+          cache-path: ${{ format('{0}/node_modules', github.workspace) }}
+          cache-key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }} 
+          run: |
+            yarn install
+            yarn run platform-install
+            yarn run install-app-deps
 
-      - name: Install Node.js dependencies
-        run: yarn install
+      - name: Setup cached node.js with dependencies (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        uses: qlrd/setup-cached-node@main
+        with:
+          node-version: '18.15.0' 
+          cache-path: ${{ format('{0}/node_modules', github.workspace) }}
+          cache-key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock', format('{0}/node_modules/png-to-ico/bin', github.workspace)) }} 
+          run: |
+            yarn install
+            yarn run platform-install
+            yarn run install-app-deps
 
-      - name: Run src/pages/*.vue, public/**.js and src/**.js  linting
+      - name: Lint (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        shell: bash
         run: yarn run lint
+
+      - name: Lint (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: yarn run lint 
+
+      - name: Create Icon (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        shell: pwsh
+        run: yarn run icon

@@ -4,6 +4,7 @@
     justify-start
     row
     fill-height
+    id="check-resources-official-release-sig-page"
   > 
     <v-flex
       v-if="!checked"
@@ -18,8 +19,8 @@
                 color="green"
               />
             </v-flex>
-            <v-flex xs8 sm12>
-              Checking...
+            <v-flex xs8 sm12 id="check-resources-official-release-sig-page-card-title-checking">
+              Checking official release signature...
             </v-flex>
           </v-layout>
         </v-card-title>
@@ -30,23 +31,35 @@
       xs12
     >
       <v-card flat>
-        <v-card-title> 
+        <v-card-title
+          id="check-resources-official-release-sig-page-card-title-checked"
+        > 
           <v-icon>mdi-folder-alert-outline</v-icon>&ensp;{{ title }}
         </v-card-title>
-        <v-card-subtitle>
+        <v-card-subtitle
+          id="check-resources-official-release-sig-page-card-subtitle-checked"
+        >
           Already downloaded
         </v-card-subtitle>
         <v-card-content>
-          <v-card-text>
-            Click "OK" to dowload again or "Cancel" to proceed with the downloaded version.
+          <v-card-text
+            id="check-resources-official-release-sig-page-card-content-checked"
+          >
+            Click "Proceed" to proceed with the downloaded version or "Download the file again".
           </v-card-text>
         </v-card-content>
-        <v-card-actions>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'DownloadOfficialReleaseSigPage' })">
-            OK
+        <v-card-actions> 
+          <v-btn
+            @click="$emit('onSuccess', { page: 'CheckResourcesOfficialReleasePemPage' })"
+            id="check-resources-official-release-sig-page-button-proceed-checked"
+          >
+            Proceed
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'CheckResourcesOfficialReleasePemPage' })">
-            Cancel
+          <v-btn
+            @click="$emit('onSuccess', { page: 'DownloadOfficialReleaseSigPage' })"
+            id="check-resources-official-release-sig-page-button-download-checked" 
+          > 
+            Download the file again
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -66,7 +79,9 @@ export default {
   watch: {
     async title (value) {
       if (value !== '') {
-        await window.KruxInstaller.check.resource(value)
+        setTimeout(async () => {
+          await window.KruxInstaller.check.resource(value)
+        }, 1000)
       }
     }
   },
@@ -93,7 +108,9 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.check.onError((_event, value) => {
-      this.$emit('onSuccess', { page: 'DownloadOfficialReleaseSigPage' })
+      this.$nextTick(() => {
+        this.$emit('onSuccess', { page: 'DownloadOfficialReleaseSigPage' })
+      })
     })
   }
 }

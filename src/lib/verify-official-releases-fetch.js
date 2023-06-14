@@ -40,11 +40,9 @@ class VerifyOfficialReleasesFetchHandler extends Handler {
     // verify for new releases if length of fetch is greater than the local list
     if (list.length === 0 || list.length < (Object.keys(this.releases)).length) {
       const __list__ = []
-      for (let i in this.releases) {
-        const __v__ = this.releases[i]
-        const version = __v__.ref.split('tags/')[1]
-        __list__.push(`selfcustody/krux/releases/tag/${version}`)
-      }
+      const __v__ = this.releases[this.releases.length - 1]
+      const version = __v__.ref.split('tags/')[1]
+      __list__.push(`selfcustody/krux/releases/tag/${version}`)
       __list__.push('odudex/krux_binaries')
       this.store.set('versions', __list__)
       list = this.store.get('versions')

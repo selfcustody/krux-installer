@@ -1,0 +1,234 @@
+name: Test electron app on Linux
+
+on:
+  workflow_call:
+
+    inputs:
+      build:
+        description: 'The build type (AppImage, deb, snap)'
+        type: string
+        required: true
+
+      test:
+        description: 'The main test to be done (main, select-device, select-version, flash)'
+        type: string
+        required: true
+
+      sub-test:
+        description: 'The sub-test to be done (select-version: [init, release, sha256, sig, pem])'
+        type: string
+        required: false
+
+      krux-version:
+        description: 'Flag to indicate which version will be tested'
+        type: string
+        default: '22.08.2'
+
+      digest-ext:
+        description: 'The extension for sha256 digest file'
+        type: string
+        default: 'sha256.txt'
+
+
+jobs:
+
+  test-linux:
+    runs-on: ubuntu-latest
+  
+    steps:
+
+      - name: Checkout Git repository
+        uses: actions/checkout@v3
+      
+      - name: Setup cached node.js with dependencies
+        uses: qlrd/setup-cached-node@main
+        with:
+          node-version: '18.15.0'
+          cache-path: ${{ github.workspace }}/node_modules
+          cache-key: ${{ runner.os }}-yarn-${{ hashFiles('yarn.lock') }} 
+
+      - name: Setup variables
+        id: setup
+        run: | 
+          KRUX_VERSION=${{ inputs.krux-version }}
+          KRUX_INSTALLER_VERSION=`node -e "console.log(require('./package.json').version)"`
+          KRUX_INSTALLER_NAME="KruxInstaller-$KRUX_INSTALLER_VERSION" >> $GITHUB_OUTPUT 
+          echo "app-version=$KRUX_INSTALLER_VERSION" >> $GITHUB_OUTPUT
+          echo "app-name=$KRUX_INSTALLER_NAME" >> $GITHUB_OUTPUT
+          echo "config-path=/home/runner/.config/krux-installer" >> $GITHUB_OUTPUT
+          echo "release-path=/home/runner/krux-installer/v$KRUX_VERSION" >> $GITHUB_OUTPUT
+          echo "main-path=/home/runner/krux-installer/main" >> $GITHUB_OUTPUT
+
+      - name: Restore cached config 
+        id: restore-cache-config
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.setup.outputs.config-path }}
+          key: ${{ runner.os }}-config-${{ steps.setup.outputs.app_version }}
+
+      - name: Restore cache build
+        id: restore-cache-build
+        uses: actions/cache/restore@v3 
+        with:
+          path: |
+            dist_electron/${{ steps.setup.outputs.app-name }}.${{ inputs.build }} 
+            dist_electron/${{ steps.setup.outputs.app-name }}.${{ inputs.build }}.${{ inputs.digest-ext }}
+            dist_electron/linux-unpacked
+          key: ${{ runner.os }}-build-${{ hashFiles('src/**', 'public/**', 'vue.config.js') }}
+
+      - name: Restore cache release resource 
+        if: >-
+          ${{
+            (
+              inputs.test == 'select-version' ||
+              inputs.test == 'flash'
+            ) &&
+            inputs.sub-test != 'init'
+          }}
+        id: restore-cache-release
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.setup.outputs.release-path }}/krux-v${{ inputs.krux-version }}.zip
+          key: ${{ runner.os }}-release-v${{ inputs.krux-version }}
+
+      - name: Restore cache sha256 resource  
+        if: >-
+          ${{
+            (
+              inputs.test == 'select-version' ||
+              inputs.test == 'flash'
+            ) &&
+            inputs.sub-test != 'init'
+          }}
+        id: restore-cache-sha256
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.setup.outputs.release-path }}/krux-v${{ inputs.krux-version }}.zip.${{ inputs.digest-ext }}
+          key: ${{ runner.os }}-sha256-v${{ inputs.krux-version }}
+
+      - name: Restore cache signature resource  
+        if: >-
+          ${{
+            (
+              inputs.test == 'select-version' ||
+              inputs.test == 'flash' 
+            ) &&
+            inputs.sub-test != 'init'
+          }}
+        id: restore-cache-sig
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.setup.outputs.release-path }}/krux-v${{ inputs.krux-version }}.zip.sig
+          key: ${{ runner.os }}-sig-v${{ inputs.krux-version }}
+
+      - name: Restore cache public key certificate resource 
+        if: >-
+          ${{
+            (
+              inputs.test == 'select-version' || 
+              inputs.test == 'flash'
+            ) &&
+            inputs.sub-test != 'init'
+          }}
+        id: restore-cache-pem
+        uses: actions/cache/restore@v3
+        with:
+          path: ${{ steps.setup.outputs.main-path }}/selfcustody.pem
+          key: ${{ runner.os }}-pem-v${{ inputs.krux-version }}
+
+      - name: Test
+        env:
+          IS_MAIN: ${{ inputs.test == 'main' }}
+          IS_SELECT_DEVICE: ${{ inputs.test == 'select-device' }}
+          IS_SELECT_VERSION_INIT: ${{ inputs.test == 'select-version' && inputs.sub-test == 'init' }} 
+          IS_SELECT_VERSION_RELEASE_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'release' && steps.restore-cache-release.outputs.cache-hit != 'true' }}
+          IS_SELECT_VERSION_RELEASE_NO_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'release' && steps.restore-cache-release.outputs.cache-hit == 'true' }}  
+          IS_SELECT_VERSION_SHA256_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'sha256' && steps.restore-cache-sha256.outputs.cache-hit != 'true' }}
+          IS_SELECT_VERSION_SHA256_NO_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'sha256' && steps.restore-cache-sha256.outputs.cache-hit == 'true' }}  
+          IS_SELECT_VERSION_SIG_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'sig' && steps.restore-cache-sig.outputs.cache-hit != 'true' }}
+          IS_SELECT_VERSION_SIG_NO_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'sig' && steps.restore-cache-sig.outputs.cache-hit == 'true' }}
+          IS_SELECT_VERSION_PEM_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'pem' && steps.restore-cache-pem.outputs.cache-hit != 'true' }}
+          IS_SELECT_VERSION_PEM_NO_DOWNLOAD: ${{ inputs.test == 'select-version' && inputs.sub-test == 'pem' && steps.restore-cache-pem.outputs.cache-hit == 'true' }} 
+          IS_SELECT_VERSION_VERIFY: ${{ inputs.test == 'select-version' && inputs.sub-test == 'verify' }}
+          IS_FLASH_INIT: ${{ inputs.test == 'flash' && inputs.sub-test == 'init' }}  
+          IS_FLASH_VERSION: ${{ inputs.test == 'flash' && inputs.sub-test == 'version' }} 
+        run: |-
+          if [[ ($IS_MAIN == true) || ($IS_SELECT_DEVICE == true) ]]; then
+            yarn run test ${{ inputs.test }}
+          fi
+
+          if [[ ($IS_SELECT_VERSION_INIT == true) || ($IS_FLASH_INIT == true) ]]; then
+            yarn run test ${{ inputs.test }}/${{ inputs.sub-test }}
+          fi
+
+          if [[ ($IS_FLASH_VERSION == true) ]]; then
+            yarn run test ${{ inputs.test }}/v${{ inputs.krux-version }}
+          fi
+
+          if [[ ($IS_SELECT_VERSION_RELEASE_DOWNLOAD == true) || ($IS_SELECT_VERSION_SHA256_DOWNLOAD == true) || ($IS_SELECT_VERSION_SIG_DOWNLOAD == true) || ($IS_SELECT_VERSION_PEM_DOWNLOAD == true) || ($IS_SELECT_VERSION_VERIFY == true) ]]; then
+            yarn run test ${{ inputs.test }}/v${{ inputs.krux-version }}/${{ inputs.sub-test }}
+          fi
+
+          if [[ ($IS_SELECT_VERSION_RELEASE_NO_DOWNLOAD == true) || ($IS_SELECT_VERSION_SHA256_NO_DOWNLOAD == true) || ($IS_SELECT_VERSION_SIG_NO_DOWNLOAD == true) || ($IS_SELECT_VERSION_PEM_NO_DOWNLOAD == true) ]]; then
+            yarn run test ${{ inputs.test }}/v${{ inputs.krux-version }}/${{ inputs.sub-test }} --filter '0[0-9][0-9].download*.spec.ts'
+          fi
+
+      - name: Save cache release resource
+        if: >-
+          ${{
+            (
+              inputs.test == 'select-version' ||
+              inputs.test == 'flash' 
+            ) &&
+            inputs.sub-test != 'init' &&
+            steps.restore-cache-release.outputs.cache-hit != 'true'
+          }}
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ steps.setup.outputs.release-path }}/krux-v${{ inputs.krux-version }}.zip
+          key: ${{ runner.os }}-release-v${{ inputs.krux-version }}
+
+      - name: Save cache sha256 resource
+        if: >-
+          ${{
+            (
+              inputs.test == 'select-version' ||
+              inputs.test == 'flash' 
+            ) &&
+            inputs.sub-test != 'init' &&
+            steps.restore-cache-sha256.outputs.cache-hit != 'true'
+          }}
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ steps.setup.outputs.release-path }}/krux-v${{ inputs.krux-version }}.zip.${{ inputs.digest-ext }}
+          key: ${{ runner.os }}-sha256-v${{ inputs.krux-version }}
+
+      - name: Save cache signature resource
+        if: >-
+          ${{
+            (
+              inputs.test == 'select-version' ||
+              inputs.test == 'flash' 
+            ) &&
+            inputs.sub-test != 'init' &&
+            steps.restore-cache-sig.outputs.cache-hit != 'true'
+          }}
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ steps.setup.outputs.release-path }}/krux-v${{ inputs.krux-version }}.zip.sig
+          key: ${{ runner.os }}-sig-v${{ inputs.krux-version }}
+
+      - name: Save cache public key certificate resource
+        if: >-
+          ${{ 
+            (
+              inputs.test == 'select-version' || 
+              inputs.test == 'flash'
+            ) &&
+            inputs.sub-test != 'init' &&
+            steps.restore-cache-pem.outputs.cache-hit != 'true'
+          }}
+        uses: actions/cache/save@v3
+        with:
+          path: ${{ steps.setup.outputs.main-path }}/selfcustody.pem
+          key: ${{ runner.os }}-pem-v${{ inputs.krux-version }}

@@ -2,10 +2,20 @@
   <v-app>
     <v-main>
       <v-layout column wrap>
-        <v-flex xs2 sm2 class="mx-auto my-auto">
-          <KruxLogo />
+        <v-flex
+          xs2
+          sm2
+          id="side-banner"
+          class="mx-auto my-auto"
+        >
+          <KruxLogo id="krux-banner" />
         </v-flex>
-        <v-flex xs10 sm10 class="mx-auto my-auto">
+        <v-flex
+          xs10
+          sm10
+          class="mx-auto my-auto"
+          id="side-page"
+        >
           <component
             :is="page"
             @onSuccess="handleSuccess"
@@ -41,7 +51,6 @@ import DownloadTestKtoolPage from './pages/DownloadTestKtoolPage.vue'
 import DownloadTestKbootPage from './pages/DownloadTestKbootPage.vue'
 import VerifyOfficialReleasesPage from './pages/VerifyOfficialReleasesPage.vue'
 import UnzipOfficialReleasesPage from './pages/UnzipOfficialReleasesPage.vue'
-import ConfirmDetectedDevicePage from './pages/ConfirmDetectedDevicePage.vue'
 import ConfirmDetectedSDCardPage from './pages/ConfirmDetectedSDCardPage.vue'
 import WriteFirmwareToSDCardPage from './pages/WriteFirmwareToSDCardPage.vue'
 import WriteFirmwareToDevicePage from './pages/WriteFirmwareToDevicePage.vue'
@@ -73,7 +82,6 @@ export default {
     DownloadTestKbootPage,  
     VerifyOfficialReleasesPage,
     UnzipOfficialReleasesPage,
-    ConfirmDetectedDevicePage,
     ConfirmDetectedSDCardPage,
     WriteFirmwareToSDCardPage,
     WriteFirmwareToDevicePage,

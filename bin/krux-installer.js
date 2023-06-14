@@ -35,14 +35,14 @@ function runner (cmd, args, env) {
       bin = cmd
     }
 
-    console.log(`  \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m`);
+    console.log(`running \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m`);
 
     if (args.indexOf('<') !== -1 || args.indexOf('>') !== -1) {
       resolve(await new Promise(function(res, rej) {
         exec(`${bin} ${args.join(' ')}`, function (error, stdout, stderr) {
           if (error) rej(error)
           if (stderr) rej(new Error(stderr))
-          res(`  \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: 0`);
+          res(0);
         })
       }))
     } else {
@@ -58,7 +58,11 @@ function runner (cmd, args, env) {
         service.stderr.on('data', onData)
 
         service.on('close', function(code) {
-          res(`  \x1b[32m${cmd}\x1b[0m \x1b[33m${args.join(' ')}\x1b[0m exit code: ${code}`);
+          if (code !== 0) {
+            rej(code);
+          } else {
+            res(code);
+          }
         });
       }))
     }
@@ -66,46 +70,46 @@ function runner (cmd, args, env) {
 }
 
 async function main() {
-  console.log("");
-  console.log(`   ${name} ${version}`);
-  console.log(" ████████████████████████████████");
-  console.log(" ██                            ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██         ██████             ██");
-  console.log(" ██           ██               ██");
-  console.log(" ██           ██  ██           ██");
-  console.log(" ██           ██ ██            ██");
-  console.log(" ██           ████             ██");
-  console.log(" ██           ██ ██            ██");
-  console.log(" ██           ██  ██           ██");
-  console.log(" ██           ██   ██          ██");
-  console.log(" ██                            ██");
-  console.log(" ████████████████████████████████");
+  console.log("                           ");
+  console.log("           ██              ");
+  console.log("           ██              ");
+  console.log("           ██              ");
+  console.log("         ██████            ");
+  console.log("           ██              ");
+  console.log("           ██  ██          ");
+  console.log("           ██ ██           ");
+  console.log("           ████            ");
+  console.log("           ██ ██           ");
+  console.log("           ██  ██          ");
+  console.log("           ██   ██         ");
+  console.log("                           ");
+  console.log(` ${name} ${version}`);
   console.log("");
 
   if (action === 'lint') {
+    runner(`yamllint${process.platform === 'win32' ? '.cmd' : ''}`, ['--schema=CORE_SCHEMA', '.github/workflows/*.yml'])
     runner(`vue-cli-service${process.platform === 'win32' ? '.cmd' : '' }`, ['lint'])
     runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ join(__dirname, '..', 'public') ])
     runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ join(__dirname, '..', 'src') ])
+    runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ '--ext', 'ts', join(__dirname, '..', 'test/pageobjects') ])
+    runner(`eslint${process.platform === 'win32' ? '.cmd' : '' }`, [ '--ext', 'ts', join(__dirname, '..', 'test/specs') ])
   }
 
   if (action === 'icon') {
-    const fromTxt = join(__dirname, '..', 'build', 'krux.txt')
-    const toSvg = join(__dirname, '..', 'build', 'krux.svg')
-    runner(`aasvg${process.platform === 'win32' ? '.cmd' : '' }`, ['<', fromTxt, '>', toSvg])
+    //const fromTxt = join(__dirname, '..', 'build', 'krux.txt')
+    //const toSvg = join(__dirname, '..', 'build', 'krux.svg')
+    //runner(`aasvg${process.platform === 'win32' ? '.cmd' : '' }`, ['<', fromTxt, '>', toSvg])
 
-    const toPng = join(__dirname, '..', 'build', 'krux.png')
-    runner(`svgexport${process.platform === 'win32' ? '.cmd' : '' }`, [toSvg, toPng])
+    //const toPng = join(__dirname, '..', 'build', 'krux.png')
+    //runner(`svgexport${process.platform === 'win32' ? '.cmd' : '' }`, [toSvg, toPng])
 
-    const toIconPng = join(__dirname, '..', 'build', 'icon.png')
-    runner(`resize-img${process.platform === 'win32' ? '.cmd' : '' }`, ['--width', '256', '--height', '256', toPng, '>', toIconPng])
+    //const toIconPng = join(__dirname, '..', 'build', 'krux.png')
+    //runner(`resize-img${process.platform === 'win32' ? '.cmd' : '' }`, ['--width', '256', '--height', '256', toPng, '>', toIconPng])
 
     if (process.platform === 'win32') {
+      const pngIcon = join(__dirname, '..', 'build', 'icon.png')
       const toIcon = join(__dirname, '..', 'build', 'icon.ico')
-      const ico = runner('png-to-ico.cmd', [ toIconPng, '>', toIcon ])
+      const ico = runner('png-to-ico.cmd', [ pngIcon, '>', toIcon ])
       promises.push(ico)
     }
 
@@ -162,7 +166,7 @@ async function main() {
       const version = dependencies[name];
       const module = join(__dirname, '..', 'node_modules', name)
       console.log(`  \x1b[34m\u2022\x1b[0m installing platform dependency ${name} for ${process.platform}`)
-      runner(`yarn${process.platform === 'win32' ? '.cmd' : '' }`, ['add', `${name}@${version}`])
+      runner(`yarn${process.platform === 'win32' ? '.cmd' : '' }`, ['add', '--dev', `${name}@${version}`])
     }
   }
 
@@ -170,13 +174,33 @@ async function main() {
     runner(`electron-builder${process.platform === 'win32' ? '.cmd' : '' }`, [action])
   }
 
+  if (action === 'test') {
+    const test = process.argv.slice(3)
+    const wdioconf = join(__dirname, '..', 'wdio.conf.js')
+
+    if (process.platform === 'linux') {
+      const __args__ = ['wdio', 'run', wdioconf]
+      test.forEach(function(t) {
+        __args__.push(t)
+      })
+
+      runner('xvfb-maybe', __args__)
+    } else {
+      const __args__ = ['run', wdioconf]
+      test.forEach(function(t) {
+        __args__.push(t)
+      })
+      runner(`wdio${process.platform === 'win32' ? '.cmd' : '' }`, __args__)
+    }
+  }
+
   try {
     const results = await Promise.all(promises)
-    results.forEach(function(result) {
-      console.log(result)
+    results.forEach(function(exitCode) {
+      process.exit(exitCode)
     })
-  } catch (error) {
-    console.log(error)
+  } catch (exitCode) {
+    process.exit(exitCode)
   }
 }
 

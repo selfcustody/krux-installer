@@ -31,8 +31,3 @@ dist/
 
 # resources
 resources/
-
-build/*.png
-build/*.ico
-build/*.svg
-build/*.icns

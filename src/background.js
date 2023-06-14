@@ -15,6 +15,14 @@ import createDebug from 'debug'
 import dotenv from 'dotenv'
 
 /*
+ * WDIO TESTS
+ */
+//if (process.env.WDIO_ELECTRON === 'true') {
+//  import('wdio-electron-service/main')
+//}
+
+
+/*
  * Debugger
  *
  * If the environment variable DEBUG is attributed to 'background'
@@ -102,7 +110,7 @@ async function createWindow() {
       contextIsolation: !process.env.ELECTRON_NODE_INTEGRATION || true,
       enableRemoteModule: process.env.ELECTRON_NODE_INTEGRATION || false,
       // eslint-disable-next-line no-undef
-      preload: join(__static, 'preload.js')
+      preload: join(__static, 'preload.js'),
     }
   }
 
@@ -134,6 +142,41 @@ async function createWindow() {
   ipcMain.handle('store-set', storeSet(win, store))
   ipcMain.handle('store-get', storeGet(win, store))
   ipcMain.handle('flash', flash(win, store))
+
+
+  // Since electron 20
+  // the approach descibed in
+  // https://webdriver.io/docs/wdio-electron-service/#example-configuration
+  // do not works.
+  // The 'solution' was copy the contents from node-modules/wdio-electron-service/dist/main
+  // and reconfigure some variables
+  if (process.env.WDIO_ELECTRON === 'true') {
+    // eslint-disable-next-line no-unused-vars
+    ipcMain.handle('wdio-electron', (_events, ...args) => {
+      return {
+        appData: app.getPath('appData'),
+        documents: app.getPath('documents')
+      }
+    })
+
+    ipcMain.handle('wdio-electron.app', (_event, propName, ...args) => {
+      return new Promise((resolve, reject) => {
+        if (!app[propName]) reject(`property or method ${propName} is not valid`)
+        try {
+          let result
+          if (typeof app[propName] === 'function') {
+            result = app[propName].apply(app, Array.prototype.slice.call(args, 1))
+            console.log(result)
+          } else {
+            result = app[propName]
+          }
+          resolve(result)
+        } catch (error) {
+          reject(error)
+        }
+      })
+    })
+  }
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     debug('Loading the url of the dev server in development mode')

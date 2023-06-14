@@ -22,7 +22,7 @@
                 </v-card-text>
               </v-card-content>
               <v-card-actions>
-                <v-btn @click.prevent="umountSDCard">
+                <v-btn @click="umountSDCard">
                   Umount Sdcard
                 </v-btn>
               </v-card-actions>

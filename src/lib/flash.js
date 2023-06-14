@@ -44,7 +44,6 @@ class FlashHandler extends Handler {
       this.chmod.commands.push({ command: 'chmod', args: ['+x', this.flash.command] })
     } else if (os === 'win32') {
       this.flash.command = join(this.cwd, 'ktool-win.exe')
-      // SEE
       // https://stackoverflow.com/questions/2928738/how-to-grant-permission-to-users-for-a-directory-using-command-line-in-windows
       // https://answers.microsoft.com/en-us/windows/forum/all/what-is-meant-by-no-mapping-between-account-names/dcccb1bb-1c4d-4bd5-91a7-832cabf9c86b)
       // https://www.techinpost.com/no-mapping-between-account-names-and-security-ids-was-done/
@@ -55,8 +54,19 @@ class FlashHandler extends Handler {
       // this.chmod.commands.push({ command: 'icacls.exe', args: [this.flash.command, '/grant:r', 'Everyone:F'] })
     }
 
+    // The kboot path of choosed device
     const kboot = join(this.cwd, this.device, 'kboot.kfpkg')
-    this.flash.args = ['-B', 'goE', '-b', '1500000', kboot]
+
+    // Flash instructions
+    // if the device is 'maixpy_dock', the board argument (-B) is 'dan'
+    // otherwise, is 'goE'
+    // SEE https://github.com/odudex/krux_binaries#flash-instructions
+    if (this.device === 'maixpy_dock') {
+      this.flash.args = ['-B', 'dan', '-b', '1500000', kboot]
+    } else {
+      this.flash.args = ['-B', 'goE', '-b', '1500000', kboot]
+    }
+
   }
 
   enable () {
@@ -115,11 +125,18 @@ class FlashHandler extends Handler {
   }
 
   async write () {
+
     const flash = this.createFlash()
     const message = flash.message
-    const runner = await flash.spawn()
+    let firstRun = true
 
+    const runner = await flash.spawn()
     runner.stdout.on('data', (data) => {
+      if (firstRun){
+        // show to user the running command
+        this.send(`${this.name}:data`, `\x1b[32m$> ${message}\x1b[0m\n\n`)
+        firstRun = false
+      }
       const out = Buffer.from(data, 'utf-8').toString()
       this.log(out)
       this.send(`${this.name}:data`, out)

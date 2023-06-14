@@ -4,14 +4,19 @@
     justify-start
     row
     fill-height
+    id="download-official-release-sha256-txt-page"
   >
     <v-flex xs12>
       <v-card flat>
-        <v-card-title>
+        <v-card-title
+          id="download-official-release-sha256-txt-page-card-title"
+        >
           Downloading...
         </v-card-title>
-        <v-card-subtitle>
-          <b>{{ baseUrl }}/{{ version }}/krux-${{ version }}.sha256.txt</b>
+        <v-card-subtitle
+          id="download-official-release-sha256-txt-page-card-subtitle"
+        >
+          <b>{{ baseUrl }}/{{ version }}/krux-{{ version }}.zip.sha256.txt</b>
         </v-card-subtitle>
         <v-card-actions>
           <v-progress-linear
@@ -19,7 +24,7 @@
             height="25"
             color="blue-grey"
           >
-            <strong>{{ progress }}%</strong>
+            <strong id="download-official-release-sha256-txt-page-card-progress-linear-text">{{ progress }}%</strong>
           </v-progress-linear>
         </v-card-actions>
       </v-card>
@@ -56,7 +61,11 @@ export default {
         
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.download.onSuccess((_event, value) => {
-      this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSigPage' })
+      this.$nextTick(() => {
+        setTimeout(() => {
+          this.$emit('onSuccess', { page: 'CheckResourcesOfficialReleaseSigPage' })
+        }, 1000)
+      })
     })
 
     // eslint-disable-next-line no-unused-vars

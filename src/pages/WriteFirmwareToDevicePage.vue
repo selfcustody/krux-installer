@@ -1,19 +1,22 @@
 <template>
-  <v-layout row wrap>
+  <v-layout
+    row
+    wrap
+    id="write-firmware-to-device-page"
+  >
     <v-flex xs12 sm12>
       <v-card
         v-if="!isWritten"
         class="ma-5 pa-5"
       >
-        <v-card-title>Flashing...</v-card-title>
-        <v-card-subtitle>
-          <b v-if="!done">Do not unpulg device or shutdown computer!</b>
-          <b v-if="done">Output </b>
-          <b v-if="done">(toogle developer tools to see all outputs).</b>
+        <v-card-title id="write-firmware-to-device-page-card-title">Flashing...</v-card-title>
+        <v-card-subtitle id="write-firmware-to-device-page-card-subtitle">
+          <b v-if="!done">Do not unplug device or shutdown computer!</b>
+          <b v-if="done">Output (toogle developer tools to see all of them).</b>
         </v-card-subtitle>
-        <v-card-content>
+        <v-card-content id="write-firmware-to-device-page-card-content">
           <v-card-text>
-            <div class="console" v-html="html" />
+            <div id="write-firmware-to-device-page-console" class="console" v-html="html" ref="console" />
           </v-card-text>
         </v-card-content>
         <v-card-actions>
@@ -24,9 +27,9 @@
           />
           <v-btn 
             v-if="done"
-            @click.prevent="$emit('onSuccess', { page: 'MainPage' })"
+            @click="onBack"
           >
-              Back
+            Back
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -47,15 +50,21 @@ export default {
       html: ''
     }
   },
-  async created () {  
+  beforeMount () {
+    this.$data.html = ''
+  },
+  created () {
+    setTimeout(async function () {
+      await window.KruxInstaller.flash.firmware()
+    }, 1000)
 
-    await window.KruxInstaller.flash.firmware()
- 
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.flash.onData((_event, value) => { 
-      const output = this.parse(value)
-      tmpHtml += output
-      this.html = output
+      this.$nextTick(() => {
+        const output = this.parse(value)
+        tmpHtml += output
+        this.html = output
+      })
     })
 
     // eslint-disable-next-line no-unused-vars
@@ -68,6 +77,7 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     window.KruxInstaller.flash.onError((_event, value) => {
+      this.done = false
       this.$emit('onError', value)
     })
   },
@@ -80,6 +90,11 @@ export default {
       
       const ansi = new AnsiUp()
       return ansi.ansi_to_html(msg).replace(/\n/gm, '<br>')
+    },
+    onBack () {
+      this.$nextTick(() => {
+        this.$emit('onSuccess', { page: 'MainPage' })
+      })
     }
   }
 }
@@ -88,6 +103,7 @@ export default {
 <style>
 .console {
   font-family: monospace;
+  font-size: 10px;
   text-align: left;
   background-color: black;
   color: #fff;

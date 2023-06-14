@@ -43,19 +43,19 @@
         <v-card-actions>
           <v-btn
             v-if="info.state === 'umounted'"
-            @click.prevent="mountSDCard"
+            @click="mountSDCard"
           >
             Mount it!
           </v-btn>
           <v-btn
             v-if="info.state === 'mounted'"
-            @click.prevent="set_sdcard"
+            @click="set_sdcard"
           >
             Download and write
           </v-btn>
           <br/>
           <v-btn
-            @click.prevent="$emit('onSuccess', { page: 'DetectSDCardPage' })"
+            @click="$emit('onSuccess', { page: 'DetectSDCardPage' })"
           >
             Back
           </v-btn>

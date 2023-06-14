@@ -4,25 +4,37 @@
     justify-start
     row
     fill-height
+    id="select-device-page"
   >
     <v-flex xs12 sm4>
       <v-card class="ma-5 pa-5">
-        <v-card-title>
+        <v-card-title
+          id="select-device-page-card-title"
+        >
           <v-icon>mdi-devices</v-icon>
           Choose the firmware's device that you want install
         </v-card-title>
-        <v-card-content>
+        <v-card-content
+          id="select-device-page-card-content"
+        >
           <v-select
             v-model="device"
             :items="devices"
             label="Device"
+            id="select-device-page-form-select"
           />
         </v-card-content>
         <v-card-actions>
-          <v-btn @click.prevent="select">
+          <v-btn
+            @click="select"
+            id="select-device-page-form-select-button"
+          >
             Select
           </v-btn>
-          <v-btn @click.prevent="$emit('onSuccess', { page: 'MainPage' })">
+          <v-btn 
+            @click="$emit('onSuccess', { page: 'MainPage' })"
+            id="select-device-page-form-back-button"
+          >
             Back
           </v-btn>
         </v-card-actions>

@@ -1,34 +1,20 @@
 {
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs"
-    }
-  },
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ESNext",
+    "useDefineForClassFields": true,
     "module": "ESNext",
-    "baseUrl": "./",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
+    "moduleResolution": "Node",
     "strict": true,
-    "noUnusedLocals": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "inlineSources": true,
-    "sourceMap": true,
-    "allowSyntheticDefaultImports": true,
-    "newLine": "lf",
-    "noEmitOnError": true,
-    "lib": ["DOM", "ES2020"],
-    "noImplicitAny": true,
-    "noUnusedParameters": false,
+    "jsx": "preserve",
     "resolveJsonModule": true,
-    "allowJs": true,
-    "checkJs": true,
-    "noEmit": true,
-    "types": ["node", "@wdio/globals/types", "mocha", "webdriverio/async", "expect-webdriverio"],
-    "typeRoots": ["./node_modules/@types"]
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": true
   },
-  "include": ["**/*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src"],
+  "references": [
+    { "path": "./tsconfig.node.json" }
+  ]
 }

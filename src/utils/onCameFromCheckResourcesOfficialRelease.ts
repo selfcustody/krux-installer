@@ -16,8 +16,9 @@ export default async function (
       }
       await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
     } else {
+      
       data.value = {
-        baseUrl: `https://github.com\/${result.baseUrl}`,
+        baseUrl: result.baseUrl,
         resourceFrom: result.resourceFrom,
         resourceTo: result.resourceTo,
         progress: 0.0

@@ -1,15 +1,17 @@
 <template>
-  <v-card
+  <v-layout>
+    <v-flex xs12 sm6 offset-sm3>
+      <v-card
     variant="plain"
     flat
   >
-    <v-card-text>
+    <v-card-text w>
       <AsciiMorph
         :list="list"
-        :canvas="{ x: 16, y: 16 }"
+        :canvas="{ x: 6, y: 6 }"
         :index="index"
         :timeout="30"
-        fontSize="12px"
+        fontSize="10px"
       />
     </v-card-text>
     <v-card-actions class="justify-center">
@@ -22,6 +24,9 @@
       </v-btn>
     </v-card-actions>
   </v-card>
+    </v-flex>
+  </v-layout>
+  
 </template>
 
 <script setup lang="ts">

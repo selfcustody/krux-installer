@@ -1080,10 +1080,10 @@ electron-store@^8.1.0:
     conf "^10.2.0"
     type-fest "^2.17.0"
 
-electron@^24.4.1:
-  version "24.5.1"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-24.5.1.tgz#86e314cd6b322f44e62355d3ad1f39d64f341c3f"
-  integrity sha512-OxMDJj9q+XwmHb6Annc9jpRPV/HmiXyhAcl6LEin/cqDHKR+LCLx7PcXfMs/qKMVxER/TBbG7PglpjnkUMlG+w==
+electron@^25.2.0:
+  version "25.2.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-25.2.0.tgz#ff832d88f78481a82cf9feb72e605ec43553d4ba"
+  integrity sha512-I/rhcW2sV2fyiveVSBr2N7v5ZiCtdGY0UiNCDZgk2fpSC+irQjbeh7JT2b4vWmJ2ogOXBjqesrN9XszTIG6DHg==
   dependencies:
     "@electron/get" "^2.0.0"
     "@types/node" "^18.11.18"

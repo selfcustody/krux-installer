@@ -58,13 +58,8 @@ export default class DownloadResourcesHandler extends Handler {
       const { baseUrl, resourceFrom, resourceTo } = options
       this.log(options)
       
-      //const resourcesPath = this.storage.get('resources') as string
       const destinationResource = dirname(resourceTo)
       console.log(destinationResource)
-      //const destinationFilename = join(destinationResource, filename)
-      //this.log(`resourcesPath: ${resourcesPath}`)
-      //this.log(`destinationResource: ${destinationResource}`)
-      //this.log(`destinationFilename: ${destinationFilename}`)
 
       try {
         // First check if destination resource exists
@@ -139,13 +134,13 @@ export default class DownloadResourcesHandler extends Handler {
 
         data.on('error', (error) => {
           this.log(error)
-          this.send(`${this.name}:error`, error.stack)
+          this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack })
         })
 
         data.pipe(file)
       } catch (error) {
         this.log(error)
-        this.send(`${this.name}:error`, error.stack)
+        this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack })
       }
     })
   }

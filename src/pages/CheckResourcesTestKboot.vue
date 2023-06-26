@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, onMounted, onUnmounted, ref } from 'vue'
+import { Ref, onMounted, ref } from 'vue'
 import { AsciiMorph } from 'vue-asciimorph'
 
 const index: Ref<number> = ref(0)
@@ -31,7 +31,7 @@ const list: Ref<string[][]> = ref([
     ' '
   ],
   [
-    'Checking if selfcustody release is already downloaded...'
+    'Checking if odudex kboot.kfpkg is already downloaded...'
   ],
   [
     ' '
@@ -55,8 +55,8 @@ onMounted(async () => {
   await delay(4000)
   index.value += 1
   await window.api.invoke('krux:store:get', {
-    from: 'CheckResourcesOfficialReleaseZip',
-    keys: ['version']
+    from: 'CheckResourcesTestKboot',
+    keys: ['device', 'version', 'os', 'isMac10']
   })
   index.value += 1
 })

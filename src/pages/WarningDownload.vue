@@ -58,6 +58,12 @@ const { baseUrl, resourceFrom, resourceTo, proceedTo, backTo} = toRefs(props)
  * Methods
  */
 async function proceedToFn () {
+  if (proceedTo.value === 'Main') {
+    await window.api.invoke('krux:store:get', {
+      from: 'WarningDownload',
+      keys: ['device', 'version', 'os', 'isMac10']
+    })
+  }
   await window.api.invoke('krux:change:page', { page: proceedTo.value })
 }
 
@@ -70,6 +76,9 @@ async function downloadToFn () {
 }
 
 async function backToFn () {
-  await window.api.invoke('krux:change:page', { page: backTo.value })
+  await window.api.invoke('krux:store:get', {
+    from: 'WarningDownload',
+    keys: ['device', 'version', 'os', 'isMac10']
+  })
 }
 </script>

@@ -44,21 +44,13 @@ export default class StoreSetHandler extends Handler {
         options.key !== 'versions' || 
         options.key !== 'version'
       ) {
-        const oldValue = this.storage.get(options.key)
-        
-        // newValue
         this.storage.set(options.key, options.value)
         const newValue = this.storage.get(options.key)
-        if (oldValue !== newValue) {
-          const result = {
-            ...options,
-            value: newValue as string
-          }
-          this.send(`${this.name}:success`, result)
-        } else {
-          const error = Error(`Unknow: cannot set '${options.key}'`)
-          this.send(`${this.name}:error`, error.stack)
+        const result = {
+          ...options,
+          value: newValue as string
         }
+        this.send(`${this.name}:success`, result)
       } else {
         const error = Error(`Forbidden: cannot set '${options.key}'`)
         this.log(error.stack)

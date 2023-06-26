@@ -9,7 +9,11 @@
 <script setup lang="ts">
 import { Ref, ref, shallowRef, onMounted } from 'vue';
 
-// pages
+/**
+ * Pages: this components will be injected
+ * in dynamic manner, see `pages` and `page` variable
+ * for more information
+ */
 import KruxInstallerLogo from './pages/KruxInstallerLogo.vue';
 import ErrorMsg from './pages/ErrorMsg.vue';
 import Main from './pages/Main.vue';
@@ -28,21 +32,27 @@ import CheckResourcesOfficialReleasePem from './pages/CheckResourcesOfficialRele
 import DownloadOfficialReleasePem from './pages/DownloadOfficialReleasePem.vue';
 import CheckVerifyOfficialRelease from './pages/CheckVerifyOfficialRelease.vue';
 import VerifiedOfficialRelease from './pages/VerifiedOfficialRelease.vue';
+import CheckResourcesTestFirmware from './pages/CheckResourcesTestFirmware.vue';
+import DownloadTestFirmware from './pages/DownloadTestFirmware.vue';
+import CheckResourcesTestKboot from './pages/CheckResourcesTestKboot.vue';
+import DownloadTestKboot from './pages/DownloadTestKboot.vue'
+import CheckResourcesTestKtool from './pages/CheckResourcesTestKtool.vue';
+import DownloadTestKtool from './pages/DownloadTestKtool.vue'
 
-// methods
-import setupDataToMainPage from './utils/setupDataToMainPage';
-import onCheckResources from './utils/onCheckResources';
-import onCheckResourcesOfficial from './utils/onCheckResourcesOfficial';
-import onCheckVerifyReleaseHash from './utils/onCheckVerifyReleaseHash';
-import onSelectPage from './utils/onSelectPage';
-import onGithubCheck from './utils/onGithubCheck';
-import onCameFromCheckResourcesOfficialRelease from './utils/onCameFromCheckResourcesOfficialRelease';
-import onCameFromCheckVerifyOfficialRelease from './utils/onCameFromCheckVerifyOfficialRelease';
-import onCameFromWarningDownload from './utils/onCameFromWarningDownload';
-import onDownloadOfficialRelease from './utils/onDownloadOfficialRelease';
-import onVerifyReleaseHash from './utils/onVerifyReleaseHash'
-import onVerifyReleaseSign from './utils/onVerifyReleaseSign'
-import onErrorMsg from './utils/onErrorMsg'
+/**
+ * Methods: These function will
+ * manipulate `page` and `data` variables
+ */
+import onError from './utils/onError'
+import onKruxChangePage from './utils/onKruxChangePage';
+import onKruxStoreGet from './utils/onKruxStoreGet';
+import onKruxStoreSet from './utils/onKruxStoreSet';
+import onKruxVerifyReleasesFetch from './utils/onKruxVerifyReleasesFetch';
+import onKruxCheckResources from './utils/onKruxCheckResources';
+import onKruxDownloadResources from './utils/onKruxDownloadResources';
+import onKruxVerifyReleasesHash from './utils/onKruxVerifyReleasesHash';
+import onKruxVerifyReleaseSign from './utils/onKruxVerifyReleaseSign';
+import onKruxDownloadResourcesData from './utils/onKruxDownloadResourcesData';
 
 /**
  * Reference for which component will be used as showing page
@@ -59,7 +69,6 @@ const data: Ref<Record<string, any>> = ref({})
  * 
  * This works like the legacy approach:
  * 
- * @example
  * ```js
  * export default defineComponent({
  *  components: { ... }
@@ -85,91 +94,14 @@ const pages: Ref<Record<string, any>> = shallowRef({
   'CheckResourcesOfficialReleasePem': CheckResourcesOfficialReleasePem,
   'DownloadOfficialReleasePem': DownloadOfficialReleasePem,
   'CheckVerifyOfficialRelease': CheckVerifyOfficialRelease,
-  'VerifiedOfficialRelease': VerifiedOfficialRelease
-}) 
-
-/**
- * Generalized Rprocedure to redirects to ErrorMsg page
- * @param _ 
- * @param result 
- */
-function onError (_: Event, result: Record<'name' | 'message' | 'stack', any>): void  {
-  onErrorMsg(data, result)
-}
-
-function onKruxChangePage (_: Event, result: Record<'page', string>) {
-  page.value = result.page
-}
-
-/**
- * Setup `data` and/or redirects to a `page`, or invoke another api call
- */
-async function onKruxStoreGet (_: Event, result: Record<'from' | 'key' | 'values', any>) {
-  setupDataToMainPage(data, result, {
-    when: [
-      'KruxInstallerLogo',
-      'SelectVersion',
-      'VerifiedOfficialRelease',
-      'ErrorMsg'
-    ]
-  })
-  await onCheckResources(result, [
-    { match: /selfcustody\/.*/g, goto: 'CheckResourcesOfficialReleaseZip' } ,
-    { match: /odudex\/.*/g,      goto: 'CheckResourcesTestFirmware' }
-  ])
-  await onCheckResourcesOfficial(result)
-  await onCheckVerifyReleaseHash(result)
-}
-
-/**
- * Setup `data` for SelectDevice and SelectVersion Pages
- */
-function onKruxStoreSet (_: Event, result: Record<'from' | 'key' | 'value', any>) {
-  onSelectPage(data, result, { page: 'SelectDevice' })
-  onSelectPage(data, result, { page: 'SelectVersion' })
-}
-
-async function onKruxVerifyReleasesFetch (_event: Event, result: Record<'from' | 'key' | 'value', any>) {
-  await onGithubCheck(data, result)
-}
-
-async function onKruxCheckResource (_: Event, result: Record<'from' | 'exists' | 'baseUrl' | 'resourceFrom' | 'resourceTo', any>) {
-  await onCameFromCheckResourcesOfficialRelease(data, result, { from: 'Zip',    proceedTo: 'Sha256', abbreviated: true })
-  await onCameFromCheckResourcesOfficialRelease(data, result, { from: 'Sha256', proceedTo: 'Sig',    abbreviated: true })
-  await onCameFromCheckResourcesOfficialRelease(data, result, { from: 'Sig',    proceedTo: 'Pem',    abbreviated: true })
-  await onCameFromCheckResourcesOfficialRelease(data, result, { from: 'Pem',    proceedTo: 'CheckVerifyOfficialRelease', abbreviated: false })
-  await onCameFromCheckVerifyOfficialRelease(data, result)
-  await onCameFromWarningDownload(data, result)
-}
-
-/**
- * When download finishes, redirect it:
- * - DownloadOfficialReleaseZip --> CheckResourcesOfficialReleaseSha256
- * - DownloadOfficialReleaseSha256 --> CheckResourcesOfficialReleaseSig
- * - DownloadOfficialReleaseSig --> CheckResourcesOfficialReleasePem
- * - DownloadOfficialReleasePem --> VerifyOfficialRelease
- */
-async function onKruxDownloadResources (_: Event, result: Record<'from', string>) {
-  onDownloadOfficialRelease(result, { from: 'DownloadOfficialReleaseZip',    to: 'CheckResourcesOfficialReleaseSha256' })
-  onDownloadOfficialRelease(result, { from: 'DownloadOfficialReleaseSha256', to: 'CheckResourcesOfficialReleaseSig' })
-  onDownloadOfficialRelease(result, { from: 'DownloadOfficialReleaseSig',    to: 'CheckResourcesOfficialReleasePem' })
-  onDownloadOfficialRelease(result, { from: 'DownloadOfficialReleasePem',    to: 'CheckVerifyOfficialRelease'})
-}
-
-async function onKruxVerifyReleasesHash (_: Event, result: any) {
-  onVerifyReleaseHash(data, result)
-}
-
-async function onKruxVerifyReleaseSign (_: Event, result: any) {
-  onVerifyReleaseSign(data, result)
-}
-
-/**
- * Stream progress when download resources
- */
-function onKruxDownloadResourcesData (_: Event, result: any) {
-  data.value.progress = result
-}
+  'VerifiedOfficialRelease': VerifiedOfficialRelease,
+  'CheckResourcesTestFirmware': CheckResourcesTestFirmware,
+  'DownloadTestFirmware': DownloadTestFirmware,
+  'CheckResourcesTestKboot': CheckResourcesTestKboot,
+  'DownloadTestKboot': DownloadTestKboot,
+  'CheckResourcesTestKtool': CheckResourcesTestKtool,
+  'DownloadTestKtool': DownloadTestKtool
+})
 
 /**
  * ================================================
@@ -181,26 +113,27 @@ function onKruxDownloadResourcesData (_: Event, result: any) {
  * * onError: Channels that have the post-fixed word 'error' in `lib/*.ts` finished calls
  * * onData: Channels that have the post-fixed word 'data' in `lib/*.ts` streaming calls 
  */
-
-window.api.onSuccess('krux:change:page', onKruxChangePage);
-window.api.onSuccess('krux:store:get', onKruxStoreGet);
-window.api.onSuccess('krux:store:set', onKruxStoreSet);
-window.api.onSuccess('krux:verify:releases:fetch', onKruxVerifyReleasesFetch)
-window.api.onSuccess('krux:check:resource', onKruxCheckResource)
-window.api.onSuccess('krux:download:resources', onKruxDownloadResources)
-window.api.onSuccess('krux:verify:releases:hash', onKruxVerifyReleasesHash)
-window.api.onSuccess('krux:verify:releases:sign', onKruxVerifyReleaseSign)
-window.api.onData('krux:download:resources', onKruxDownloadResourcesData)
-window.api.onError('krux:change:page', onError)
-window.api.onError('krux:store:get', onError)
-window.api.onError('krux:store:set', onError)
-window.api.onError('krux:verify:openssl', onError)
-window.api.onError('krux:verify:releases:fetch', onError)
-window.api.onError('krux:check:resource',onError)
-window.api.onError('krux:download:resources', onError)
+window.api.onSuccess('krux:change:page', onKruxChangePage(page));
+window.api.onSuccess('krux:store:get', onKruxStoreGet(data));
+window.api.onSuccess('krux:store:set', onKruxStoreSet(data));
+window.api.onSuccess('krux:verify:releases:fetch', onKruxVerifyReleasesFetch(data));
+window.api.onSuccess('krux:check:resource', onKruxCheckResources(data));
+window.api.onSuccess('krux:download:resources', onKruxDownloadResources(data));
+window.api.onSuccess('krux:verify:releases:hash', onKruxVerifyReleasesHash(data));
+window.api.onSuccess('krux:verify:releases:sign', onKruxVerifyReleaseSign(data));
+window.api.onData('krux:download:resources', onKruxDownloadResourcesData(data));
+window.api.onError('krux:change:page', onError(data));
+window.api.onError('krux:store:get', onError(data));
+window.api.onError('krux:store:set', onError(data));
+window.api.onError('krux:verify:openssl', onError(data));
+window.api.onError('krux:verify:releases:fetch', onError(data));
+window.api.onError('krux:check:resource',onError(data));
+window.api.onError('krux:download:resources', onError(data));
 
 /**
- * Mounted
+ * Mounted: when app starts,
+ * first show the krux logo to 
+ * fit the style in devices
  */
 onMounted(async function () {
   await window.api.invoke('krux:change:page', { page: 'KruxInstallerLogo' })

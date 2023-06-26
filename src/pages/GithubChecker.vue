@@ -77,9 +77,9 @@ async function delay (t: number) {
 
 onMounted(async () => {
   index.value += 1
-  await delay(2000)
+  await delay(4000)
   await window.api.invoke('krux:verify:releases:fetch', { from: 'GithubChecker' })
   index.value += 1
-  await delay(2000)
+  await delay(4000)
 })
 </script>

@@ -18,11 +18,17 @@
 </template>
 
 <script setup lang="ts">
-import { Ref, ref, onMounted } from 'vue'
+import { Ref, ref, onMounted, toRefs } from 'vue'
 import { AsciiMorph  } from 'vue-asciimorph'
 
+const props = defineProps<{
+  opensslMsg: string
+}>()
+
+const { opensslMsg } = toRefs(props)
+
 const index: Ref<number> = ref(0)
-const timeout: Ref<number> = ref(30)
+const timeout: Ref<number> = ref(25)
 const canvas: Ref<{ x: number, y: number }> = ref({ x: 16, y: 16})
 const fontSize: Ref<string> = ref('18px')
 const list: Ref<string[][]> = ref([
@@ -45,13 +51,13 @@ const list: Ref<string[][]> = ref([
     "   KRUX INSTALLER   "
   ],
   [
-    "   LOADING DATA     "
+    "Checking if\nopenssl exists\on the system..."
   ],
   [
-    "  VERIFYING OPENSSL "
+    opensslMsg.value
   ],
   [
-    "                    "
+    " "
   ]
 ])
 
@@ -62,18 +68,15 @@ async function delay (t: number) {
 }
 
 onMounted(async function () {
-  await delay(1000)
+  await delay(500)
+  index.value += 1
+  await delay(2000)
   index.value += 1
   await delay(3000)
   index.value += 1
-  await delay(100)
+  await delay(5000)
+  index.value += 1
   await window.api.invoke('krux:store:get', { from: 'KruxInstallerLogo', keys: ['device', 'version', 'os', 'isMac10'] })
-  await delay(1000)
-  index.value += 1
-  await window.api.invoke('krux:verify:openssl', { from: 'KruxInstallerLogo' })
-  await delay(1000)
-  index.value += 1
-  await delay(100)
   await window.api.invoke('krux:change:page', { page: 'Main' })
 })
 </script>

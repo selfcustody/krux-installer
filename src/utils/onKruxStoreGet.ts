@@ -37,7 +37,6 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'WarningDownload' || 
       result.from === 'ErrorMsg'
     ) {
-      data.value = {}
       data.value.device = result.values.device
       data.value.version = result.values.version
       if (result.values.os === 'linux') {

@@ -44,6 +44,7 @@ import DownloadTestKtool from './pages/DownloadTestKtool.vue'
  * manipulate `page` and `data` variables
  */
 import onError from './utils/onError'
+import onKruxVerifyOpenssl from './utils/onKruxVerifyOpenssl';
 import onKruxChangePage from './utils/onKruxChangePage';
 import onKruxStoreGet from './utils/onKruxStoreGet';
 import onKruxStoreSet from './utils/onKruxStoreSet';
@@ -53,7 +54,6 @@ import onKruxDownloadResources from './utils/onKruxDownloadResources';
 import onKruxVerifyReleasesHash from './utils/onKruxVerifyReleasesHash';
 import onKruxVerifyReleaseSign from './utils/onKruxVerifyReleaseSign';
 import onKruxDownloadResourcesData from './utils/onKruxDownloadResourcesData';
-
 /**
  * Reference for which component will be used as showing page
  */
@@ -114,6 +114,7 @@ const pages: Ref<Record<string, any>> = shallowRef({
  * * onData: Channels that have the post-fixed word 'data' in `lib/*.ts` streaming calls 
  */
 window.api.onSuccess('krux:change:page', onKruxChangePage(page));
+window.api.onSuccess('krux:verify:openssl',onKruxVerifyOpenssl(data))
 window.api.onSuccess('krux:store:get', onKruxStoreGet(data));
 window.api.onSuccess('krux:store:set', onKruxStoreSet(data));
 window.api.onSuccess('krux:verify:releases:fetch', onKruxVerifyReleasesFetch(data));
@@ -136,6 +137,7 @@ window.api.onError('krux:download:resources', onError(data));
  * fit the style in devices
  */
 onMounted(async function () {
+  await window.api.invoke('krux:verify:openssl', { from: 'App' })
   await window.api.invoke('krux:change:page', { page: 'KruxInstallerLogo' })
 })
 </script>

@@ -15,6 +15,7 @@ import { Ref, ref, shallowRef, onMounted } from 'vue';
  * for more information
  */
 import KruxInstallerLogo from './pages/KruxInstallerLogo.vue';
+import ConsoleLoad from './pages/ConsoleLoad.vue';
 import ErrorMsg from './pages/ErrorMsg.vue';
 import Main from './pages/Main.vue';
 import SelectDevice from './pages/SelectDevice.vue';
@@ -78,6 +79,7 @@ const data: Ref<Record<string, any>> = ref({})
  */
 const pages: Ref<Record<string, any>> = shallowRef({
   'KruxInstallerLogo': KruxInstallerLogo,
+  'ConsoleLoad': ConsoleLoad,
   'ErrorMsg': ErrorMsg,
   'Main': Main,
   'SelectDevice': SelectDevice,
@@ -137,7 +139,6 @@ window.api.onError('krux:download:resources', onError(data));
  * fit the style in devices
  */
 onMounted(async function () {
-  await window.api.invoke('krux:verify:openssl', { from: 'App' })
   await window.api.invoke('krux:change:page', { page: 'KruxInstallerLogo' })
 })
 </script>

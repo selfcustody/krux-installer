@@ -1,4 +1,5 @@
 import { Ref } from "vue"
+import delay from './delay'
 
 /**
  * Setup `data` and/or redirects to a `page`, or invoke another api call;
@@ -26,8 +27,17 @@ import { Ref } from "vue"
  * @param options
  * @returns Promise<void>
  */
-export default function onKruxStoreGet (data: Ref<Record<string, any>>): Function{
+export default function onKruxStoreGet (data: Ref<Record<string, any>>): Function {
   return async function (_: Event, result: Record<'from' | 'key' | 'values', any>): Promise<void> {
+    // # ConsoleLoad
+    if ( result.from === 'KruxInstallerLogo') {
+      data.value = {}
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+      data.value.messages = ['Loading data from storage']
+      data.value.indexes = [0]
+      await delay(30)
+      data.value.indexes[data.value.indexes.length - 1] += 1
+    }
     // # Main page
     if (
       result.from === 'KruxInstallerLogo' ||
@@ -51,7 +61,17 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       if (result.values.os === 'darwin' && result.values.isMac10) {
         data.value.ktool === 'ktool-mac-10'
       }
+      if (result.from === 'KruxInstallerLogo') {
+        await delay(2000)
+        data.value.messages.push('Verifying openssl')
+        data.value.indexes.push(0)
+        await delay(30)
+        data.value.indexes[data.value.indexes.length - 1] += 1
+        await delay(2000)
+        await window.api.invoke('krux:verify:openssl', { from: 'KruxInstallerLogo' })
+      }
     }
+
 
     // ### CheckResources
     if (result.from === 'CheckResources') {

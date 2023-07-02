@@ -25,7 +25,7 @@
               @click.prevent="selectVersion"
             >
               <v-card-title>
-                {{ version }}
+                {{ myVersion }}
               </v-card-title>
             </v-card>
           </v-item>
@@ -56,7 +56,8 @@ import { computed } from 'vue'
 const props = defineProps<{
   version: string,
   device: string,
-  ktool: string
+  os: string,
+  isMac10: boolean
 }>()
 
 
@@ -71,9 +72,22 @@ const myVersion = computed(() => {
   return props.version === 'Select version' ? props.version : `Version: ${props.version}`
 })
 
-
 const flash = computed(() => {
-  return props.device === 'Select device' ? 'Flash' : `Flash with ${props.ktool}`
+  if (props.os === 'linux') {
+    return 'Flash with ktool-linux'
+  }
+  else if (props.os === 'win32') {
+    return 'Flash with ktool-win.exe'
+  }
+  else if (props.os === 'darwin' && !props.isMac10) {
+    return 'Flash with ktool-mac'
+  }
+  else if (props.os === 'darwin' && props.isMac10) {
+    return 'Flash with ktool-mac-10'
+  }
+  else {
+    return 'Flash'
+  }
 })
 
 /**

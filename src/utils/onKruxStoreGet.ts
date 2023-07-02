@@ -1,5 +1,7 @@
 import { Ref } from "vue"
 import delay from './delay'
+import setMainData from './setMainData'
+import addMessage from "./addMessage"
 
 /**
  * Setup `data` and/or redirects to a `page`, or invoke another api call;
@@ -33,62 +35,98 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     if ( result.from === 'KruxInstallerLogo') {
       data.value = {}
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
-      data.value.messages = ['Loading data from storage']
-      data.value.indexes = [0]
-      await delay(30)
-      data.value.indexes[data.value.indexes.length - 1] += 1
-    }
-    // # Main page
-    if (
-      result.from === 'KruxInstallerLogo' ||
-      result.from === 'SelectVersion' || 
-      result.from === 'VerifiedOfficialRelease' || 
-      result.from === 'DownloadTestKtool' ||
-      result.from === 'WarningDownload' || 
-      result.from === 'ErrorMsg'
-    ) {
-      data.value.device = result.values.device
-      data.value.version = result.values.version
-      if (result.values.os === 'linux') {
-        data.value.ktool === 'ktool-linux'
-      }
-      if (result.values.os === 'win32') {
-        data.value.ktool === 'ktool-win.exe'
-      }
-      if (result.values.os === 'darwin' && !result.values.isMac10) {
-        data.value.ktool === 'ktool-mac'
-      }
-      if (result.values.os === 'darwin' && result.values.isMac10) {
-        data.value.ktool === 'ktool-mac-10'
-      }
-      if (result.from === 'KruxInstallerLogo') {
-        await delay(2000)
-        data.value.messages.push('Verifying openssl')
-        data.value.indexes.push(0)
-        await delay(30)
-        data.value.indexes[data.value.indexes.length - 1] += 1
-        await delay(2000)
-        await window.api.invoke('krux:verify:openssl', { from: 'KruxInstallerLogo' })
-      }
+      data.value.messages = []
+      data.value.indexes = []
+      await addMessage(data, 'Loading data from storage')
+      await addMessage(data, 'Verifying openssl')
+      await window.api.invoke('krux:verify:openssl', { from: 'KruxInstallerLogo' })
+      setMainData(data, result)
     }
 
+    if (result.from === 'SelectDevice') {
+      setMainData(data, result)
+      await window.api.invoke('krux:change:page', { page: 'Main' })
+    }
 
-    // ### CheckResources
-    if (result.from === 'CheckResources') {
-      let page = ''
-      let checked = false
+    if (result.from === 'SelectVersion') {
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+      data.value.messages = []
+      data.value.indexes = [] 
+
       if (result.values.version.match(/selfcustody\/.*/g)){
-        checked = true
-        page = 'CheckResourcesOfficialReleaseZip'
+        
+        const domain = 'https://github.com'
+        let baseUrl = result.values.version.replace(/tag/g, 'download')
+        let version = baseUrl.split('download/')[1]
+        baseUrl = baseUrl.split(`/${version}`)[0]
+        const resource =`${version}/krux-${version}.zip`
+
+        await addMessage(data, `Checking ${domain}/${baseUrl}/${resource}`)
+        await window.api.invoke('krux:check:resource', {
+          from: result.from,
+          baseUrl: `${domain}/${baseUrl}`,
+          resource: resource
+        })
       }
-      if (result.values.version.match(/odudex\/.*/g)){
-        checked = true
-        page = 'CheckResourcesTestFirmware'
+      if (result.values.version.match(/odudex\/krux_binaries/g)){
+        
+        const domain = 'https://raw.githubusercontent.com'
+        let baseUrl = result.values.version
+        const resource = `main/${result.values.device}/firmware.bin`
+
+        await addMessage(data, `Checking ${domain}/${baseUrl}/${resource}`)
+        await window.api.invoke('krux:check:resource', {
+          from: result.from,
+          baseUrl: domain,
+          resource: `${baseUrl}/${resource}`
+        })
       }
+      /*
+        if (result.from.match(/Zip$/g)) {
+         
+        }
+        if (result.from.match(/Sha256$/g)) {
+          resource =`${version}/krux-${version}.zip.sha256.txt`
+        }
+        if (result.from.match(/Sig$/g)) {
+          resource =`${version}/krux-${version}.zip.sig`
+        }
+        checked = true
+  
+      }
+      if (result.values.version.match(/odudex\//g)){
+        checked = true
+        version = 'odudex'
+      }
+      
+      data.value.messages = []
+      data.value.messages.push(`Checking if ${version} release is already downloaded`)
+      data.value.indexes.push(0)
+      data.value.indexes[data.value.indexes.length - 1] += 1
+
       if (!checked) {
-        page = 'ErrorMsg'
+        await window.api.invoke('krux:change:page', { page: 'ErrorMsg' })
+      } else {
+
       }
-      await window.api.invoke('krux:change:page', { page: page })
+      */
+      setMainData(data, result)
+    }
+
+    if ( result.from === 'VerifiedOfficialRelease') {
+      setMainData(data, result)
+    }
+
+    if ( result.from === 'DownloadTestKtool') {
+      setMainData(data, result)
+    }
+
+    if ( result.from === 'WarningDownload') {
+      setMainData(data, result)
+    }
+
+    if ( result.from === 'ErrorMsg') {
+      setMainData(data, result)
     }
 
     if (result.from.match(/CheckResourcesOfficialRelease*/g)) {

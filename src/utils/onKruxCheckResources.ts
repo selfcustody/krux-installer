@@ -1,12 +1,32 @@
-export default function (data: Record<string, any>): Function {
+import { Ref } from "vue"
+import addMessage from "./addMessage"
+
+export default function (data: Ref<Record<string, any>>): Function {
   return async function (
     _: Event,
     result: Record<'from' | 'exists' | 'baseUrl' | 'resourceFrom' | 'resourceTo', any>
   ): Promise<void> {
-    data.value = {}
     data.value.baseUrl = result.baseUrl
     data.value.resourceFrom = result.resourceFrom
     data.value.resourceTo = result.resourceTo
+
+    if (result.from === 'SelectVersion' ) { 
+      if (result.exists) {
+        await addMessage(data, `${result.resourceTo} found`)
+        data.value.proceedTo = 'CheckResourcesOfficialReleaseSha256'
+        data.value.backTo = 'GithubChecker'
+        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+      } else {
+        await addMessage(data, `${result.resourceTo} not found`)
+        data.value.progress = 0.0
+        if (result.baseUrl.match(/selfcustody/g)) {
+          await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseZip' })
+        }
+        if (result.resourceFrom.match(/odudex\/krux_binaries/g)){
+          await window.api.invoke('krux:change:page', { page: 'DownloadTestFirmware' })
+        }
+      }
+    }
 
     if (result.from === 'CheckResourcesOfficialReleaseZip' ) { 
       if (result.exists) {

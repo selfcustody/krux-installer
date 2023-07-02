@@ -115,7 +115,7 @@ const pages: Ref<Record<string, any>> = shallowRef({
  * * onError: Channels that have the post-fixed word 'error' in `lib/*.ts` finished calls
  * * onData: Channels that have the post-fixed word 'data' in `lib/*.ts` streaming calls 
  */
-window.api.onSuccess('krux:change:page', onKruxChangePage(page));
+window.api.onSuccess('krux:change:page', onKruxChangePage(data, page));
 window.api.onSuccess('krux:verify:openssl',onKruxVerifyOpenssl(data))
 window.api.onSuccess('krux:store:get', onKruxStoreGet(data));
 window.api.onSuccess('krux:store:set', onKruxStoreSet(data));

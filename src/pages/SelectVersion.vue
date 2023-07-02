@@ -50,8 +50,7 @@ async function back() {
 }
 
 async function select(version: string) {
-  await window.api.invoke('krux:store:set', { key: 'version', value: version })
-  await window.api.invoke('krux:change:page', { page: 'CheckResources' })
+  await window.api.invoke('krux:store:set', { from: 'SelectVersion', key: 'version', value: version })
 }
 
 </script>

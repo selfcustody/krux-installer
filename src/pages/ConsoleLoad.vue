@@ -17,7 +17,7 @@ import { AsciiMorph  } from 'vue-asciimorph';
 import { Ref, ref, toRefs, computed} from 'vue';
 
 const timeout: Ref<number> = ref(10)
-const canvas: Ref<{ x: number, y: number }> = ref({ x: 32, y: 6})
+const canvas: Ref<{ x: number, y: number }> = ref({ x: 64, y: 5})
 const fontSize: Ref<string> = ref('12px')
   
 const props = defineProps<{
@@ -29,23 +29,7 @@ const { messages, indexes } = toRefs(props)
 
 const list_msg = computed(function () {
   return messages.value.map(function (val) {
-    return [[' '], [val]]
-  })
+    return [[' '], [val], [' ']]
+  }) || []
 })
-
 </script>
-
-<!--
-<style>
-.console {
-  font-family: monospace;
-  font-size: 10px;
-  text-align: left;
-  background-color: black;
-  color: #fff;
-  overflow-y: auto;
-  width: 600px;
-  height: 600px;
-}
-</style>
--->

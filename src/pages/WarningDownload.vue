@@ -1,12 +1,8 @@
 <template>
   <v-card flat variant="plain">
-    <v-card-subtitle>
-      {{ resourceTo }}
-    </v-card-subtitle>
-    <v-card-subtitle> Already downloaded </v-card-subtitle>
     <v-card-text>
       Click <span style="color: green;">Proceed</span>
-      to continue with the downloaded version or 
+      to continue with the downloaded version of <br/> <br/><pre>{{ resourceTo }}</pre> <br/> or 
       <span style="color: yellow;">Download the file again.</span>
     </v-card-text>
     <v-card-actions class="justify-center">

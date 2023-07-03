@@ -1,8 +1,14 @@
 <template>
   <v-card flat variant="plain">
     <v-card-text>
-      Click <span style="color: green;">Proceed</span>
-      to continue with the downloaded version of <br/> <br/><pre>{{ resourceTo }}</pre> <br/> or 
+      Click 
+      <span style="color: green;">Proceed</span>
+      to continue with the downloaded version of
+      <br/>
+      <br/>
+      <pre style="font-size: 12px;">{{ resourceTo }}</pre>
+      <br/>
+      or 
       <span style="color: yellow;">Download the file again.</span>
     </v-card-text>
     <v-card-actions class="justify-center">
@@ -48,18 +54,16 @@ const props = defineProps<{
 /**
  * Variables
  */
-const { baseUrl, resourceFrom, resourceTo, proceedTo, backTo} = toRefs(props)
+const { baseUrl, resourceFrom, resourceTo, proceedTo} = toRefs(props)
 
 /**
  * Methods
  */
 async function proceedToFn () {
-  if (proceedTo.value === 'Main') {
-    await window.api.invoke('krux:store:get', {
-      from: 'WarningDownload',
-      keys: ['device', 'version', 'os', 'isMac10']
-    })
-  }
+  await window.api.invoke('krux:store:get', {
+    from: `WarningDownload::${resourceTo.value}`,
+    keys: ['device', 'version', 'os', 'isMac10']
+  })
   await window.api.invoke('krux:change:page', { page: proceedTo.value })
 }
 

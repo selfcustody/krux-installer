@@ -1,7 +1,6 @@
 import { Ref } from "vue"
-import delay from './delay'
 import setMainData from './setMainData'
-import addMessage from "./addMessage"
+import messages from "./messages"
 
 /**
  * Setup `data` and/or redirects to a `page`, or invoke another api call;
@@ -31,28 +30,32 @@ import addMessage from "./addMessage"
  */
 export default function onKruxStoreGet (data: Ref<Record<string, any>>): Function {
   return async function (_: Event, result: Record<'from' | 'key' | 'values', any>): Promise<void> {
-    // # ConsoleLoad
+    
+    // When user start app
     if ( result.from === 'KruxInstallerLogo') {
       data.value = {}
+      messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
-      data.value.messages = []
-      data.value.indexes = []
-      await addMessage(data, 'Loading data from storage')
-      await addMessage(data, 'Verifying openssl')
+      await messages.add(data, 'Loading data from storage')
+      await messages.add(data, 'Verifying openssl')
       await window.api.invoke('krux:verify:openssl', { from: 'KruxInstallerLogo' })
       setMainData(data, result)
     }
 
+    // When user selected device to be flashed
     if (result.from === 'SelectDevice') {
       setMainData(data, result)
       await window.api.invoke('krux:change:page', { page: 'Main' })
     }
 
+    // When user selected between
+    // official release version (.zip -> .zip.sha256.txt -> .zip.sig -> .pem files)
+    // or test (.bin -> .kboot -> .kfpkg -> ktool)
     if (result.from === 'SelectVersion') {
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
-      data.value.messages = []
-      data.value.indexes = [] 
+      messages.clean(data)
 
+      // official release version (.zip -> .zip.sha256.txt -> .zip.sig -> .pem files)
       if (result.values.version.match(/selfcustody\/.*/g)){
         
         const domain = 'https://github.com'
@@ -61,56 +64,65 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
         baseUrl = baseUrl.split(`/${version}`)[0]
         const resource =`${version}/krux-${version}.zip`
 
-        await addMessage(data, `Checking ${domain}/${baseUrl}/${resource}`)
+        await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
         await window.api.invoke('krux:check:resource', {
           from: result.from,
           baseUrl: `${domain}/${baseUrl}`,
           resource: resource
         })
       }
+
+      // or test (.bin -> .kboot -> .kfpkg -> ktool)
       if (result.values.version.match(/odudex\/krux_binaries/g)){
         
         const domain = 'https://raw.githubusercontent.com'
         let baseUrl = result.values.version
         const resource = `main/${result.values.device}/firmware.bin`
 
-        await addMessage(data, `Checking ${domain}/${baseUrl}/${resource}`)
+        await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
         await window.api.invoke('krux:check:resource', {
           from: result.from,
           baseUrl: domain,
           resource: `${baseUrl}/${resource}`
         })
       }
-      /*
-        if (result.from.match(/Zip$/g)) {
-         
-        }
-        if (result.from.match(/Sha256$/g)) {
-          resource =`${version}/krux-${version}.zip.sha256.txt`
-        }
-        if (result.from.match(/Sig$/g)) {
-          resource =`${version}/krux-${version}.zip.sig`
-        }
-        checked = true
-  
-      }
-      if (result.values.version.match(/odudex\//g)){
-        checked = true
-        version = 'odudex'
-      }
-      
-      data.value.messages = []
-      data.value.messages.push(`Checking if ${version} release is already downloaded`)
-      data.value.indexes.push(0)
-      data.value.indexes[data.value.indexes.length - 1] += 1
-
-      if (!checked) {
-        await window.api.invoke('krux:change:page', { page: 'ErrorMsg' })
-      } else {
-
-      }
-      */
       setMainData(data, result)
+    }
+
+    // When user came from .zip file and will check for .zip.sha256.txt file
+    if (result.from.match(/^WarningDownload::.*.zip$/)) {
+      setMainData(data, result)
+      messages.clean(data)
+      const domain = 'https://github.com'
+      let baseUrl = result.values.version.replace(/tag/g, 'download')
+      let version = baseUrl.split('download/')[1]
+      baseUrl = baseUrl.split(`/${version}`)[0]
+      
+      const resource =`${version}/krux-${version}.zip.sha256.txt`
+      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
+      await window.api.invoke('krux:check:resource', {
+        from: result.from,
+        baseUrl: `${domain}/${baseUrl}`,
+        resource: resource
+      })   
+    }
+
+    // When user came from .zip file and will check for .zip.sha256.txt file
+    if (result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)) {
+      setMainData(data, result)
+      messages.clean(data)
+      const domain = 'https://github.com'
+      let baseUrl = result.values.version.replace(/tag/g, 'download')
+      let version = baseUrl.split('download/')[1]
+      baseUrl = baseUrl.split(`/${version}`)[0]
+      
+      const resource =`${version}/krux-${version}.zip.sig`
+      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
+      await window.api.invoke('krux:check:resource', {
+        from: result.from,
+        baseUrl: `${domain}/${baseUrl}`,
+        resource: resource
+      })   
     }
 
     if ( result.from === 'VerifiedOfficialRelease') {
@@ -121,9 +133,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       setMainData(data, result)
     }
 
-    if ( result.from === 'WarningDownload') {
-      setMainData(data, result)
-    }
+    
 
     if ( result.from === 'ErrorMsg') {
       setMainData(data, result)

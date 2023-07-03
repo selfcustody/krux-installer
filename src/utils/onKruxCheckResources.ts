@@ -1,5 +1,5 @@
 import { Ref } from "vue"
-import addMessage from "./addMessage"
+import messages from "./messages"
 
 export default function (data: Ref<Record<string, any>>): Function {
   return async function (
@@ -10,21 +10,59 @@ export default function (data: Ref<Record<string, any>>): Function {
     data.value.resourceFrom = result.resourceFrom
     data.value.resourceTo = result.resourceTo
 
+    // When user decides between official
+    // or test releaases
     if (result.from === 'SelectVersion' ) { 
       if (result.exists) {
-        await addMessage(data, `${result.resourceTo} found`)
-        data.value.proceedTo = 'CheckResourcesOfficialReleaseSha256'
+        await messages.add(data, `${result.resourceTo} found`)
+        data.value.proceedTo = 'ConsoleLoad'
         data.value.backTo = 'GithubChecker'
+        await messages.close(data)
         await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
       } else {
-        await addMessage(data, `${result.resourceTo} not found`)
+        await messages.add(data, `${result.resourceTo} not found`)
         data.value.progress = 0.0
+        await messages.close(data)
         if (result.baseUrl.match(/selfcustody/g)) {
           await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseZip' })
         }
         if (result.resourceFrom.match(/odudex\/krux_binaries/g)){
           await window.api.invoke('krux:change:page', { page: 'DownloadTestFirmware' })
         }
+      }
+    }
+
+    // When user decides for official release
+    // and checked zip file to redirect to sha256.txt file
+    if (result.from.match(/^WarningDownload::.*.zip$/)) {
+      if (result.exists) {
+        await messages.add(data, `${result.resourceTo} found`)
+        data.value.proceedTo = 'ConsoleLoad'
+        data.value.backTo = 'GithubChecker'
+        await messages.close(data)
+        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+      } else {
+        await messages.add(data, `${result.resourceTo} not found`)
+        data.value.progress = 0.0
+        await messages.close(data)
+        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSha256' })
+      }
+    }
+
+    // When user decides for official release
+    // and checked zip.sha256.txt file to redirect to zip.sig file
+    if (result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)) {
+      if (result.exists) {
+        await messages.add(data, `${result.resourceTo} found`)
+        data.value.proceedTo = 'ConsoleLoad'
+        data.value.backTo = 'GithubChecker'
+        await messages.close(data)
+        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+      } else {
+        await messages.add(data, `${result.resourceTo} not found`)
+        data.value.progress = 0.0
+        await messages.close(data)
+        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSig' })
       }
     }
 

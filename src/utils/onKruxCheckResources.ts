@@ -1,6 +1,28 @@
 import { Ref } from "vue"
 import messages from "./messages"
 
+async function onResourceExist (
+  data: Ref<Record<string, any>>,
+  result: Record<'from' | 'exists' | 'baseUrl' | 'resourceFrom' | 'resourceTo', any>
+) {
+  await messages.add(data, `${result.resourceTo} found`)
+  data.value.proceedTo = 'ConsoleLoad'
+  data.value.backTo = 'GithubChecker'
+  await messages.close(data)
+  await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+}
+
+async function onResourceNotExist (
+  data: Ref<Record<string, any>>,
+  result: Record<'from' | 'exists' | 'baseUrl' | 'resourceFrom' | 'resourceTo', any>,
+  page: string
+) {
+  await messages.add(data, `${result.resourceTo} not found`)
+  data.value.progress = 0.0
+  await messages.close(data)
+  await window.api.invoke('krux:change:page', { page: page })
+}
+
 export default function (data: Ref<Record<string, any>>): Function {
   return async function (
     _: Event,
@@ -14,20 +36,13 @@ export default function (data: Ref<Record<string, any>>): Function {
     // or test releaases
     if (result.from === 'SelectVersion' ) { 
       if (result.exists) {
-        await messages.add(data, `${result.resourceTo} found`)
-        data.value.proceedTo = 'ConsoleLoad'
-        data.value.backTo = 'GithubChecker'
-        await messages.close(data)
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+        await onResourceExist(data, result)
       } else {
-        await messages.add(data, `${result.resourceTo} not found`)
-        data.value.progress = 0.0
-        await messages.close(data)
         if (result.baseUrl.match(/selfcustody/g)) {
-          await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseZip' })
+          await onResourceNotExist(data, result, 'DownloadOfficialReleaseZip')
         }
         if (result.resourceFrom.match(/odudex\/krux_binaries/g)){
-          await window.api.invoke('krux:change:page', { page: 'DownloadTestFirmware' })
+          await onResourceNotExist(data, result, 'DownloadTestFirmware')
         }
       }
     }
@@ -36,16 +51,9 @@ export default function (data: Ref<Record<string, any>>): Function {
     // and checked zip file to redirect to sha256.txt file
     if (result.from.match(/^WarningDownload::.*.zip$/)) {
       if (result.exists) {
-        await messages.add(data, `${result.resourceTo} found`)
-        data.value.proceedTo = 'ConsoleLoad'
-        data.value.backTo = 'GithubChecker'
-        await messages.close(data)
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+        await onResourceExist(data, result)
       } else {
-        await messages.add(data, `${result.resourceTo} not found`)
-        data.value.progress = 0.0
-        await messages.close(data)
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSha256' })
+        await onResourceNotExist(data, result, 'DownloadOfficialReleaseSha256')
       }
     }
 
@@ -53,16 +61,19 @@ export default function (data: Ref<Record<string, any>>): Function {
     // and checked zip.sha256.txt file to redirect to zip.sig file
     if (result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)) {
       if (result.exists) {
-        await messages.add(data, `${result.resourceTo} found`)
-        data.value.proceedTo = 'ConsoleLoad'
-        data.value.backTo = 'GithubChecker'
-        await messages.close(data)
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+        await onResourceExist(data, result)
       } else {
-        await messages.add(data, `${result.resourceTo} not found`)
-        data.value.progress = 0.0
-        await messages.close(data)
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSig' })
+        await onResourceNotExist(data, result, 'DownloadOfficialReleaseSig')
+      }
+    }
+
+    // When user decides for official release
+    // and checked zip.sig file to redirect to .pem file
+    if (result.from.match(/^WarningDownload::.*.zip.sig$/)) {
+      if (result.exists) {
+        await onResourceExist(data, result)
+      } else {
+        await onResourceNotExist(data, result, 'DownloadOfficialReleasePem')
       }
     }
 

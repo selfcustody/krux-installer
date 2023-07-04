@@ -5,6 +5,10 @@ import messages from "./messages"
 /**
  * Setup `data` and/or redirects to a `page`, or invoke another api call;
  * 
+ * ### KruxInstallerLogo
+ * 
+ * - When user start app
+ *  
  * ### Main page
  * 
  * When `result.from` value is: 
@@ -18,11 +22,42 @@ import messages from "./messages"
  * - `version`; and 
  * - `ktool`.
  * 
- * ### CheckResources
+ * ### SelectDevice
  * 
- * When user click `Select version` button, it will need to decide wheather go to official release
- * or odudex's experimental release. After,it will need to check if the resource exist. If not exist,
- * redirect to download pages; if exist, redirect to warning page.
+ * When user selected device to be flashed;
+ * 
+ * It will need to decide wheather go to official release
+ * or odudex's experimental release. After,it will need to check if the specific resource exist.
+ * If not exist, redirect to download pages; if exist, redirect to warning page.
+ * 
+ * The likely cycles will be:
+ * 
+ *  * Official release:
+ *    * SelectVersion
+ *      * krux:check:resource for https://github.com/selfcustody/krux/releases/download/{{ version }}/krux-{{ version }}.zip:
+ *        * if exists, then krux:change:page to WarningDownload:
+ *          * proceed to krux:check:resource for https://github.com/selfcustody/krux/releases/download/{{ version }}/krux-{{ version }}.zip.sha256.txt
+ *          * download again with krux:change:page to DownloadOfficialReleaseZip
+ *          * back to krux:change:page GithubChecker
+ *        * if not exists, then krux:change:page to DownloadOfficialReleaseZip
+ *      * krux:check:resource for https://github.com/selfcustody/krux/releases/download/{{ version }}/krux-{{ version }}.zip.sha256.txt:
+ *        * if exists, then krux:change:page to WarningDownload:
+ *          * proceed to krux:check:resource for https://github.com/selfcustody/krux/releases/download/{{ version }}/krux-{{ version }}.zip.sig
+ *          * download again with krux:change:page to DownloadOfficialReleaseSha256
+ *          * back to krux:change:page GithubChecker
+ *        * if not exists, then krux:change:page to DownloadOfficialReleaseSha256
+ *      * krux:check:resource for https://github.com/selfcustody/krux/releases/download/{{ version }}/krux-{{ version }}.zip.sig:
+ *        * if exists, then krux:change:page to WarningDownload:
+ *          * proceed to krux:check:resource for https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem
+ *          * download again with krux:change:page to DownloadOfficialReleaseSig
+ *          * back to krux:change:page GithubChecker
+ *        * if not exists, then krux:change:page to DownloadOfficialReleasePem
+ *      * krux:check:resource for https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem:
+ *        * if exists, then krux:change:page to WarningDownload:
+ *          * proceed to krux:change:page for CheckVerifyOfficialRelease 
+ *          * download again with krux:change:page to DownloadOfficialReleasePem
+ *          * back to krux:change:page GithubChecker
+ *        * if not exists, then krux:change:page to DownloadOfficialReleasePem
  * 
  * @param data 
  * @param options
@@ -107,7 +142,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       })   
     }
 
-    // When user came from .zip file and will check for .zip.sha256.txt file
+    // When user came from .zip.sha256.txt file and will check for .zip.sig file
     if (result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)) {
       setMainData(data, result)
       messages.clean(data)
@@ -123,6 +158,32 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
         baseUrl: `${domain}/${baseUrl}`,
         resource: resource
       })   
+    }
+
+    // When user came from .zip.sig file and will check for .pem file
+    if (result.from.match(/^WarningDownload::.*.zip.sig$/)) {
+      setMainData(data, result)
+      messages.clean(data)
+      const domain = 'https://raw.githubusercontent.com'
+      const baseUrl = 'selfcustody/krux'
+      const resource = 'main/selfcustody.pem'
+
+      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
+      await window.api.invoke('krux:check:resource', {
+        from: result.from,
+        baseUrl: `${domain}/${baseUrl}`,
+        resource: resource
+      })   
+    }
+    // When user came from .zip.sig file and will check for .pem file
+    if (result.from.match(/^WarningDownload::.*.pem$/)) {
+      setMainData(data, result)
+      messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'CheckVerifyOfficialRelease' })
+    }
+
+    if (result.from === 'CheckVerifyOfficialRelease') {
+      await window.api.invoke('krux:verify:releases:hash')
     }
 
     if ( result.from === 'VerifiedOfficialRelease') {
@@ -218,10 +279,6 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
         baseUrl: `${domain}/${result.values.version}/main`,
         resource: resource
       })
-    }
-
-    if (result.from === 'CheckVerifyOfficialRelease') {
-      await window.api.invoke('krux:verify:releases:hash')
     }
   }
 }

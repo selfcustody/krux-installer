@@ -49,7 +49,10 @@ export default function (data: Ref<Record<string, any>>): Function {
 
     // When user decides for official release
     // and checked zip file to redirect to sha256.txt file
-    if (result.from.match(/^WarningDownload::.*.zip$/)) {
+    if (
+      result.from === 'DownloadOfficialReleaseZip' ||
+      result.from.match(/^WarningDownload::.*.zip$/)
+    ) {
       if (result.exists) {
         await onResourceExist(data, result)
       } else {
@@ -59,7 +62,10 @@ export default function (data: Ref<Record<string, any>>): Function {
 
     // When user decides for official release
     // and checked zip.sha256.txt file to redirect to zip.sig file
-    if (result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)) {
+    if (
+      result.from === 'DownloadOfficialReleaseSha256' ||
+      result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)
+    ) {
       if (result.exists) {
         await onResourceExist(data, result)
       } else {
@@ -69,55 +75,14 @@ export default function (data: Ref<Record<string, any>>): Function {
 
     // When user decides for official release
     // and checked zip.sig file to redirect to .pem file
-    if (result.from.match(/^WarningDownload::.*.zip.sig$/)) {
+    if (
+      result.from === 'DownloadOfficialReleaseSig' ||
+      result.from.match(/^WarningDownload::.*.zip.sig$/)
+    ) {
       if (result.exists) {
         await onResourceExist(data, result)
       } else {
         await onResourceNotExist(data, result, 'DownloadOfficialReleasePem')
-      }
-    }
-
-    if (result.from === 'CheckResourcesOfficialReleaseZip' ) { 
-      if (result.exists) {
-        data.value.proceedTo = 'CheckResourcesOfficialReleaseSha256'
-        data.value.backTo = 'GithubChecker'
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
-      } else {
-        data.value.progress = 0.0
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseZip' })
-      }
-    }
-
-    if (result.from === 'CheckResourcesOfficialReleaseSha256' ) { 
-      if (result.exists) {
-        data.value.proceedTo = 'CheckResourcesOfficialReleaseSig'
-        data.value.backTo = 'GithubChecker'
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
-      } else {
-        data.value.progress = 0.0
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSha256' })
-      }
-    }
-
-    if (result.from === 'CheckResourcesOfficialReleaseSig' ) { 
-      if (result.exists) {
-        data.value.proceedTo = 'CheckResourcesOfficialReleasePem'
-        data.value.backTo = 'GithubChecker'
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
-      } else {
-        data.value.progress = 0.0
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSig' })
-      }
-    }
-
-    if (result.from === 'CheckResourcesOfficialReleasePem' ) { 
-      if (result.exists) {
-        data.value.proceedTo = 'CheckVerifyOfficialRelease'
-        data.value.backTo = 'GithubChecker'
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
-      } else {
-        data.value.progress = 0.0
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleasePem' })
       }
     }
 

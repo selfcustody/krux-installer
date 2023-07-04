@@ -124,8 +124,15 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       setMainData(data, result)
     }
 
-    // When user came from .zip file and will check for .zip.sha256.txt file
-    if (result.from.match(/^WarningDownload::.*.zip$/)) {
+    // When user came from:
+    //  * .zip file
+    //  * chacked it (and exists)
+    //  * check for .zip.sha256.txt file
+    if (
+      result.from === 'DownloadOfficialReleaseZip' ||
+      result.from.match(/^WarningDownload::.*.zip$/)
+    ) {
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       setMainData(data, result)
       messages.clean(data)
       const domain = 'https://github.com'
@@ -143,7 +150,11 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     }
 
     // When user came from .zip.sha256.txt file and will check for .zip.sig file
-    if (result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)) {
+    if (
+      result.from === 'DownloadOfficialReleaseSha256' ||
+      result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)
+    ) {
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       setMainData(data, result)
       messages.clean(data)
       const domain = 'https://github.com'
@@ -161,7 +172,11 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     }
 
     // When user came from .zip.sig file and will check for .pem file
-    if (result.from.match(/^WarningDownload::.*.zip.sig$/)) {
+    if (
+      result.from === 'DownloadOfficialReleaseSig' ||
+      result.from.match(/^WarningDownload::.*.zip.sig$/)
+    ) {
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       setMainData(data, result)
       messages.clean(data)
       const domain = 'https://raw.githubusercontent.com'
@@ -175,8 +190,12 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
         resource: resource
       })   
     }
+
     // When user came from .zip.sig file and will check for .pem file
-    if (result.from.match(/^WarningDownload::.*.pem$/)) {
+    if (
+      result.from === 'DownloadOfficialReleasePem' ||
+      result.from.match(/^WarningDownload::.*.pem$/)
+    ) {
       setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'CheckVerifyOfficialRelease' })

@@ -73,7 +73,7 @@ onMounted(async function() {
     from: 'CheckVerifyOfficialRelease',
     keys: ['version']
   })
-  await delay(1000)
+  await delay(4000)
   index.value += 1
 })
 </script>

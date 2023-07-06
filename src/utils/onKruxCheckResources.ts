@@ -90,73 +90,36 @@ export default function (data: Ref<Record<string, any>>): Function {
       data.value = {}
     }
 
-    if (result.from === 'CheckResourcesTestFirmware') {
+    if (
+      result.from === 'DownloadTestFirmware' ||
+      result.from.match(/^WarningDownload::.*firmware.bin$/)
+    ) {
       if (result.exists) {
-        data.value.proceedTo = 'CheckResourcesTestKboot'
-        data.value.backTo = 'GithubChecker'
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+        await onResourceExist(data, result)
       } else {
-        data.value.progress = 0.0
-        await window.api.invoke('krux:change:page', { page: 'DownloadTestFirmware' })
+        await onResourceNotExist(data, result, 'DownloadTestKboot')
       }
     }
 
-    if (result.from === 'CheckResourcesTestKboot') {
+    if (
+      result.from === 'DownloadTestKboot' ||
+      result.from.match(/^WarningDownload::.*kboot.kfpkg$/)
+    ) {
       if (result.exists) {
-        data.value.proceedTo = 'CheckResourcesTestKtool'
-        data.value.backTo = 'GithubChecker'
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+        await onResourceExist(data, result)
       } else {
-        data.value.progress = 0.0
-        await window.api.invoke('krux:change:page', { page: 'DownloadTestKboot' })
+        await onResourceNotExist(data, result, 'DownloadTestKtool')
       }
     }
 
-    if (result.from === 'CheckResourcesTestKtool') {
+    if (
+      result.from === 'DownloadTestKtool' ||
+      result.from.match(/^WarningDownload::.*ktool-(linux|win.exe|mac|mac-10)$/)
+    ) {
       if (result.exists) {
-        data.value.proceedTo = 'Main'
-        data.value.backTo = 'GithubChecker'
-        await window.api.invoke('krux:change:page', { page: 'WarningDownload' })
+        await onResourceExist(data, result)
       } else {
-        data.value.progress = 0.0
-        await window.api.invoke('krux:change:page', { page: 'DownloadTestKtool' })
-      }
-    }
-
-    if (result.from === 'WarningDownload') {
-      data.value = {
-        baseUrl: result.baseUrl,
-        resourceFrom: result.resourceFrom,
-        resourceTo: result.resourceTo,
-        progress: 0.0
-      }
-      let page = ''
-      if (result.resourceFrom.match(/zip$/g)) {
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseZip' })
-      }
-      else if (result.resourceFrom.match(/zip.sha256.txt$/g)) {
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSha256' })
-      }
-      else if (result.resourceFrom.match(/zip.sig$/g)) {
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleaseSig' })
-      }
-      else if (result.resourceFrom.match(/pem$/g)) {
-        await window.api.invoke('krux:change:page', { page: 'DownloadOfficialReleasePem' })
-      }
-      else if (result.resourceFrom.match(/bin$/g)) {
-        await window.api.invoke('krux:change:page', { page: 'DownloadTestFirmware' })
-      }
-      else if (result.resourceFrom.match(/kfpkg$/g)) {
-        await window.api.invoke('krux:change:page', { page: 'DownloadTestKboot' })
-      }
-      else if (result.resourceFrom.match(/^ktool/g)) {
-        await window.api.invoke('krux:change:page', { page: 'DownloadTestKtool' })
-      }
-      else {
-        data.value = {
-          stack: new Error(`Invalid resource: ${result.resourceFrom}`)
-        }
-        await window.api.invoke('krux:change:page', { page: 'ErrorMsg' })
+        await onResourceNotExist(data, result, 'Main')
       }
     }
   }

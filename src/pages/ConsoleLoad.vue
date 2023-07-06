@@ -28,8 +28,14 @@ const props = defineProps<{
 const { messages, indexes } = toRefs(props)
 
 const list_msg = computed(function () {
-  return messages.value.map(function (val) {
-    return [[' '], [val], [' ']]
-  }) || []
+  if (messages === undefined) {
+    return [
+      [[' '], ['wait...'], [' ']]
+    ]
+  } else {
+    return messages.value.map(function (val) {
+      return [[' '], [val], [' ']]
+    })
+  }
 })
 </script>

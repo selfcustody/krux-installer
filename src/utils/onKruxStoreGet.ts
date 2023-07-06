@@ -87,9 +87,9 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     // official release version (.zip -> .zip.sha256.txt -> .zip.sig -> .pem files)
     // or test (.bin -> .kboot -> .kfpkg -> ktool)
     if (result.from === 'SelectVersion') {
-      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       messages.clean(data)
-
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+      
       // official release version (.zip -> .zip.sha256.txt -> .zip.sig -> .pem files)
       if (result.values.version.match(/selfcustody\/.*/g)){
         
@@ -124,6 +124,10 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       setMainData(data, result)
     }
 
+    // ===========================
+    // Official release life cycle
+    // ===========================
+
     // When user came from:
     //  * .zip file
     //  * chacked it (and exists)
@@ -132,9 +136,10 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadOfficialReleaseZip' ||
       result.from.match(/^WarningDownload::.*.zip$/)
     ) {
-      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       setMainData(data, result)
       messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+      
       const domain = 'https://github.com'
       let baseUrl = result.values.version.replace(/tag/g, 'download')
       let version = baseUrl.split('download/')[1]
@@ -154,9 +159,10 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadOfficialReleaseSha256' ||
       result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)
     ) {
-      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       setMainData(data, result)
       messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+      
       const domain = 'https://github.com'
       let baseUrl = result.values.version.replace(/tag/g, 'download')
       let version = baseUrl.split('download/')[1]
@@ -176,9 +182,10 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadOfficialReleaseSig' ||
       result.from.match(/^WarningDownload::.*.zip.sig$/)
     ) {
-      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       setMainData(data, result)
       messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+      
       const domain = 'https://raw.githubusercontent.com'
       const baseUrl = 'selfcustody/krux'
       const resource = 'main/selfcustody.pem'
@@ -209,95 +216,72 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       setMainData(data, result)
     }
 
-    if ( result.from === 'DownloadTestKtool') {
+    // =======================
+    // Test release life cycle
+    // =======================
+
+    if (
+      result.from === 'DownloadTestFirmware' ||
+      result.from.match(/^WarningDownload::.*firmware.bin$/)
+    ) {
       setMainData(data, result)
+      messages.clean(data)
+      const domain = 'https://raw.githubusercontent.com'
+      const baseUrl = result.values.version
+      const resource = `main/${result.values.device}/kboot.kfpkg`
+
+      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
+      await window.api.invoke('krux:check:resource', {
+        from: result.from,
+        baseUrl: domain,
+        resource: `${baseUrl}/${resource}`
+      })
     }
 
-    
+    if (
+      result.from === 'DownloadTestKboot' ||
+      result.from.match(/^WarningDownload::.*kboot.kfpkg$/)
+    ) {
+      setMainData(data, result)
+      messages.clean(data)
+      const domain = 'https://raw.githubusercontent.com'
+      const baseUrl = result.values.version
+      let resource = ''
+
+      if (result.values.os === 'linux') {
+        resource = `main/ktool-linux`
+      }
+      else if (result.values.os === 'win32') {
+        resource = `main/ktool-win.exe`
+      }
+      else if (result.values.os === 'darwin' && !result.values.isMac10) {
+        resource = `main/ktool-mac`
+      }
+      else if (result.values.os === 'darwin' && result.values.isMac10) {
+        resource = `main/ktool-mac-10`
+      }
+
+      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
+      await window.api.invoke('krux:check:resource', {
+        from: result.from,
+        baseUrl: domain,
+        resource: `${baseUrl}/${resource}`
+      })   
+    }
+
+    if (
+      result.from === 'DownloadTestKtoll' ||
+      result.from.match(/^WarningDownload::.*ktool-(linux|win.exe|mac|mac-10)$/)
+    ) {
+      setMainData(data, result)
+      messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'Main' })
+    }
 
     if ( result.from === 'ErrorMsg') {
       setMainData(data, result)
     }
 
-    if (result.from.match(/CheckResourcesOfficialRelease*/g)) {
-      let domain, baseUrl, resource;
-      if (
-        result.from === 'CheckResourcesOfficialReleaseZip' ||
-        result.from === 'CheckResourcesOfficialReleaseSha256' ||
-        result.from === 'CheckResourcesOfficialReleaseSig'
-      ) {
-        // https://github.com/selfcustody/krux/releases/download/{{ version }}/krux-{{ version }}.zip
     
-        domain = 'https://github.com'
-    
-        baseUrl = result.values.version.replace(/tag/g, 'download')
-        const version = baseUrl.split('download/')[1]
-        baseUrl = baseUrl.split(`/${version}`)[0]
-    
-        if (result.from.match(/Zip$/g)) {
-          resource =`${version}/krux-${version}.zip`
-        }
-        if (result.from.match(/Sha256$/g)) {
-          resource =`${version}/krux-${version}.zip.sha256.txt`
-        }
-        if (result.from.match(/Sig$/g)) {
-          resource =`${version}/krux-${version}.zip.sig`
-        }
-      }
-      if (result.from === 'CheckResourcesOfficialReleasePem') {
-        domain = 'https://raw.githubusercontent.com'
-        baseUrl = 'selfcustody/krux'
-        resource = 'main/selfcustody.pem'
-      }
-      await window.api.invoke('krux:check:resource', {
-        from: result.from,
-        baseUrl: `${domain}/${baseUrl}`,
-        resource: resource
-      })
-    }
-
-    if (result.from.match(/CheckResourcesTest*/g)) {
-      let resource;
-      const domain = 'https://raw.githubusercontent.com'
-      if (result.from === 'CheckResourcesTestFirmware') {
-        if (!result.values.device) {
-          data.value = { stack: new Error('Device not provided') }
-          await window.api.invoke('krux:change:page', { page: 'ErrorMsg'})
-        }
-        resource = `${result.values.device}/firmware.bin`
-      }
-      if (result.from === 'CheckResourcesTestKboot') {
-        if (!result.values.device) {
-          data.value = { stack: new Error('Device not provided') }
-          await window.api.invoke('krux:change:page', { page: 'ErrorMsg'})
-        }
-        resource = `${result.values.device}/kboot.kfpkg`
-      }
-      if (result.from === 'CheckResourcesTestKtool') {
-        if (!result.values.os) {
-          data.value = { stack: new Error('OS not provided') }
-          await window.api.invoke('krux:change:page', { page: 'ErrorMsg'})
-        }
-        let ktool
-        if (result.values.os === 'linux') {
-          resource = `ktool-linux`
-        }
-        if (result.values.os === 'win32') {
-          resource = `ktool-win.exe`
-        }
-        if (result.values.os === 'darwin') {
-          if (result.values.isMac10) {
-            resource = `ktool-mac-10`
-          } else {
-            resource = `ktool-mac`
-          }
-        }
-      }
-      await window.api.invoke('krux:check:resource', {
-        from: result.from,
-        baseUrl: `${domain}/${result.values.version}/main`,
-        resource: resource
-      })
-    }
   }
 }

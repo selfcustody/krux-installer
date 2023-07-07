@@ -226,6 +226,8 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     ) {
       setMainData(data, result)
       messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+
       const domain = 'https://raw.githubusercontent.com'
       const baseUrl = result.values.version
       const resource = `main/${result.values.device}/kboot.kfpkg`
@@ -244,6 +246,8 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     ) {
       setMainData(data, result)
       messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+
       const domain = 'https://raw.githubusercontent.com'
       const baseUrl = result.values.version
       let resource = ''

@@ -285,8 +285,5 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     if ( result.from === 'ErrorMsg') {
       setMainData(data, result)
     }
-
-
-    
   }
 }

@@ -18,10 +18,9 @@ function clean(data: Ref<Record<string, any>>): void {
 }
 
 async function close(data: Ref<Record<string, any>>): Promise<void> {
-  await delay(1000)
   for(let i in data.value.indexes) {
     data.value.indexes[i] = 2
-    await delay(200)
+    await delay(100)
   }
 }
 

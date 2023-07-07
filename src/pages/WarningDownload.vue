@@ -69,7 +69,7 @@ async function proceedToFn () {
 
 async function downloadToFn () {
   await window.api.invoke('krux:check:resource', {
-    from: 'WarningDownload',
+    from: `Again::WarningDownload::${resourceTo.value}`,
     baseUrl: baseUrl.value,
     resource: resourceFrom.value
   })

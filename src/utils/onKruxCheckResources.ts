@@ -23,6 +23,16 @@ async function onResourceNotExist (
   await window.api.invoke('krux:change:page', { page: page })
 }
 
+async function onDownloadAgain (
+  data: Ref<Record<string, any>>,
+  result: Record<'from' | 'exists' | 'baseUrl' | 'resourceFrom' | 'resourceTo', any>,
+  page: string
+) {
+  data.value.progress = 0.0
+  await messages.close(data)
+  await window.api.invoke('krux:change:page', { page: page })
+}
+
 export default function (data: Ref<Record<string, any>>): Function {
   return async function (
     _: Event,
@@ -46,6 +56,7 @@ export default function (data: Ref<Record<string, any>>): Function {
         }
       }
     }
+
 
     // When user decides for official release
     // and checked zip file to redirect to sha256.txt file
@@ -121,6 +132,38 @@ export default function (data: Ref<Record<string, any>>): Function {
       } else {
         await onResourceNotExist(data, result, 'Main')
       }
+    }
+
+    // ====================================================
+    // Warning Cycle: when user decide to re-download files
+    // ====================================================
+
+    if (result.from.match(/^Again::WarningDownload::.*.zip$$/)) {
+      await onDownloadAgain(data, result, 'DownloadOfficialReleaseZip')
+    }
+
+    if (result.from.match(/^Again::WarningDownload::.*.zip.sha256.txt$/)) {
+      await onDownloadAgain(data, result, 'DownloadOfficialReleaseSha256')
+    }
+
+    if (result.from.match(/^Again::WarningDownload::.*.zip.sig$/)) {
+      await onDownloadAgain(data, result, 'DownloadOfficialReleaseSig')
+    }
+
+    if (result.from.match(/^Again::WarningDownload::.*.pem$/)) {
+      await onDownloadAgain(data, result, 'DownloadOfficialReleasePem')
+    }
+
+    if (result.from.match(/^Again::WarningDownload::.*firmware.bin$/)) {
+      await onDownloadAgain(data, result, 'DownloadTestFirmware')
+    }
+
+    if (result.from.match(/^Again::WarningDownload::.*kboot.kfpkg$/)) {
+      await onDownloadAgain(data, result, 'DownloadTestKboot')
+    }
+
+    if (result.from.match(/^Again::WarningDownload::.*ktool-(linux|win.exe|mac|mac-10)$/)) {
+      await onDownloadAgain(data, result, 'DownloadTestKtool')
     }
   }
 }

@@ -270,7 +270,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     }
 
     if (
-      result.from === 'DownloadTestKtoll' ||
+      result.from === 'DownloadTestKtool' ||
       result.from.match(/^WarningDownload::.*ktool-(linux|win.exe|mac|mac-10)$/)
     ) {
       setMainData(data, result)
@@ -281,6 +281,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     if ( result.from === 'ErrorMsg') {
       setMainData(data, result)
     }
+
 
     
   }

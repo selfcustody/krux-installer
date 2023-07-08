@@ -2,6 +2,27 @@ import { Ref } from "vue"
 import setMainData from './setMainData'
 import messages from "./messages"
 
+async function onGetResource (
+  data: Ref<Record<string, any>>,
+  result: Record<string, any>,
+  options: Record<string, any>
+): Promise<void> {
+
+  let toCheck = ''
+  if (options.resource.match(/^.*(zip|sha256.txt|sig|pem)$/g)){
+    toCheck = options.resource.match(/^.*(zip|sha256.txt|sig|pem)$/g)[0]
+  } else if (options.resource.match(/^.*(firmware|kboot|ktool).*$/g)) {
+    toCheck = options.resource.split('/main/')[1]
+  }
+
+  await messages.add(data, `Checking ${toCheck}`)
+  await window.api.invoke('krux:check:resource', {
+    from: result.from,
+    baseUrl: options.baseUrl,
+    resource: options.resource
+  })
+}
+
 /**
  * Setup `data` and/or redirects to a `page`, or invoke another api call;
  * 
@@ -103,29 +124,21 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
         let baseUrl = result.values.version.replace(/tag/g, 'download')
         let version = baseUrl.split('download/')[1]
         baseUrl = baseUrl.split(`/${version}`)[0]
-        const resource =`${version}/krux-${version}.zip`
 
-        await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
-        await window.api.invoke('krux:check:resource', {
-          from: result.from,
+        await onGetResource(data, result, {
           baseUrl: `${domain}/${baseUrl}`,
-          resource: resource
+          resource: `${version}/krux-${version}.zip`
         })
       }
 
       // or test (.bin -> .kboot -> .kfpkg -> ktool)
       if (result.values.version.match(/odudex\/krux_binaries/g)){
-        
-        const domain = 'https://raw.githubusercontent.com'
-        let baseUrl = result.values.version
-        const resource = `main/${result.values.device}/firmware.bin`
 
-        await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
-        await window.api.invoke('krux:check:resource', {
-          from: result.from,
-          baseUrl: domain,
-          resource: `${baseUrl}/${resource}`
+        await onGetResource(data, result, {
+          baseUrl: 'https://raw.githubusercontent.com',
+          resource: `${result.values.version}/main/${result.values.device}/firmware.bin`
         })
+        
       }
       setMainData(data, result)
     }
@@ -150,14 +163,11 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       let baseUrl = result.values.version.replace(/tag/g, 'download')
       let version = baseUrl.split('download/')[1]
       baseUrl = baseUrl.split(`/${version}`)[0]
-      
-      const resource =`${version}/krux-${version}.zip.sha256.txt`
-      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
-      await window.api.invoke('krux:check:resource', {
-        from: result.from,
+
+      await onGetResource(data, result, {
         baseUrl: `${domain}/${baseUrl}`,
-        resource: resource
-      })   
+        resource: `${version}/krux-${version}.zip.sha256.txt`
+      })
     }
 
     // When user came from .zip.sha256.txt file and will check for .zip.sig file
@@ -173,14 +183,11 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       let baseUrl = result.values.version.replace(/tag/g, 'download')
       let version = baseUrl.split('download/')[1]
       baseUrl = baseUrl.split(`/${version}`)[0]
-      
-      const resource =`${version}/krux-${version}.zip.sig`
-      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
-      await window.api.invoke('krux:check:resource', {
-        from: result.from,
+
+      await onGetResource(data, result, {
         baseUrl: `${domain}/${baseUrl}`,
-        resource: resource
-      })   
+        resource: `${version}/krux-${version}.zip.sig`
+      })  
     }
 
     // When user came from .zip.sig file and will check for .pem file
@@ -191,17 +198,11 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
-      
-      const domain = 'https://raw.githubusercontent.com'
-      const baseUrl = 'selfcustody/krux'
-      const resource = 'main/selfcustody.pem'
 
-      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
-      await window.api.invoke('krux:check:resource', {
-        from: result.from,
-        baseUrl: `${domain}/${baseUrl}`,
-        resource: resource
-      })   
+      await onGetResource(data, result, {
+        baseUrl: 'https://raw.githubusercontent.com/selfcustody/krux',
+        resource: 'main/selfcustody.pem'
+      }) 
     }
 
     // When user came from .zip.sig file and will check for .pem file
@@ -234,16 +235,11 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
 
-      const domain = 'https://raw.githubusercontent.com'
-      const baseUrl = result.values.version
-      const resource = `main/${result.values.device}/kboot.kfpkg`
-
-      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
-      await window.api.invoke('krux:check:resource', {
-        from: result.from,
-        baseUrl: domain,
-        resource: `${baseUrl}/${resource}`
-      })
+      await onGetResource(data, result, {
+        baseUrl: 'https://raw.githubusercontent.com',
+        resource: `${result.values.version}/main/${result.values.device}/kboot.kfpkg`
+      })  
+      
     }
 
     if (
@@ -254,8 +250,6 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
 
-      const domain = 'https://raw.githubusercontent.com'
-      const baseUrl = result.values.version
       let resource = ''
 
       if (result.values.os === 'linux') {
@@ -271,12 +265,10 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
         resource = `main/ktool-mac-10`
       }
 
-      await messages.add(data, `Checking ${domain}/${baseUrl}/${resource}`)
-      await window.api.invoke('krux:check:resource', {
-        from: result.from,
-        baseUrl: domain,
-        resource: `${baseUrl}/${resource}`
-      })   
+      await onGetResource(data, result, {
+        baseUrl: 'https://raw.githubusercontent.com',
+        resource: `${result.values.version}/${resource}`
+      })
     }
 
     if (

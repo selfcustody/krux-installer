@@ -5,7 +5,13 @@ async function onResourceExist (
   data: Ref<Record<string, any>>,
   result: Record<'from' | 'exists' | 'baseUrl' | 'resourceFrom' | 'resourceTo', any>
 ) {
-  await messages.add(data, `${result.resourceTo} found`)
+  let checked
+  if (result.resourceTo.match(/^.*(zip|sha256.txt|sig|pem)$/g)){
+    checked = result.resourceTo.split('krux-installer/')[1]
+  } else if (result.resourceTo.match(/^.*(firmware|kboot|ktool).*$/g)) {
+    checked = result.resourceTo.split('/main/')[1]
+  }
+  await messages.add(data, `${checked} found`)
   data.value.proceedTo = 'ConsoleLoad'
   data.value.backTo = 'GithubChecker'
   await messages.close(data)
@@ -17,7 +23,13 @@ async function onResourceNotExist (
   result: Record<'from' | 'exists' | 'baseUrl' | 'resourceFrom' | 'resourceTo', any>,
   page: string
 ) {
-  await messages.add(data, `${result.resourceTo} not found`)
+  let checked
+  if (result.resourceTo.match(/^.*(zip|sha256.txt|sig|pem)$/g)){
+    checked = result.resourceTo.split('krux-installer/')[1]
+  } else if (result.resourceTo.match(/^.*(firmware|kboot|ktool).*$/g)) {
+    checked = result.resourceTo.split('/main/')[1]
+  }
+  await messages.add(data, `${checked} not found`)
   data.value.progress = 0.0
   await messages.close(data)
   await window.api.invoke('krux:change:page', { page: page })

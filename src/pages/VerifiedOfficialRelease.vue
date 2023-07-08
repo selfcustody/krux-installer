@@ -18,7 +18,7 @@
               <v-card-subtitle>Openssl verification command </v-card-subtitle>
               <v-card-item>
                 <div class="console"> $> {{ command }} </div>
-                <div class="console-result"> {{ sign }} </div>
+                <div class="console-result"> Output: {{ sign }} </div>
                 <v-btn
                   variant="text"
                   color="red"
@@ -46,7 +46,7 @@
   font-size: 12px;
   text-align: left;
   background-color: black;
-  color: green;
+  color: yellowgreen;
   height: 90px;
 }
 .console-result {

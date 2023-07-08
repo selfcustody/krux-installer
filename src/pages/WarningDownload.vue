@@ -77,7 +77,7 @@ async function downloadToFn () {
 
 async function backToFn () {
   await window.api.invoke('krux:store:get', {
-    from: 'WarningDownload',
+    from: 'Back::WarningDownload',
     keys: ['device', 'version', 'os', 'isMac10']
   })
 }

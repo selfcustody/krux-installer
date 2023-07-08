@@ -83,6 +83,12 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       await window.api.invoke('krux:change:page', { page: 'Main' })
     }
 
+    // When user selected back on SelectVersion
+    if (result.from === 'Back::SelectVersion' ) {
+      setMainData(data, result)
+      await window.api.invoke('krux:change:page', { page: 'Main' })
+    }
+
     // When user selected between
     // official release version (.zip -> .zip.sha256.txt -> .zip.sig -> .pem files)
     // or test (.bin -> .kboot -> .kfpkg -> ktool)
@@ -282,8 +288,16 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       await window.api.invoke('krux:change:page', { page: 'Main' })
     }
 
+    if (result.from === 'Back::WarningDownload') {
+      setMainData(data, result)
+      messages.clean(data)
+      await window.api.invoke('krux:change:page', { page: 'GithubChecker' })
+    }
+
     if ( result.from === 'ErrorMsg') {
       setMainData(data, result)
     }
+
+
   }
 }

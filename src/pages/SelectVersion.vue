@@ -45,8 +45,7 @@ const { versions } = toRefs(props)
  * Functions
  */
 async function back() {
-  await window.api.invoke('krux:store:get', { from: 'SelectVersion', keys: ['device', 'version', 'os', 'isMac10'] })
-  await window.api.invoke('krux:change:page', { page: 'Main' })
+  await window.api.invoke('krux:store:get', { from: 'Back::SelectVersion', keys: ['device', 'version', 'os', 'isMac10'] })
 }
 
 async function select(version: string) {

@@ -32,12 +32,52 @@
           </v-item>
         </v-col>
       </v-row>
+      <v-row>
+        <v-col>
+          <v-item v-slot="{ selectedClass }">
+            <v-card
+              variant="outlined"
+              :class="[selectedClass]"
+              @click="showDetails"
+              >
+              <v-card-title>Show details</v-card-title>
+            </v-card>
+          </v-item>
+          <v-overlay
+            v-model="details"
+            contained
+            width="100%" 
+            height="100%"
+            class="align-left justify-left"
+          >
+          <!-- 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain'-->
+            <v-card color="black">
+              <v-card-title color="white">Resource details</v-card-title>
+              <v-card-subtitle>{{ resourceFrom }} </v-card-subtitle>
+              <v-card-text color="white"><b>Remote:</b> {{ baseUrl}}/{{ resourceFrom }}</v-card-text>
+              <v-card-text color="white"><b>Local:</b> {{ resourceTo }}</v-card-text>
+              <v-card-actions color="white" class="align-center justify-center">
+                <v-item v-slot="{ selectedClass }">
+                  <v-card
+                    variant="outlined"
+                    :class="[selectedClass]"
+                    @click="closeDetails"
+                  >
+                    <v-card-title>Close</v-card-title>
+                  </v-card>
+                </v-item>
+              </v-card-actions>
+            </v-card>
+          </v-overlay>
+        </v-col>
+      </v-row>
+
     </v-container>
   </v-item-group>
 </template>
 
 <script setup lang="ts">
-import { toRefs, computed } from 'vue'
+import { Ref, ref, toRefs, computed } from 'vue'
 
 /**
  * Allowed props
@@ -53,6 +93,7 @@ const props = defineProps<{
 /**
  * Variables
  */
+const details: Ref<boolean> = ref(false)
 const { baseUrl, resourceFrom, resourceTo, proceedTo} = toRefs(props)
 
 const resourceName = computed(function () {
@@ -80,6 +121,14 @@ async function downloadToFn () {
     baseUrl: baseUrl.value,
     resource: resourceFrom.value
   })
+}
+
+function showDetails () {
+  details.value = true
+}
+
+function closeDetails () {
+  details.value = false
 }
 
 async function backToFn () {

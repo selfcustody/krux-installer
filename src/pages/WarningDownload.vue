@@ -48,14 +48,14 @@
             contained
             width="100%" 
             height="100%"
-            class="align-left justify-left"
           >
           <!-- 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain'-->
             <v-card color="black">
               <v-card-title color="white">Resource details</v-card-title>
               <v-card-subtitle>{{ resourceFrom }} </v-card-subtitle>
-              <v-card-text color="white"><b>Remote:</b> {{ baseUrl}}/{{ resourceFrom }}</v-card-text>
-              <v-card-text color="white"><b>Local:</b> {{ resourceTo }}</v-card-text>
+              <v-card-text color="white"><b>Remote:</b><br/> {{ baseUrl}}/{{ resourceFrom }}</v-card-text>
+              <v-card-text color="white"><b>Local:</b><br/> {{ resourceTo }}</v-card-text>
+              <v-card-text color="white"><b>Description:</b><br/> {{ whatDo }}</v-card-text>
               <v-card-actions color="white" class="align-center justify-center">
                 <v-item v-slot="{ selectedClass }">
                   <v-card
@@ -101,6 +101,26 @@ const resourceName = computed(function () {
     return resourceTo.value.split('krux-installer/')[1]
   } else if (resourceTo.value.match(/^.*(firmware|kboot|ktool).*$/g)) {
     return resourceTo.value.split('/main/')[1]
+  }
+})
+
+const whatDo = computed(function (){
+  if (resourceTo.value.match(/^.*zip$/g)){
+    return 'This file is the official release with all necessary contents to flash or update krux firmware on your Kendryte K210 device, including the firmware signature that prove the firmware\'s authenticity'
+  } else if (resourceTo.value.match(/^.*sha256.txt$/g)){
+    return 'This file proves the integrity of previous file. It uses the sha256 algorithm to check if zip file has not be changed during download.'
+  } else if (resourceTo.value.match(/^.*sig$/g)){
+    return 'This file, with the public key certificate, proves the authenticity of zip file, checking if the zip file was signed by its creator.'
+  } else if (resourceTo.value.match(/^.*pem$/g)){
+    return 'This file, with the signature, proves the authenticity of zip file, checking if the zip file was signed by its creator.'
+  } else if (resourceTo.value.match(/^.*firmware.bin$/g)) {
+    return 'This file is the unsigned krux firmware used for tests.'
+  } else if (resourceTo.value.match(/^.*kboot.kfpkg$/g)) {
+    return 'This file is the unsigned krux kendryte bootloader used for tests.'
+  } else if (resourceTo.value.match(/^.*ktool-.*$/g)) {
+    return 'This file is the OS\'s specific kendryte tool to write firmware and the bootloader onto device.'
+  } else {
+    throw new Error(`${resourceTo} not recognized`)
   }
 })
 

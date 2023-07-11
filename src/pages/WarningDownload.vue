@@ -3,6 +3,36 @@
     <v-container>
       <v-row>
         <v-col>
+          <v-overlay
+            v-model="details"
+            contained
+            width="100%" 
+            height="100%"
+          >
+          <!-- 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain'-->
+            <v-card color="black">
+              <v-card-title color="white">Resource details</v-card-title>
+              <v-card-subtitle>{{ resourceFrom }} </v-card-subtitle>
+              <v-card-text color="white"><b>Remote:</b><br/> {{ baseUrl}}/{{ resourceFrom }}</v-card-text>
+              <v-card-text color="white"><b>Local:</b><br/> {{ resourceTo }}</v-card-text>
+              <v-card-text color="white"><b>Description:</b><br/> {{ whatDo }}</v-card-text>
+              <v-card-actions color="white" class="align-center justify-center">
+                <v-item v-slot="{ selectedClass }">
+                  <v-card
+                    variant="outlined"
+                    :class="[selectedClass]"
+                    @click="closeDetails"
+                  >
+                    <v-card-title>Close</v-card-title>
+                  </v-card>
+                </v-item>
+              </v-card-actions>
+            </v-card>
+          </v-overlay>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
           <span style="color: yellowgreen;">{{  resourceName }} </span> already downloaded 
         </v-col>
       </v-row>
@@ -43,35 +73,21 @@
               <v-card-title>Show details</v-card-title>
             </v-card>
           </v-item>
-          <v-overlay
-            v-model="details"
-            contained
-            width="100%" 
-            height="100%"
-          >
-          <!-- 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain'-->
-            <v-card color="black">
-              <v-card-title color="white">Resource details</v-card-title>
-              <v-card-subtitle>{{ resourceFrom }} </v-card-subtitle>
-              <v-card-text color="white"><b>Remote:</b><br/> {{ baseUrl}}/{{ resourceFrom }}</v-card-text>
-              <v-card-text color="white"><b>Local:</b><br/> {{ resourceTo }}</v-card-text>
-              <v-card-text color="white"><b>Description:</b><br/> {{ whatDo }}</v-card-text>
-              <v-card-actions color="white" class="align-center justify-center">
-                <v-item v-slot="{ selectedClass }">
-                  <v-card
-                    variant="outlined"
-                    :class="[selectedClass]"
-                    @click="closeDetails"
-                  >
-                    <v-card-title>Close</v-card-title>
-                  </v-card>
-                </v-item>
-              </v-card-actions>
-            </v-card>
-          </v-overlay>
         </v-col>
       </v-row>
-
+      <v-row>
+        <v-col>
+          <v-item v-slot="{ selectedClass }">
+            <v-card
+              variant="outlined"
+              :class="[selectedClass]"
+              @click="backToFn"
+              >
+              <v-card-title>Back</v-card-title>
+            </v-card>
+          </v-item>
+        </v-col>
+      </v-row>
     </v-container>
   </v-item-group>
 </template>

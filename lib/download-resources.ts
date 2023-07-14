@@ -125,6 +125,7 @@ export default class DownloadResourcesHandler extends Handler {
 
         data.on('close', () => {
           this.log(`Resource can be found in ${resourceTo}`)
+
           this.send(`${this.name}:success`, {
             from: options.from,
             resourceFrom: options.resourceFrom,

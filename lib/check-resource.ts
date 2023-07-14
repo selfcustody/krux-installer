@@ -47,10 +47,12 @@ export default class CheckResourcesHandler extends Handler {
       
         this.log(`Checking if ${destinationResource} exists`)
       
-        const __exists__ = 
+        const __exists__ = await existsAsync(destinationResource)
+
+        
         this.send(`${this.name}:success`, {
           from: options.from,
-          exists: await existsAsync(destinationResource),
+          exists: __exists__,
           baseUrl: options.baseUrl,
           resourceFrom: options.resource,
           resourceTo: destinationResource

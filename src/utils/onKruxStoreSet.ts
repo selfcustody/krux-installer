@@ -1,5 +1,4 @@
 import { Ref } from "vue"
-import setMainData from './setMainData'
 
 /**
  * Setup `data` for SelectDevice and SelectVersion Pages
@@ -9,7 +8,7 @@ import setMainData from './setMainData'
 export default function (data: Ref<Record<string, any>>): Function {
   return async function (_: Event, result: Record<'from' | 'key' | 'value', any>) {
     if (result.from === 'SelectDevice' || result.from === 'SelectVersion') {
-      await window.api.invoke('krux:store:get', { from: result.from, keys: ['device', 'version', 'os', 'isMac10'] })
+      await window.api.invoke('krux:store:get', { from: result.from, keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
     }
   }
 }

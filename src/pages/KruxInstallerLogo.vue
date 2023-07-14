@@ -55,6 +55,6 @@ onMounted(async function () {
   index.value += 1
   await delay(2000)
   index.value += 1
-  await window.api.invoke('krux:store:get', { from: 'KruxInstallerLogo', keys: ['device', 'version', 'os', 'isMac10'] })
+  await window.api.invoke('krux:store:get', { from: 'KruxInstallerLogo', keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
 })
 </script>

@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, toRefs } from 'vue'
+import { toRefs } from 'vue'
 
 const props = defineProps<{
   versions: string[]
@@ -45,7 +45,7 @@ const { versions } = toRefs(props)
  * Functions
  */
 async function back() {
-  await window.api.invoke('krux:store:get', { from: 'Back::SelectVersion', keys: ['device', 'version', 'os', 'isMac10'] })
+  await window.api.invoke('krux:store:get', { from: 'Back::SelectVersion', keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
 }
 
 async function select(version: string) {

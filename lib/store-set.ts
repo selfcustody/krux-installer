@@ -50,6 +50,10 @@ export default class StoreSetHandler extends Handler {
           ...options,
           value: newValue as string
         }
+
+        // Little hack to set 'showFlash'
+        // if 
+
         this.send(`${this.name}:success`, result)
       } else {
         const error = Error(`Forbidden: cannot set '${options.key}'`)

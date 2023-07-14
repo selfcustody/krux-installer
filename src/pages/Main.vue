@@ -25,13 +25,13 @@
               @click.prevent="selectVersion"
             >
               <v-card-title>
-                {{ myVersion }}
+                {{ version }}
               </v-card-title>
             </v-card>
           </v-item>
         </v-col>
       </v-row>
-      <v-row>
+      <v-row v-if="showFlash">
         <v-col>
           <v-item v-slot="{ selectedClass }">
             <v-card
@@ -51,13 +51,14 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { onMounted, computed, toRefs } from 'vue';
 
 const props = defineProps<{
   version: string,
   device: string,
   os: string,
-  isMac10: boolean
+  isMac10: boolean,
+  showFlash: boolean
 }>()
 
 
@@ -68,7 +69,7 @@ const device = computed(() => {
   return props.device === 'Select device' ? props.device : `Device: ${props.device}`
 })
 
-const myVersion = computed(() => {
+const version = computed(() => {
   return props.version === 'Select version' ? props.version : `Version: ${props.version}`
 })
 
@@ -91,6 +92,11 @@ const flash = computed(() => {
 })
 
 /**
+ *Variables
+ */
+const { showFlash } = toRefs(props)
+
+/**
  * Methods
  */
 async function selectDevice () {
@@ -104,4 +110,24 @@ async function selectVersion () {
 async function flashDevice () {
   await window.api.invoke('krux:change:page', { page: 'BeforeFlashDevice' })
 }
+
+onMounted(async function () {
+// set data.value.showFlash
+  if (props.device.match(/maixpy_(m5stickv|amigo_ips|amigo_tft|bit|dock)/g)) {
+    if (props.version.match(/selfcustody\/.*/g)) {
+      const __version__ = props.version.split('tag/')[1]
+      await window.api.invoke('krux:check:resource', {
+        from: `CheckShowFlash::Main`,
+        baseUrl: '',
+        resource: `${__version__}/krux-${__version__}.zip`
+      })
+    } else if (props.version.match(/odudex\/krux_binaries/g)) {
+      await window.api.invoke('krux:check:resource', {
+        from: `CheckShowFlash::Main`,
+        baseUrl: '',
+        resource: `${props.version}/main/${props.device}/firmware.bin`
+      })
+    }
+  }
+})
 </script>

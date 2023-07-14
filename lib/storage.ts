@@ -48,6 +48,9 @@ export default class Storage extends Base {
       },
       sdcard: {
         type: 'string'
+      },
+      showFlash: {
+        type: 'boolean'
       }
     }
   }
@@ -125,6 +128,7 @@ export default class Storage extends Base {
       const device = 'Select device'
       const sdcard = ''
       let isMac10 = false
+      const showFlash = false
 
       if (process.platform === 'darwin') {
         isMac10 = await this.matchIsMac10()
@@ -138,6 +142,7 @@ export default class Storage extends Base {
       store.set('version', version)
       store.set('device', device)
       store.set('sdcard', sdcard)
+      store.set('showFlash', showFlash)
 
       const keys = Object.keys(this.config)
       for (let k in keys) {

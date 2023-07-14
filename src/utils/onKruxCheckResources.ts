@@ -177,5 +177,9 @@ export default function (data: Ref<Record<string, any>>): Function {
     if (result.from.match(/^Again::WarningDownload::.*ktool-(linux|win.exe|mac|mac-10)$/)) {
       await onDownloadAgain(data, result, 'DownloadTestKtool')
     }
+
+    if (result.from.match(/^CheckShowFlash::Main$/)) {
+      data.value.showFlash = result.exists
+    }
   }
 }

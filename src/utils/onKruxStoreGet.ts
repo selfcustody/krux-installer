@@ -86,7 +86,7 @@ async function onGetResource (
  */
 export default function onKruxStoreGet (data: Ref<Record<string, any>>): Function {
   return async function (_: Event, result: Record<'from' | 'key' | 'values', any>): Promise<void> {
-    
+
     // When user start app
     if ( result.from === 'KruxInstallerLogo') {
       data.value = {}
@@ -98,15 +98,17 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       setMainData(data, result)
     }
 
+    //
+
     // When user selected device to be flashed
     if (result.from === 'SelectDevice') {
-      setMainData(data, result)
+      await setMainData(data, result)
       await window.api.invoke('krux:change:page', { page: 'Main' })
     }
 
     // When user selected back on SelectVersion
     if (result.from === 'Back::SelectVersion' ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       await window.api.invoke('krux:change:page', { page: 'Main' })
     }
 
@@ -155,7 +157,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadOfficialReleaseZip' ||
       result.from.match(/^WarningDownload::.*.zip$/)
     ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       
@@ -175,7 +177,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadOfficialReleaseSha256' ||
       result.from.match(/^WarningDownload::.*.zip.sha256.txt$/)
     ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
       
@@ -195,7 +197,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadOfficialReleaseSig' ||
       result.from.match(/^WarningDownload::.*.zip.sig$/)
     ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
 
@@ -210,7 +212,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadOfficialReleasePem' ||
       result.from.match(/^WarningDownload::.*.pem$/)
     ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'CheckVerifyOfficialRelease' })
     }
@@ -231,7 +233,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadTestFirmware' ||
       result.from.match(/^WarningDownload::.*firmware.bin$/)
     ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
 
@@ -246,7 +248,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadTestKboot' ||
       result.from.match(/^WarningDownload::.*kboot.kfpkg$/)
     ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
 
@@ -275,19 +277,19 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       result.from === 'DownloadTestKtool' ||
       result.from.match(/^WarningDownload::.*ktool-(linux|win.exe|mac|mac-10)$/)
     ) {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'Main' })
     }
 
     if (result.from === 'Back::WarningDownload') {
-      setMainData(data, result)
+      await setMainData(data, result)
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'GithubChecker' })
     }
 
     if ( result.from === 'ErrorMsg') {
-      setMainData(data, result)
+      await setMainData(data, result)
     }
 
 

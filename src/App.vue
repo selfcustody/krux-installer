@@ -55,6 +55,7 @@ import onKruxDownloadResources from './utils/onKruxDownloadResources';
 import onKruxVerifyReleasesHash from './utils/onKruxVerifyReleasesHash';
 import onKruxVerifyReleaseSign from './utils/onKruxVerifyReleaseSign';
 import onKruxDownloadResourcesData from './utils/onKruxDownloadResourcesData';
+
 /**
  * Reference for which component will be used as showing page
  */

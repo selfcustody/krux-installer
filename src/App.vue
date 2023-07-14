@@ -55,6 +55,7 @@ import onKruxDownloadResources from './utils/onKruxDownloadResources';
 import onKruxVerifyReleasesHash from './utils/onKruxVerifyReleasesHash';
 import onKruxVerifyReleaseSign from './utils/onKruxVerifyReleaseSign';
 import onKruxDownloadResourcesData from './utils/onKruxDownloadResourcesData';
+import onKruxCheckIfItWillFlashHandler from './utils/onKruxCheckIfItWillFlashHandler';
 
 /**
  * Reference for which component will be used as showing page
@@ -122,6 +123,7 @@ window.api.onSuccess('krux:store:get', onKruxStoreGet(data));
 window.api.onSuccess('krux:store:set', onKruxStoreSet(data));
 window.api.onSuccess('krux:verify:releases:fetch', onKruxVerifyReleasesFetch(data));
 window.api.onSuccess('krux:check:resource', onKruxCheckResources(data));
+window.api.onSuccess('krux:check:will:flash', onKruxCheckIfItWillFlashHandler(data));
 window.api.onSuccess('krux:download:resources', onKruxDownloadResources(data));
 window.api.onSuccess('krux:verify:releases:hash', onKruxVerifyReleasesHash(data));
 window.api.onSuccess('krux:verify:releases:sign', onKruxVerifyReleaseSign(data));

@@ -112,22 +112,6 @@ async function flashDevice () {
 }
 
 onMounted(async function () {
-// set data.value.showFlash
-  if (props.device.match(/maixpy_(m5stickv|amigo_ips|amigo_tft|bit|dock)/g)) {
-    if (props.version.match(/selfcustody\/.*/g)) {
-      const __version__ = props.version.split('tag/')[1]
-      await window.api.invoke('krux:check:resource', {
-        from: `CheckShowFlash::Main`,
-        baseUrl: '',
-        resource: `${__version__}/krux-${__version__}.zip`
-      })
-    } else if (props.version.match(/odudex\/krux_binaries/g)) {
-      await window.api.invoke('krux:check:resource', {
-        from: `CheckShowFlash::Main`,
-        baseUrl: '',
-        resource: `${props.version}/main/${props.device}/firmware.bin`
-      })
-    }
-  }
+  await window.api.invoke('krux:check:will:flash')
 })
 </script>

@@ -8,7 +8,7 @@ import { Ref } from "vue"
 export default function (data: Ref<Record<string, any>>): Function {
   return async function (_: Event, result: Record<'from' | 'key' | 'value', any>) {
     if (result.from === 'SelectDevice' || result.from === 'SelectVersion') {
-      await window.api.invoke('krux:store:get', { from: result.from, keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
+      await window.api.invoke('krux:store:get', { from: result.from, keys: ['device', 'version', 'os', 'isMac10'] })
     }
   }
 }

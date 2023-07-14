@@ -178,8 +178,12 @@ export default function (data: Ref<Record<string, any>>): Function {
       await onDownloadAgain(data, result, 'DownloadTestKtool')
     }
 
-    if (result.from.match(/^CheckShowFlash::Main$/)) {
-      data.value.showFlash = result.exists
+    if (result.from.match(/^CheckShowFlash::Main::selfcustody$/)) {
+      data.value.showFlash = !data.value.showFlash && result.exists
+    }
+
+    if (result.from.match(/^CheckShowFlash::Main::odudex::firmware$/)) {
+      data.value.showFlash = !data.value.showFlash && result.exists
     }
   }
 }

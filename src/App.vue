@@ -21,30 +21,22 @@ import Main from './pages/Main.vue';
 import SelectDevice from './pages/SelectDevice.vue';
 import SelectVersion from './pages/SelectVersion.vue';
 import GithubChecker from './pages/GithubChecker.vue';
-import CheckResources from './pages/CheckResources.vue';
 import WarningDownload from './pages/WarningDownload.vue';
-import CheckResourcesOfficialReleaseZip from './pages/CheckResourcesOfficialReleaseZip.vue';
 import DownloadOfficialReleaseZip from './pages/DownloadOfficialReleaseZip.vue';
-import CheckResourcesOfficialReleaseSha256 from './pages/CheckResourcesOfficialReleaseSha256.vue';
 import DownloadOfficialReleaseSha256 from './pages/DownloadOfficialReleaseSha256.vue';
-import CheckResourcesOfficialReleaseSig from './pages/CheckResourcesOfficialReleaseSig.vue';
 import DownloadOfficialReleaseSig from './pages/DownloadOfficialReleaseSig.vue';
-import CheckResourcesOfficialReleasePem from './pages/CheckResourcesOfficialReleasePem.vue';
 import DownloadOfficialReleasePem from './pages/DownloadOfficialReleasePem.vue';
 import CheckVerifyOfficialRelease from './pages/CheckVerifyOfficialRelease.vue';
 import VerifiedOfficialRelease from './pages/VerifiedOfficialRelease.vue';
-import CheckResourcesTestFirmware from './pages/CheckResourcesTestFirmware.vue';
 import DownloadTestFirmware from './pages/DownloadTestFirmware.vue';
-import CheckResourcesTestKboot from './pages/CheckResourcesTestKboot.vue';
-import DownloadTestKboot from './pages/DownloadTestKboot.vue'
-import CheckResourcesTestKtool from './pages/CheckResourcesTestKtool.vue';
-import DownloadTestKtool from './pages/DownloadTestKtool.vue'
+import DownloadTestKboot from './pages/DownloadTestKboot.vue';
+import DownloadTestKtool from './pages/DownloadTestKtool.vue';
 
 /**
  * Methods: These function will
  * manipulate `page` and `data` variables
  */
-import onError from './utils/onError'
+import onError from './utils/onError';
 import onKruxVerifyOpenssl from './utils/onKruxVerifyOpenssl';
 import onKruxChangePage from './utils/onKruxChangePage';
 import onKruxStoreGet from './utils/onKruxStoreGet';
@@ -87,23 +79,15 @@ const pages: Ref<Record<string, any>> = shallowRef({
   'SelectDevice': SelectDevice,
   'GithubChecker': GithubChecker,
   'SelectVersion': SelectVersion,
-  'CheckResources': CheckResources,
   'WarningDownload': WarningDownload,
-  'CheckResourcesOfficialReleaseZip': CheckResourcesOfficialReleaseZip,
   'DownloadOfficialReleaseZip': DownloadOfficialReleaseZip,
-  'CheckResourcesOfficialReleaseSha256': CheckResourcesOfficialReleaseSha256,
   'DownloadOfficialReleaseSha256': DownloadOfficialReleaseSha256,
-  'CheckResourcesOfficialReleaseSig': CheckResourcesOfficialReleaseSig,
   'DownloadOfficialReleaseSig': DownloadOfficialReleaseSig,
-  'CheckResourcesOfficialReleasePem': CheckResourcesOfficialReleasePem,
   'DownloadOfficialReleasePem': DownloadOfficialReleasePem,
   'CheckVerifyOfficialRelease': CheckVerifyOfficialRelease,
   'VerifiedOfficialRelease': VerifiedOfficialRelease,
-  'CheckResourcesTestFirmware': CheckResourcesTestFirmware,
   'DownloadTestFirmware': DownloadTestFirmware,
-  'CheckResourcesTestKboot': CheckResourcesTestKboot,
   'DownloadTestKboot': DownloadTestKboot,
-  'CheckResourcesTestKtool': CheckResourcesTestKtool,
   'DownloadTestKtool': DownloadTestKtool
 })
 

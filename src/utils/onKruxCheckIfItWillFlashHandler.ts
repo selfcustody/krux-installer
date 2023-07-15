@@ -9,6 +9,21 @@ export default function (data: Ref<Record<string, any>>): Function {
       } else {
         data.value.clickMessage = `Please click 'Version: ${data.value.version}' to download sources for ${data.value.device}`
       }
+    } else {
+      let click = ''
+      if (data.value.os === 'linux') {
+        click =  'Flash with ktool-linux'
+      }
+      else if (data.value.os === 'win32') {
+        click = 'Flash with ktool-win.exe'
+      }
+      else if (data.value.os === 'darwin' && !data.value.isMac10) {
+        click = 'Flash with ktool-mac'
+      }
+      else if (data.value.os === 'darwin' && data.value.isMac10) {
+        click = 'Flash with ktool-mac-10'
+      }
+      data.value.clickMessage = `Connect your ${data.value.device} device before click '${click}'`
     }
   }
 }

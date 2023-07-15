@@ -1,6 +1,11 @@
 <template>
   <v-item-group>
     <v-container>
+      <v-row v-if="clickMessage !== ''">
+        <v-col>
+          {{ clickMessage }}
+        </v-col>
+      </v-row>
       <v-row>
         <v-col>
           <v-item v-slot="{ selectedClass }">
@@ -51,14 +56,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, toRefs } from 'vue';
+import { onMounted, computed, toRefs, ref, Ref } from 'vue';
 
 const props = defineProps<{
   version: string,
   device: string,
   os: string,
   isMac10: boolean,
-  showFlash: boolean
+  showFlash: boolean,
+  clickMessage: string
 }>()
 
 
@@ -91,10 +97,12 @@ const flash = computed(() => {
   }
 })
 
+
 /**
  *Variables
  */
 const { showFlash } = toRefs(props)
+
 
 /**
  * Methods
@@ -113,5 +121,6 @@ async function flashDevice () {
 
 onMounted(async function () {
   await window.api.invoke('krux:check:will:flash')
+  
 })
 </script>

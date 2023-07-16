@@ -116,11 +116,10 @@ async function selectVersion () {
 }
 
 async function flashDevice () {
-  await window.api.invoke('krux:change:page', { page: 'BeforeFlashDevice' })
+  await window.api.invoke('krux:change:page', { page: 'FlashToDevice' })
 }
 
 onMounted(async function () {
   await window.api.invoke('krux:check:will:flash')
-  
 })
 </script>

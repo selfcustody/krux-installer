@@ -31,6 +31,7 @@ import VerifiedOfficialRelease from './pages/VerifiedOfficialRelease.vue';
 import DownloadTestFirmware from './pages/DownloadTestFirmware.vue';
 import DownloadTestKboot from './pages/DownloadTestKboot.vue';
 import DownloadTestKtool from './pages/DownloadTestKtool.vue';
+import FlashToDevice from './pages/FlashToDevice.vue';
 
 /**
  * Methods: These function will
@@ -48,6 +49,8 @@ import onKruxVerifyReleasesHash from './utils/onKruxVerifyReleasesHash';
 import onKruxVerifyReleaseSign from './utils/onKruxVerifyReleaseSign';
 import onKruxDownloadResourcesData from './utils/onKruxDownloadResourcesData';
 import onKruxCheckIfItWillFlashHandler from './utils/onKruxCheckIfItWillFlashHandler';
+import onKruxFlash from './utils/onKruxFlash';
+import onKruxFlashData from './utils/onKruxFlashData';
 
 /**
  * Reference for which component will be used as showing page
@@ -88,7 +91,8 @@ const pages: Ref<Record<string, any>> = shallowRef({
   'VerifiedOfficialRelease': VerifiedOfficialRelease,
   'DownloadTestFirmware': DownloadTestFirmware,
   'DownloadTestKboot': DownloadTestKboot,
-  'DownloadTestKtool': DownloadTestKtool
+  'DownloadTestKtool': DownloadTestKtool,
+  'FlashToDevice': FlashToDevice
 })
 
 /**
@@ -111,7 +115,9 @@ window.api.onSuccess('krux:check:will:flash', onKruxCheckIfItWillFlashHandler(da
 window.api.onSuccess('krux:download:resources', onKruxDownloadResources(data));
 window.api.onSuccess('krux:verify:releases:hash', onKruxVerifyReleasesHash(data));
 window.api.onSuccess('krux:verify:releases:sign', onKruxVerifyReleaseSign(data));
+window.api.onSuccess('krux:flash', onKruxFlash(data));
 window.api.onData('krux:download:resources', onKruxDownloadResourcesData(data));
+window.api.onData('krux:flash', onKruxFlashData(data));
 window.api.onError('krux:change:page', onError(data));
 window.api.onError('krux:store:get', onError(data));
 window.api.onError('krux:store:set', onError(data));
@@ -119,6 +125,7 @@ window.api.onError('krux:verify:openssl', onError(data));
 window.api.onError('krux:verify:releases:fetch', onError(data));
 window.api.onError('krux:check:resource',onError(data));
 window.api.onError('krux:download:resources', onError(data));
+window.api.onError('krux:flash', onError(data));
 
 /**
  * Mounted: when app starts,

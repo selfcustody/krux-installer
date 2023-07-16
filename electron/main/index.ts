@@ -13,6 +13,7 @@ import StoreSetHandler from '../../lib/store-set'
 import StoreGetHandler from '../../lib/store-get'
 import VerifyOpensslHandler from '../../lib/verify-openssl'
 import CheckIfItWillFlashHandler from '../../lib/check-if-it-will-flash'
+import FlashHandler from '../../lib/flash'
 
 const kruxInstaller = new App(`KruxInstaller | v${version}`)
 
@@ -69,6 +70,10 @@ kruxInstaller.start(async ({ app, win, ipcMain}) => {
   // Create 'check if it will flash' handler
   const checkIfItWillFlashHandler = new CheckIfItWillFlashHandler(win, store, ipcMain)
   checkIfItWillFlashHandler.build()
+
+  // Create flash' handler
+  const flashHandler = new FlashHandler(win, store, ipcMain)
+  flashHandler.build()
 
   // Create Wdio test handlers
   // if environment variable WDIO_ELECTRON equals 'true'

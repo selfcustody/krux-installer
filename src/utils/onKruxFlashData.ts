@@ -13,10 +13,11 @@ export default function (
     _: Event, 
     result:string
   ): void {
-    data.value.output = result.replace(/%\s/, "\n")
-    data.value.output = data.value.output.replace(/kiB\/s/g, "kiB/s\n")
-      
+
     const ansi = new AnsiUp()
-    data.value.output = ansi.ansi_to_html(data.value.output).replace(/\n/gm, '<br>')
+    let tmp = result.replace(/%\s/, "\n")
+    tmp = tmp.replace(/kiB\/s/g, "kiB/s\n")
+
+    data.value.output = ansi.ansi_to_html(tmp).replace(/\n/gm, '<br>')
   }
 }

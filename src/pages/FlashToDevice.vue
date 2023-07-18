@@ -7,16 +7,15 @@
             <v-card
               variant="outlined"
             >
-              <v-card-title v-if="!done">Flashing...</v-card-title>
-              <v-card-title v-if="done && !error">Flashed</v-card-title> 
-              <v-card-title v-if="done && error">Error</v-card-title>
-              <v-card-subtitle v-if="!done">Do not unplug device or shutdown computer!</v-card-subtitle>
-              <v-card-subtitle v-if="done && !error">Done</v-card-subtitle>
-              <v-card-subtitle v-if="done && error">Something wrong occured</v-card-subtitle>
+              <v-card-title > {{ !done ? 'Flashing...' : 'Done' }} </v-card-title>
+              <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : '' }} </v-card-subtitle>
               <v-card-text>
-                <div class="console" v-html="output" />
+                <div v-if="!done" class="console" v-html="output" />
+                <div v-if="done"  class="console" v-html="allOutput" />
               </v-card-text>  
               <v-card-actions
+                class="align-center"
+                v-if="done"
                 @click="backToFn"
               >
                 Back
@@ -35,14 +34,12 @@ import { onMounted, toRefs, ref, Ref, watch } from 'vue';
 
 const props = defineProps<{
   output: string,
-  done: boolean,
-  error: boolean
+  done: boolean
 }>()
 
-const tmpOutput: Ref<string> = ref('');
-const { output, done, error } = toRefs(props)
+const { output, done } = toRefs(props)
 
-
+const allOutput: Ref<string> = ref('')
 /**
   Methods
  */
@@ -55,9 +52,7 @@ onMounted(async function () {
 })
 
 watch(output, function(newValue) {
-  if (!done) {
-    tmpOutput.value += newValue
-  }
+  allOutput.value += newValue
 })
 </script>
 

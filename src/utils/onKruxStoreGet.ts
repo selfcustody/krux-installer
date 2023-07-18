@@ -285,7 +285,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
     if (result.from === 'Back::WarningDownload') {
       await setMainData(data, result)
       messages.clean(data)
-      await window.api.invoke('krux:change:page', { page: 'GithubChecker' })
+      await window.api.invoke('krux:change:page', { page: 'Main' })
     }
 
     if ( result.from === 'ErrorMsg') {
@@ -294,7 +294,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
 
     if (result.from === 'FlashToDevice') {
       messages.clean(data)
-      await window.api.invoke('krux:change:page', { page: 'ConsoleLoad' })
+      await window.api.invoke('krux:change:page', { page: 'Main' })
       setMainData(data, result)
     }
 

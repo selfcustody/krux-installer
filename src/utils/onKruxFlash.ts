@@ -7,7 +7,6 @@ export default function (
     _: Event, 
     result:Record<string, any>
   ): void {
-    data.value.done = true
-    data.value.error = false
+    data.value.done = result.done
   }
 }

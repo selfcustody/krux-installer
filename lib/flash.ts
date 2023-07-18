@@ -61,6 +61,19 @@ export default class FlashHandler extends Handler {
         cwd = join(resources, version)
       }
 
+      // set correct kboot.kfpkg
+      const kboot = join(cwd, device, 'kboot.kfpkg')
+
+      // set correct flash instructions
+      // if the device 'maixpy_dock' the board argument (-B) is 'dan', 
+      // otherwise, is 'goE'
+      // SEE https://github.com/odudex/krux_binaries#flash-instructions
+      if (device.match(/maixpy_dock/g)) {
+        flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000', kboot]
+      } else {
+        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
+      }
+
       // Choose the correct ktool flasher
       if (os === 'linux') {
         flash.command = join(cwd, 'ktool-linux')
@@ -70,46 +83,32 @@ export default class FlashHandler extends Handler {
       } else if (os === 'darwin' && !isMac10) {
         flash.command = join(cwd, 'ktool-mac')
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
-      } else if (os === 'linux' && isMac10) {
+      } else if (os === 'darwin' && isMac10) {
         flash.command = join(cwd, 'ktool-mac-10')
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
-      }
-
-      // set correct kboot.kfpkg
-      const kboot = join(cwd, device, 'kboot.kfpkg')
-
-      // set correct flash instructions
-      // if the device 'maixpy_dock' the board argument (-B) is 'dan', 
-      // otherwise, is 'goE'
-      // SEE https://github.com/odudex/krux_binaries#flash-instructions
-      if (device.match(/maixpy_dock/g)) {
-        flash.args = `-B dan -b 1500000 ${kboot}`.split(' ')
-      } else {
-        flash.args = `-B goE -b 1500000 ${kboot}`.split(' ')
       }
 
       // stack commands to be executed
       const promises = chmod.commands.map((cmd) => {
         return new Promise<void>((resolve, reject) => {
-          const message = `${cmd.command} ${cmd.args.join(' ')}`
-
           let error = null
           let buffer = Buffer.alloc(0)
-          this.log(message)
 
+          this.send(`${this.name}:data`, `\x1b[32m$> ${cmd.command} ${cmd.args.join(' ')}\x1b[0m\n\n`)
           const script = spawn(cmd.command, cmd.args)
 
           script.stdout.on('data', (data) => {
             buffer = Buffer.concat([buffer, data])
+            this.send(`${this.name}:data`, buffer.toString())
           })
 
           script.stderr.on('data', (data) => {
             buffer = Buffer.concat([buffer, data])
+            this.send(`${this.name}:data`, buffer.toString())
             error = true
           })
 
           script.on('close', (code) => {
-            this.log(`${message} exit code: ${code}`)
             if (error) {
               error = new Error(buffer.toString())
               reject(error)
@@ -119,69 +118,44 @@ export default class FlashHandler extends Handler {
         })
       })
 
+      await Promise.all(promises)
+
       // setup flash command
-      const result: Record<string, string | Function> = {}
-      result.message =  `${flash.command} ${flash.args.join(' ')}`
+      let flasher = null
+
+      this.send(`${this.name}:data`, `\x1b[32m$> ${flash.command} ${flash.args.join(' ')}\x1b[0m\n\n`)
 
       if (os === 'linux') {
-        result.spawn = async () => {
-          this.log(result.message as string)
-          const sudoer = new SudoerLinux({ name: 'KruxInstaller' })
-          return await sudoer.spawn(flash.command, flash.args, { env: process.env })
-        }
-      } if (os === 'darwin') {
-        result.spawn = async () => {
-          2,10
-          this.log(result.message as string)
-          const sudoer = new SudoerDarwin({ name: 'KruxInstaller' })
-          return await sudoer.spawn(flash.command, flash.args, { env: process.env })
-        }
+        const sudoer = new SudoerLinux()
+        flasher = await sudoer.spawn(flash.command, flash.args.join(' '), { env: process.env })
+      } else if (os === 'darwin') {
+        const sudoer = new SudoerDarwin()
+        flasher = await sudoer.spawn(flash.command, flash.args.join(' '), { env: process.env })
       } else if (os === 'win32') {
-        result.spawn = () => {
-          return new Promise((resolve) => {
-            this.log(result.message as string)
-            resolve(spawn(flash.command, flash.args))
-          })
+        flasher = spawn(flash.command, flash.args)
+      }
+
+      let err = null
+      let output = ''
+
+      flasher.stdout.on('data', (data: any) => {
+        output = Buffer.from(data, 'utf-8').toString()
+        this.send(`${this.name}:data`, output)
+      })
+
+      flasher.stderr.on('data', (data: any) => {
+        output = Buffer.from(data, 'utf-8').toString()
+        err = new Error(output)
+        this.send(`${this.name}:data`, output)
+      })
+  
+      flasher.on('close', (code: any) => {
+        if (err) {
+          this.send(`${this.name}:error`, { name: err.name, message: err.message, stack: err.stack })
+        } else {
+          this.send(`${this.name}:success`, { done: true })
         }
-      }
-
-      // add flash command to stack
-      promises.push(new Promise<void>(async (resolve, reject) => {
-        const runner = await (result.spawn as Function)()
-        let firstRun = true
-        let err = false
-        let out = ''
-
-        runner.stdout.on('data', (data: any) => {
-          if (firstRun) {
-            this.send(`${this.name}:data`, `\x1b[32m$> ${data}\x1b[0m\n\n`)
-            firstRun = false
-          }
-          out = Buffer.from(data, 'utf-8').toString()
-          this.send(`${this.name}:data`, out)
-        })
-
-        runner.stderr.on('data', (data: any) => {
-          out = Buffer.from(data, 'utf-8').toString()
-          err = true
-          this.send(`${this.name}:data`, out)
-        })
-
-        runner.on('close', (code: any) => {
-          if (!err) {
-            resolve()
-          } else {
-            reject(new Error(out))
-          }
-        })
-      }))
-
-      try {
-        await Promise.all(promises)
-        this.send(`${this.name}:success`, { done: true })
-      } catch(err) {
-        this.send(`${this.name}:error`, { name: err.name, message: err.message, stack: err.stack })
-      }
+      })
     })
   }
 }

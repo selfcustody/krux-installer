@@ -55,7 +55,7 @@ export default class FlashHandler extends Handler {
 
       if (version.match(/selfcustody/g)) {
         version = version.split('tag/')[1]
-        cwd = join(resources, version, `krux-${version}`)
+        cwd = join(resources, `krux-${version}`)
       } else if (version.match(/odudex/g)) {
         version = join(version, 'main')
         cwd = join(resources, version)

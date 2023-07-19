@@ -49,8 +49,11 @@ import onKruxVerifyReleasesHash from './utils/onKruxVerifyReleasesHash';
 import onKruxVerifyReleaseSign from './utils/onKruxVerifyReleaseSign';
 import onKruxDownloadResourcesData from './utils/onKruxDownloadResourcesData';
 import onKruxCheckIfItWillFlashHandler from './utils/onKruxCheckIfItWillFlashHandler';
+import onKruxUnzip from './utils/onKruxUnzip';
 import onKruxFlash from './utils/onKruxFlash';
 import onKruxFlashData from './utils/onKruxFlashData';
+import onKruxUnzipData from './utils/onKruxUnzipData';
+
 
 /**
  * Reference for which component will be used as showing page
@@ -115,8 +118,10 @@ window.api.onSuccess('krux:check:will:flash', onKruxCheckIfItWillFlashHandler(da
 window.api.onSuccess('krux:download:resources', onKruxDownloadResources(data));
 window.api.onSuccess('krux:verify:releases:hash', onKruxVerifyReleasesHash(data));
 window.api.onSuccess('krux:verify:releases:sign', onKruxVerifyReleaseSign(data));
+window.api.onSuccess('krux:unzip', onKruxUnzip(data));
 window.api.onSuccess('krux:flash', onKruxFlash(data));
 window.api.onData('krux:download:resources', onKruxDownloadResourcesData(data));
+window.api.onData('krux:unzip', onKruxUnzipData(data));
 window.api.onData('krux:flash', onKruxFlashData(data));
 window.api.onError('krux:change:page', onError(data));
 window.api.onError('krux:store:get', onError(data));
@@ -126,6 +131,7 @@ window.api.onError('krux:verify:releases:fetch', onError(data));
 window.api.onError('krux:check:resource',onError(data));
 window.api.onError('krux:download:resources', onError(data));
 window.api.onError('krux:flash', onError(data));
+window.api.onError('krux:unzip', onError(data));
 
 /**
  * Mounted: when app starts,

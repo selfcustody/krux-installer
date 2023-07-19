@@ -1,43 +1,74 @@
 <template>
-  <v-card flat variant="plain">
-    <v-card-title>Succesfully Verified</v-card-title>
-    <v-card-actions>
-      <v-item-group>
-        <v-card-subtitle>Sha256 sum verification hash</v-card-subtitle>
-        <v-container>
-          <v-row>
-            <v-col v-for="(h, i) in hash">
-              <v-card-item>
-                <div class="console"> {{ h.name }} </div>
-                <div class="console-result"> {{ split2chars(h.value) }}</div>
-              </v-card-item>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              <v-card-subtitle>Openssl verification command </v-card-subtitle>
-              <v-card-item>
-                <div class="console"> $> {{ command }} </div>
-                <div class="console-result"> Output: {{ sign }} </div>
-                <v-btn
-                  variant="text"
-                  color="red"
-                  @click="backToFn"
-                >
-                  Back to main menu
-                </v-btn>
-              </v-card-item>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col>
-              
-            </v-col>
-          </v-row>
-        </v-container>
-      </v-item-group>
-    </v-card-actions>
-  </v-card>
+  <v-container>
+    <v-item-group>
+      <v-row>
+        <v-col>
+          <v-card
+            variant="plain"
+          >
+            <v-card-title>
+              Succesfully Verified
+            </v-card-title>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-card
+            variant="plain"
+          >
+            <v-card-subtitle>
+              Sha256 sum verification hash
+            </v-card-subtitle>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row
+         v-for="(h, i) in hash"
+         :key="i"
+      >
+        <v-col>
+          <v-card
+            variant="plain"
+          >
+            <v-card-subtitle>
+              {{ h.name }} 
+            </v-card-subtitle>
+            <v-card-text style="color: yellowgreen;">
+              {{ split2chars(h.value) }}
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-card
+            variant="plain"
+          >
+            <v-card-subtitle>
+              Openssl verification command
+            </v-card-subtitle>
+            <v-card-text style="color: yellowgreen;">
+              $> {{ command }} 
+            </v-card-text>
+            <v-card-text style="color: yellowgreen;">
+              Output: {{ sign }} 
+            </v-card-text>
+          </v-card>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <v-card
+            variant="outlined"
+            @click="backToFn"
+          >
+            Back
+          </v-card>
+        </v-col>
+      </v-row>
+    </v-item-group>
+  </v-container>
 </template>
 
 <style>
@@ -47,14 +78,6 @@
   text-align: left;
   background-color: black;
   color: yellowgreen;
-  height: 90px;
-}
-.console-result {
-  font-family: monospace;
-  font-size: 12px;
-  text-align: left;
-  background-color: black;
-  color: white;
   height: 90px;
 }
 </style>

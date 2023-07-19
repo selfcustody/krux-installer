@@ -2,101 +2,19 @@
 
 import { join } from 'path'
 import { createWriteStream } from 'fs'
-import { open } from 'yauzl'
+import { ZipFile, open } from 'yauzl'
 import { mkdirAsync } from './utils'
 import Handler from './handler'
 import ElectronStore from 'electron-store'
 
-/**
- * unzipAsync
- *
- * unzip the required .zip file selected in options.file
- * to a selected destination in options.destination
- *
- * @param handler
- * @param options
- */
-function unzipAsync (handler, options) {
+function openZipFile (filepath: string): Promise<ZipFile> {
   return new Promise(function (resolve, reject) {
-    const zipFilePath = join(options.destination, options.resource, options.file)
-
-    handler.log(`Opening ${zipFilePath}`)
-    open(zipFilePath, { lazyEntries: true }, function (err, zipfile) {
-      if (err) reject(err)
-      zipfile.readEntry()
-
-      const entries = []
-
-      // Each fileName should be added to entries array
-      // that will be returned to client application
-      // This event should extract each file to
-      // a destination folder defined in store
-      zipfile.on('entry', async function (entry) {
-        if (/\/$/.test(entry.fileName)) {
-          // Directory file names end with '/'.
-          // Note that entries for directories themselves are optional.
-          // An entry's fileName implicitly requires its parent directories to exist.
-          const folder = join(options.destination, options.resource, entry.fileName)
-          handler.log(`Creating ${folder}`)
-          await mkdirAsync(folder)
-          zipfile.readEntry();
-        } else {
-          handler.log(`Extracting ${entry.fileName}`)
-
-          // create the destination file
-          const writeStreamPath = join(options.destination, options.resource, entry.fileName)
-          const writeStream = createWriteStream(writeStreamPath)
-
-          // define some variables to calculate the
-          // percentege o extraction
-          const uncompressedSize = entry.uncompressedSize
-          let currentSize = 0
-
-          // reset progress on client
-          handler.send(`${handler.name}:data`, {
-            file: entry.fileName,
-            progress: 0
-          })
-
-          // put the names in array
-          entries.push(entry.fileName)
-
-          // extract it
-          zipfile.openReadStream(entry, function (entryError, readStream) {
-            if (entryError) reject(entryError)
-
-            readStream.on('data',function (chunk) {
-              currentSize += chunk.length
-              const percent = ((currentSize/uncompressedSize) * 100).toFixed(2)
-              handler.send(`${handler.name}:data`, {
-                file: entry.fileName,
-                progress: percent
-              })
-            })
-
-            readStream.on('end', function () {
-              handler.log(`Extracted to ${writeStreamPath}`)
-              zipfile.readEntry()
-            })
-
-            readStream.on('error', function (streamErr) {
-              reject(streamErr)
-            })
-
-            readStream.pipe(writeStream)
-          })
-        }
-      })
-
-      zipfile.on('end', function () {
-        zipfile.close()
-        handler.send(`${handler.name}:success`, entries)
-        resolve(entries)
-      })
-
-      zipfile.on('error', function(zipErr) {
-        reject(zipErr)
-      })
+    open(filepath, { lazyEntries: true }, function (err, zipfile) {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(zipfile)
+      }
     })
   })
 }
@@ -104,7 +22,7 @@ function unzipAsync (handler, options) {
 export default class UnzipResourceHandler extends Handler {
 
   constructor (win: Electron.BrowserWindow, storage: ElectronStore, ipcMain: Electron.IpcMain) {
-    super('krux:unzip:resource', win, storage, ipcMain)
+    super('krux:unzip', win, storage, ipcMain)
   }
 
   /**
@@ -114,22 +32,25 @@ export default class UnzipResourceHandler extends Handler {
    * @example
    * ```
    * // unzip in client
-   * // the $HOME/documents/krux-installer/v22.08.2/krux-v22.08.2.zip resource
+   * // the $HOME/{{ Documents folder }}/krux-installer/{{ latest-version }}/krux-{{ latest-version }}.zip resource
    * methods: {
    *  async check () {
-   *    await window.api.invoke('krux:unzip:resource', {
-   *      resource: 'v22.08.2',
-   *      file: 'krux-v22.08.2.zip'
-   *    })
+   *    await window.api.invoke('krux:unzip')
    * 
+        // When the invoked method was successfully invoked,
+   *    // it doesn't matter if it's true or false
+   *    window.api.onData('krux:unzip', function(_, message) {
+   *      // ... do something
+   *    }) 
+
    *    // When the invoked method was successfully invoked,
    *    // it doesn't matter if it's true or false
-   *    window.api.onSuccess('krux:unzip:resource', function(_, list) {
+   *    window.api.onSuccess('krux:unzip', function() {
    *      // ... do something
    *    }) 
    *  
    *    // When an error occurs
-   *    window.api.onError('krux:unzip:resource', function(_, error) {
+   *    window.api.onError('krux:unzip', function(_, error) {
    *      // ... do something
    *    }) 
    *  }
@@ -138,18 +59,120 @@ export default class UnzipResourceHandler extends Handler {
    * ```
    */
   build () {
-    super.build(async (_, options) =>{
+    super.build(async (_: Event) =>{
       try {
-        const destination = this.storage.get('resources') as string
-        this.log(`Extracting ${join(options.resource, options.file)}`)
-        await unzipAsync(this, {
-          resource: options.resource,
-          file: options.file,
-          destination: destination
-        })
+        // Only unzip if is a selfcustody version
+        let version = this.storage.get('version') as string;
+        if (version.match(/selfcustody.*/g)) {
+          const device = this.storage.get('device') as string;
+          const resources  = this.storage.get('resources') as string;
+          const os  = this.storage.get('os') as string;
+          const isMac10  = this.storage.get('isMac10') as boolean;
+          version = version.split('tag/')[1];
+          const zipFilePath = join(resources, version, `krux-${version}.zip`)
+          
+
+          this.send(`${this.name}:data`, `Extracting ${zipFilePath}<br/><br/>`)
+
+          const zipfile = await openZipFile(zipFilePath)
+          zipfile.readEntry()
+
+          // Each fileName should be added to entries array
+          // that will be returned to client application
+          // This event should extract each file to
+          // a destination folder defined in store
+          zipfile.on('entry', async (entry) => {
+
+            // Directory file names end with '/'.
+            // Note that entries for directories themselves are optional.
+            // An entry's fileName implicitly requires its parent directories to exist.
+            const onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
+            const deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
+            const deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)
+            const deviceKruxFirmwareBinSig = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin.sig$`)
+            const deviceKruxKboot = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/kboot.kfpkg$`)
+            let ktoolKrux = null
+
+            if (os === 'linux') ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-linux$/
+            if (os === 'darwin' && !isMac10) ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac$/
+            if (os === 'darwin' && isMac10) ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac-10$/
+            if (os === 'win32') ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-win\.exe$/
+
+            const destination = join(resources, entry.fileName)
+
+            if (/\/$/.test(entry.fileName)) {
+              
+              if (onlyRootKruxFolder.test(entry.fileName)) {
+                this.send(`${this.name}:data`, `Creating ${destination}<br/><br/>`)
+                await mkdirAsync(destination)
+              } else if (deviceKruxFolder.test(entry.fileName)) {
+                this.send(`${this.name}:data`, `Creating ${destination}<br/><br/>`)
+                await mkdirAsync(destination)
+              }
+              zipfile.readEntry();
+            } else {
+              
+              // (only extract device related files)
+              if (
+                deviceKruxFirmwareBin.test(destination) ||
+                deviceKruxFirmwareBinSig.test(destination) || 
+                deviceKruxKboot.test(destination) ||
+                ktoolKrux.test(destination)
+              ) {
+                
+                // create the destination file
+                const writeStream = createWriteStream(destination)
+
+                // define some variables to calculate the
+                // percentege o extraction
+                // const uncompressedSize = entry.uncompressedSize
+                // let currentSize = 0.0
+                // let percent = ((currentSize/uncompressedSize) * 100).toFixed(2)
+
+                this.send(`${this.name}:data`, `Extracting ${entry.fileName}...<br/><br/>`)
+
+                // extract it
+                zipfile.openReadStream(entry, (entryError, readStream) => {
+                  if (entryError) {
+                    this.send(`${this.name}:error`, { name: entryError.name, message: entryError.message, stack: entryError.stack })
+                  } else {
+                    // readStream.on('data', (chunk) => {
+                    //  currentSize += chunk.length
+                    //  const percent = ((currentSize/uncompressedSize) * 100).toFixed(2)
+                    //  this.send(`${this.name}:data`, `Extracting ${entry.fileName}: ${percent}%`)
+                    // })
+
+                    readStream.on('end', () => {
+                      this.send(`${this.name}:data`, `Extracted to ${destination}<br/><br/>`)
+                      zipfile.readEntry()
+                    })
+
+                    readStream.on('error', (streamErr) => {
+                      this.send(`${this.name}:error`, { name: streamErr.name, message: streamErr.message, stack: streamErr.stack })
+                    })
+
+                    readStream.pipe(writeStream)
+                  }
+                })
+              } else {
+                zipfile.readEntry()
+              }
+            }
+          })
+
+          zipfile.on('end', () => {
+            zipfile.close()
+            this.send(`${this.name}:success`, null)
+          })
+
+          zipfile.on('error', (zipErr) => {
+            this.send(`${this.name}:error`, { name: zipErr.name, message: zipErr.message, stack: zipErr.stack })
+          })
+        } else {
+          this.send(`${this.name}:success`, null)
+        }
       } catch (error) {
-        this.log(error)
-        this.send(`${this.name}:error`, error)
+        this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack })
       }
     })
   }

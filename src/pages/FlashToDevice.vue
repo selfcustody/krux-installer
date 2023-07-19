@@ -18,7 +18,12 @@
                 v-if="done"
                 @click="backToFn"
               >
-                Back
+                <v-card
+                  variant="outlined"
+                  @click="backToFn"
+                >
+                  Back
+                </v-card>
               </v-card-actions>
             </v-card>
           </v-item>
@@ -48,7 +53,7 @@ async function backToFn () {
 }
 
 onMounted(async function () {
-  await window.api.invoke('krux:flash') 
+  await window.api.invoke('krux:unzip')
 })
 
 watch(output, function(newValue) {

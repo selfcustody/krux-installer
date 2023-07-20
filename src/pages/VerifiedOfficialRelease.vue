@@ -7,19 +7,8 @@
             variant="plain"
           >
             <v-card-title>
-              Succesfully Verified
+              Sha256sum integrity
             </v-card-title>
-          </v-card>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <v-card
-            variant="plain"
-          >
-            <v-card-subtitle>
-              Sha256 sum verification hash
-            </v-card-subtitle>
           </v-card>
         </v-col>
       </v-row>
@@ -31,10 +20,8 @@
           <v-card
             variant="plain"
           >
-            <v-card-subtitle>
-              {{ h.name }} 
-            </v-card-subtitle>
-            <v-card-text style="color: yellowgreen;">
+            <v-card-text v-html="getSubtitleName(h.name)" />
+            <v-card-text class="text-center" style="color: red;">
               {{ split2chars(h.value) }}
             </v-card-text>
           </v-card>
@@ -45,14 +32,14 @@
           <v-card
             variant="plain"
           >
-            <v-card-subtitle>
-              Openssl verification command
-            </v-card-subtitle>
-            <v-card-text style="color: yellowgreen;">
-              $> {{ command }} 
-            </v-card-text>
-            <v-card-text style="color: yellowgreen;">
-              Output: {{ sign }} 
+            <v-card-title>
+              Signature authenticity
+            </v-card-title>
+            <v-card-text class="text-justify">
+              <span style="font-size: 13px; color: yellowgreen">$> {{ command }}</span>
+              <br/>
+              <br/>
+              <span style="font-size: 13px; color: red">{{ sign }}</span> 
             </v-card-text>
           </v-card>
         </v-col>
@@ -60,6 +47,7 @@
       <v-row>
         <v-col>
           <v-card
+            pa-2
             variant="outlined"
             @click="backToFn"
           >
@@ -101,6 +89,14 @@ const { hash, sign, command } = toRefs(props)
  */
 function split2chars(str: string): string {
   return (str.split(/(?=(?:..)*$)/)).join(' ')
+}
+
+function getSubtitleName(str: string) {
+  if (/^.*sha256.txt$/g.test(str)) {
+    return `Expected result from file <span style="color: yellowgreen;"> ${str} </span>`
+  } else {
+    return `Summed result of file <span style="color: yellowgreen;"> ${str} </span>`
+  }
 }
 
 async function backToFn () {

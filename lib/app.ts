@@ -32,7 +32,7 @@ export default class App extends Base {
    */
   private title: string;
 
-  constructor (title) {
+  constructor (title: string) {
     super('krux:app')
     this.title = title
     this.setupEnvironment()
@@ -125,7 +125,7 @@ export default class App extends Base {
       this.log('  no need for add')
     } else if (process.platform === 'darwin' ) {
       separator = ':'
-      const _env = process.env.PATH.split(separator)
+      const _env = (process.env.PATH as string).split(separator)
       if (_env.indexOf('/usr/local/opt/openssl/bin') === -1) {
         openssls.push('/usr/local/opt/openssl/bin')
       }
@@ -134,7 +134,7 @@ export default class App extends Base {
       }
     } else if (process.platform === 'win32') {
       separator = ';'
-      const _env = process.env.PATH.split(separator)
+      const _env = (process.env.PATH as string).split(separator)
       const vendor = join(__dirname, '..', 'extraResources', 'OpenSSL', 'bin') as string
       if (_env.indexOf(vendor) === -1) {
         openssls.push(vendor)
@@ -158,7 +158,6 @@ export default class App extends Base {
   public start (callback: any): void {
     app.on('window-all-closed', () => {
       console.log('All windows closed: quiting')
-      this.win = null
       if (process.platform !== 'darwin') app.quit()
     })
 

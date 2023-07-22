@@ -19,7 +19,7 @@ export default class Handler extends Base {
     this.ipcMain = ipcMain
   }
 
-  build (callback) {
+  build (callback: Function) {
     this.log(`building ipcMain.handle for '${this.name}'`)
     this.ipcMain.handle(`${this.name}`, async (_, options) => {
       await callback(options)

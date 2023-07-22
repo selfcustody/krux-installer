@@ -26,6 +26,30 @@
           "endsPattern": "^.*\\[ startup \\] KruxInstaller v.*$"
         }
       }
+    },
+    {
+      "label": "Before E2E",
+      "type": "shell",
+      "command": "node .vscode/.e2e.script.mjs",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "javascript",
+        "fileLocation": "relative",
+        "pattern": {
+          // TODO: correct "regexp"
+          "regexp": "^([a-zA-Z]\\:\/?([\\w\\-]\/?)+\\.\\w+):(\\d+):(\\d+): (ERROR|WARNING)\\: (.*)$",
+          "file": 1,
+          "line": 3,
+          "column": 4,
+          "code": 5,
+          "message": 6
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Execution of [0-9]+ workers started at.*$",
+          "endsPattern": "^.*INFO chromedriver: ChromeDriver was started successfully.$"
+        }
+      }
     }
   ]
 }

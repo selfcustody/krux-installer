@@ -20,34 +20,55 @@
       "DEBUG": "krux:*"
     }
   },
+  "e2e": {
+    "env": {
+      "TS_NODE_PROJECT": "./tsconfig.e2e.json",
+      "WDIO_ELECTRON": true
+    }
+  },
   "scripts": {
     "dev": "vue-tsc --noEmit && vite",
     "build": "vue-tsc --noEmit && vite build && electron-builder",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:init": "wdio run wdio.conf.js init"
   },
   "devDependencies": {
+    "@types/chai": "^4.3.5",
     "@types/command-exists": "^1.2.0",
     "@types/debug": "^4.1.7",
-    "@types/node": "^20.4.2",
+    "@types/node": "^20.4.3",
     "@vitejs/plugin-vue": "^4.1.0",
-    "electron": "^25.3.0",
+    "@wdio/cli": "^8.13.5",
+    "@wdio/globals": "^8.13.4",
+    "@wdio/local-runner": "^8.13.4",
+    "@wdio/mocha-framework": "^8.12.1",
+    "@wdio/spec-reporter": "^8.12.2",
+    "chai": "^4.3.7",
+    "chromedriver": "^114.0.3",
+    "electron": "^25.3.1",
     "electron-builder": "^24.4.0",
+    "electron-chromedriver": "^25.3.1",
+    "glob": "^10.3.3",
+    "rimraf": "^5.0.1",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
-    "vite": "^4.4.4",
+    "vite": "^4.4.6",
     "vite-plugin-electron": "^0.12.0",
     "vite-plugin-electron-renderer": "^0.14.1",
     "vue": "^3.2.47",
-    "vue-tsc": "^1.8.5"
+    "vue-tsc": "^1.8.6",
+    "wdio-electron-service": "^4.3.0"
   },
   "dependencies": {
     "@o/electron-sudo": "^2.8.23",
     "ansi_up": "^5.2.1",
     "axios": "^1.4.0",
     "command-exists": "^1.2.9",
+    "debug": "^4.3.4",
     "electron-store": "^8.1.0",
     "vite-plugin-vuetify": "^1.0.2",
     "vue-asciimorph": "^0.0.3",
-    "vuetify": "^3.3.8",
+    "vuetify": "^3.3.9",
     "yauzl": "^2.10.0"
   }
 }

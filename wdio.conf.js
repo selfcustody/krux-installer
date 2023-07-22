@@ -1,43 +1,52 @@
-const { join } = require('path');
+const { join } = require('path')
 const { exec } = require('child_process')
 const { access, readFileSync } = require('fs')
 const { glob } = require('glob')
 const { rimraf } = require('rimraf')
 const { tmpdir } = require('os')
-const electronVersion = require('./package.json').devDependencies.electron
+const createDebug = require('debug')
+const { devDependencies, version } = require('./package.json')
 
+const debug = createDebug('krux:wdio:e2e')
 
-const testSpecPaths = [ `${join(__dirname, 'test', 'specs', process.argv[4])}/*.ts` ]
-const excludeSpecPaths = []
+// test specs are organized by lifecycle steps;
+// each step is under a specific folder:
+// [1] - init: when app starts and need an initial configuration
+// [2] - main: the main page
+// [3] - select-device: the select-device step
+// [4] - select-version: the select-version step (this is the hardest step to configure or change)
+// [5] - flash: this step only covers the initial procedures, due the fact we will not be able to simulate a device
+const testSpecPaths = [ `${join(__dirname, 'test', 'e2e', 'specs', process.argv[4])}/*.ts` ]
 
-if (process.argv[5] === '--filter' && process.argv[6] !== '') {
-  const p = join(__dirname, 'test', 'specs', process.argv[4], process.argv[6])
-  excludeSpecPaths.push(p);
-}
+// Maybe its possible that, in the step [4], after downloads
+// some tests fail; if fail, we can just ignore the download test
+// and go to 'already downloaded' test step
+// const excludeSpecPaths = []
 
-/*
- if (testSpecPaths[0].match(/^.*sha256.*$/g)) {
-    excludeSpecPaths.push(`${join(__dirname, 'test', 'specs', process.argv[4])}/*.download-sha256-txt.spec.ts`)
-  }
-  if (testSpecPaths[0].match(/^.*sig.*$/g)) {
-    excludeSpecPaths.push(`${join(__dirname, 'test', 'specs', process.argv[4])}/*.download-sig.spec.ts`)
-  }
-  if (testSpecPaths[0].match(/^.*pem.*$/g)) {
-    excludeSpecPaths.push(`${join(__dirname, 'test', 'specs', process.argv[4])}/*.download-pem.spec.ts`)
-  }
-*/
-let APP_PATH
+// if (process.argv[5] === '--filter' && process.argv[6] !== '') {
+// const p = join(__dirname, 'test', 'e2e', 'specs', process.argv[4], process.argv[6])
+//  excludeSpecPaths.push(p);
+//}
+
+// Electron service and `onWorkerStart`
+// will need the full path of builded application
+// the first will be using during the tests and
+// the second to start application for initial setup
+let APP_PATH = ''
+const RELEASE_PATH = join(__dirname, 'release', version)
 
 if (process.platform === 'linux') {
-  APP_PATH = join(__dirname, 'dist_electron', 'linux-unpacked', 'krux-installer')
+  APP_PATH = join(RELEASE_PATH, 'linux-unpacked', 'krux-installer')
 } else if (process.platform === 'win32') {
-  APP_PATH = join(__dirname, 'dist_electron', 'win-unpacked', 'KruxInstaller.exe')
+  APP_PATH = join(RELEASE_PATH, 'win-unpacked', 'KruxInstaller.exe')
 } else if (process.platform === 'darwin') {
-  console.error(`Not implemented for ${process.platform}`)
-  process.exit(1)
+  APP_PATH = join(RELEASE_PATH, 'mac-unpacked', 'krux-installer')
+} else {
+  throw new Error(`Platform '${process.platform}' not suported`)
 }
 
-console.log(`Using ${APP_PATH} with electron v${electronVersion}`)
+debug(`Using ${APP_PATH} with electron v${devDependencies.electron}`)
+debug(`Running wdio with tests at ${testSpecPaths[0]}`)
 
 exports.config = {
     //
@@ -64,20 +73,20 @@ exports.config = {
     //
     specs: testSpecPaths,
     // Patterns to exclude.
-    exclude: excludeSpecPaths,
+    //exclude: excludeSpecPaths,
     // WebdriverIO will automatically detect if these dependencies are installed
     // and will compile your config and tests for you. Ensure to have a tsconfig.json
     // in the same directory as you WDIO config. If you need to configure how ts-node
     // runs please use the environment variables for ts-node or use wdio config's
     // autoCompileOpts section.
     autoCompileOpts: {
-      autoCompile: true,
-      tsNodeOpts: {
-        parserOptions: "@babel/eslint-parser",
-        transpileOnly: true,
-        files: true,
-        project: join(__dirname, 'tsconfig.json'),
-      },
+        autoCompile: true,
+        // see https://github.com/TypeStrong/ts-node#cli-and-programmatic-options
+        // for all available options
+        tsNodeOpts: {
+            transpileOnly: true,
+            project: './tsconfig.e2e.json'
+        }
     },
     //
     // ============
@@ -97,7 +106,7 @@ exports.config = {
     //
     maxInstances: 1,
     //
-    // If you have trouble getting all important capabilities together, check out the
+    // If you have trouble getting all constant capabilities together, check out the
     // Sauce Labs platform configurator - a great tool to configure your capabilities:
     // https://saucelabs.com/platform/platform-configurator
     //
@@ -178,7 +187,7 @@ exports.config = {
             port: 9519,
             logFileName: join(__dirname, 'wdio-chromedriver.log'),
           },
-          electronVersion: '24.1.2'
+          electronVersion: devDependencies.electron.split("^")[1]
         }
       ]
     ],
@@ -203,9 +212,6 @@ exports.config = {
     // The only one supported by default is 'dot'
     // see also: https://webdriver.io/docs/dot-reporter
     reporters: ['spec'],
-
-
-
     //
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
@@ -237,7 +243,6 @@ exports.config = {
      * @param  {[type]} args     object that will be merged with the main configuration once worker is initialized
      * @param  {[type]} execArgv list of string arguments passed to the worker process
      */
-    // eslint-disable-next-line no-unused-vars
     onWorkerStart: function (cid, caps, specs, args, execArgv) {
       // This is a little 'hacking'
       // the created 'krux-installer' process generated by
@@ -248,21 +253,25 @@ exports.config = {
       return new Promise(function(resolve, reject) {
         if (specs[0].indexOf('001.config.spec.ts') !== -1) {
           const shell = process.env.SHELL
-          console.log('------------------------------------')
-          console.log(`platform: ${process.platform}`)
-          console.log(`shell: ${shell}`)
-          console.log('INTERMEDIATE RUNNING TO CREATE STORE')
+          debug(`platform: ${process.platform}`)
+          debug(`shell: ${shell}`)
+          debug('INTERMEDIATE RUNNING TO CREATE STORE')
+          debug(`running ${APP_PATH}...`)
 
-          console.log(`exec \x1b[32m${APP_PATH}\x1b[0m`)
-
+          // Get the Process ID to stop it after exection
           const __process__ = exec(APP_PATH, function(err) {
             if (err) reject(err)
           })
 
-          console.log(`PID \x1b[33m${__process__.pid}\x1b[0m in execution`)
-          setTimeout(function() {
-            let config
+          debug(`PID ${__process__.pid} in execution`)
 
+          // Wait for some time, show the config file path
+          // and stop the process killing it providing it pid.
+          // Linux and darwin have similar ways to do this (`kill` command);
+          // on windows, we will use powershell `Stop-Process -Id` arg
+          // TODO: provide a cmd alternative on windows without powershell
+          setTimeout(function() {
+            let config = ''
             if (process.platform === 'linux') {
               config = join(process.env.HOME, '.config', 'krux-installer', 'config.json')
             } else if (process.platform === 'win32') {
@@ -271,25 +280,22 @@ exports.config = {
               config = join(process.env.HOME, 'Library', 'Application Support', 'krux-installer', 'config.json')
             }
 
-            // eslint-disable-next-line no-unused-vars
+            debug(`Config at ${config}`)
+
             access(config, function(error) {
               if (error) reject(error)
               const json = readFileSync(config, 'utf-8')
-              console.log(JSON.parse(json))
-              console.log(`killing process \x1b[33m${__process__.pid}\x1b[0m`)
-              console.log('DONE')
+              debug(JSON.parse(json))
+              debug(`killing process ${__process__.pid}`)
+              debug('DONE')
               if (process.platform === 'linux') {
                 exec(`kill ${__process__.pid}`, function(err) {
                   if (err) reject(err)
-                  console.log('------------------------------------')
-                  console.log('')
                   resolve()
                 })
               } else if (process.platform === 'win32' && shell === 'pwsh') {
                 exec(`Stop-Process -Id ${__process__.pid}`, function(err) {
                   if (err) reject(err)
-                  console.log('------------------------------------')
-                  console.log('')
                   resolve()
                 })
               }
@@ -373,51 +379,8 @@ exports.config = {
      * Hook that gets executed after the suite has ended
      * @param {Object} suite suite details
      */
-    // eslint-disable-next-line no-unused-vars
-    /*
-    afterSuite: async function (suite) {
-      let index = 0
-      const promises = []
-
-      /*
-      function createPromises(dir) {
-        dirs.forEach(function(dir) {
-          index += 1
-          promises.push(new Promise(function(res) {
-            setTimeout(res, 1000 * index)
-          }))
-          promises.push(new Promise(function(res) {
-            console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
-            rimraf(dir, { preserveRoot: false }, function() {
-              res()
-            })
-          }))
-        })
-      }i
-
-      function removing(dir) {
-        index += 1
-        promises.push(new Promise(function(res) {
-          setTimeout(res, 1000 * index)
-        }))
-        promises.push(new Promise(function(res) {
-          console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
-          rimraf(dir, { preserveRoot: false }, function() {
-            res()
-          })
-        }))
-      }
-
-      const tmp = tmpdir()
-      const yarnDir = join(tmp, 'yarn--*')
-      const lightDir = join(tmp, 'lighthouse.*')
-      const yarns = await glob(yarnDir)
-      const lights = await glob(lightDir)
-      yarns.map(removing)
-      lights.map(removing)
-
-      return Promise.all(promises)
-    },
+    //afterSuite: async function (suite) {
+    //},
     /**
      * Runs after a WebdriverIO command gets executed
      * @param {String} commandName hook command name
@@ -455,11 +418,14 @@ exports.config = {
     // eslint-disable-next-line no-unused-vars
     onComplete: async function(exitCode, config, capabilities, results) {
 
-      function removing(dir) {
-        console.log(`running \x1b[32mrm -rf\x1b[0m \x1b[33m${dir}\x1b[0m`)
-        rimraf(dir, { preserveRoot: false }, function() {
-          console.log(`  - ${dir} removed`)
-        })
+      async function removing(dir) {
+        debug(`running -rf ${dir}`)
+        try {
+          await rimraf(dir, { preserveRoot: false })
+          debug(`${dir} removed`)
+        } catch (error) {
+          debug(error)
+        }
       }
 
       const tmp = tmpdir()

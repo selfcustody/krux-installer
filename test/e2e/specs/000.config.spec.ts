@@ -1,6 +1,6 @@
 import { expect as expectChai } from 'chai'
 import createDebug from 'debug'
-import { version } from '../../../../package.json';
+import { version } from '../../../package.json';
 import {
   existsAsync,
   getAPI,
@@ -9,7 +9,7 @@ import {
   getConfigPath,
   getConfigString,
   getConfigObject
-} from '../../utils'
+} from '../utils'
 
 const debug = createDebug('krux:wdio:e2e:config')
 

@@ -4,9 +4,9 @@ import {
   isAppReady,
   getAppName,
   getAppVersion
-} from '../../utils'
-import { name, version } from '../../../../package.json'
-import App from '../../pageobjects/app.page'
+} from '../utils'
+import { name, version } from '../../../package.json'
+import App from '../pageobjects/app.page'
 
 describe('KruxInstaller initialization', () => {
 

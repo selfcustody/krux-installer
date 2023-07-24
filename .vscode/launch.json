@@ -22,8 +22,7 @@
       "name": "Test E2E App",
       "preLaunchTask": "Before E2E",
       "configurations": [
-        "Debug Main Process",
-        "Debug Renderer Process"
+        "Test E2E init"
       ],
       "presentation": {
         "hidden": false,
@@ -62,6 +61,22 @@
         // Skip files in host(VITE_DEV_SERVER_URL)
         "http://127.0.0.1:3344/**"
       ]
+    },
+    {
+      "name": "Test E2E init",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/wdio",
+      "windows": {
+        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/wdio.cmd"
+      },
+      "runtimeArgs": [
+        "--remote-debugging-port=9229",
+        "run",
+        "wdio.conf.ts"
+      ],
+      "envFile": "${workspaceFolder}/.vscode/.e2e.env",
+      "console": "integratedTerminal"
     }
   ]
 }

@@ -11,9 +11,10 @@
     "esModuleInterop": true,
     "lib": ["ESNext", "DOM"],
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": ["node"]
   },
-  "include": ["src"],
+  "include": ["src", "wdio.conf.ts"],
   "references": [
     { "path": "./tsconfig.node.json" },
     { "path": "./tsconfig.e2e.json" }

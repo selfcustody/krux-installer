@@ -1,14 +1,34 @@
 {
   "ts-node": {
     "compilerOptions": {
-      "module": "ES2020"
+      "module": "ESNext"
     }
   },
   "compilerOptions": {
-    "target": "ES2020",
+    "baseUrl": "./",
+    "composite": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "types": ["node", "mocha"],
+    "typeRoots": ["./node_modules/@types", "./node_modules/@wdio/types" ]
+  },
+  "include": ["package.json", "wdio.conf.ts",   "test/e2e/utils/", "test/e2e/pageobjects/", "test/e2e/specs/"]
+}
+
+/*{
+  "ts-node": {
+    "compilerOptions": {
+      "module": "ESNext"
+    }
+  },
+  "compilerOptions": {
+    "composite": true,
+    "target": "ESNext",
     "module": "ESNext",
     "baseUrl": "test/e2e",
-    "moduleResolution": "node",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "strict": true,
     "noUnusedLocals": true,
@@ -18,17 +38,16 @@
     "sourceMap": true,
     "allowSyntheticDefaultImports": true,
     "newLine": "lf",
-    "noEmitOnError": true,
-    "lib": ["DOM", "ES2020"],
+    "noEmitOnError": false,
+    "lib": ["DOM", "ESNext"],
     "noImplicitAny": true,
     "noUnusedParameters": false,
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": true,
-    "noEmit": true,
-    "types": ["node", "@wdio/global", "@wdio/types", "mocha", "webdriverio/async", "expect-webdriverio"],
+    "types": ["node", "@wdio/global/types", "@wdio/types", "mocha", "webdriverio/async", "expect-webdriverio"],
     "typeRoots": ["./node_modules/@types"]
   },
-  "include": ["**/*.ts"],
+  "include": ["/*.ts"],
   "exclude": ["node_modules"]
-}
+}*/

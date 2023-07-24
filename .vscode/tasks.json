@@ -6,7 +6,7 @@
     {
       "label": "Before Debug",
       "type": "shell",
-      "command": "node .vscode/.debug.script.mjs",
+      "command": "node .vscode/.script.mjs debug",
       "isBackground": true,
       "problemMatcher": {
         "owner": "typescript",
@@ -30,7 +30,7 @@
     {
       "label": "Before E2E",
       "type": "shell",
-      "command": "node .vscode/.e2e.script.mjs",
+      "command": "node .vscode/.script.mjs e2e",
       "isBackground": true,
       "problemMatcher": {
         "owner": "javascript",
@@ -46,8 +46,8 @@
         },
         "background": {
           "activeOnStart": true,
-          "beginsPattern": "^.*Execution of [0-9]+ workers started at.*$",
-          "endsPattern": "^.*INFO chromedriver: ChromeDriver was started successfully.$"
+          "beginsPattern": "^Creating *.env$",
+          "endsPattern": "^Running \"Testing E2E App\"$"
         }
       }
     }

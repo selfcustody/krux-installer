@@ -47,3 +47,19 @@ export async function getAppName (): Promise<string> {
 export async function getAppVersion (): Promise<string> {
   return await browser.electron.app('getVersion') as string
 }
+
+export function delay(ms: number): Promise<number> {
+  return new Promise((resolve) => {
+    return setTimeout(resolve, ms)
+  })
+}
+
+// Correct way to convert size in bytes to KB, MB, GB in JavaScript
+// https://gist.github.com/lanqy/5193417?permalink_comment_id=4225701#gistcomment-4225701
+export function formatBytes (bytes: number, aproximation: string ='floor') {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  if (bytes === 0) return 'n/a'
+  const i = Math.min(Math[aproximation](Math.log(bytes) / Math.log(1024)), sizes.length - 1)
+  if (i === 0) return `${bytes} ${sizes[i]}`
+  return `${(bytes / (1024 ** i)).toFixed(2)} ${sizes[i]}`
+}

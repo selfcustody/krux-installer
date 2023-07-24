@@ -30,7 +30,7 @@ export default class WdioTestHandler extends Handler {
    * Create `wdio-electron` and `wdio-electron.app` ipcMain handlers`
    */
   build (): void {
-    super.build(async (options: { from: string }) => {
+    super.build(async (options: any) => {
       try {
         if (process.env.WDIO_ELECTRON === undefined && process.env.WDIO_ELECTRON == 'true') {
           this.log(`building ipcMain.handle for ${this.name}`)

@@ -9,19 +9,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 
 // parse .script.mjs option to create an
 // appropriate .env file
-console.log(process.argv)
-const option = process.argv[2] 
+const option = process.argv[2]
 
-// write .<option>.env file
+// write .debug.env
+const envContent = Object.entries(pkg.vscode[option].env).map(([key, val]) => `${key}=${val}`)
+const envName = `.${option}.env`
+const envPath = path.join(__dirname, envName)
+console.log(`Creating ${envPath}`)
+fs.writeFileSync(envPath, envContent.join('\n'))
 
-const envContent = Object.entries(pkg.debug.env).map(([key, val]) => `${key}=${val}`)
-fs.writeFileSync(path.join(__dirname, '.e2e.env'), envContent.join('\n'))
+const runCommand = pkg.vscode[option].run.split(' ')
 
 // bootstrap
 spawn(
   // TODO: terminate `npm run dev` when Debug exits.
-  process.platform === 'win32' ? 'yarn.cmd' : 'yarn',
-  ['run', 'test:init'],
+  process.platform === 'win32' ? `${runCommand[0]}.cmd` : runCommand[0],
+  [runCommand[1], runCommand[2]],
   {
     stdio: 'inherit',
     env: Object.assign(process.env, { VSCODE_DEBUG: 'true' }),

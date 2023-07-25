@@ -1,9 +1,31 @@
 {
   "ts-node": {
     "compilerOptions": {
+      "transpileOnly": true,
       "module": "ESNext"
     }
   },
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "strict": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "esModuleInterop": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noEmit": true,
+    "types": ["node", "mocha"],
+    "typeRoots": ["./node_modules/@types", "./node_modules/@wdio/types" ]
+  },
+
+  "include": ["package.json", "wdio.conf.ts",   "test/**/*.ts"]
+}
+
+/*
   "compilerOptions": {
     "baseUrl": "./",
     "composite": true,
@@ -12,12 +34,9 @@
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "types": ["node", "mocha"],
-    "typeRoots": ["./node_modules/@types", "./node_modules/@wdio/types" ]
+    
   },
-  "include": ["package.json", "wdio.conf.ts",   "test/e2e/utils/", "test/e2e/pageobjects/", "test/e2e/specs/"]
-}
-
-/*{
+{
   "ts-node": {
     "compilerOptions": {
       "module": "ESNext"

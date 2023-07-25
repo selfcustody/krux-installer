@@ -1,11 +1,13 @@
 import { join } from 'path'
 import { access, readFile } from 'fs'
 import { promisify } from 'util'
-import { browser } from 'wdio-electron-service';
-import { name } from '../../../package.json';
+import { browser } from 'wdio-electron-service'
+import { createRequire } from 'node:module'
+
+const { name } = createRequire(import.meta.url)('../../../package.json')
 
 export const existsAsync = promisify(access)
-const readFileAsync = promisify(readFile)
+export const readFileAsync = promisify(readFile)
 
 export async function getAPI (): Promise<Record<string, any>> {
   return await browser.electron.api() as Record<string, any>

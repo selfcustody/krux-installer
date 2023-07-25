@@ -47,7 +47,7 @@
         "background": {
           "activeOnStart": true,
           "beginsPattern": "^Creating *.env$",
-          "endsPattern": "^Running \"Testing E2E App\"$"
+          "endsPattern": "^Running E2E$"
         }
       }
     }

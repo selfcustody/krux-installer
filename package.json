@@ -25,10 +25,11 @@
     },
     "e2e": {
       "env": {
-        "TS_NODE_PROJECT": "./tsconfig.json",
-        "WDIO_ELECTRON": true
+        "TS_NODE_PROJECT": "./tsconfig.e2e.json",
+        "WDIO_ELECTRON": true,
+        "DEBUG": "krux:*"
       },
-      "run": "echo Running \"Testing E2E App\""
+      "run": "echo Running E2E"
     }
   },
   "scripts": {

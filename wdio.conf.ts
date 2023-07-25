@@ -90,7 +90,6 @@ export const config = {
       // see https://github.com/TypeStrong/ts-node#cli-and-programmatic-options
       // for all available options
       tsNodeOpts: {
-        transpileOnly: true,
         project: './tsconfig.e2e.json'
       }
     },
@@ -142,7 +141,7 @@ export const config = {
     // Define all options that are relevant for the WebdriverIO instance here
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
-    logLevel: 'info',
+    logLevel: 'trace',
     //
     // Set specific log levels per logger
     // loggers:
@@ -224,8 +223,8 @@ export const config = {
     mochaOpts: {
         ui: 'bdd',
         timeout: 60000,
-        require: ['@babel/register']
-
+    //    presets: ["@babel/preset-env"],
+    //    require: ['@babel/register']
     },
     //
     // =====
@@ -267,7 +266,7 @@ export const config = {
           debug(`running ${APP_PATH}...`)
 
           // Get the Process ID to stop it after exection
-          const __process__ = exec(APP_PATH, function(err: Error) {
+          const __process__ = exec(APP_PATH, function(err) {
             if (err) reject(err)
           })
 
@@ -290,19 +289,19 @@ export const config = {
 
             debug(`Config at ${config}`)
 
-            access(config, function(error: Error) {
+            access(config, function(error) {
               if (error) reject(error)
               const json = readFileSync(config, 'utf-8')
               debug(JSON.parse(json))
               debug(`killing process ${__process__.pid}`)
               debug('DONE')
               if (process.platform === 'linux') {
-                exec(`kill ${__process__.pid}`, function(err: Error) {
+                exec(`kill ${__process__.pid}`, function(err) {
                   if (err) reject(err)
                   resolve()
                 })
               } else if (process.platform === 'win32' && shell === 'pwsh') {
-                exec(`Stop-Process -Id ${__process__.pid}`, function(err: Error) {
+                exec(`Stop-Process -Id ${__process__.pid}`, function(err) {
                   if (err) reject(err)
                   resolve()
                 })

@@ -14,9 +14,8 @@
     "noEmit": true,
     "types": ["node"]
   },
-  "include": ["src", "wdio.conf.ts"],
+  "include": ["src"],
   "references": [
-    { "path": "./tsconfig.node.json" },
-    { "path": "./tsconfig.e2e.json" }
+    { "path": "./tsconfig.node.json" }
   ]
 }

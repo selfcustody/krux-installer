@@ -66,14 +66,14 @@
       "name": "Test E2E init",
       "type": "node",
       "request": "launch",
-      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/wdio",
+      "runtimeExecutable": "yarn",
       "windows": {
-        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/wdio.cmd"
+        "runtimeExecutable": "yarn.cmd"
       },
       "runtimeArgs": [
         "--remote-debugging-port=9229",
         "run",
-        "wdio.conf.ts"
+        "e2e:init"
       ],
       "envFile": "${workspaceFolder}/.vscode/.e2e.env",
       "console": "integratedTerminal"

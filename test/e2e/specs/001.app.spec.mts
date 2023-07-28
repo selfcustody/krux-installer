@@ -1,3 +1,4 @@
+import { createRequire } from 'module'
 import { expect as expectChai } from 'chai'
 import { expect as expectWDIO } from '@wdio/globals'
 import {
@@ -5,8 +6,9 @@ import {
   getAppName,
   getAppVersion
 } from '../utils'
-import { name, version } from '../../../package.json'
-import App from '../pageobjects/app.page'
+
+const { name, version } = createRequire(import.meta.url)('../../../package.json')
+const { App } = createRequire(import.meta.url)('../pageobjects/app.page')
 
 describe('KruxInstaller initialization', () => {
 

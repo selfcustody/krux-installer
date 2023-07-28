@@ -3,6 +3,8 @@
 
 import ElectronStore from 'electron-store';
 import Handler from './handler'
+import { createRequire } from 'node:module'
+import electron, { app, BrowserWindow, dialog, ipcMain } from 'electron';
 
 /**
  * Extend `Base` class for initializing KruxInstaller storage,
@@ -31,42 +33,14 @@ export default class WdioTestHandler extends Handler {
    */
   build (): void {
     super.build(async (options: any) => {
-      try {
-        if (process.env.WDIO_ELECTRON === undefined && process.env.WDIO_ELECTRON == 'true') {
-          this.log(`building ipcMain.handle for ${this.name}`)
-          this.log('Configuring \'wdio-electron\' handler')
-
-          this.ipcMain.handle('wdio-electron', (_events, ...args) => {
-            return {
-              appData: this.app.getPath('appData'),
-              documents: this.app.getPath('documents')
-            }
-          })
-
-          this.log('Configuring \'wdio-electron.app\' handler')
-          this.ipcMain.handle('wdio-electron.app', (_event, propName, ...args) => {
-            return new Promise((resolve, reject) => {
-              if (!(this.app as any)[propName]) reject(`property or method ${propName} is not valid`)
-              try {
-                let result: any
-                if (typeof (this.app as any)[propName] === 'function') {
-                  result = (this.app as any)[propName].apply(this.app, Array.prototype.slice.call(args, 1))
-                  this.log(result)
-                } else {
-                  result = (this.app as any)[propName]
-                }
-                resolve(result)
-              } catch (error) {
-                reject(error)
-              }
-            })
-          })
-        } else {
-          this.log(`not building any ipcMain.handle for ${this.name}`)
+      this.log('Configuring \'wdio-electron\' handler')
+      createRequire(import.meta.url)('./node_modules/wdio-electron-service/main')
+      this.ipcMain.handle('wdio-electron', (_events, ...args) => {
+        return {
+          appData: this.app.getPath('appData'),
+          documents: this.app.getPath('documents')
         }
-      } catch (error) {
-        this.log(error as any)
-      }
+      })
     })
   }
 } 

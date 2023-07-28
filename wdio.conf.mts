@@ -1,19 +1,24 @@
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url';
-import { access, readFileSync } from 'fs'
+import { access, readFileSync, readdir } from 'fs'
+import { promisify } from'util'
 import { exec } from 'child_process'
 import { glob } from 'glob'
 import { rimraf } from 'rimraf'
 import { tmpdir } from 'os'
-import { createRequire } from 'node:module'
+import { createRequire } from 'module'
 import createDebug from 'debug'
 
 const { devDependencies, version } = createRequire(import.meta.url)('./package.json')
-
+const debug = createDebug('krux:wdio:e2e')
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const debug = createDebug('krux:wdio:e2e')
+// force WDIO_ELECTRON to be true
+if (!process.env.WDIO_ELECTRON || process.env.WDIO_ELECTRON !== 'true') {
+  debug('Force WDIO_ELECTRON=true')
+  process.env.WDIO_ELECTRON = 'true'
+}
 
 // test specs are organized by lifecycle steps;
 // each step is under a specific folder:
@@ -22,7 +27,18 @@ const debug = createDebug('krux:wdio:e2e')
 // [3] - select-device: the select-device step
 // [4] - select-version: the select-version step (this is the hardest step to configure or change)
 // [5] - flash: this step only covers the initial procedures, due the fact we will not be able to simulate a device
-const testSpecPaths = [ join(__dirname, 'test', 'e2e', 'specs', '*.ts') ]
+const readdirAsync = promisify(readdir)
+async function createSpecPaths () {
+  const __path__ = join('./test', 'e2e', 'specs')
+  const items = await readdirAsync(__path__)
+  const res = []
+  for(let i in items) {
+    const item = join(__path__, items[i])
+    res.push(item)
+  }
+  console.log(res)
+  return res
+}
 
 // Maybe its possible that, in the step [4], after downloads
 // some tests fail; if fail, we can just ignore the download test
@@ -51,9 +67,6 @@ if (process.platform === 'linux') {
   throw new Error(`Platform '${process.platform}' not suported`)
 }
 
-debug(`Using ${APP_PATH} with electron v${devDependencies.electron}`)
-debug(`Running wdio with tests at ${testSpecPaths[0]}`)
-
 export const config = {
     //
     // ====================
@@ -77,7 +90,7 @@ export const config = {
     // then the current working directory is where your `package.json` resides, so `wdio`
     // will be called from there.
     //
-    specs: testSpecPaths,
+    //specs: await createSpecPaths(),
     // Patterns to exclude.
     //exclude: excludeSpecPaths,
     // WebdriverIO will automatically detect if these dependencies are installed
@@ -90,7 +103,8 @@ export const config = {
       // see https://github.com/TypeStrong/ts-node#cli-and-programmatic-options
       // for all available options
       tsNodeOpts: {
-        project: './tsconfig.e2e.json'
+        project: './tsconfig.e2e.json',
+        transpileOnly: true,
       }
     },
     //
@@ -221,10 +235,9 @@ export const config = {
     // Options to be passed to Mocha.
     // See the full list at http://mochajs.org/
     mochaOpts: {
-        ui: 'bdd',
-        timeout: 60000,
-    //    presets: ["@babel/preset-env"],
-    //    require: ['@babel/register']
+      ui: 'bdd',
+      timeout: 60000,
+      require: ['node_modules/@babel/register/lib/index.js']
     },
     //
     // =====
@@ -239,8 +252,8 @@ export const config = {
      * @param {Object} config wdio configuration object
      * @param {Array.<Object>} capabilities list of capabilities details
      */
-    // onPrepare: function (config, capabilities) {
-    // },
+    //onPrepare: function (config, capabilities) {
+    //},
     /**
      * Gets executed before a worker process is spawned and can be used to initialise specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -426,7 +439,7 @@ export const config = {
     onComplete: async function(exitCode: number, config: Object, capabilities: Object[], results: Object) {
 
       async function removing(dir: string) {
-        debug(`running -rf ${dir}`)
+        debug(`Cleaning ${dir}`)
         try {
           await rimraf(dir, { preserveRoot: false })
           debug(`${dir} removed`)

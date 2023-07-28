@@ -14,8 +14,11 @@ export async function getAPI (): Promise<Record<string, any>> {
 }
 
 export async function getAppDataPath (): Promise<string> {
-  const api = await getAPI()
-  return api.appData
+  return await browser.electron.app('getPath', 'appData') as string
+}
+
+export async function getResourcesPath (): Promise<string> {
+  return await browser.electron.app('getPath', 'documents') as string
 }
 
 export async function getAppDataNamePath (): Promise<string> {

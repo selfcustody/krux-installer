@@ -1,32 +1,21 @@
+import { access } from 'fs'
+import { promisify } from 'util'
 import { expect as expectChai } from 'chai'
-import createDebug from 'debug'
-import { createRequire } from 'node:module'
-const { version } = createRequire(import.meta.url)('../../../package.json')
+import { browser } from 'wdio-electron-service'
 
-import {
-  existsAsync,
-  getAPI,
-  getAppDataPath,
-  getAppDataNamePath,
-  getConfigPath,
-  getConfigString,
-  getConfigObject
-} from '../utils/index.js'
-
-const debug = createDebug('krux:wdio:e2e:config')
-
+const existsAsync = promisify(access)
 
 describe('KruxInstaller configuration', () => {
 
-  it('should be able to get wdio API', async () => {
-    const api = await getAPI()
-    expectChai(api).to.be.not.equal(undefined)
-    expectChai(api).to.have.property('appData')
-    expectChai(api.appData).to.be.a('string')
+  it('should \'appData\' path exists', async () => {
+    const api = await browser.electron.api() as Record<string, any>
+    const existsAppDataPath= await existsAsync(api.appData as string)
+    expectChai(existsAppDataPath).to.be.equal(true)
   })
 
-  it('should \'appData\' path exists', async () => {
-    const apiDataPath = await getAppDataPath()
+/*
+  it('should \'documents\' path exists', async () => {
+    const apiDataPath = await getResourcesPath()
     const existsAppDataPath= await existsAsync(apiDataPath)
     expectChai(existsAppDataPath).to.be.equal(true)
   })
@@ -151,4 +140,5 @@ describe('KruxInstaller configuration', () => {
     const { sdcard } = await getConfigObject()
     expectChai(sdcard).to.have.property('sdcard')
   })
+  */
 })

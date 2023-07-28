@@ -1,6 +1,5 @@
-import { version } from '../../package.json'
+import { createRequire } from 'module'
 import App from '../../lib/app'
-import WdioTest from '../../lib/wdio-test'
 import Storage from '../../lib/storage'
 import ChangePageHandler from '../../lib/change-page'
 import DownloadResourcesHandler from '../../lib/download-resources'
@@ -15,6 +14,7 @@ import VerifyOpensslHandler from '../../lib/verify-openssl'
 import CheckIfItWillFlashHandler from '../../lib/check-if-it-will-flash'
 import FlashHandler from '../../lib/flash'
 
+const { version } = createRequire(import.meta.url)('../../package.json')
 const kruxInstaller = new App(`KruxInstaller | v${version}`)
 
 kruxInstaller.start(async ({ app, win, ipcMain}) => {
@@ -77,6 +77,9 @@ kruxInstaller.start(async ({ app, win, ipcMain}) => {
 
   // Create Wdio test handlers
   // if environment variable WDIO_ELECTRON equals 'true'
-  const wdioTest = new WdioTest(app, ipcMain)
-  wdioTest.build()
+  if (process.env.WDIO_ELECTRON !== undefined && process.env.WDIO_ELECTRON === 'true') {
+    const WdioTest = createRequire(import.meta.url)('../../lib/wdio-test')
+    const wdioTest = new WdioTest(app, ipcMain)
+    wdioTest.build()
+  }
 })

@@ -1,28 +1,24 @@
 {
-  "ts-node": {
-    "compilerOptions": {
-      "transpileOnly": true,
-      "module": "ESNext"
-    }
-  },
   "compilerOptions": {
-    "target": "ESNext",
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "strict": true,
-    "jsx": "preserve",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "esModuleInterop": true,
-    "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true,
-    "noEmit": true,
-    "types": ["node", "mocha"],
-    "typeRoots": ["./node_modules/@types", "./node_modules/@wdio/types" ]
+    "baseUrl": ".",
+    "module": "commonjs",
+    "types": ["node", "mocha", "wdio-electron-service", "@wdio/sync"]
   },
-
-  "include": ["package.json", "wdio.conf.ts",   "test/**/*.ts"]
+  "include": [
+    "package.json", 
+    "wdio.conf.mts",
+    "test/e2e/pageobjects/*.ts",
+    "test/e2e/utils/*.ts",
+    "test/e2e/specs/*.mts"
+  ],
+  "exclude": [
+    "src",
+    "lib",
+    "dist",
+    "dist-electron",
+    "node_modules",
+    "typings"
+  ]
 }
 
 /*

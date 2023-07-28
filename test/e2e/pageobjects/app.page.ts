@@ -10,8 +10,7 @@ class App extends Page {
     this.__app__ = '#app'
   }
 
-  get application () { 
-    // eslint-disable-next-line no-undef
+  get application () {
     return $(this.__app__)
   }
 

@@ -70,13 +70,13 @@ export default class App extends Base {
     // This warning only shows in development mode
     // Read more on https://www.electronjs.org/docs/latest/tutorial/security
     // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
-    const __envs__ = ['DIST', 'DIST_ELECTRON', 'PUBLIC', 'WDIO_ELECTRON', 'ELECTRON_DISABLE_SECURITY_WARNINGS']
+    const __envs__ = ['DIST', 'DIST_ELECTRON', 'PUBLIC', 'TEST', 'ELECTRON_DISABLE_SECURITY_WARNINGS']
     
     this.log('Application environment')
     this.log(`  DIST                              : ${process.env.DIST}`)
     this.log(`  DIST_ELECTRON                     : ${process.env.DIST_ELECTRON}`)
-    this.log(`  PUBLIC                            : ${process.env.PUBLIC}`)
-    this.log(`  WDIO_ELECTRON                     : ${process.env.WDIO_ELECTRON}`)
+    this.log(`  PUBLIC                            : ${process.env.PUBLIC}`) 
+    this.log(`  TEST                              : ${process.env.TEST}`)
     this.log(`  ELECTRON_DISABLE_SECURITY_WARNINGS: ${process.env.DIST}`)
   }
 

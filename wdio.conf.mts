@@ -9,6 +9,8 @@ import { tmpdir } from 'os'
 import { createRequire } from 'module'
 import createDebug from 'debug'
 
+process.env.TEST = true
+
 const { devDependencies, version } = createRequire(import.meta.url)('./package.json')
 const debug = createDebug('krux:wdio:e2e')
 const __filename = fileURLToPath(import.meta.url);
@@ -90,7 +92,12 @@ export const config = {
     // then the current working directory is where your `package.json` resides, so `wdio`
     // will be called from there.
     //
-    //specs: await createSpecPaths(),
+    specs: [
+      './test/e2e/specs/*.ts'
+    ],
+    //featureFlags: {
+    //  specFiltering: true  
+    //},
     // Patterns to exclude.
     //exclude: excludeSpecPaths,
     // WebdriverIO will automatically detect if these dependencies are installed
@@ -137,7 +144,7 @@ export const config = {
         //browserName: 'chrome',
         //acceptInsecureCerts: true
         //'goog:chromeOptions': {
-        //  args: ['no-sandbox', 'headless']
+        //  args: ['no-sandbox']
         //}
         //  prefs: {
         //    enable_do_not_track: true

@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+const { $ } = require('@wdio/globals')
 
 export default class Page {
 

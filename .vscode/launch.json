@@ -73,7 +73,7 @@
       "runtimeArgs": [
         "--remote-debugging-port=9229",
         "run",
-        "e2e:init"
+        "e2e"
       ],
       "envFile": "${workspaceFolder}/.vscode/.e2e.env",
       "console": "integratedTerminal"

@@ -1,5 +1,5 @@
-import { $ } from '@wdio/globals'
-import Page from './page'
+
+const Page = require('./page')
 
 class App extends Page {
 
@@ -16,4 +16,4 @@ class App extends Page {
 
 }
 
-export default new App()
+module.exports = App

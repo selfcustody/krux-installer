@@ -1,68 +1,38 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "module": "commonjs",
-    "types": ["node", "mocha", "wdio-electron-service", "@wdio/sync"]
-  },
-  "include": [
-    "package.json", 
-    "wdio.conf.mts",
-    "test/e2e/pageobjects/*.ts",
-    "test/e2e/utils/*.ts",
-    "test/e2e/specs/*.mts"
-  ],
-  "exclude": [
-    "src",
-    "lib",
-    "dist",
-    "dist-electron",
-    "node_modules",
-    "typings"
-  ]
-}
-
-/*
-  "compilerOptions": {
-    "baseUrl": "./",
-    "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "types": ["node", "mocha"],
-    
-  },
-{
-  "ts-node": {
-    "compilerOptions": {
-      "module": "ESNext"
-    }
-  },
-  "compilerOptions": {
-    "composite": true,
-    "target": "ESNext",
-    "module": "ESNext",
     "baseUrl": "test/e2e",
-    "moduleResolution": "Node",
-    "esModuleInterop": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noFallthroughCasesInSwitch": true,
-    "noImplicitReturns": true,
-    "inlineSources": true,
-    "sourceMap": true,
+    "target": "ES6",
+    "module": "commonjs", 
     "allowSyntheticDefaultImports": true,
     "newLine": "lf",
     "noEmitOnError": false,
-    "lib": ["DOM", "ESNext"],
+    "lib": ["DOM", "ES6"],
     "noImplicitAny": true,
     "noUnusedParameters": false,
     "resolveJsonModule": true,
     "allowJs": true,
     "checkJs": true,
-    "types": ["node", "@wdio/global/types", "@wdio/types", "mocha", "webdriverio/async", "expect-webdriverio"],
-    "typeRoots": ["./node_modules/@types"]
-  },
-  "include": ["/*.ts"],
-  "exclude": ["node_modules"]
-}*/
+    //"types": [
+    //  "node",
+    //  "mocha", 
+    //  "@types/mocha"
+      //"@wdio/global/types",
+      //"@wdio/types",
+      //"webdriverio/async",
+      //"expect-webdriverio"
+    //],
+    "lib": ["ESNext", "DOM"]
+    "include": [
+      "package.json", 
+      "wdio.conf.mts",
+      "test/**/*.ts"
+    ],
+    "exclude": [
+      "src",
+      "lib",
+      "dist",
+      "dist-electron",
+      "typings"
+  ]
+  }
+}

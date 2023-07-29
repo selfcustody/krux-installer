@@ -1,59 +1,52 @@
-import { join } from 'path'
-import { access, readFile } from 'fs'
-import { promisify } from 'util'
-import { browser } from 'wdio-electron-service'
-import { createRequire } from 'node:module'
+const { join } = require('path')
+const { readFile } = require('fs/promises')
+const { browser } = require('@wdio/globals')
 
-const { name } = createRequire(import.meta.url)('../../../package.json')
-
-export const existsAsync = promisify(access)
-export const readFileAsync = promisify(readFile)
-
-export async function getAPI (): Promise<Record<string, any>> {
+exports.getAPI = async function(): Promise<Record<string, any>> {
   return await browser.electron.api() as Record<string, any>
 }
 
-export async function getAppDataPath (): Promise<string> {
+exports.getAppDataPath = async function (): Promise<string> {
   return await browser.electron.app('getPath', 'appData') as string
 }
 
-export async function getResourcesPath (): Promise<string> {
+exports.getResourcesPath = async function (): Promise<string> {
   return await browser.electron.app('getPath', 'documents') as string
 }
 
-export async function getAppDataNamePath (): Promise<string> {
-  const api = await getAPI()
-  return join(api.appData, name)
+exports.getAppDataNamePath = async function (): Promise<string> {
+  const api = await exports.getAPI()
+  return join(api.appData, pkg.name)
 }
 
-export async function getConfigPath (): Promise<string> {
-  const appDataNamePath = await getAppDataNamePath()
+exports.getConfigPath = async function (): Promise<string> {
+  const appDataNamePath = await exports.appDataNamePath()
   return join(appDataNamePath, 'config.json')
 }
 
-export async function getConfigString (): Promise<string> {
-  const configPath = await getConfigPath()
-  return await readFileAsync(configPath, 'utf8')
+exports.getConfigString = async function (): Promise<string> {
+  const configPath = await exports.getConfigPath()
+  return await readFile(configPath, 'utf8')
 }
 
-export async function getConfigObject (): Promise<Record<string, any>> {
-  const configString = await getConfigString()
+exports.getConfigObject = async function (): Promise<Record<string, any>> {
+  const configString = await exports.getConfigString()
   return JSON.parse(configString)
 }
 
-export async function isAppReady (): Promise<boolean> {
+exports.isAppReady = async function (): Promise<boolean> {
   return await browser.electron.app('isReady') as boolean
 }
 
-export async function getAppName (): Promise<string> {
+exports.getAppName = async function (): Promise<string> {
   return await browser.electron.app('getName') as string
 }
 
-export async function getAppVersion (): Promise<string> {
+exports.getAppVersion = async function  (): Promise<string> {
   return await browser.electron.app('getVersion') as string
 }
 
-export function delay(ms: number): Promise<number> {
+exports.delay = function (ms: number): Promise<number> {
   return new Promise((resolve) => {
     return setTimeout(resolve, ms)
   })
@@ -61,10 +54,11 @@ export function delay(ms: number): Promise<number> {
 
 // Correct way to convert size in bytes to KB, MB, GB in JavaScript
 // https://gist.github.com/lanqy/5193417?permalink_comment_id=4225701#gistcomment-4225701
-export function formatBytes (bytes: number, aproximation: string ='floor') {
+exports.formatBytes = function (bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
   if (bytes === 0) return 'n/a'
-  const i = Math.min(Math[aproximation](Math.log(bytes) / Math.log(1024)), sizes.length - 1)
+  const n = Math.log(bytes as number) / Math.log(1024)
+  const i = Math.min(Math.floor(n), sizes.length - 1)
   if (i === 0) return `${bytes} ${sizes[i]}`
-  return `${(bytes / (1024 ** i)).toFixed(2)} ${sizes[i]}`
+  return `${(bytes / (1024 ** i)).toFixed(2)} ${sizes[i]}` as string
 }

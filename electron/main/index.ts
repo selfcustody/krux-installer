@@ -77,9 +77,25 @@ kruxInstaller.start(async ({ app, win, ipcMain}) => {
 
   // Create Wdio test handlers
   // if environment variable WDIO_ELECTRON equals 'true'
-  if (process.env.WDIO_ELECTRON !== undefined && process.env.WDIO_ELECTRON === 'true') {
-    const WdioTest = createRequire(import.meta.url)('../../lib/wdio-test')
-    const wdioTest = new WdioTest(app, ipcMain)
-    wdioTest.build()
+  if (process.env.TEST === 'true') {
+    win.webContents.send('building ipcMain.handle for \'wdio-electron.app\'') 
+    ipcMain.handle('wdio-electron.app', (_event, funcName, ...args) => {
+      const appProp = app[funcName];
+      if (typeof appProp === 'function') {
+        return appProp.apply(app, args);
+      }
+      return appProp;
+    });
+
+    win.webContents.send('building ipcMain.handle for \'wdio-electron\'') 
+    ipcMain.handle('wdio-electron', (_events, ...args) => {
+      return {
+        appData: app.getPath('appData'),
+        documents: app.getPath('documents')
+      }
+    })
+  } else { 
+    win.webContents.send("skip build ipcMain.handle for 'wdio-electron.app'")  
+    win.webContents.send("skip build ipcMain.handle for 'wdio-electron'") 
   }
 })

@@ -1,11 +1,9 @@
 /// <reference path="../typings/index.d.ts"/>
 /// <reference path="../node_modules/electron-store/index.d.ts" />
+/// <reference path="../node_modules/wdio-electron-service/dist/main.d.ts" />
 
-import ElectronStore from 'electron-store';
-import Handler from './handler'
-import { createRequire } from 'node:module'
-import electron, { app, BrowserWindow, dialog, ipcMain } from 'electron';
-
+import Base from './base'
+import electron, { BrowserWindow, dialog } from 'electron';
 /**
  * Extend `Base` class for initializing KruxInstaller storage,
  * assigning `krux:wdio:e2e` to `name` property. 
@@ -19,28 +17,21 @@ import electron, { app, BrowserWindow, dialog, ipcMain } from 'electron';
  * 
  * @see Electron.IpcMain
  */
-export default class WdioTestHandler extends Handler {
+export default class WdioTestHandler extends Base {
       
   protected app: Electron.App;
+  protected ipcMain: Electron.IpcMain;
 
-  constructor (app: Electron.App, win: Electron.BrowserWindow, storage: ElectronStore, ipcMain: Electron.IpcMain) {
-    super('krux:wdio:e2e', win, storage, ipcMain);
+  constructor (app: Electron.App, ipcMain: Electron.IpcMain) {
+    super('krux:wdio:e2e');
     this.app = app
+    this.ipcMain = ipcMain
   }
 
   /*
    * Create `wdio-electron` and `wdio-electron.app` ipcMain handlers`
    */
   build (): void {
-    super.build(async (options: any) => {
-      this.log('Configuring \'wdio-electron\' handler')
-      createRequire(import.meta.url)('./node_modules/wdio-electron-service/main')
-      this.ipcMain.handle('wdio-electron', (_events, ...args) => {
-        return {
-          appData: this.app.getPath('appData'),
-          documents: this.app.getPath('documents')
-        }
-      })
-    })
+    
   }
-} 
+}

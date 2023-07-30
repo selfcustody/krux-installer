@@ -1,0 +1,51 @@
+name: E2E test electron application on linux
+
+on:
+  workflow_call:
+
+jobs:
+
+  test-linux:
+    runs-on: ubuntu-latest
+  
+    steps:
+
+      - name: Checkout Git repository
+        uses: actions/checkout@v3
+
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Variables helpers
+        id: setup
+        run: |
+          KRUX_VERSION=`node -e "console.log(require('./package.json').version)"`
+          echo "app-version=$KRUX_VERSION" >> $GITHUB_OUTPUT
+          KRUX_NAME=krux-installer-$KRUX_VERSION
+          echo "app-name=$KRUX_NAME" >> $GITHUB_OUTPUT
+          echo "::group::Variables"
+          echo "app-version=$KRUX_VERSION"
+          echo "app-name=$KRUX_NAME"
+          echo "::endgroup::"
+
+      - name: Restore cache build
+        id: restore-cache-build
+        uses: actions/cache/restore@v3 
+        with:
+          path: |
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.AppImage
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.AppImage.sha256.txt
+            release/${{ steps.setup.outputs.app-version }}/linux-unpacked
+          key: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-AppImage-${{ hashFiles('dist-electron/**') }}
+
+      - name: Install dependencies 
+        run: | 
+          yarn install
+          yarn add --dev xvfb-maybe
+
+      - name: E2E test electron app
+        if: ${{ steps.restore-cache-build.outputs.cache-hit != 'true' }}
+        shell: bash
+        run: ./node_modules/.bin/xvfb-maybe ./node_modules/.bin/wdio run wdio.conf.mts

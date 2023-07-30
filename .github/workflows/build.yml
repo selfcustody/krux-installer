@@ -2,46 +2,31 @@ name: Build
 
 on:
   push:
-    branches: [main]
+    branches: 
+      - main
+      - new-ui
     paths-ignore:
       - "**.md"
-      - "**.spec.js"
+      #- "**.spec.js"
       - ".idea"
       - ".vscode"
       - ".dockerignore"
       - "Dockerfile"
-      - ".gitignore"
-      - ".github/**"
-      - "!.github/workflows/build.yml"
+      #- ".gitignore"
+      #- ".github/**"
+      #- "!.github/workflows/build.yml"
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
 
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+  build-linux-appimage:
+    uses: ./.github/workflows/build-linux-appimage.yml
+    secrets: 
+      token: ${{ secrets.github_token }}
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
+  test-linux:
+    needs: build-linux-appimage
+    uses: ./.github/workflows/test-linux.yml
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build Release Files
-        run: npm run build
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: release_on_${{ matrix. os }}
-          path: release/
-          retention-days: 5
+  upload-linux-appimage:
+    needs: test-linux
+    uses: ./.github/workflows/upload-linux-appimage.yml

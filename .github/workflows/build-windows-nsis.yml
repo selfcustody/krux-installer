@@ -1,0 +1,177 @@
+name: Build electron application on windows
+
+on:
+  workflow_call:
+    secrets:
+      token:
+        required: true
+    
+jobs:
+  build-win:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Git repository
+        uses: actions/checkout@v3
+ 
+      - name: Install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Variables helpers 
+        id: setup
+        shell: pwsh
+        run: |
+          $loc = Get-Location
+          $firmware_version = "v22.08.2"
+          $zipname = "krux-$firmware_version.zip"
+          $signame = "krux-$firmware_version.zip.sig"
+          $pemname = "selfcustody.pem"
+          $extraResources = "$loc\extraResources"
+          $opensslVersion = "3.1.1"
+          $release_url = "https://github.com/selfcustody/krux/releases/download"
+          $raw_url = "https://raw.githubusercontent.com/selfcustody/krux/main"
+          $app_version = node -e "console.log(require('./package.json').version)"
+          $pre_app_name = node -e "console.log(require('./package.json').name)"
+          $app_name=$pre_app_name + "_" + $app_version
+          echo "app-version=$app_version" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "app-name=$app_name" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "zip-file=$loc\$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
+          echo "sig-file=$loc\$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "pem-file=$loc\$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "release-zip=$release_url/$firmware_version/$zipname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "release-sig=$release_url/$firmware_version/$signame" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "release-pem=$raw_url/$pemname" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "extra-resources=$extraResources" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "openssl-version=$opensslVersion" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "openssl-build-dir=$loc\openssl" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "openssl-prefix=$extraResources\OpenSSL" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append  
+          echo "openssl-dir=$extraResources\OpenSSL\CommonFiles" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "openssl-bin=$prefix\bin\openssl.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "::group::Variables" 
+          echo "app-version=$app_version"
+          echo "app-name=$app_name"
+          echo "zip-file=$loc\$zipname"  
+          echo "sig-file=$loc\$signame" 
+          echo "pem-file=$loc\$pemname" 
+          echo "release-zip=$release_url/$firmware_version/$zipname" 
+          echo "release-sig=$release_url/$firmware_version/$signame"
+          echo "release-pem=$raw_url/$pemname"
+          echo "extra-resources=$extraResources"
+          echo "openssl-version=$opensslVersion"
+          echo "openssl-build-dir=$loc\openssl"
+          echo "openssl-prefix=$extraResources\OpenSSL"  
+          echo "openssl-dir=$extraResources\OpenSSL\CommonFiles"
+          echo "openssl-bin=$prefix\bin\openssl.exe"
+          echo "::endgroup::"
+
+      - name: Restore OpenSSL build
+        id: restore-cache-extra 
+        uses: actions/cache/restore@v3 
+        with:
+          path: ${{ steps.setup.outputs.extra-resources }}
+          key: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-openssl-${{ steps.setup.outputs.openssl-version }}
+
+      - name: Create extraResources directory for OpenSSL build
+        if: ${{ steps.restore-cache-extra.outputs.cache-hit != 'true' }}
+        shell: pwsh
+        run: |
+          $exists=Test-Path -Path ${{ steps.setup.outputs.extra-resources }}
+          if(!$exists) { New-Item -ItemType directory -Path ${{ steps.setup.outputs.extra-resources }} }
+
+      - name: Configure, build, test and install OpenSSL 
+        if: ${{ steps.restore-cache-extra.outputs.cache-hit != 'true' }}
+        uses: qlrd/compile-openssl-windows-action@v0.0.2
+        with:
+          build-type: 'plain'
+          version: openssl-${{ steps.setup.outputs.openssl-version }}
+          prefix: ${{ steps.setup.outputs.openssl-prefix }}
+          openssldir: ${{ steps.setup.outputs.openssl-dir }}
+
+      - name: Download krux's release firmware zip file for pre-test
+        if: ${{ steps.restore-cache-extra.outputs.cache-hit != 'true' }}
+        shell: cmd
+        run: curl.exe -L ${{ steps.setup.outputs.release-zip }} -o ${{ steps.setup.outputs.zip-file }}
+    
+      - name: Download krux's release firmware signature file for pre-test
+        if: ${{ steps.restore-cache-extra.outputs.cache-hit != 'true' }}
+        shell: cmd
+        run: curl.exe -L ${{ steps.setup.outputs.release-sig }} -o ${{ steps.setup.outputs.sig-file }}
+
+      - name: Download selfcustody's public key certificate for pre-test
+        if: ${{ steps.restore-cache-extra.outputs.cache-hit != 'true' }}
+        shell: cmd
+        run: |
+          curl.exe -L -H "Accept-Charset: utf-8" ${{ steps.setup.outputs.release-pem }} -o ${{ steps.setup.outputs.pem-file }}
+
+      - name: Pre-test built-in OpenSSL
+        if: ${{ steps.restore-cache-extra.outputs.cache-hit != 'true' }}
+        shell: cmd 
+        run: >
+          ${{ steps.setup.outputs.openssl-prefix }}${{ steps.setup.outputs.openssl-bin }} sha256 <${{ steps.setup.outputs.zip-file }} -binary | 
+          ${{ steps.setup.outputs.openssl-prefix }}${{ steps.setup.outputs.openssl-bin }} pkeyutl -verify -pubin
+          -inkey ${{ steps.setup.outputs.pem-file }}
+          -sigfile ${{ steps.setup.outputs.sig-file }}
+   
+      - name: Save cached built-in OpenSSL
+        if: ${{ steps.restore-cache-extra.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v3  
+        with:
+          path: ${{ steps.setup.outputs.extra-resources }}
+          key: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-openssl-${{ steps.setup.outputs.openssl-version }}
+
+      - name: Install dependencies 
+        shell: pwsh
+        run: yarn.cmd install
+
+      - name: Install chromedriver.exe
+        shell: pwsh
+        run: |
+          $url = "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_win32.zip"
+          $tmp_path = ".\chromedriver_win32.zip"
+          $dest_path = "node_modules\chromedriver\bin"
+          Invoke-WebRequest -Uri $url -OutFile $tmp_path
+          Expand-Archive -LiteralPath $tmp_path -DestinationPath $dest_path
+
+      - name: List chromedriver binaries
+        shell: pwsh
+        run: ls node_modules\chromedriver\bin
+      
+      - name: Build electron app
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ secrets.token }}
+        run: yarn.cmd run build --win nsis
+
+      - name: Hash electron app
+        uses: qlrd/sha256sum-action@v2
+        with:
+          working-directory: release/${{ steps.setup.outputs.app-version }}
+          file: ${{ steps.setup.outputs.app-name }}.exe
+          ext: sha256.txt
+
+      - name: List release files
+        shell: pwsh
+        run: |
+          echo "::group::Release files"
+          ls release/${{ steps.setup.outputs.app-version }}
+          echo "::endgroup::"
+          echo "::group::Win Unpacked files"
+          ls release/${{ steps.setup.outputs.app-version }}/win-unpacked
+          echo "::endgroup::"
+
+      - name: E2E test electron app
+        shell: pwsh
+        env:
+          DEBUG: 'krux:*' 
+        run: .\node_modules\.bin\wdio.cmd run wdio.conf.mts
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ runner.os}}-${{ steps.setup.outputs.app-name }}-Nsis
+          retention-days: 5
+          path: |
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.exe 
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.exe.sha256.txt

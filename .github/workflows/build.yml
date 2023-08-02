@@ -23,10 +23,7 @@ jobs:
     secrets: 
       token: ${{ secrets.github_token }}
 
-  test-linux:
-    needs: build-linux-appimage
-    uses: ./.github/workflows/test-linux.yml
-
-  upload-linux-appimage:
-    needs: test-linux
-    uses: ./.github/workflows/upload-linux-appimage.yml
+  build-windows-nsis:
+    uses: ./.github/workflows/build-windows-nsis.yml 
+    secrets: 
+      token: ${{ secrets.github_token }}

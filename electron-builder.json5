@@ -12,6 +12,9 @@
     "dist-electron",
     "dist"
   ],
+  "extraResources": [
+    "extraResources"
+  ],
   "mac": {
     "artifactName": "${productName}_${version}.${ext}",
     "target": [

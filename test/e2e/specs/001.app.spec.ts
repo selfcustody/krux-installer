@@ -8,7 +8,7 @@ const {
   getAppVersion
 } = require('../utils')
 
-const $ = require('@wdio/globals').$
+const App = require('../pageobjects/app.page')
 const pkg = require('../../../package.json')
 
 describe('KruxInstaller initialization', () => {
@@ -28,8 +28,9 @@ describe('KruxInstaller initialization', () => {
     expectChai(__version__).to.be.equal(pkg.version)
   })
 
-  it('should launch with correct title', async () => { 
-    const title = $('title')
-    await expectWDIO(title).toHaveText(`KruxInstaller v${pkg.version}`)
+  it('should launch correctly', async () => { 
+    const instance = new App()
+    await instance.app.waitForExist({ timeout: 5000 })
+    await instance.main.waitForExist({ timeout: 5000 })
   })
 })

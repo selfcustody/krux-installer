@@ -33,29 +33,15 @@ jobs:
           echo "app-name=$KRUX_NAME"
           echo "::endgroup::"
 
-      - name: Restore cache build
-        id: restore-cache-build
-        uses: actions/cache/restore@v3 
-        with:
-          path: |
-            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.AppImage
-            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.AppImage.sha256.txt
-            release/${{ steps.setup.outputs.app-version }}/linux-unpacked
-          key: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-AppImage-${{ hashFiles('dist-electron/**') }}
-
       - name: Install dependencies 
-        if: ${{ steps.restore-cache-build.outputs.cache-hit != 'true' }}
         run: yarn install
 
       - name: Build electron app
-        if: ${{ steps.restore-cache-build.outputs.cache-hit != 'true' }}
-        shell: bash
         env:
           GH_TOKEN: ${{ secrets.token }}
         run: yarn run build --linux AppImage
 
       - name: Hash electron app (Linux)
-        if: ${{ steps.restore-cache-build.outputs.cache-hit != 'true' }}
         uses: qlrd/sha256sum-action@v2
         with:
           working-directory: ./release/${{ steps.setup.outputs.app-version }}
@@ -68,12 +54,19 @@ jobs:
           ls -la release/${{ steps.setup.outputs.app-version }}
           echo "::endgroup::"
 
-      - name: Save cache build
-        if: ${{ steps.restore-cache-build.outputs.cache-hit != 'true' }}
-        uses: actions/cache/save@v3
+      - name: Install xvfb-maybe to allow headless test
+        run: yarn add --dev xvfb-maybe
+
+      - name: E2E test electron app
+        env:
+          DEBUG: 'krux:*'
+        run: ./node_modules/.bin/xvfb-maybe ./node_modules/.bin/wdio run wdio.conf.mts
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
         with:
+          name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-AppImage
+          retention-days: 5
           path: |
             release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.AppImage
             release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.AppImage.sha256.txt
-            release/${{ steps.setup.outputs.app-version }}/linux-unpacked
-          key: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-AppImage-${{ hashFiles('dist-electron/**') }}

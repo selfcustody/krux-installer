@@ -22,49 +22,29 @@ if (!process.env.WDIO_ELECTRON || process.env.WDIO_ELECTRON !== 'true') {
   process.env.WDIO_ELECTRON = 'true'
 }
 
-// test specs are organized by lifecycle steps;
-// each step is under a specific folder:
-// [1] - init: when app starts and need an initial configuration
-// [2] - main: the main page
-// [3] - select-device: the select-device step
-// [4] - select-version: the select-version step (this is the hardest step to configure or change)
-// [5] - flash: this step only covers the initial procedures, due the fact we will not be able to simulate a device
-const readdirAsync = promisify(readdir)
-async function createSpecPaths () {
-  const __path__ = join('./test', 'e2e', 'specs')
-  const items = await readdirAsync(__path__)
-  const res = []
-  for(let i in items) {
-    const item = join(__path__, items[i])
-    res.push(item)
-  }
-  console.log(res)
-  return res
-}
-
-// Maybe its possible that, in the step [4], after downloads
-// some tests fail; if fail, we can just ignore the download test
-// and go to 'already downloaded' test step
-// const excludeSpecPaths = []
-
-// if (process.argv[5] === '--filter' && process.argv[6] !== '') {
-// const p = join(__dirname, 'test', 'e2e', 'specs', process.argv[4], process.argv[6])
-//  excludeSpecPaths.push(p);
-//}
-
 // Electron service and `onWorkerStart`
 // will need the full path of builded application
 // the first will be using during the tests and
 // the second to start application for initial setup
 let APP_PATH = ''
+let CHROMEDRIVER_PATH = ''
 const RELEASE_PATH = join(__dirname, 'release', version)
 
 if (process.platform === 'linux') {
   APP_PATH = join(RELEASE_PATH, 'linux-unpacked', 'krux-installer')
+  CHROMEDRIVER_PATH = createRequire(import.meta.url).resolve(
+    join('chromedriver', 'bin', 'chromedriver')
+  )
 } else if (process.platform === 'win32') {
-  APP_PATH = join(RELEASE_PATH, 'win-unpacked', 'KruxInstaller.exe')
+  APP_PATH = join(RELEASE_PATH, 'win-unpacked', 'krux-installer.exe') 
+  CHROMEDRIVER_PATH = createRequire(import.meta.url).resolve(
+    join('chromedriver', 'bin', 'chromedriver.exe')
+  )
 } else if (process.platform === 'darwin') {
-  APP_PATH = join(RELEASE_PATH, 'mac-unpacked', 'krux-installer')
+  APP_PATH = join(RELEASE_PATH, 'mac-unpacked', 'krux-installer') 
+  CHROMEDRIVER_PATH = createRequire(import.meta.url).resolve(
+    join('chromedriver', 'bin', 'chromedriver')
+  )
 } else {
   throw new Error(`Platform '${process.platform}' not suported`)
 }
@@ -141,11 +121,11 @@ export const config = {
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
         maxInstances: 1,
-        //browserName: 'chrome',
+        browserName: 'chrome',
         //acceptInsecureCerts: true
-        //'goog:chromeOptions': {
-        //  args: ['no-sandbox']
-        //}
+        'goog:chromeOptions': {
+          args: ['no-sandbox']
+        }
         //  prefs: {
         //    enable_do_not_track: true
         //  }
@@ -206,14 +186,16 @@ export const config = {
       [
         'electron',
         {
-          //appPath: join(__dirname, 'dist_electron'),
-          //appName: __APPNAME__,
+          //appPath: RELEASE_PATH,
+          //appName: RELEASE_NAME,
           binaryPath: APP_PATH,
+          appArgs: ['--disable-infobars', '--disable-dev-shm-usage', '--no-sandbox'],
           chromedriver: {
             port: 9519,
-            logFileName: './wdio-chromedriver.log',
+            logFileName: 'wdio-chromedriver.log',
+            chromedriverCustomPath: createRequire(import.meta.url).resolve(join('chromedriver', 'bin', 'chromedriver'))
           },
-          electronVersion: devDependencies.electron.split("^")[1]
+          //electronVersion: devDependencies.electron.split("^")[1]
         }
       ]
     ],

@@ -27,3 +27,8 @@ jobs:
     uses: ./.github/workflows/build-windows-nsis.yml 
     secrets: 
       token: ${{ secrets.github_token }}
+
+  build-mac-dmg:
+    uses: ./.github/workflows/build-mac-dmg.yml 
+    secrets: 
+      token: ${{ secrets.github_token }}

@@ -91,7 +91,17 @@ kruxInstaller.start(async ({ app, win, ipcMain}) => {
     ipcMain.handle('wdio-electron', (_events, ...args) => {
       return {
         appData: app.getPath('appData'),
-        documents: app.getPath('documents')
+        documents: app.getPath('documents'),
+        store: {
+          appVersion: store.get('appVersion'),
+          resources: store.get('resources'),
+          os: store.get('os'),
+          versions: store.get('versions'),
+          version: store.get('version'),
+          device: store.get('device'),
+          sdcard: store.get('sdcard'),
+          showFlash: store.get('showFlash')
+        }
       }
     })
   } else { 

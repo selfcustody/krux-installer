@@ -11,6 +11,7 @@
           :index="index"
           :timeout="timeout"
           :fontSize="fontSize"
+          id="krux-installer-logo"
         />
       </v-col>
     </v-row>

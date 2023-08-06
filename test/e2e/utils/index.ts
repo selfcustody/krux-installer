@@ -2,50 +2,6 @@ const { join } = require('path')
 const { readFile } = require('fs/promises')
 const { browser } = require('@wdio/globals')
 
-exports.getAPI = async function(): Promise<Record<string, any>> {
-  return await browser.electron.api() as Record<string, any>
-}
-
-exports.getAppDataPath = async function (): Promise<string> {
-  return await browser.electron.app('getPath', 'appData') as string
-}
-
-exports.getResourcesPath = async function (): Promise<string> {
-  return await browser.electron.app('getPath', 'documents') as string
-}
-
-exports.getAppDataNamePath = async function (): Promise<string> {
-  const api = await exports.getAPI()
-  return join(api.appData, pkg.name)
-}
-
-exports.getConfigPath = async function (): Promise<string> {
-  const appDataNamePath = await exports.appDataNamePath()
-  return join(appDataNamePath, 'config.json')
-}
-
-exports.getConfigString = async function (): Promise<string> {
-  const configPath = await exports.getConfigPath()
-  return await readFile(configPath, 'utf8')
-}
-
-exports.getConfigObject = async function (): Promise<Record<string, any>> {
-  const configString = await exports.getConfigString()
-  return JSON.parse(configString)
-}
-
-exports.isAppReady = async function (): Promise<boolean> {
-  return await browser.electron.app('isReady') as boolean
-}
-
-exports.getAppName = async function (): Promise<string> {
-  return await browser.electron.app('getName') as string
-}
-
-exports.getAppVersion = async function  (): Promise<string> {
-  return await browser.electron.app('getVersion') as string
-}
-
 exports.delay = function (ms: number): Promise<number> {
   return new Promise((resolve) => {
     return setTimeout(resolve, ms)

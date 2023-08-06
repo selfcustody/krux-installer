@@ -7,6 +7,7 @@
         :index="indexes[i]"
         :timeout="timeout"
         :fontSize="fontSize"
+        :id="toDashes(messages[i])"
       />
     </div>
   </v-container>
@@ -38,4 +39,10 @@ const list_msg = computed(function () {
     })
   }
 })
+
+function toDashes(msg: string) {
+  return msg.split(' ').map(function(str) {
+    return str.toLowerCase()
+  }).join('-')
+}
 </script>

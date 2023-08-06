@@ -38,16 +38,17 @@ export default class VerifyOpensslHandler extends Handler {
       try {
         const platform = this.storage.get('os')
         let msg = ''
-        if (platform === 'linux' || platform === 'darwin') {
-          const exists = await commandExists('openssl')
-          msg = "openssl for "+platform+`${exists ? " found in $PATH" : "not found"}`
+        let exists: string =  ''
+        if (platform === 'linux' || platform === 'darwin' ) {
+          exists = await commandExists('openssl')
         }
         else if (platform === 'win32') {
-          const exists = await commandExists('openssl.exe')
-          msg = "openssl.exe for "+platform+`${exists ? " found in $Env.Path" : "not found"}`
+          exists = await commandExists('openssl.exe')
         } else {
-          msg = `neither "openssl" or "openssl.exe" found in PATH for ${platform}`
+          throw new Error(`neither "openssl" or "openssl.exe" found for ${platform}`)
         }
+        
+        msg = "openssl for "+platform+`${exists ? " found" : "not found"}`
 
         const result = {
           ...options,

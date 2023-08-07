@@ -8,8 +8,11 @@
               variant="outlined"
               :class="[selectedClass]"
               @click.prevent="selectDevice(device)"
+              :id="`select-device-${device}-button`"
             >
-              <v-card-title>
+              <v-card-title
+                :id="`select-device-${device}-title`"
+              >
                 {{ device }}
               </v-card-title>
             </v-card>
@@ -23,8 +26,11 @@
               variant="outlined"
               :class="[selectedClass]"
               @click.prevent="back()"
+              id="select-device-back-button"
             >
-              <v-card-title>
+              <v-card-title
+                id="select-device-back-title"
+              >
                 Back
               </v-card-title>
             </v-card>

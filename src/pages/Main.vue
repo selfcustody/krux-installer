@@ -1,8 +1,10 @@
 <template>
-  <v-item-group>
+  <v-item-group id="main-page">
     <v-container>
       <v-row v-if="clickMessage !== ''">
-        <v-col>
+        <v-col
+          id="main-page-click-message-text"
+        >
           {{ clickMessage }}
         </v-col>
       </v-row>
@@ -13,8 +15,11 @@
               variant="outlined"
               :class="selectedClass"
               @click.prevent="selectDevice"
+              id="main-page-select-device-button"
             >
-              <v-card-title>
+              <v-card-title
+                id="main-page-select-device-text"
+              >
                 {{ device }}
               </v-card-title>
             </v-card>
@@ -28,8 +33,11 @@
               variant="outlined"
               :class="selectedClass"
               @click.prevent="selectVersion"
+              id="main-page-select-version-button"
             >
-              <v-card-title>
+              <v-card-title
+                id="main-page-select-version-text"
+              >
                 {{ version }}
               </v-card-title>
             </v-card>
@@ -43,8 +51,11 @@
               variant="outlined"
               :class="selectedClass"
               @click.prevent="flashDevice"
+              id="main-page-flash-button"
             >
-              <v-card-title>
+              <v-card-title
+                id="main-page-flash-text"
+              >
                 {{ flash }}
               </v-card-title>
             </v-card>

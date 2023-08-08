@@ -1,5 +1,5 @@
 <template>
-  <v-item-group>
+  <v-item-group id="select-device-page">
     <v-container>
       <v-row v-for="(device, i) in devices" :key="i">
         <v-col>
@@ -8,10 +8,10 @@
               variant="outlined"
               :class="[selectedClass]"
               @click.prevent="selectDevice(device)"
-              :id="`select-device-${device}-button`"
+              :id="`select-device-page-${device}-button`"
             >
               <v-card-title
-                :id="`select-device-${device}-title`"
+                :id="`select-device-page-${device}-text`"
               >
                 {{ device }}
               </v-card-title>
@@ -26,10 +26,10 @@
               variant="outlined"
               :class="[selectedClass]"
               @click.prevent="back()"
-              id="select-device-back-button"
+              id="select-device-page-back-button"
             >
               <v-card-title
-                id="select-device-back-title"
+                id="select-device-page-back-text"
               >
                 Back
               </v-card-title>

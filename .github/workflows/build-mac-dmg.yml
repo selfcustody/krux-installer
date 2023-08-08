@@ -94,7 +94,8 @@ jobs:
         run: ./node_modules/.bin/wdio run wdio.conf.mts
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3 
+        if: ${{ github.ref_name == 'main' }}
         with:
           name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-dmg
           retention-days: 5

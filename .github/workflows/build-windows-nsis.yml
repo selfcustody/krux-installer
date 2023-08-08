@@ -168,7 +168,8 @@ jobs:
         run: .\node_modules\.bin\wdio.cmd run wdio.conf.mts
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3 
+        if: ${{ github.ref_name == 'main' }}
         with:
           name: ${{ runner.os}}-${{ steps.setup.outputs.app-name }}-Nsis
           retention-days: 5

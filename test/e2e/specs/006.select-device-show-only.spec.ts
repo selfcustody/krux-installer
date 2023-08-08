@@ -8,7 +8,7 @@ const SELECT_DEVICE_TEXT = 'Select device'
 const SELECT_VERSION_TEXT = 'Select version'
 const PLEASE_SELECT_VERSION_MESSAGE = 'Please click \'Select version\' to download sources'
 
-describe('KruxInstaller Main page', () => {
+describe('KruxInstaller SelectDevice page (show only)', () => {
 
   let instance: any;
 

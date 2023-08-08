@@ -64,6 +64,7 @@ jobs:
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
+        if: ${{ github.ref_name == 'main' }}
         with:
           name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-AppImage
           retention-days: 5

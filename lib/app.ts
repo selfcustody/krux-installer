@@ -135,7 +135,7 @@ export default class App extends Base {
     } else if (process.platform === 'win32') {
       separator = ';'
       const _env = (process.env.PATH as string).split(separator)
-      const vendor = join(__dirname, '..', 'extraResources', 'OpenSSL', 'bin') as string
+      const vendor = join(__dirname, '..', 'resources', 'extraResources', 'OpenSSL', 'bin') as string
       if (_env.indexOf(vendor) === -1) {
         openssls.push(vendor)
       }

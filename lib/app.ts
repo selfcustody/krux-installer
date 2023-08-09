@@ -1,7 +1,7 @@
 /// <reference path="../typings/index.d.ts"/>
 
 import { release } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import Base from './base'
 
@@ -70,9 +70,9 @@ export default class App extends Base {
     // This warning only shows in development mode
     // Read more on https://www.electronjs.org/docs/latest/tutorial/security
     // process.env['ELECTRON_DISABLE_SECURITY_WARNINGS'] = 'true'
-    const __envs__ = ['DIST', 'DIST_ELECTRON', 'PUBLIC', 'TEST', 'ELECTRON_DISABLE_SECURITY_WARNINGS']
     
     this.log('Application environment')
+    this.log(`  PORTABLE_EXECUTABLE_FILE:         : ${process.env.PORTABLE_EXECUTABLE_FILE}`)
     this.log(`  DIST                              : ${process.env.DIST}`)
     this.log(`  DIST_ELECTRON                     : ${process.env.DIST_ELECTRON}`)
     this.log(`  PUBLIC                            : ${process.env.PUBLIC}`) 
@@ -135,10 +135,16 @@ export default class App extends Base {
     } else if (process.platform === 'win32') {
       separator = ';'
       const _env = (process.env.PATH as string).split(separator)
-      const vendor = join(__dirname, '..', 'resources', 'extraResources', 'OpenSSL', 'bin') as string
-      if (_env.indexOf(vendor) === -1) {
-        openssls.push(vendor)
+      
+      // This path only will exist
+      // when build occurs
+      // inside github-actions
+      const __opensslBinDir =  join(process.env.DIST, '..', '..', 'extraResources', 'OpenSSL', 'bin')
+
+      if (_env.indexOf(__opensslBinDir) === -1) {
+        openssls.push(__opensslBinDir)
       }
+      
     }
     for (let i in openssls) {
       this.log(`  adding ${openssls[i]} to PATH`)

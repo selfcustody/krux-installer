@@ -15,6 +15,10 @@ async function onGetResource (
     toCheck = options.resource.split('/main/')[1]
   }
 
+  console.log(`from: ${result.from}`)
+  console.log(`baseUrl: ${options.baseUrl}`)
+  console.log(`resource: ${options.resource}`)
+
   await messages.add(data, `Checking ${toCheck}`)
   await window.api.invoke('krux:check:resource', {
     from: result.from,

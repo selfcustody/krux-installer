@@ -2,6 +2,7 @@
 
 import { release } from 'node:os'
 import { dirname, join } from 'node:path'
+import { access } from 'node:fs/promises'
 import { app, BrowserWindow, shell, ipcMain } from 'electron'
 import Base from './base'
 
@@ -112,11 +113,32 @@ export default class App extends Base {
   }
 
   /**
+   * This path only will exist when build occurs
+   * inside github-actions, once OpenSSL is built on runtime
+   * @param _env 
+   * @param openssls 
+   */
+  private async setupBuiltinOpensslWin32 (_env: string[], openssls: string[], possiblePaths: string[]): Promise<void> {
+    for (let i in possiblePaths) {
+      try {
+        this.debug(`  trying ${possiblePaths[i]}`)
+        await access(possiblePaths[i])
+        if (_env.indexOf(possiblePaths[i]) === -1) {
+          openssls.push(possiblePaths[i])
+        }
+        break
+      } catch (error) {
+        this.debug(`  OPENSSL ADD PATH WARN: ${error}`)
+      }
+    }
+  }
+
+  /**
    * Check if platform (darwin or win32)
    * needs and additional configuration
    * to add openssl binary
    */
-  private setupOpenssl (): void {
+  private async setupOpenssl (): Promise<void> {
     this.log(`Adding openssl in ${process.platform} environment variable PATH`)
     const openssls = []
     let separator = ''
@@ -135,16 +157,13 @@ export default class App extends Base {
     } else if (process.platform === 'win32') {
       separator = ';'
       const _env = (process.env.PATH as string).split(separator)
-      
-      // This path only will exist
-      // when build occurs
-      // inside github-actions
-      const __opensslBinDir =  join(process.env.DIST, '..', '..', 'extraResources', 'OpenSSL', 'bin')
-
-      if (_env.indexOf(__opensslBinDir) === -1) {
-        openssls.push(__opensslBinDir)
-      }
-      
+      await this.setupBuiltinOpensslWin32(_env, openssls, [
+        join(process.env.DIST, '..', 'release', 'extraResources', 'OpenSSL', 'bin'),
+        join(process.env.DIST, '..', '..', 'extraResources', 'OpenSSL', 'bin'),
+        join(app.getPath('appData'), '..', 'Local', 'Programs', 'krux-installer', 'resources', 'extraResources', 'OpenSSL', 'bin'),
+        join(process.env.ProgramFiles, 'Git', 'usr', 'bin'),
+        join(process.env.ProgramFiles, 'OpenVPN', 'bin'),
+      ]);
     }
     for (let i in openssls) {
       this.log(`  adding ${openssls[i]} to PATH`)

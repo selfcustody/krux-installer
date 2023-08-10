@@ -8,8 +8,20 @@ async function onResourceExist (
   let checked
   if (result.resourceTo.match(/^.*(zip|sha256.txt|sig|pem)$/g)){
     checked = result.resourceTo.split('krux-installer/')[1]
+    // on Windows, the path came with inverted slashes,
+    // so, if the checking fails, 
+    // check again
+    if (checked === undefined) {
+      checked = result.resourceTo.split('krux-installer\\')[1]
+    }
   } else if (result.resourceTo.match(/^.*(firmware|kboot|ktool).*$/g)) {
     checked = result.resourceTo.split('/main/')[1]
+    // on Windows, the path came with inverted slashes,
+    // so, if the checking fails, 
+    // check again
+    if (checked === undefined) {
+      checked = result.resourceTo.split('\\main\\')[1]
+    }
   }
   await messages.add(data, `${checked} found`)
   data.value.proceedTo = 'ConsoleLoad'
@@ -26,8 +38,20 @@ async function onResourceNotExist (
   let checked
   if (result.resourceTo.match(/^.*(zip|sha256.txt|sig|pem)$/g)){
     checked = result.resourceTo.split('krux-installer/')[1]
+    // on Windows, the path came with inverted slashes,
+    // so, if the checking fails, 
+    // check again
+    if (checked === undefined) {
+      checked = result.resourceTo.split('krux-installer\\')[1]
+    }
   } else if (result.resourceTo.match(/^.*(firmware|kboot|ktool).*$/g)) {
     checked = result.resourceTo.split('/main/')[1]
+    // on Windows, the path came with inverted slashes,
+    // so, if the checking fails, 
+    // check again
+    if (checked === undefined) {
+      checked = result.resourceTo.split('\\main\\')[1]
+    }
   }
   await messages.add(data, `${checked} not found`)
   data.value.progress = 0.0

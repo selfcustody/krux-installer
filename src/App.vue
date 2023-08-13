@@ -142,3 +142,13 @@ onMounted(async function () {
   await window.api.invoke('krux:change:page', { page: 'KruxInstallerLogo' })
 })
 </script>
+
+<style>
+html, 
+body {
+  margin: 0;
+  padding: 0;
+  color: rgb(255,255,255);
+  background-color: rgb(0, 0, 0);
+}
+</style>

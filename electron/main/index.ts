@@ -77,7 +77,7 @@ kruxInstaller.start(async ({ app, win, ipcMain}) => {
 
   // Create Wdio test handlers
   // if environment variable WDIO_ELECTRON equals 'true'
-  if (process.env.TEST === 'true') {
+  if (process.env.TEST === 'true' && process.env.WDIO_ELECTRON === 'true') {
     win.webContents.send('building ipcMain.handle for \'wdio-electron.app\'') 
     ipcMain.handle('wdio-electron.app', (_event, funcName, ...args) => {
       const appProp = app[funcName];

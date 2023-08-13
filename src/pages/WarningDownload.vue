@@ -33,7 +33,7 @@
       </v-row>
       <v-row>
         <v-col>
-          <span style="color: yellowgreen;">{{  resourceName }} </span> already downloaded 
+          <span style="color: yellowgreen;">{{ resourceName }} </span> already downloaded 
         </v-col>
       </v-row>
       <v-row>
@@ -113,11 +113,23 @@ const details: Ref<boolean> = ref(false)
 const { baseUrl, resourceFrom, resourceTo, proceedTo} = toRefs(props)
 
 const resourceName = computed(function () {
+  let __resourceName__ = ''
   if (resourceTo.value.match(/^.*(zip|sha256.txt|sig|pem)$/g)){
-    return resourceTo.value.split('krux-installer/')[1]
+    __resourceName__ = resourceTo.value.split('krux-installer/')[1]
+    
+    // If fails, maybe we are in windows
+    if (__resourceName__ === undefined) {
+      __resourceName__ = resourceTo.value.split('krux-installer\\')[1]
+    }
   } else if (resourceTo.value.match(/^.*(firmware|kboot|ktool).*$/g)) {
-    return resourceTo.value.split('/main/')[1]
+    __resourceName__ = resourceTo.value.split('/main/')[1]
+    
+    // If fails, maybe we are in windows
+    if (__resourceName__ === undefined) {
+      __resourceName__ = resourceTo.value.split('\\main\\')[1]
+    }
   }
+  return __resourceName__ 
 })
 
 const whatDo = computed(function (){

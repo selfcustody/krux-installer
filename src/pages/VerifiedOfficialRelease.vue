@@ -3,9 +3,7 @@
     <v-item-group>
       <v-row>
         <v-col>
-          <v-card
-            variant="plain"
-          >
+          <v-card variant="text">
             <v-card-title>
               Sha256sum integrity
             </v-card-title>
@@ -17,20 +15,15 @@
          :key="i"
       >
         <v-col>
-          <v-card
-            variant="plain"
-          >
-            <v-card-text v-html="getSubtitleName(h.name)" />
-            <v-card-text class="text-center" style="color: red;">
-              {{ split2chars(h.value) }}
-            </v-card-text>
+          <v-card variant="text">
+            <v-card-text v-html="getSubtitleNameWithHash(h)" />
           </v-card>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
           <v-card
-            variant="plain"
+            variant="text"
           >
             <v-card-title>
               Signature authenticity
@@ -87,16 +80,15 @@ const { hash, sign, command } = toRefs(props)
  * to facilitate manual verification
  * https://stackoverflow.com/questions/18407260/split-a-string-to-groups-of-2-chars-using-split#18419843
  */
-function split2chars(str: string): string {
-  return (str.split(/(?=(?:..)*$)/)).join(' ')
-}
-
-function getSubtitleName(str: string) {
-  if (/^.*sha256.txt$/g.test(str)) {
-    return `Expected result from file <span style="color: yellowgreen;"> ${str} </span>`
+function getSubtitleNameWithHash(toBeHash: Record<string, string>) {
+  const splited = (toBeHash.value.split(/(?=(?:..)*$)/)).join(' ')
+  let wrapped = ''
+  if (/^.*sha256.txt$/g.test(toBeHash.name)) {
+    wrapped = `Expected result from file <span style="color: yellowgreen;"> ${toBeHash.name} </span>`
   } else {
-    return `Summed result of file <span style="color: yellowgreen;"> ${str} </span>`
+    wrapped = `Summed result of file <span style="color: yellowgreen;"> ${toBeHash.name} </span>`
   }
+  return `<div style="color: white;">${wrapped}</div><div style="color: red;">${splited}</div>`
 }
 
 async function backToFn () {

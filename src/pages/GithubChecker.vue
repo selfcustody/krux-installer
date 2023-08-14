@@ -8,6 +8,7 @@
           :index="index"
           :timeout="timeout"
           :fontSize="fontSize"
+          id="github-octocat-checker-logo"
         />
       </v-col>
     </v-row>

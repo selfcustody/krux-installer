@@ -1,5 +1,5 @@
 <template>
-  <v-item-group>
+  <v-item-group id="select-version-page">
     <v-container>
       <v-row v-for="(version, i) in versions" :key="i">
         <v-col>
@@ -8,8 +8,9 @@
               variant="outlined"
               :class="[selectedClass]"
               @click="select(version)"
+              :id="`select-version-page-${version}-button`"
             >
-              <v-card-title> {{ version }}</v-card-title>
+              <v-card-title :id="`select-version-page-${version}-text`"> {{ version }}</v-card-title>
             </v-card>
           </v-item>
         </v-col>
@@ -21,8 +22,9 @@
               variant="outlined"
               :class="[selectedClass]"
               @click.prevent="back()"
+              id="select-device-page-back-button"
             >
-              <v-card-title>
+              <v-card-title id="select-version-page-back-text">
                 Back
               </v-card-title>
             </v-card>

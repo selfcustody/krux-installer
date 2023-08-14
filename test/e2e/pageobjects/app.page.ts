@@ -31,6 +31,14 @@ class App {
   private __select_device_page_maixpy_bit_text__: string;
   private __select_device_page_maixpy_dock_text__: string;
   private __select_device_page_maixpy_back_text__: string;
+  private __select_version_page__: string;
+  private __select_version_page_selfcustody_button__: string;
+  private __select_version_page_selfcustody_text__: string;
+  private __select_version_page_odudex_button__: string;
+  private __select_version_page_odudex_text__: string;
+  private __select_version_page_back_button__: string;
+  private __select_version_page_back_text__: string;
+  private __github_octocat_checker_logo__: string;
 
   constructor () {
     this.__app__ = '#app'
@@ -55,13 +63,21 @@ class App {
     this.__select_device_page_maixpy_amigo_tft_button__ = 'div#select-device-page-maixpy_amigo_tft-button' 
     this.__select_device_page_maixpy_bit_button__ = 'div#select-device-page-maixpy_bit-button' 
     this.__select_device_page_maixpy_dock_button__ = 'div#select-device-page-maixpy_dock-button' 
-    this.__select_device_page_back_button__ = 'div#select-device-page-back-button'
+    this.__select_device_page_maixpy_back_button__ = 'div#select-device-page-back-button'
     this.__select_device_page_maixpy_m5stickv_text__ = 'div#select-device-page-maixpy_m5stickv-text' 
     this.__select_device_page_maixpy_amigo_ips_text__ = 'div#select-device-page-maixpy_amigo_ips-text'  
     this.__select_device_page_maixpy_amigo_tft_text__ = 'div#select-device-page-maixpy_amigo_tft-text'  
     this.__select_device_page_maixpy_bit_text__ = 'div#select-device-page-maixpy_bit-text'  
     this.__select_device_page_maixpy_dock_text__ = 'div#select-device-page-maixpy_dock-text'  
-    this.__select_device_page_back_text__ = 'div#select-device-page-back-text' 
+    this.__select_device_page_maixpy_back_text__ = 'div#select-device-page-back-text' 
+    this.__select_version_page__ = 'div#select-version-page';
+    this.__select_version_page_selfcustody_button__ = 'div#select-version-page-selfcustody/krux/releases/tag/v22.08.2-button'
+    this.__select_version_page_back_button__ = 'div#select-version-page-back-button'
+    this.__select_version_page_odudex_button__ = 'div#select-version-page-odudex/krux_binaries-button'
+    this.__select_version_page_selfcustody_text__ = 'div#select-version-page-selfcustody/krux/releases/tag/v22.08.2-text'
+    this.__select_version_page_odudex_text__ = 'div#select-version-page-odudex/krux_binaries-text'
+    this.__select_version_page_back_text__ = 'div#select-version-page-back-text'
+    this.__github_octocat_checker_logo__ = 'pre#github-octocat-checker-logo'
   }
 
   get title () {
@@ -157,7 +173,7 @@ class App {
   }
 
   get selectBackButton () {
-    return $(this.__select_device_page_back_button__)
+    return $(this.__select_device_page_maixpy_back_button__)
   }
 
   get selectMaixpyM5StickVText () {
@@ -181,9 +197,40 @@ class App {
   }
 
   get selectBackText () {
-    return $(this.__select_device_page_back_text__)
+    return $(this.__select_device_page_maixpy_back_text__)
   }
 
+  get selectVersionPage () {
+    return $(this.__select_version_page__)
+  }
+
+  get selectVersionSelfcustodyButton () {
+    return $(this.__select_version_page_selfcustody_button__)
+  }
+
+  get selectVersionOdudexButton () {
+    return $(this.__select_version_page_odudex_button__)
+  }
+
+  get selectVersionBackButton () {
+    return $(this.__select_version_page_back_button__)
+  }
+
+  get selectVersionSelfcustodyText () {
+    return $(this.__select_version_page_selfcustody_text__)
+  }
+
+  get selectVersionOdudexText () {
+    return $(this.__select_version_page_odudex_text__)
+  }
+
+  get selectVersionBackText () {
+    return $(this.__select_version_page_back_text__)
+  }
+
+  get githubOctocatCheckerLogo () {
+    return $(this.__github_octocat_checker_logo__)
+  }
 }
 
 module.exports = App

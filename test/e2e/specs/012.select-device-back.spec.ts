@@ -4,7 +4,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectDevice page selects \'maixpy_dock\' device', () => {
+describe('KruxInstaller SelectDevice page selects \'back\' button', () => {
 
   let instance: any;
 
@@ -32,8 +32,8 @@ describe('KruxInstaller SelectDevice page selects \'maixpy_dock\' device', () =>
     await instance.mainSelectDeviceButton.click()
     await instance.mainPage.waitForExist({ reverse: true })
     await instance.selectDevicePage.waitForExist() 
-    await instance.selectMaixpyDockButton.waitForExist() 
-    await instance.selectMaixpyDockButton.click()
+    await instance.selectBackButton.waitForExist() 
+    await instance.selectBackButton.click()
   })
 
   it('should change to Main page', async () => {
@@ -43,8 +43,8 @@ describe('KruxInstaller SelectDevice page selects \'maixpy_dock\' device', () =>
     await expectWDIO(instance.mainPage).toBeDisplayed()
   })
 
-  it('should \'Select device\' button changed its text to \'Device: maixpy_dock\'', async () => {
-    await expectWDIO(instance.mainSelectDeviceText).toHaveText('Device: maixpy_dock')
+  it('should \'Select device\' button mantain its text to \'Select device\'', async () => {
+    await expectWDIO(instance.mainSelectDeviceText).toHaveText('Select device')
   })
 
 })

@@ -86,26 +86,30 @@ export default class UnzipResourceHandler extends Handler {
             // Directory file names end with '/'.
             // Note that entries for directories themselves are optional.
             // An entry's fileName implicitly requires its parent directories to exist.
-            const onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
-            const deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
-            const deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)
-            const deviceKruxFirmwareBinSig = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin.sig$`)
-            const deviceKruxKboot = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/kboot.kfpkg$`)
+            let onlyRootKruxFolder = null
+            let deviceKruxFolder = null
+            let deviceKruxFirmwareBin = null
+            let deviceKruxFirmwareBinSig = null
+            let deviceKruxKboot = null
             let ktoolKrux = null
+
+            //if (os === 'linux' || os === 'darwin') {
+            onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
+            deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
+            deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)
+            deviceKruxFirmwareBinSig = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin.sig$`)
+            deviceKruxKboot = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/kboot.kfpkg$`)
 
             if (os === 'linux') ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-linux$/
             if (os === 'darwin' && !isMac10) ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac$/
             if (os === 'darwin' && isMac10) ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac-10$/
-            if (os === 'win32') ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-win\.exe$/
+            if (os === 'win32') ktoolKrux = /^(.*\\)?krux-v[0-9\.]+\\ktool-win\.exe$/
 
             const destination = join(resources, entry.fileName)
+            const isRootOrDeviceFolder = onlyRootKruxFolder.test(entry.fileName) ||  deviceKruxFolder.test(entry.fileName)
 
             if (/\/$/.test(entry.fileName)) {
-              
-              if (onlyRootKruxFolder.test(entry.fileName)) {
-                this.send(`${this.name}:data`, `Creating ${destination}<br/><br/>`)
-                await mkdirAsync(destination)
-              } else if (deviceKruxFolder.test(entry.fileName)) {
+              if (isRootOrDeviceFolder) {
                 this.send(`${this.name}:data`, `Creating ${destination}<br/><br/>`)
                 await mkdirAsync(destination)
               }
@@ -136,12 +140,6 @@ export default class UnzipResourceHandler extends Handler {
                   if (entryError) {
                     this.send(`${this.name}:error`, { name: entryError.name, message: entryError.message, stack: entryError.stack })
                   } else {
-                    // readStream.on('data', (chunk) => {
-                    //  currentSize += chunk.length
-                    //  const percent = ((currentSize/uncompressedSize) * 100).toFixed(2)
-                    //  this.send(`${this.name}:data`, `Extracting ${entry.fileName}: ${percent}%`)
-                    // })
-
                     readStream.on('end', () => {
                       this.send(`${this.name}:data`, `Extracted to ${destination}<br/><br/>`)
                       zipfile.readEntry()

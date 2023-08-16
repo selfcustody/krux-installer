@@ -1,4 +1,4 @@
-[![Build](https://github.com/qlrd/krux-installer/actions/workflows/build.yml/badge.svg)](https://github.com/qlrd/krux-installer/actions/workflows/build.yml)
+[![Build new-ui branch](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml/badge.svg?branch=new-ui)](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml)
 
 # Krux Installer
 
@@ -35,7 +35,7 @@ As it now, the generated application execute, without typing any command in term
   - [ ] Build `snap` package for [snapcraft](https://snapcraft.io/);
   - [ ] Build `pacman` package for [pacman](https://wiki.archlinux.org/title/Pacman).
 - MacOS:
-  - [ ] Build DMG installer;
+  - [x] Build DMG installer;
   - [ ] Build PKG installer;
   - [ ] Build MAS installer;
 

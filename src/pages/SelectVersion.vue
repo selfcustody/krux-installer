@@ -8,9 +8,9 @@
               variant="outlined"
               :class="[selectedClass]"
               @click="select(version)"
-              :id="`select-version-page-${version}-button`"
+              :id="`select-version-page-${ transformVersion(version) }-button`"
             >
-              <v-card-title :id="`select-version-page-${version}-text`"> {{ version }}</v-card-title>
+              <v-card-title :id="`select-version-page-${ transformVersion(version) }-text`"> {{ version }}</v-card-title>
             </v-card>
           </v-item>
         </v-col>
@@ -43,6 +43,7 @@ const props = defineProps<{
 }>()
 
 const { versions } = toRefs(props)
+
 /**
  * Functions
  */
@@ -52,6 +53,10 @@ async function back() {
 
 async function select(version: string) {
   await window.api.invoke('krux:store:set', { from: 'SelectVersion', key: 'version', value: version })
+}
+
+function transformVersion (version: string): string {
+  return version.replace(/[\/\_\.]/g, '-')
 }
 
 </script>

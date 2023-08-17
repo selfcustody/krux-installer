@@ -71,11 +71,11 @@ class App {
     this.__select_device_page_maixpy_dock_text__ = 'div#select-device-page-maixpy_dock-text'  
     this.__select_device_page_maixpy_back_text__ = 'div#select-device-page-back-text' 
     this.__select_version_page__ = 'div#select-version-page';
-    this.__select_version_page_selfcustody_button__ = 'div#select-version-page-selfcustody/krux/releases/tag/v22.08.2-button'
+    this.__select_version_page_selfcustody_button__ = 'div#select-version-page-selfcustody-krux-releases-tag-v22-08-2-button'
     this.__select_version_page_back_button__ = 'div#select-version-page-back-button'
-    this.__select_version_page_odudex_button__ = 'div#select-version-page-odudex/krux_binaries-button'
-    this.__select_version_page_selfcustody_text__ = 'div#select-version-page-selfcustody/krux/releases/tag/v22.08.2-text'
-    this.__select_version_page_odudex_text__ = 'div#select-version-page-odudex/krux_binaries-text'
+    this.__select_version_page_odudex_button__ = 'div#select-version-page-odudex-krux-binaries-button'
+    this.__select_version_page_selfcustody_text__ = 'div#select-version-page-selfcustody-krux-releases-tag-v22-08-2-text'
+    this.__select_version_page_odudex_text__ = 'div#select-version-page-odudex-krux-binaries-text'
     this.__select_version_page_back_text__ = 'div#select-version-page-back-text'
     this.__github_octocat_checker_logo__ = 'pre#github-octocat-checker-logo'
   }

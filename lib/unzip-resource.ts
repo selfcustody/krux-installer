@@ -71,7 +71,6 @@ export default class UnzipResourceHandler extends Handler {
           version = version.split('tag/')[1];
           const zipFilePath = join(resources, version, `krux-${version}.zip`)
           
-
           this.send(`${this.name}:data`, `Extracting ${zipFilePath}<br/><br/>`)
 
           const zipfile = await openZipFile(zipFilePath)
@@ -86,35 +85,43 @@ export default class UnzipResourceHandler extends Handler {
             // Directory file names end with '/'.
             // Note that entries for directories themselves are optional.
             // An entry's fileName implicitly requires its parent directories to exist.
-            let onlyRootKruxFolder = null
-            let deviceKruxFolder = null
-            let deviceKruxFirmwareBin = null
-            let deviceKruxFirmwareBinSig = null
-            let deviceKruxKboot = null
-            let ktoolKrux = null
-
-            onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
-            deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
-            deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)
-            deviceKruxFirmwareBinSig = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin.sig$`)
-            deviceKruxKboot = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/kboot.kfpkg$`)
-
-            if (os === 'linux') ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-linux$/
-            if (os === 'darwin' && !isMac10) ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac$/
-            if (os === 'darwin' && isMac10) ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac-10$/
-            if (os === 'win32') ktoolKrux = /^(.*\\)?krux-v[0-9\.]+\\ktool-win\.exe$/
-
             const destination = join(resources, entry.fileName)
-            const isRootOrDeviceFolder = onlyRootKruxFolder.test(entry.fileName) ||  deviceKruxFolder.test(entry.fileName)
 
             if (/\/$/.test(entry.fileName)) {
-              if (isRootOrDeviceFolder) {
+              const onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
+              const deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
+              if (onlyRootKruxFolder.test(entry.fileName) ||  deviceKruxFolder.test(entry.fileName)) {
                 this.send(`${this.name}:data`, `Creating ${destination}<br/><br/>`)
                 await mkdirAsync(destination)
               }
               zipfile.readEntry();
             } else {
-              
+
+              let ktoolKrux: RegExp;
+              let deviceKruxFirmwareBin: RegExp;
+              let deviceKruxFirmwareBinSig: RegExp;
+              let deviceKruxKboot: RegExp;
+
+              if (os === 'linux') {
+                ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-linux$/
+              } else if (os === 'darwin' && !isMac10) {
+                ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac$/
+              } else if (os === 'darwin' && isMac10) {
+                ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac-10$/
+              } else if (os === 'win32') {
+                ktoolKrux = /^(.*\\)?krux-v[0-9\.]+\\ktool-win\.exe$/
+              }
+
+              if (os === 'linux' || os === 'darwin') {
+                deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)
+                deviceKruxFirmwareBinSig = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin.sig$`)
+                deviceKruxKboot = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/kboot.kfpkg$`)
+              } else if (os === 'win32') {
+                deviceKruxFirmwareBin = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\firmware.bin$`)
+                deviceKruxFirmwareBinSig = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\firmware.bin.sig$`)
+                deviceKruxKboot = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\kboot.kfpkg$`)
+              }
+
               // (only extract device related files)
               if (
                 deviceKruxFirmwareBin.test(destination) ||
@@ -125,12 +132,6 @@ export default class UnzipResourceHandler extends Handler {
                 
                 // create the destination file
                 const writeStream = createWriteStream(destination)
-
-                // define some variables to calculate the
-                // percentege o extraction
-                // const uncompressedSize = entry.uncompressedSize
-                // let currentSize = 0.0
-                // let percent = ((currentSize/uncompressedSize) * 100).toFixed(2)
 
                 this.send(`${this.name}:data`, `Extracting ${entry.fileName}...<br/><br/>`)
 

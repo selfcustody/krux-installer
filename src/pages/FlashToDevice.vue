@@ -10,21 +10,18 @@
               <v-card-title > {{ !done ? 'Flashing...' : 'Done' }} </v-card-title>
               <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : '' }} </v-card-subtitle>
               <v-card-text>
-                <div v-if="!done" class="console" v-html="output" />
-                <div v-if="done"  class="console" v-html="allOutput" />
+                <div class="console" v-html="allOutput" />
               </v-card-text>  
-              <v-card-actions
-                class="align-center"
-                v-if="done"
-                @click="backToFn"
-              >
-                <v-card
-                  variant="outlined"
-                  @click="backToFn"
-                >
-                  Back
-                </v-card>
-              </v-card-actions>
+            </v-card>
+          </v-item>
+        </v-col>
+        <v-col v-if="done">
+          <v-item>
+            <v-card
+              variant="outlined"
+              @click="backToFn"
+            >
+              Back
             </v-card>
           </v-item>
         </v-col>
@@ -49,10 +46,12 @@ const allOutput: Ref<string> = ref('')
   Methods
  */
 async function backToFn () {
+  output.value = output.value.split(' ').splice(0).join('')
   await window.api.invoke('krux:store:get', { from: 'FlashToDevice', keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
 }
 
 onMounted(async function () {
+  allOutput.value = allOutput.value.split(' ').splice(0).join('')
   await window.api.invoke('krux:unzip')
 })
 
@@ -67,9 +66,9 @@ watch(output, function(newValue) {
   font-size: 10px;
   text-align: left;
   background-color: black;
-  color: #fff;
+  /*color: #fff;*/
   overflow-y: auto;
-  width: 390px;
+  width: 720px;
   height: 360px;
 }
 </style>

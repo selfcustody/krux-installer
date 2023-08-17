@@ -93,7 +93,6 @@ export default class UnzipResourceHandler extends Handler {
             let deviceKruxKboot = null
             let ktoolKrux = null
 
-            //if (os === 'linux' || os === 'darwin') {
             onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
             deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
             deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)

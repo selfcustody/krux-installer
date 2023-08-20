@@ -67,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, toRefs, ref, Ref } from 'vue';
+import { onMounted, computed, toRefs } from 'vue';
 
 const props = defineProps<{
   version: string,

@@ -23,7 +23,7 @@ export default function (data: Ref<Record<string, any>>): Function {
       else if (data.value.os === 'darwin' && data.value.isMac10) {
         click = 'Flash with ktool-mac-10'
       }
-      data.value.clickMessage = `Connect your ${data.value.device} device before click '${click}'`
+      data.value.clickMessage = `Connect your ${data.value.device} device and power on it before click '${click}'`
     }
   }
 }

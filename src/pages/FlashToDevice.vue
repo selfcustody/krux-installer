@@ -8,9 +8,9 @@
               variant="outlined"
             >
               <v-card-title > {{ !done ? 'Flashing...' : 'Done' }} </v-card-title>
-              <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : '' }} </v-card-subtitle>
+              <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : 'Shutdown your device and unplug it' }} </v-card-subtitle>
               <v-card-text>
-                <div class="console" v-html="allOutput" />
+                <div class="console" v-html="!done ? output : allOutput" />
               </v-card-text>  
             </v-card>
           </v-item>

@@ -6,6 +6,9 @@
   "author": "qlrd <106913782+qlrd@users.noreply.github.com>",
   "license": "MIT",
   "private": true,
+  "engines": {
+    "node": "18"
+  },
   "keywords": [
     "electron",
     "vite",
@@ -52,8 +55,7 @@
     "@wdio/mocha-framework": "^8.12.1",
     "@wdio/spec-reporter": "^8.12.2",
     "chai": "^4.3.7",
-    "chromedriver": "^114.0.3",
-    "electron": "^25.3.1",
+    "electron": "^26.0.0",
     "electron-builder": "^24.4.0",
     "glob": "^10.3.3",
     "mocha": "^10.2.0",
@@ -61,7 +63,7 @@
     "ts-node": "^10.9.1",
     "typescript": "^5.1.6",
     "vite": "^4.4.6",
-    "vite-plugin-electron": "^0.12.0",
+    "vite-plugin-electron": "^0.13.0-beta.1",
     "vite-plugin-electron-renderer": "^0.14.1",
     "vue": "^3.2.47",
     "vue-tsc": "^1.8.6",
@@ -69,7 +71,7 @@
   },
   "dependencies": {
     "@o/electron-sudo": "^2.8.23",
-    "ansi_up": "^5.2.1",
+    "ansi_up": "^6.0.0",
     "axios": "^1.4.0",
     "command-exists": "^1.2.9",
     "debug": "^4.3.4",

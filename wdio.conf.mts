@@ -6,12 +6,16 @@ import { tmpdir } from 'os'
 import { createRequire } from 'module'
 import createDebug from 'debug'
 
-process.env.TEST = true
-
 const { devDependencies, version } = createRequire(import.meta.url)('./package.json')
 const debug = createDebug('krux:wdio:e2e')
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// force TEST to be true
+if (!process.env.TEST || process.env.TEST !== 'true') {
+  debug('Force TEST=true')
+  process.env.TEST = 'true'
+}
 
 // force WDIO_ELECTRON to be true
 if (!process.env.WDIO_ELECTRON || process.env.WDIO_ELECTRON !== 'true') {
@@ -19,31 +23,10 @@ if (!process.env.WDIO_ELECTRON || process.env.WDIO_ELECTRON !== 'true') {
   process.env.WDIO_ELECTRON = 'true'
 }
 
-// Electron service and `onWorkerStart`
-// will need the full path of builded application
-// the first will be using during the tests and
-// the second to start application for initial setup
-let APP_PATH = ''
-let CHROMEDRIVER_PATH = ''
-const RELEASE_PATH = join(__dirname, 'release', version)
-
-if (process.platform === 'linux') {
-  APP_PATH = join(RELEASE_PATH, 'linux-unpacked', 'krux-installer')
-  CHROMEDRIVER_PATH = createRequire(import.meta.url).resolve(
-    join('chromedriver', 'bin', 'chromedriver')
-  )
-} else if (process.platform === 'win32') {
-  APP_PATH = join(RELEASE_PATH, 'win-unpacked', 'krux-installer.exe') 
-  CHROMEDRIVER_PATH = createRequire(import.meta.url).resolve(
-    join('chromedriver', 'bin', 'chromedriver.exe')
-  )
-} else if (process.platform === 'darwin') {
-  APP_PATH = join(RELEASE_PATH, 'mac', 'krux-installer.app', 'Contents', 'MacOS', 'krux-installer') 
-  CHROMEDRIVER_PATH = createRequire(import.meta.url).resolve(
-    join('chromedriver', 'bin', 'chromedriver')
-  )
-} else {
-  throw new Error(`Platform '${process.platform}' not suported`)
+// force VITE_COVERAGE to be true
+if (!process.env.VITE_COVERAGE || process.env.VITE_COVERAGE !== 'true') {
+  debug('Force VITE_COVERAGE=true')
+  process.env.VITE_COVERAGE = 'true'
 }
 
 export const config = {

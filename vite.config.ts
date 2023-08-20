@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import electron from 'vite-plugin-electron'
+
 //import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
 
@@ -15,6 +16,7 @@ export default defineConfig(({ command }) => {
   const sourcemap = isServe || !!process.env.VSCODE_DEBUG
 
   return {
+    open: true,
     plugins: [
       vue(),
       vuetify({ autoImport: true }),
@@ -63,7 +65,6 @@ export default defineConfig(({ command }) => {
             },
           }
         }
-
       ])
     ],
     server: process.env.VSCODE_DEBUG && (() => {

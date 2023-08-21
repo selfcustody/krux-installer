@@ -1,10 +1,12 @@
-import { join, dirname, basename } from 'path'
+import { join, dirname } from 'path'
 import { fileURLToPath } from 'url';
 import { glob } from 'glob'
 import { rimraf } from 'rimraf'
-import { tmpdir } from 'os'
+import { tmpdir, homedir } from 'os'
 import { createRequire } from 'module'
+import { osLang } from 'os-lang'
 import createDebug from 'debug'
+import { access } from 'fs/promises';
 
 const { devDependencies, version } = createRequire(import.meta.url)('./package.json')
 const debug = createDebug('krux:wdio:e2e')
@@ -28,6 +30,49 @@ if (!process.env.VITE_COVERAGE || process.env.VITE_COVERAGE !== 'true') {
   debug('Force VITE_COVERAGE=true')
   process.env.VITE_COVERAGE = 'true'
 }
+
+let SPECS_TO_EXCLUDE: string[] = [];
+
+(async function () {
+  let resources = ''
+  if (process.env.CI && process.env.GITHUB_ACTION) {
+    if (process.platform  === 'linux') {
+      resources = '/home/runner/krux-installer'
+    } else if (process.platform  === 'win32') {
+      resources = 'C:\\Users\\runneradmin\\Documents\\krux-installer'
+    } else if (process.platform  === 'darwin') {
+      resources = '/Users/runner/Documents/krux-installer'
+    }
+  } else {
+    const lang = await osLang()
+    const home = homedir()
+    if ( lang.match(/en-*/g)) {
+      resources = join(home, 'Documents', 'krux-installer')
+    } else if ( lang.match(/pt-*/g)) {
+      resources = join(home, 'Documentos', 'krux-installer')
+    } else {
+      throw new Error(`${lang} not implemented. Please implement it with correct \'Documents\' folder name`)
+    }
+  }
+
+
+  const checks = [
+    {
+      resource: join(resources, 'v22.08.2', 'krux-v22.08.2.zip'),
+      test: './test/e2e/specs/014.select-version-selfcustody-release-zip.spec.ts'
+    }
+  ]
+
+  try {
+    for(let i in checks) {
+      await access(checks[i].resource)
+      debug(`WARN: expect not run ${checks[i].test}`)
+      SPECS_TO_EXCLUDE.push(checks[i].test)
+    }
+  } catch (error) {
+    debug(`WARN: ${error}`)
+  }
+})()
 
 export const config = {
     //
@@ -59,7 +104,7 @@ export const config = {
     //  specFiltering: true  
     //},
     // Patterns to exclude.
-    //exclude: excludeSpecPaths,
+    exclude: SPECS_TO_EXCLUDE,
     // WebdriverIO will automatically detect if these dependencies are installed
     // and will compile your config and tests for you. Ensure to have a tsconfig.json
     // in the same directory as you WDIO config. If you need to configure how ts-node
@@ -210,7 +255,7 @@ export const config = {
     // See the full list at http://mochajs.org/
     mochaOpts: {
       ui: 'bdd',
-      timeout: 60000,
+      timeout: 600000,
       require: ['node_modules/@babel/register/lib/index.js']
     },
     //

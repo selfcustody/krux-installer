@@ -14,7 +14,7 @@
 </template>
 
 <script setup lang="ts">
-import { AsciiMorph  } from 'vue-asciimorph';
+import { AsciiMorph } from 'vue-asciimorph';
 import { Ref, ref, toRefs, computed} from 'vue';
 
 const timeout: Ref<number> = ref(10)
@@ -41,8 +41,20 @@ const list_msg = computed(function () {
 })
 
 function toDashes(msg: string) {
-  return msg.split(' ').map(function(str) {
+  let tag = msg.split(' ').map(function(str) {
     return str.toLowerCase()
   }).join('-')
+  
+  // unix need to replace / to -
+  tag = tag.replace(/\//g, '-')
+  
+  // general replace of . to -
+  tag = tag.replace(/\./g, '-')
+  
+  // windows need to replace \ to -
+  tag = tag.replace(/\\/g, '-')
+  
+  console.log(tag)
+  return tag
 }
 </script>

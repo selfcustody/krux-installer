@@ -39,6 +39,13 @@ class App {
   private __select_version_page_back_button__: string;
   private __select_version_page_back_text__: string;
   private __github_octocat_checker_logo__: string;
+  private __download_official_release_zip_page__: string;
+  private __download_official_release_zip_title__: string;
+  private __download_official_release_zip_subtitle__: string;
+  private __download_official_release_zip_progress__: string;
+  private __checking_release_zip_msg__: string;
+  private __not_found_release_zip_msg__: string;
+  private __found_release_zip_msg__: string;
 
   constructor () {
     this.__app__ = '#app'
@@ -78,6 +85,13 @@ class App {
     this.__select_version_page_odudex_text__ = 'div#select-version-page-odudex-krux-binaries-text'
     this.__select_version_page_back_text__ = 'div#select-version-page-back-text'
     this.__github_octocat_checker_logo__ = 'pre#github-octocat-checker-logo'
+    this.__download_official_release_zip_page__ = 'div#download-official-release-zip-page'
+    this.__download_official_release_zip_title__ = 'div#download-official-release-zip-page-title'
+    this.__download_official_release_zip_subtitle__ = 'div#download-official-release-zip-page-subtitle'
+    this.__download_official_release_zip_progress__ = 'div#download-official-release-zip-page-progress'
+    this.__checking_release_zip_msg__ = 'pre#checking-v22-08-2-krux-v22-08-2-zip'
+    this.__not_found_release_zip_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-not-found'
+    this.__found_release_zip_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-found'
   }
 
   get title () {
@@ -231,6 +245,36 @@ class App {
   get githubOctocatCheckerLogo () {
     return $(this.__github_octocat_checker_logo__)
   }
+
+
+  get checkingReleaseZipMsg () {
+    return $(this.__checking_release_zip_msg__)
+  }
+
+  get notFoundReleaseZipMsg () {
+    return $(this.__not_found_release_zip_msg__)
+  }
+
+  get foundReleaseZipMsg () {
+    return $(this.__found_release_zip_msg__)
+  }
+
+  get downloadOfficialReleaseZipPage () {
+    return $(this.__download_official_release_zip_page__)
+  }
+
+  get downloadOfficialReleaseZipTitle () {
+    return $(this.__download_official_release_zip_title__)
+  }
+
+  get downloadOfficialReleaseZipSubtitle () {
+    return $(this.__download_official_release_zip_subtitle__)
+  }
+
+  get downloadOfficialReleaseZipProgress () {
+    return $(this.__download_official_release_zip_progress__)
+  }
+
 }
 
 module.exports = App

@@ -52,4 +52,46 @@ describe('KruxInstaller SelectVersion page (already downloaded release)', () => 
     }
   })
 
+  it('should WarningDownload page should be displayed', async () => {
+    await instance.warningDownloadPage.waitForExist()
+    await expectWDIO(instance.warningDownloadPage).toBeDisplayed()
+  }) 
+
+  it('should \'v22.08.2/krux-v22.08.2.zip already downloaded\' message be displayed', async () => {
+    await instance.warningAlreadyDownloadedText.waitForExist()
+    await expectWDIO(instance.warningAlreadyDownloadedText).toBeDisplayed()
+    await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2/krux-v22.08.2.zip already downloaded')
+  })
+
+  it('should \'Proceed with current file\' button be displayed', async () => {
+    await instance.warningDownloadProceedButton.waitForExist()
+    await instance.warningDownloadProceedButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadProceedButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadProceedButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadProceedButtonText).toHaveText('Proceed with current file')
+  })
+
+  it('should \'Download it again\' button be displayed', async () => {
+    await instance.warningDownloadAgainButton.waitForExist()
+    await instance.warningDownloadAgainButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadAgainButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadAgainButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadAgainButtonText).toHaveText('Download it again')
+  })
+
+  it('should \'Show details\' button be displayed', async () = > {
+    await instance.warningDownloadShowDetailsButton.waitForExist()
+    await instance.warningDownloadShowDetailsButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadShowDetailsButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadShowDetailsButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadShowDetailsButtonText).toHaveText('Show details')
+  })
+
+  it('should \'Back\' button be displayed', async () => {
+    await instance.warningDownloadBackButton.waitForExist()
+    await instance.warningDownloadBackButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadBackButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadBackButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadBackButtonText).toHaveText('Back')
+  })
 })

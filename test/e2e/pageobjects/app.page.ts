@@ -46,6 +46,16 @@ class App {
   private __checking_release_zip_msg__: string;
   private __not_found_release_zip_msg__: string;
   private __found_release_zip_msg__: string;
+  private __warning_download_page__: string;
+  private __warning_already_downloaded_text__ : string;
+  private __warning_download_proceed_button__: string;
+  private __warning_download_proceed_button_text__: string;
+  private __warning_download_show_details_button__: string;
+  private __warning_download_show_details_button_text__: string;
+  private __warning_download_again_button__: string
+  private __warning_download_again_button_text__: string;
+  private __warning_download_back_button__: string;
+  private __warning_download_back_button_text__: string;
 
   constructor () {
     this.__app__ = '#app'
@@ -92,6 +102,16 @@ class App {
     this.__checking_release_zip_msg__ = 'pre#checking-v22-08-2-krux-v22-08-2-zip'
     this.__not_found_release_zip_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-not-found'
     this.__found_release_zip_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-found'
+    this.__warning_download_page__ = 'div#warning-download-page'
+    this.__warning_already_downloaded_text__ = 'div#warning-already-downloaded-text'
+    this.__warning_download_proceed_button__ = 'div#warning-download-proceed-button'
+    this.__warning_download_proceed_button_text__ = 'div#warning-download-proceed-button-text'
+    this.__warning_download_again_button__ = 'div#warning-download-again-button'
+    this.__warning_download_again_button_text__ = 'div#warning-download-again-button-text'
+    this.__warning_download_show_details_button__ = 'div#warning-download-show-details-button'
+    this.__warning_download_show_details_button_text__ = 'div#warning-download-show-details-button-text'
+    this.__warning_download_back_button__ = 'div#warning-download-back-button'
+    this.__warning_download_back_button_text__ = 'div#warning-download-back-button-text'
   }
 
   get title () {
@@ -275,6 +295,45 @@ class App {
     return $(this.__download_official_release_zip_progress__)
   }
 
+  get warningDownloadPage () {
+    return $(this.__warning_download_page__)
+  }
+
+  get warningAlreadyDownloadedText() {
+    return $(this.__warning_already_downloaded_text__)
+  }
+
+  get warningDownloadProceedButton () {
+    return $(this.__warning_download_proceed_button__)
+  }
+
+  get warningDownloadProceedButtonText () {
+    return $(this.__warning_download_proceed_button_text__)
+  }
+
+  get warningDownloadAgainButton () {
+    return $(this.__warning_download_again_button__)
+  }
+
+  get warningDownloadAgainButtonText () {
+    return $(this.__warning_download_again_button_text__)
+  }
+
+  get warningDownloadShowDetailsButton () {
+    return $(this.__warning_download_show_details_button__)    
+  }
+
+  get warningDownloadShowDetailsButtonText () {
+    return $(this.__warning_download_show_details_button_text__)    
+  }
+
+  get warningDownloadBackButton () {
+    return $(this.__warning_download_back_button__)
+  }
+
+  get warningDownloadBackButtonText () {
+    return $(this.__warning_download_back_button_text__)
+  } 
 }
 
 module.exports = App

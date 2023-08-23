@@ -1,5 +1,5 @@
 <template>
-  <v-item-group>
+  <v-item-group id="warning-download-page">
     <v-container>
       <v-row>
         <v-col>
@@ -32,7 +32,7 @@
         </v-col>
       </v-row>
       <v-row>
-        <v-col>
+        <v-col id="warning-already-downloaded-text">
           <span style="color: yellowgreen;">{{ resourceName }} </span> already downloaded 
         </v-col>
       </v-row>
@@ -43,8 +43,9 @@
               variant="outlined"
               :class="[selectedClass]"
               @click="proceedToFn"
-              >
-              <v-card-title>Proceed with current file</v-card-title>
+              id="warning-download-proceed-button"
+            >
+              <v-card-title id="warning-download-proceed-button-text">Proceed with current file</v-card-title>
             </v-card>
           </v-item>
         </v-col>
@@ -56,8 +57,9 @@
               variant="outlined"
               :class="[selectedClass]"
               @click="downloadToFn"
-              >
-              <v-card-title> Download it again</v-card-title>
+              id="warning-download-again-button"
+            >
+              <v-card-title id="warning-download-again-button-text">Download it again</v-card-title>
             </v-card>
           </v-item>
         </v-col>
@@ -69,8 +71,9 @@
               variant="outlined"
               :class="[selectedClass]"
               @click="showDetails"
-              >
-              <v-card-title>Show details</v-card-title>
+              id="warning-download-show-details-button"
+            >
+              <v-card-title id="warning-download-show-details-button-text">Show details</v-card-title>
             </v-card>
           </v-item>
         </v-col>
@@ -82,8 +85,9 @@
               variant="outlined"
               :class="[selectedClass]"
               @click="backToFn"
-              >
-              <v-card-title>Back</v-card-title>
+              id="warning-download-back-button"
+            >
+              <v-card-title id="warning-download-back-button-text">Back</v-card-title>
             </v-card>
           </v-item>
         </v-col>

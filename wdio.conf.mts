@@ -1,12 +1,12 @@
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url';
-import { glob } from 'glob'
+import { glob, globSync } from 'glob'
 import { rimraf } from 'rimraf'
 import { tmpdir, homedir } from 'os'
 import { createRequire } from 'module'
-import { osLang } from 'os-lang'
+import { osLangSync } from 'os-lang'
 import createDebug from 'debug'
-import { access } from 'fs/promises';
+import { accessSync } from 'fs';
 
 const { devDependencies, version } = createRequire(import.meta.url)('./package.json')
 const debug = createDebug('krux:wdio:e2e')
@@ -31,48 +31,56 @@ if (!process.env.VITE_COVERAGE || process.env.VITE_COVERAGE !== 'true') {
   process.env.VITE_COVERAGE = 'true'
 }
 
+// Define which specs to
+// test or to exclude
+let SPECS_TO_TEST: string[] = [];
 let SPECS_TO_EXCLUDE: string[] = [];
 
-(async function () {
-  let resources = ''
-  if (process.env.CI && process.env.GITHUB_ACTION) {
-    if (process.platform  === 'linux') {
-      resources = '/home/runner/krux-installer'
-    } else if (process.platform  === 'win32') {
-      resources = 'C:\\Users\\runneradmin\\Documents\\krux-installer'
-    } else if (process.platform  === 'darwin') {
-      resources = '/Users/runner/Documents/krux-installer'
+// Prepare resources path
+// for specific test environment
+let resources = ''
+  
+if (process.env.CI && process.env.GITHUB_ACTION) {
+  if (process.platform  === 'linux') {
+    resources = '/home/runner/krux-installer'
+  } else if (process.platform  === 'win32') {
+    resources = 'C:\\Users\\runneradmin\\Documents\\krux-installer'
+  } else if (process.platform  === 'darwin') {
+    resources = '/Users/runner/Documents/krux-installer'
+  }
+} else {
+  const lang = osLangSync()
+  const home = homedir()
+  if ( lang.match(/en-*/g)) {
+    resources = join(home, 'Documents', 'krux-installer')
+  } else if ( lang.match(/pt-*/g)) {
+    resources = join(home, 'Documentos', 'krux-installer')
+  } else {
+    throw new Error(`${lang} not implemented. Please implement it with correct \'Documents\' folder name`)
+  }
+}
+
+// loop through all specs and verify
+// if some of them could have a resource test.
+// - Positive: add it to SPECS_TO_EXCLUDE
+// - Negative: add it to SPECS_TO_TEST
+const specs = globSync('./test/e2e/specs/*.spec.ts')
+specs.map(async function (file: string) {
+  debug(`  checking ${file}`)
+  if (file === 'test/e2e/specs/014.select-version-selfcustody-release-zip.spec.ts') {
+    try {
+      const r = join(resources, 'v22.08.2', 'krux-v22.08.2.zip')
+      debug(`    checking ${r}`)
+      accessSync(r)
+      debug(`    ${r} exists`)
+      SPECS_TO_EXCLUDE.push(file)
+    } catch (error) {
+      SPECS_TO_TEST.push(file)
     }
   } else {
-    const lang = await osLang()
-    const home = homedir()
-    if ( lang.match(/en-*/g)) {
-      resources = join(home, 'Documents', 'krux-installer')
-    } else if ( lang.match(/pt-*/g)) {
-      resources = join(home, 'Documentos', 'krux-installer')
-    } else {
-      throw new Error(`${lang} not implemented. Please implement it with correct \'Documents\' folder name`)
-    }
+    SPECS_TO_TEST.push(file)
   }
-
-
-  const checks = [
-    {
-      resource: join(resources, 'v22.08.2', 'krux-v22.08.2.zip'),
-      test: './test/e2e/specs/014.select-version-selfcustody-release-zip.spec.ts'
-    }
-  ]
-
-  try {
-    for(let i in checks) {
-      await access(checks[i].resource)
-      debug(`WARN: expect not run ${checks[i].test}`)
-      SPECS_TO_EXCLUDE.push(checks[i].test)
-    }
-  } catch (error) {
-    debug(`WARN: ${error}`)
-  }
-})()
+})
 
 export const config = {
     //
@@ -97,14 +105,12 @@ export const config = {
     // then the current working directory is where your `package.json` resides, so `wdio`
     // will be called from there.
     //
-    specs: [
-      './test/e2e/specs/*.ts'
-    ],
+    specs: SPECS_TO_TEST.reverse(),
     //featureFlags: {
     //  specFiltering: true  
     //},
     // Patterns to exclude.
-    exclude: SPECS_TO_EXCLUDE,
+    exclude: SPECS_TO_EXCLUDE.reverse(),
     // WebdriverIO will automatically detect if these dependencies are installed
     // and will compile your config and tests for you. Ensure to have a tsconfig.json
     // in the same directory as you WDIO config. If you need to configure how ts-node

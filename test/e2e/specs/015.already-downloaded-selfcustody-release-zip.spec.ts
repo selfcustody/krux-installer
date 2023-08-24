@@ -60,7 +60,11 @@ describe('KruxInstaller SelectVersion page (already downloaded release)', () => 
   it('should \'v22.08.2/krux-v22.08.2.zip already downloaded\' message be displayed', async () => {
     await instance.warningAlreadyDownloadedText.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedText).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2/krux-v22.08.2.zip already downloaded')
+    if (process.platform === 'linux' || process.platform === 'darwin') {
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2/krux-v22.08.2.zip already downloaded')
+    } else if (process.platform === 'win32') {
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2\\krux-v22.08.2.zip already downloaded')
+    }
   })
 
   it('should \'Proceed with current file\' button be displayed', async () => {

@@ -4,7 +4,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded release - show only)', () => {
 
   let instance: any;
 
@@ -98,4 +98,5 @@ describe('KruxInstaller SelectVersion page (already downloaded release)', () => 
     await expectWDIO(instance.warningDownloadBackButtonText).toBeDisplayed()
     await expectWDIO(instance.warningDownloadBackButtonText).toHaveText('Back')
   })
+
 })

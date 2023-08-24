@@ -79,7 +79,7 @@ describe('KruxInstaller SelectVersion page (already downloaded release)', () => 
     await expectWDIO(instance.warningDownloadAgainButtonText).toHaveText('Download it again')
   })
 
-  it('should \'Show details\' button be displayed', async () = > {
+  it('should \'Show details\' button be displayed', async () => {
     await instance.warningDownloadShowDetailsButton.waitForExist()
     await instance.warningDownloadShowDetailsButtonText.waitForExist()
     await expectWDIO(instance.warningDownloadShowDetailsButton).toBeDisplayed()

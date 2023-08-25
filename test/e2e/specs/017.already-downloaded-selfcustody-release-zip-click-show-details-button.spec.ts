@@ -113,9 +113,22 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click s
   
   })
 
-  it ('should a overlay text have the properly description', async () => {
+  it('should a overlay text have the properly description', async () => {
     await instance.warningAlreadyDownloadedOverlayTextWhatdo.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toBeDisplayed()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toHaveText('Description:\nThis file is the official release with all necessary contents to flash or update krux firmware on your Kendryte K210 device, including the firmware signature that prove the firmware\'s authenticity')
+  })
+
+  it('should \'close\' have \'Close\' text',async () => {
+    await instance.warningAlreadyDownloadedOverlayButtonClose.waitForExist()
+    await expectWDIO(instance.warningAlreadyDownloadedOverlayButtonClose).toBeDisplayed()
+    await expectWDIO(instance.warningAlreadyDownloadedOverlayButtonClose).toHaveText('Close')
+  })
+
+  it('should \'close\' button make overlay not visible', async () => {
+    await instance.warningAlreadyDownloadedOverlayButtonClose.click()
+    await instance.warningAlreadyDownloadedOverlay.waitForExist({ reverse: true })
+    await expectWDIO(instance.warningAlreadyDownloadedOverlay).not.toBeDisplayed()
+
   })
 })

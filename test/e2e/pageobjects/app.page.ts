@@ -62,6 +62,7 @@ class App {
   private __warning_already_downloaded_overlay_text_remote__: string;
   private __warning_already_downloaded_overlay_text_local__: string;
   private __warning_already_downloaded_overlay_text_whatdo__: string;
+  private __warning_already_downloaded_overlay_button_close__: string;
 
   constructor () {
     this.__app__ = '#app'
@@ -124,6 +125,7 @@ class App {
     this.__warning_already_downloaded_overlay_text_remote__ = 'div#warning-already-downloaded-overlay-text-remote'
     this.__warning_already_downloaded_overlay_text_local__ = 'div#warning-already-downloaded-overlay-text-local'
     this.__warning_already_downloaded_overlay_text_whatdo__ = 'div#warning-already-downloaded-overlay-text-whatdo'
+    this.__warning_already_downloaded_overlay_button_close__ = 'div#warning-already-downloaded-overlay-button-close'
   }
 
   get title () {
@@ -369,6 +371,10 @@ class App {
 
   get warningAlreadyDownloadedOverlayTextWhatdo () {
     return $(this.__warning_already_downloaded_overlay_text_whatdo__)
+  }
+
+  get warningAlreadyDownloadedOverlayButtonClose () {
+    return $(this.__warning_already_downloaded_overlay_button_close__)
   }
 }
 

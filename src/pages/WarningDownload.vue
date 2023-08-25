@@ -23,6 +23,7 @@
                     variant="outlined"
                     :class="[selectedClass]"
                     @click="closeDetails"
+                    id="warning-already-downloaded-overlay-button-close"
                   >
                     <v-card-title>Close</v-card-title>
                   </v-card>

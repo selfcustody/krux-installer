@@ -8,14 +8,15 @@
             contained
             width="100%" 
             height="100%"
+            id="warning-already-downloaded-overlay"
           >
-          <!-- 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain'-->
+            <!-- 'text' | 'flat' | 'elevated' | 'tonal' | 'outlined' | 'plain'-->
             <v-card color="black">
-              <v-card-title color="white">Resource details</v-card-title>
-              <v-card-subtitle>{{ resourceFrom }} </v-card-subtitle>
-              <v-card-text color="white"><b>Remote:</b><br/> {{ baseUrl}}/{{ resourceFrom }}</v-card-text>
-              <v-card-text color="white"><b>Local:</b><br/> {{ resourceTo }}</v-card-text>
-              <v-card-text color="white"><b>Description:</b><br/> {{ whatDo }}</v-card-text>
+              <v-card-title color="white" id="warning-already-downloaded-overlay-title">Resource details</v-card-title>
+              <v-card-subtitle id="warning-already-downloaded-overlay-subtitle">{{ resourceFrom }} </v-card-subtitle>
+              <v-card-text color="white" id="warning-already-downloaded-overlay-text-remote"><b>Remote:</b><br/> {{ baseUrl}}/{{ resourceFrom }}</v-card-text>
+              <v-card-text color="white" id="warning-already-downloaded-overlay-text-local"><b>Local:</b><br/> {{ resourceTo }}</v-card-text>
+              <v-card-text color="white" id="warning-already-downloaded-overlay-text-whatdo"><b>Description:</b><br/> {{ whatDo }}</v-card-text>
               <v-card-actions color="white" class="align-center justify-center">
                 <v-item v-slot="{ selectedClass }">
                   <v-card

@@ -56,6 +56,12 @@ class App {
   private __warning_download_again_button_text__: string;
   private __warning_download_back_button__: string;
   private __warning_download_back_button_text__: string;
+  private __warning_already_downloaded_overlay__: string;
+  private __warning_already_downloaded_overlay_title__: string;
+  private __warning_already_downloaded_overlay_subtitle__: string;
+  private __warning_already_downloaded_overlay_text_remote__: string;
+  private __warning_already_downloaded_overlay_text_local__: string;
+  private __warning_already_downloaded_overlay_text_whatdo__: string;
 
   constructor () {
     this.__app__ = '#app'
@@ -112,6 +118,12 @@ class App {
     this.__warning_download_show_details_button_text__ = 'div#warning-download-show-details-button-text'
     this.__warning_download_back_button__ = 'div#warning-download-back-button'
     this.__warning_download_back_button_text__ = 'div#warning-download-back-button-text'
+    this.__warning_already_downloaded_overlay__ = 'div#warning-already-downloaded-overlay'
+    this.__warning_already_downloaded_overlay_title__ = 'div#warning-already-downloaded-overlay-title'
+    this.__warning_already_downloaded_overlay_subtitle__ = 'div#warning-already-downloaded-overlay-subtitle'
+    this.__warning_already_downloaded_overlay_text_remote__ = 'div#warning-already-downloaded-overlay-text-remote'
+    this.__warning_already_downloaded_overlay_text_local__ = 'div#warning-already-downloaded-overlay-text-local'
+    this.__warning_already_downloaded_overlay_text_whatdo__ = 'div#warning-already-downloaded-overlay-text-whatdo'
   }
 
   get title () {
@@ -333,7 +345,31 @@ class App {
 
   get warningDownloadBackButtonText () {
     return $(this.__warning_download_back_button_text__)
-  } 
+  }
+
+  get warningAlreadyDownloadedOverlay () {
+    return $(this.__warning_already_downloaded_overlay__)
+  }
+
+  get warningAlreadyDownloadedOverlayTitle () {
+    return $(this.__warning_already_downloaded_overlay_title__)
+  }
+
+  get warningAlreadyDownloadedOverlaySubtitle () {
+    return $(this.__warning_already_downloaded_overlay_subtitle__)
+  }
+
+  get warningAlreadyDownloadedOverlayTextRemote () {
+    return $(this.__warning_already_downloaded_overlay_text_remote__)
+  }
+
+  get warningAlreadyDownloadedOverlayTextLocal () {
+    return $(this.__warning_already_downloaded_overlay_text_local__)
+  }
+
+  get warningAlreadyDownloadedOverlayTextWhatdo () {
+    return $(this.__warning_already_downloaded_overlay_text_whatdo__)
+  }
 }
 
 module.exports = App

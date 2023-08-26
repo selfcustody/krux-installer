@@ -63,6 +63,8 @@ class App {
   private __warning_already_downloaded_overlay_text_local__: string;
   private __warning_already_downloaded_overlay_text_whatdo__: string;
   private __warning_already_downloaded_overlay_button_close__: string;
+  private __checking_release_zip_sha256_txt_msg__: string;
+  private __not_found_release_zip_sha256_txt_msg__: string;
 
   constructor () {
     this.__app__ = '#app'
@@ -126,6 +128,8 @@ class App {
     this.__warning_already_downloaded_overlay_text_local__ = 'div#warning-already-downloaded-overlay-text-local'
     this.__warning_already_downloaded_overlay_text_whatdo__ = 'div#warning-already-downloaded-overlay-text-whatdo'
     this.__warning_already_downloaded_overlay_button_close__ = 'div#warning-already-downloaded-overlay-button-close'
+    this.__checking_release_zip_sha256_txt_msg__ = 'pre#checking-v22-08-2-krux-v22-08-2-zip-sha256-txt'
+    this.__not_found_release_zip_sha256_txt_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-sha256-txt-not-found'
   }
 
   get title () {
@@ -375,6 +379,14 @@ class App {
 
   get warningAlreadyDownloadedOverlayButtonClose () {
     return $(this.__warning_already_downloaded_overlay_button_close__)
+  }
+
+  get checkingReleaseZipSha256txtMsg () {
+    return $(this.__checking_release_zip_sha256_txt_msg__)
+  }
+
+  get notFoundReleaseZipSha256txtMsg () {
+    return $(this.__not_found_release_zip_sha256_txt_msg__ )
   }
 }
 

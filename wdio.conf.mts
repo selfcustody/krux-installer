@@ -67,7 +67,10 @@ if (process.env.CI && process.env.GITHUB_ACTION) {
 const specs = globSync('./test/e2e/specs/*.spec.ts')
 specs.map(async function (file: string) {
   debug(`  checking ${file}`)
-  if (file === 'test/e2e/specs/014.select-version-selfcustody-release-zip.spec.ts') {
+  if (
+    file === 'test/e2e/specs/014.select-version-selfcustody-release-zip.spec.ts' ||
+    file === 'test/e2e/specs/018.already-downloaded-selfcustody-release-zip-click-download-again.spec.ts' 
+  ) {
     try {
       const r = join(resources, 'v22.08.2', 'krux-v22.08.2.zip')
       debug(`    checking ${r}`)

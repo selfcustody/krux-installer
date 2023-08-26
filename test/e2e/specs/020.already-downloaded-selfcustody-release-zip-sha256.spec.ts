@@ -6,7 +6,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release - click proceed button)', () => {
+describe('KruxInstaller SelectVersion page (download release sha256.txt)', () => {
 
   let instance: any;
 
@@ -53,12 +53,49 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click p
     await instance.warningDownloadShowDetailsButtonText.waitForExist()
     await instance.warningDownloadBackButton.waitForExist()
     await instance.warningDownloadBackButtonText.waitForExist()
-  })
-
-  it ('should click \'Proceed\' button and go out of WarningDownload page', async () => {
     await instance.warningDownloadProceedButton.click()
     await instance.warningDownloadPage.waitForExist({ reverse: true })
-    await expectWDIO(instance.warningDownloadPage).not.toBeDisplayed()
+
+  })
+
+  it ('should \'checking v22.08.2/krux-v22.08.2.zip.sha256.txt\' message appears', async () => {
+    await instance.checkingReleaseZipSha256txtMsg.waitForExist()
+    await expectWDIO(instance.checkingReleaseZipSha256txtMsg).toBeDisplayed()
+  })
+
+  it ('should \'v22.08.2/krux-v22.08.2.zip.sha256.txt not found\' message appears', async () => {
+    await instance.notFoundReleaseZipSha256txtMsg.waitForExist()
+    await expectWDIO(instance.notFoundReleaseZipSha256txtMsg).toBeDisplayed()
+  })
+
+  it('should go to DownloadOfficialReleaseZipSha256 page', async () => {
+    await instance.downloadOfficialReleaseZipSha256txtPage.waitForExist()
+    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPage).toBeDisplayed()
+  })
+
+  it('should DownloadOfficialReleaseZipSha256 page have \'Downloading\' title', async () => {
+    await instance.downloadOfficialReleaseZipSha256txtPageTitle.waitForExist()
+    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageTitle).toBeDisplayed()
+    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageTitle).toHaveText('Downloading')
+  })
+
+  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt\' subtitle', async () => {
+    await instance.downloadOfficialReleaseZipSha256txtPageSubtitle.waitForExist()
+    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toBeDisplayed()
+    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt')
+  })
+
+  it('should DownloadOfficialReleaseZipSha256 page progress until 100%', async () => {
+    await instance.downloadOfficialReleaseZipSha256txtPageProgress.waitForExist()
+    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageProgress).toBeDisplayed()
+    await instance.downloadOfficialReleaseZipSha256txtPageProgress.waitUntil(async function () {
+      const percentText = await this.getText()
+      const percent = parseFloat(percentText.split('%')[0])
+      return percent === 100.00
+    }, {
+      timeout: 600000,
+      interval: 50
+    })
   })
   
 })

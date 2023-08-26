@@ -1,19 +1,19 @@
 <template>
   <v-item-group>
-    <v-container>
+    <v-container id="download-official-release-zip-sha256-txt-page">
       <v-row>
         <v-col>
           <v-item>
             <v-card
               variant="plain"
             >
-              <v-card-title>
+              <v-card-title id="download-official-release-zip-sha256-txt-page-title">
                 Downloading
               </v-card-title>
-              <v-card-subtitle>
+              <v-card-subtitle id="download-official-release-zip-sha256-txt-page-subtitle">
                 {{ downloadUrl }}
               </v-card-subtitle>
-              <v-card-text class="downloading">
+              <v-card-text class="downloading" id="download-official-release-zip-sha256-txt-page-progress">
                 <strong> {{ downloadProgress }} </strong>
               </v-card-text>
             </v-card>

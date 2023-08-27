@@ -80,7 +80,20 @@ specs.map(async function (file: string) {
     } catch (error) {
       SPECS_TO_TEST.push(file)
     }
-  } else {
+  } else if (
+    file === 'test/e2e/specs/020.select-version-selfcustody-release-zip-sha256.spec.ts'
+  ) {
+    try {
+      const r = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sha256.txt')
+      debug(`    checking ${r}`)
+      accessSync(r)
+      debug(`    ${r} exists`)
+      SPECS_TO_EXCLUDE.push(file)
+    } catch (error) {
+      SPECS_TO_TEST.push(file)
+    }
+  } 
+  else {
     SPECS_TO_TEST.push(file)
   }
 })

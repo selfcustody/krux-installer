@@ -55,7 +55,6 @@ describe('KruxInstaller SelectVersion page (download release sha256.txt)', () =>
     await instance.warningDownloadBackButtonText.waitForExist()
     await instance.warningDownloadProceedButton.click()
     await instance.warningDownloadPage.waitForExist({ reverse: true })
-
   })
 
   it ('should \'checking v22.08.2/krux-v22.08.2.zip.sha256.txt\' message appears', async () => {

@@ -1,3 +1,4 @@
+const expectChai = require('chai').expect
 const expectWDIO = require('@wdio/globals').expect
 const { join } = require('path')
 const { homedir } = require('os')
@@ -6,7 +7,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release - click show details button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded release sha256.txt - click show details button)', () => {
 
   let instance: any;
 
@@ -53,6 +54,12 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click s
     await instance.warningDownloadShowDetailsButtonText.waitForExist()
     await instance.warningDownloadBackButton.waitForExist()
     await instance.warningDownloadBackButtonText.waitForExist()
+    await instance.warningDownloadProceedButton.click()
+    await instance.warningDownloadPage.waitForExist({ reverse: true })
+    await instance.checkingReleaseZipSha256txtMsg.waitForExist()
+    await instance.foundReleaseZipSha256txtMsg.waitForExist()
+    await instance.warningDownloadPage.waitForExist()
+    await instance.warningDownloadShowDetailsButton.waitForExist()
   })
 
   it ('should overlay not be shown', async () => {
@@ -65,22 +72,22 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click s
     await expectWDIO(instance.warningAlreadyDownloadedOverlay).toBeDisplayed()
   })
 
-  it ('should overlay title be \'Resource details\'', async () => {
+  it('should overlay title be \'Resource details\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTitle.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTitle).toBeDisplayed()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTitle).toHaveText('Resource details')
   })
 
-  it ('should overlay subtitle be \'v22.08.2/krux-v22.08.2.zip\'', async () => {
+  it ('should overlay subtitle be \'v22.08.2/krux-v22.08.2.zip.sha256.txt\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTitle.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v22.08.2/krux-v22.08.2.zip')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v22.08.2/krux-v22.08.2.zip.sha256.txt')
   })
 
-  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip\'', async () => {
+  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTextRemote.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt')
   })
 
   it ('should a overlay text have properly local resource', async () => {
@@ -108,14 +115,14 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click s
       }
     }
 
-    const resource = join(resources, 'v22.08.2', 'krux-v22.08.2.zip')
+    const resource = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sha256.txt')
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextLocal).toHaveText(`Local:\n${resource}`)
   })
 
   it('should a overlay text have the properly description', async () => {
     await instance.warningAlreadyDownloadedOverlayTextWhatdo.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toHaveText('Description:\nThis file is the official release with all necessary contents to flash or update krux firmware on your Kendryte K210 device, including the firmware signature that prove the firmware\'s authenticity')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toHaveText('Description:\nThis file proves the integrity of previous file. It uses the sha256 algorithm to check if zip file has not be changed during download.')
   })
 
   it('should \'close\' have \'Close\' text',async () => {

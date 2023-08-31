@@ -7,7 +7,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release sha256.txt - click download again button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded release sha256.txt - click  proceed button)', () => {
 
   let instance: any;
 
@@ -59,44 +59,14 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await instance.checkingReleaseZipSha256txtMsg.waitForExist()
     await instance.foundReleaseZipSha256txtMsg.waitForExist()
     await instance.warningDownloadPage.waitForExist()
-    await instance.warningDownloadAgainButton.waitForExist()
-    await instance.warningDownloadAgainButtonText.waitForExist()
+    await instance.warningDownloadProceedButton.waitForExist()
+    await instance.warningDownloadProceedButtonText.waitForExist()
   })
 
-  it ('should click \'Download again\' go out of WarningDownload page', async () => {
-    await instance.warningDownloadAgainButton.click()
+  it ('should click \'Proceed\' go out of WarningDownload page', async () => {
+    await instance.warningDownloadProceedButton.click()
     await instance.warningDownloadPage.waitForExist({ reverse: true })
     await expectWDIO(instance.warningDownloadPage).not.toBeDisplayed()
-  })
-
-  it ('should be in DownloadOfficialReleaseZipSha256 page', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPage.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPage).toBeDisplayed()
-  })
-
-  it('should DownloadOfficialReleaseZipSha256 page have \'Downloading\' title', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPageTitle.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageTitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageTitle).toHaveText('Downloading')
-  })
-
-  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt\' subtitle', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPageSubtitle.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt')
-  })
-
-  it('should DownloadOfficialReleaseZipSha256 page progress until 100%', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPageProgress.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageProgress).toBeDisplayed()
-    await instance.downloadOfficialReleaseZipSha256txtPageProgress.waitUntil(async function () {
-      const percentText = await this.getText()
-      const percent = parseFloat(percentText.split('%')[0])
-      return percent === 100.00
-    }, {
-      timeout: 600000,
-      interval: 50
-    })
   })
   
 })

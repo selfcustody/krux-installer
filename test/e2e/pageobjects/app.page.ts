@@ -7,9 +7,11 @@ class App {
   private __logo__: string;
   private __loading_data_msg__: string;
   private __verifying_openssl_msg__: string;
+
   private __openssl_for_linux_found__: string;
   private __openssl_for_darwin_found__: string;
   private __openssl_for_win32_found__: string;
+
   private __main_page__: string;
   private __main_page_click_message_text__: string;
   private __main_page_select_device_button__: string;
@@ -18,6 +20,7 @@ class App {
   private __main_page_select_version_text__: string;
   private __main_page_flash_button__: string;
   private __main_page_flash_text__: string;
+
   private __select_device_page__: string;
   private __select_device_page_maixpy_m5stickv_button__: string;
   private __select_device_page_maixpy_amigo_ips_button__: string;
@@ -31,6 +34,7 @@ class App {
   private __select_device_page_maixpy_bit_text__: string;
   private __select_device_page_maixpy_dock_text__: string;
   private __select_device_page_maixpy_back_text__: string;
+
   private __select_version_page__: string;
   private __select_version_page_selfcustody_button__: string;
   private __select_version_page_selfcustody_text__: string;
@@ -38,14 +42,36 @@ class App {
   private __select_version_page_odudex_text__: string;
   private __select_version_page_back_button__: string;
   private __select_version_page_back_text__: string;
+
   private __github_octocat_checker_logo__: string;
+
   private __download_official_release_zip_page__: string;
   private __download_official_release_zip_title__: string;
   private __download_official_release_zip_subtitle__: string;
   private __download_official_release_zip_progress__: string;
+
   private __checking_release_zip_msg__: string;
   private __not_found_release_zip_msg__: string;
   private __found_release_zip_msg__: string;
+
+  private __checking_release_zip_sha256_txt_msg__: string;
+  private __not_found_release_zip_sha256_txt_msg__: string;
+  private __found_release_zip_sha256_txt_msg__: string;
+
+  private __download_official_release_zip_sha256_txt_page__: string;
+  private __download_official_release_zip_sha256_txt_page_title__: string;
+  private __download_official_release_zip_sha256_txt_page_subtitle__: string;
+  private __download_official_release_zip_sha256_txt_page_progress__: string;
+
+  private __checking_release_zip_sig_msg__: string;
+  private __not_found_release_zip_sig_msg__: string;
+  private __found_release_zip_sig_msg__: string;
+
+  private __download_official_release_zip_sig_page__: string;
+  private __download_official_release_zip_sig_title__: string;
+  private __download_official_release_zip_sig_subtitle__: string;
+  private __download_official_release_zip_sig_progress__: string;
+
   private __warning_download_page__: string;
   private __warning_already_downloaded_text__ : string;
   private __warning_download_proceed_button__: string;
@@ -63,15 +89,6 @@ class App {
   private __warning_already_downloaded_overlay_text_local__: string;
   private __warning_already_downloaded_overlay_text_whatdo__: string;
   private __warning_already_downloaded_overlay_button_close__: string;
-  private __checking_release_zip_sha256_txt_msg__: string;
-  private __not_found_release_zip_sha256_txt_msg__: string;
-  private __found_release_zip_sha256_txt_msg__: string;
-  private __download_official_release_zip_sha256_txt_page__: string;
-  private __download_official_release_zip_sha256_txt_page_title__: string;
-  private __download_official_release_zip_sha256_txt_page_subtitle__: string;
-  private __download_official_release_zip_sha256_txt_page_progress__: string;
-  
-  
 
   constructor () {
     this.__app__ = '#app'
@@ -79,9 +96,11 @@ class App {
     this.__logo__ = "pre#krux-installer-logo"
     this.__loading_data_msg__ = 'pre#loading-data-from-storage'
     this.__verifying_openssl_msg__ = 'pre#verifying-openssl'
+
     this.__openssl_for_linux_found__ = 'pre#openssl-for-linux-found'
     this.__openssl_for_darwin_found__ = 'pre#openssl-for-darwin-found'
     this.__openssl_for_win32_found__ = 'pre#openssl-for-win32-found'
+
     this.__main_page__ = '#main-page'
     this.__main_page_click_message_text__ = 'div#main-click-message-text'
     this.__main_page_select_device_button__ = 'div#main-page-select-device-button'
@@ -90,6 +109,7 @@ class App {
     this.__main_page_select_version_text__ = 'div#main-page-select-version-text'
     this.__main_page_flash_button__ = 'div#main-page-flash-button'
     this.__main_page_flash_text__ = 'div#main-page-flash-text'
+
     this.__select_device_page__ = 'div#select-device-page';
     this.__select_device_page_maixpy_m5stickv_button__ = 'div#select-device-page-maixpy_m5stickv-button'
     this.__select_device_page_maixpy_amigo_ips_button__ = 'div#select-device-page-maixpy_amigo_ips-button'
@@ -103,6 +123,7 @@ class App {
     this.__select_device_page_maixpy_bit_text__ = 'div#select-device-page-maixpy_bit-text'  
     this.__select_device_page_maixpy_dock_text__ = 'div#select-device-page-maixpy_dock-text'  
     this.__select_device_page_maixpy_back_text__ = 'div#select-device-page-back-text' 
+
     this.__select_version_page__ = 'div#select-version-page';
     this.__select_version_page_selfcustody_button__ = 'div#select-version-page-selfcustody-krux-releases-tag-v22-08-2-button'
     this.__select_version_page_back_button__ = 'div#select-version-page-back-button'
@@ -110,14 +131,36 @@ class App {
     this.__select_version_page_selfcustody_text__ = 'div#select-version-page-selfcustody-krux-releases-tag-v22-08-2-text'
     this.__select_version_page_odudex_text__ = 'div#select-version-page-odudex-krux-binaries-text'
     this.__select_version_page_back_text__ = 'div#select-version-page-back-text'
+
     this.__github_octocat_checker_logo__ = 'pre#github-octocat-checker-logo'
+
     this.__download_official_release_zip_page__ = 'div#download-official-release-zip-page'
     this.__download_official_release_zip_title__ = 'div#download-official-release-zip-page-title'
     this.__download_official_release_zip_subtitle__ = 'div#download-official-release-zip-page-subtitle'
     this.__download_official_release_zip_progress__ = 'div#download-official-release-zip-page-progress'
+
     this.__checking_release_zip_msg__ = 'pre#checking-v22-08-2-krux-v22-08-2-zip'
     this.__not_found_release_zip_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-not-found'
     this.__found_release_zip_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-found'
+
+    this.__checking_release_zip_sha256_txt_msg__ = 'pre#checking-v22-08-2-krux-v22-08-2-zip-sha256-txt'
+    this.__not_found_release_zip_sha256_txt_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-sha256-txt-not-found'
+    this.__found_release_zip_sha256_txt_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-sha256-txt-found'
+
+    this.__download_official_release_zip_sha256_txt_page__ = 'div#download-official-release-zip-sha256-txt-page'
+    this.__download_official_release_zip_sha256_txt_page_title__ = 'div#download-official-release-zip-sha256-txt-page-title'
+    this.__download_official_release_zip_sha256_txt_page_subtitle__ = 'div#download-official-release-zip-sha256-txt-page-subtitle'
+    this.__download_official_release_zip_sha256_txt_page_progress__ = 'div#download-official-release-zip-sha256-txt-page-progress'
+
+    this.__checking_release_zip_sig_msg__ = 'pre#checking-v22-08-2-krux-v22-08-2-zip-sig'
+    this.__not_found_release_zip_sig_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-sig-not-found'
+    this.__found_release_zip_sig_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-sig-found'
+
+    this.__download_official_release_zip_sig_page__ = 'div#download-official-release-zip-sig-page'
+    this.__download_official_release_zip_sig_title__ = 'div#download-official-release-zip-sig-page-title'
+    this.__download_official_release_zip_sig_subtitle__ = 'div#download-official-release-zip-sig-page-subtitle'
+    this.__download_official_release_zip_sig_progress__ = 'div#download-official-release-zip-sig-page-progress'
+
     this.__warning_download_page__ = 'div#warning-download-page'
     this.__warning_already_downloaded_text__ = 'div#warning-already-downloaded-text'
     this.__warning_download_proceed_button__ = 'div#warning-download-proceed-button'
@@ -135,13 +178,6 @@ class App {
     this.__warning_already_downloaded_overlay_text_local__ = 'div#warning-already-downloaded-overlay-text-local'
     this.__warning_already_downloaded_overlay_text_whatdo__ = 'div#warning-already-downloaded-overlay-text-whatdo'
     this.__warning_already_downloaded_overlay_button_close__ = 'div#warning-already-downloaded-overlay-button-close'
-    this.__checking_release_zip_sha256_txt_msg__ = 'pre#checking-v22-08-2-krux-v22-08-2-zip-sha256-txt'
-    this.__not_found_release_zip_sha256_txt_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-sha256-txt-not-found'
-    this.__found_release_zip_sha256_txt_msg__ = 'pre#v22-08-2-krux-v22-08-2-zip-sha256-txt-found'
-    this.__download_official_release_zip_sha256_txt_page__ = 'div#download-official-release-zip-sha256-txt-page'
-    this.__download_official_release_zip_sha256_txt_page_title__ = 'div#download-official-release-zip-sha256-txt-page-title'
-    this.__download_official_release_zip_sha256_txt_page_subtitle__ = 'div#download-official-release-zip-sha256-txt-page-subtitle'
-    this.__download_official_release_zip_sha256_txt_page_progress__ = 'div#download-official-release-zip-sha256-txt-page-progress'
   }
 
   get title () {
@@ -421,6 +457,33 @@ class App {
     return $(this.__download_official_release_zip_sha256_txt_page_progress__)
   }
 
+  get checkingReleaseZipSigMsg () {
+    return $(this.__checking_release_zip_sig_msg__)
+  }
+
+  get notFoundReleaseZipSigMsg () {
+    return $(this.__not_found_release_zip_sig_msg__)
+  }
+
+  get foundReleaseZipSigMsg () {
+    return $(this.__found_release_zip_sig_msg__)
+  }
+
+  get downloadOfficialReleaseZipSigPage () {
+    return $(this.__download_official_release_zip_sig_page__)
+  }
+
+  get downloadOfficialReleaseZipSigTitle () {
+    return $(this.__download_official_release_zip_sig_title__)
+  }
+
+  get downloadOfficialReleaseZipSigSubtitle () {
+    return $(this.__download_official_release_zip_sig_subtitle__)
+  }
+
+  get downloadOfficialReleaseZipSigProgress () {
+    return $(this.__download_official_release_zip_sig_progress__)
+  }
 }
 
 module.exports = App

@@ -1,10 +1,13 @@
 const expectChai = require('chai').expect
 const expectWDIO = require('@wdio/globals').expect
+const { join } = require('path')
+const { homedir } = require('os')
+const { osLangSync } = require('os-lang')
 const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release sha256.txt - click back button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded  release signature - click back button)', () => {
 
   let instance: any;
 
@@ -56,6 +59,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await instance.checkingReleaseZipSha256txtMsg.waitForExist()
     await instance.foundReleaseZipSha256txtMsg.waitForExist()
     await instance.warningDownloadPage.waitForExist()
+    await instance.warningDownloadProceedButton.waitForExist()
+    await instance.warningDownloadProceedButtonText.waitForExist()
+    await instance.warningDownloadProceedButton.click()
+    await instance.warningDownloadPage.waitForExist({ reverse: true })
+    await instance.checkingReleaseZipSigMsg.waitForExist()
+    await instance.foundReleaseZipSigMsg.waitForExist()
+    await instance.warningDownloadPage.waitForExist()
     await instance.warningDownloadBackButton.waitForExist()
   })
 
@@ -75,5 +85,5 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await expectWDIO(instance.mainSelectVersionText).toBeDisplayed()
     await expectWDIO(instance.mainSelectVersionText).toHaveText('Version: selfcustody/krux/releases/tag/v22.08.2')
   })
-
+  
 })

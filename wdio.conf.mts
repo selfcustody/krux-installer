@@ -94,7 +94,8 @@ specs.map(async function (file: string) {
       SPECS_TO_TEST.push(file)
     }
   } else if (
-    file === 'test/e2e/specs/026.select-version-selfcustody-release-zip-sig.spec.ts'
+    file === 'test/e2e/specs/026.select-version-selfcustody-release-zip-sig.spec.ts' ||
+    file === 'test/e2e/specs/030.already-downloaded-selfcustody-release-zip-sig-download-again-button.spec.ts'
   ) {
     try {
       const r = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sig')

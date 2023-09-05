@@ -7,7 +7,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded  release signature - click download again button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded  release signature - click proceed button)', () => {
 
   let instance: any;
 

@@ -1,19 +1,19 @@
 <template>
   <v-item-group>
-    <v-container>
+    <v-container id="download-official-release-pem-page">
       <v-row>
         <v-col>
           <v-item>
             <v-card
               variant="plain"
             >
-              <v-card-title>
+              <v-card-title id="download-official-release-pem-page-title">
                 Downloading
               </v-card-title>
-              <v-card-subtitle>
+              <v-card-subtitle id="download-official-release-pem-page-subtitle">
                 {{ downloadUrl }}
               </v-card-subtitle>
-              <v-card-text class="downloading">
+              <v-card-text class="downloading" id="download-official-release-pem-page-progress">
                 <strong> {{ downloadProgress }} </strong>
               </v-card-text>
             </v-card>
@@ -22,7 +22,7 @@
       </v-row>
     </v-container>
   </v-item-group>
-</template>
+</template>.
 
 <script setup lang="ts">
 import { computed, toRefs, onMounted } from 'vue'

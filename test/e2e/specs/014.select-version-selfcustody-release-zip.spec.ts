@@ -86,7 +86,7 @@ describe('KruxInstaller SelectVersion page (download release)', () => {
       const percent = parseFloat(percentText.split('%')[0])
       return percent === 100.00
     }, {
-      timeout: 600000,
+      timeout: 60000,
       interval: 50
     })
   })

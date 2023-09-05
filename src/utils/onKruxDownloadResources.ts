@@ -15,7 +15,7 @@ import delay from "./delay"
  */
 export default function (data: Ref<Record<any,string>>): Function {
   return async function (_: Event, result: Record<'from', string>): Promise<void> {
-    await delay(2000)
+    await delay(3000)
     await window.api.invoke('krux:store:get', {
       from: result.from,
       keys: ['device', 'version', 'os', 'isMac10']

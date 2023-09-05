@@ -72,6 +72,15 @@ class App {
   private __download_official_release_zip_sig_subtitle__: string;
   private __download_official_release_zip_sig_progress__: string;
 
+  private __checking_release_pem_msg__: string;
+  private __not_found_release_pem_msg__: string;
+  private __found_release_pem_msg__: string;
+  
+  private __download_official_release_pem_page__: string;
+  private __download_official_release_pem_title__: string;
+  private __download_official_release_pem_subtitle__: string;
+  private __download_official_release_pem_progress__: string;
+  
   private __warning_download_page__: string;
   private __warning_already_downloaded_text__ : string;
   private __warning_download_proceed_button__: string;
@@ -160,6 +169,15 @@ class App {
     this.__download_official_release_zip_sig_title__ = 'div#download-official-release-zip-sig-page-title'
     this.__download_official_release_zip_sig_subtitle__ = 'div#download-official-release-zip-sig-page-subtitle'
     this.__download_official_release_zip_sig_progress__ = 'div#download-official-release-zip-sig-page-progress'
+
+    this.__download_official_release_pem_page__ = 'div#download-official-release-pem-page'
+    this.__download_official_release_pem_title__ = 'div#download-official-release-pem-page-title'
+    this.__download_official_release_pem_subtitle__ = 'div#download-official-release-pem-page-subtitle' 
+    this.__download_official_release_pem_progress__ = 'div#download-official-release-pem-page-progress'
+  
+    this.__checking_release_pem_msg__ = 'pre#checking-main-selfcustody-pem'
+    this.__not_found_release_pem_msg__ = 'pre#main-selfcustody-pem-not-found'
+    this.__found_release_pem_msg__ = 'pre#main-selfcustody-pem-found'
 
     this.__warning_download_page__ = 'div#warning-download-page'
     this.__warning_already_downloaded_text__ = 'div#warning-already-downloaded-text'
@@ -484,6 +502,35 @@ class App {
   get downloadOfficialReleaseZipSigProgress () {
     return $(this.__download_official_release_zip_sig_progress__)
   }
+
+  get downloadOfficialReleasePemPage () {
+    return $(this.__download_official_release_pem_page__)
+  }
+
+  get downloadOfficialReleasePemTitle () {
+    return $(this.__download_official_release_pem_title__)
+  }
+
+  get downloadOfficialReleasePemSubtitle () {
+    return $(this.__download_official_release_pem_subtitle__)
+  }
+
+  get downloadOfficialReleasePemProgress () {
+    return $(this.__download_official_release_pem_page__)
+  }
+
+  get checkingReleasePemMsg () {
+    return $(this.__checking_release_pem_msg__)
+  }
+  
+  get notFoundReleasePemMsg () {
+    return $(this.__not_found_release_pem_msg__)
+  }
+
+  get foundReleasePemMsg () {
+    return $(this.__found_release_pem_msg__)
+  }
+
 }
 
 module.exports = App

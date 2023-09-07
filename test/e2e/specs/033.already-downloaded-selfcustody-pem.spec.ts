@@ -7,7 +7,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (download public key certificate)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded public key certificate - show only)', () => {
 
   let instance: any;
 
@@ -71,45 +71,60 @@ describe('KruxInstaller SelectVersion page (download public key certificate)', (
     await instance.warningDownloadProceedButton.click()
   })
    
-  it ('should \'checking selfcustody.pem\' message appears', async () => {
+  it ('should \'main/selfcustody.pem found\' message appears', async () => {
     await instance.checkingReleasePemMsg.waitForExist()
     await expectWDIO(instance.checkingReleasePemMsg).toBeDisplayed()
+    if (process.platform === 'linux' || process.platform === 'darwin') {
+      await expectWDIO(instance.foundReleasePemMsg).toHaveText('main/selfcustody.pem found')
+    } else if (process.platform === 'win32') {
+      await expectWDIO(instance.foundReleasePemMsg).toHaveText('main/selfcustody.pem found')
+    }
+  })
+  
+  it('should WarningDownload page should be displayed', async () => {
+    await instance.warningDownloadPage.waitForExist()
+    await expectWDIO(instance.warningDownloadPage).toBeDisplayed()
+  }) 
+
+  it('should \'main/selfcustody.pem already downloaded\' message be displayed', async () => {
+    await instance.warningAlreadyDownloadedText.waitForExist()
+    await expectWDIO(instance.warningAlreadyDownloadedText).toBeDisplayed()
+    if (process.platform === 'linux' || process.platform === 'darwin') {
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('main/selfcustody.pem already downloaded')
+    } else if (process.platform === 'win32') {
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('main/selfcustody.pem already downloaded')
+    }
   })
 
-  it ('should \'main/selfcustody.pem not found\' message appears', async () => {
-    await instance.notFoundReleasePemMsg.waitForExist()
-    await expectWDIO(instance.notFoundReleasePemMsg).toBeDisplayed()
+  it('should \'Proceed with current file\' button be displayed', async () => {
+    await instance.warningDownloadProceedButton.waitForExist()
+    await instance.warningDownloadProceedButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadProceedButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadProceedButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadProceedButtonText).toHaveText('Proceed with current file')
   })
-
-  it('should go to DownloadOfficialReleasePem page', async () => {
-    await instance.downloadOfficialReleasePemPage.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleasePemPage).toBeDisplayed()
+  
+  it('should \'Download it again\' button be displayed', async () => {
+    await instance.warningDownloadAgainButton.waitForExist()
+    await instance.warningDownloadAgainButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadAgainButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadAgainButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadAgainButtonText).toHaveText('Download it again')
   })
-
-  it('should DownloadOfficialReleasePem page have \'Downloading\' title', async () => {
-    await instance.downloadOfficialReleasePemTitle.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleasePemTitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleasePemTitle).toHaveText('Downloading')
+  
+  it('should \'Show details\' button be displayed', async () => {
+    await instance.warningDownloadShowDetailsButton.waitForExist()
+    await instance.warningDownloadShowDetailsButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadShowDetailsButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadShowDetailsButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadShowDetailsButtonText).toHaveText('Show details')
   })
-
-  it('should DownloadOfficialReleasePem page have \'https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem\' subtitle', async () => {
-    await instance.downloadOfficialReleasePemSubtitle.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleasePemSubtitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleasePemSubtitle).toHaveText('https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem')
+  
+  it('should \'Back\' button be displayed', async () => {
+    await instance.warningDownloadBackButton.waitForExist()
+    await instance.warningDownloadBackButtonText.waitForExist()
+    await expectWDIO(instance.warningDownloadBackButton).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadBackButtonText).toBeDisplayed()
+    await expectWDIO(instance.warningDownloadBackButtonText).toHaveText('Back')
   })
-
-  it('should DownloadOfficialReleasePem page progress until 100%', async () => {
-    await instance.downloadOfficialReleasePemProgress.waitForExist()
-    await expectWDIO(instance.downloadOfficialReleasePemProgress).toBeDisplayed()
-    // TODO: Pem is so small that wdio cannot check progress 
-    /*await instance.downloadOfficialReleasePemProgress.waitUntil(async function () {
-      const percentText = await this.getText()
-      const percent = parseFloat(percentText.split('%')[0])
-      return percent === 100.00
-    }, {
-      timeout: 60000,
-      interval: 50
-    })*/
-  })
-
 })

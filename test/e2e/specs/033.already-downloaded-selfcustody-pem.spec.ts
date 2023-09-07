@@ -92,7 +92,7 @@ describe('KruxInstaller SelectVersion page (already downloaded public key certif
     if (process.platform === 'linux' || process.platform === 'darwin') {
       await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('main/selfcustody.pem already downloaded')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('main/selfcustody.pem already downloaded')
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('main\\selfcustody.pem already downloaded')
     }
   })
 

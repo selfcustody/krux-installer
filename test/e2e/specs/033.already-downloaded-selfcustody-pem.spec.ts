@@ -77,7 +77,7 @@ describe('KruxInstaller SelectVersion page (already downloaded public key certif
     if (process.platform === 'linux' || process.platform === 'darwin') {
       await expectWDIO(instance.foundReleasePemMsg).toHaveText('main/selfcustody.pem found')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.foundReleasePemMsg).toHaveText('main/selfcustody.pem found')
+      await expectWDIO(instance.foundReleasePemMsg).toHaveText('main\\selfcustody.pem found')
     }
   })
   

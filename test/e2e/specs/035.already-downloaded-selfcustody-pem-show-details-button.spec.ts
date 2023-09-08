@@ -7,7 +7,7 @@ const { describe, it } = require('mocha')
 
 const App = require('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release signature - click show details button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded public key certificate - click show details button)', () => {
 
   let instance: any;
 
@@ -66,7 +66,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
     await instance.checkingReleaseZipSigMsg.waitForExist()
     await instance.foundReleaseZipSigMsg.waitForExist()
     await instance.warningDownloadPage.waitForExist()
-    await instance.warningDownloadShowDetailsButton.waitForExist()
+    await instance.warningDownloadProceedButton.waitForExist()
+    await instance.warningDownloadProceedButtonText.waitForExist()
+    await instance.warningDownloadProceedButton.click()
+    await instance.warningDownloadPage.waitForExist({ reverse: true })
+    await instance.checkingReleasePemMsg.waitForExist()
+    await instance.foundReleasePemMsg.waitForExist()
+    await instance.warningDownloadPage.waitForExist()
   })
 
   it ('should overlay not be shown', async () => {
@@ -85,16 +91,16 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTitle).toHaveText('Resource details')
   })
 
-  it ('should overlay subtitle be \'v22.08.2/krux-v22.08.2.zip.sig\'', async () => {
+  it ('should overlay subtitle be \'main/selfcustody.pem\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTitle.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v22.08.2/krux-v22.08.2.zip.sig')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('main/selfcustody.pem')
   })
 
-  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sig\'', async () => {
+  it ('should a overlay text have \'Remote: https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTextRemote.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sig')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem')
   })
 
   it ('should a overlay text have properly local resource', async () => {
@@ -122,16 +128,16 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
       }
     }
 
-    const resource = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sig')
+    const resource = join(resources, 'main', 'selfcustody.pem')
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextLocal).toHaveText(`Local:\n${resource}`)
   })
 
   it('should a overlay text have the properly description', async () => {
     await instance.warningAlreadyDownloadedOverlayTextWhatdo.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toHaveText('Description:\nThis file, with the public key certificate, proves the authenticity of zip file, checking if the zip file was signed by its creator.')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextWhatdo).toHaveText('Description:\nThis file, with the signature, proves the authenticity of zip file, checking if the zip file was signed by its creator.')
   })
-
+  
   it('should \'close\' have \'Close\' text',async () => {
     await instance.warningAlreadyDownloadedOverlayButtonClose.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayButtonClose).toBeDisplayed()
@@ -143,5 +149,4 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
     await instance.warningAlreadyDownloadedOverlay.waitForExist({ reverse: true })
     await expectWDIO(instance.warningAlreadyDownloadedOverlay).not.toBeDisplayed()
   })
-  
 })

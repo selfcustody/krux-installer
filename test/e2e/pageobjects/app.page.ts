@@ -97,8 +97,11 @@ class App {
   private __warning_already_downloaded_overlay_text_remote__: string;
   private __warning_already_downloaded_overlay_text_local__: string;
   private __warning_already_downloaded_overlay_text_whatdo__: string;
-  private __warning_already_downloaded_overlay_button_close__: string;
+  private __warning_already_downloaded_overlay_button_close__: string
 
+  private __check_verify_official_release_page__: string;
+  private __check_verify_official_release_len_sassaman_is_using_openssl__: string;
+  
   constructor () {
     this.__app__ = '#app'
     this.__main__ = '#app>div>main'
@@ -196,6 +199,10 @@ class App {
     this.__warning_already_downloaded_overlay_text_local__ = 'div#warning-already-downloaded-overlay-text-local'
     this.__warning_already_downloaded_overlay_text_whatdo__ = 'div#warning-already-downloaded-overlay-text-whatdo'
     this.__warning_already_downloaded_overlay_button_close__ = 'div#warning-already-downloaded-overlay-button-close'
+
+    this.__check_verify_official_release_page__ = 'div#check-verify-official-release-page'
+    this.__check_verify_official_release_len_sassaman_is_using_openssl__ = 'pre#check-verify-official-release-len-sassaman-is-using-openssl'
+    
   }
 
   get title () {
@@ -529,6 +536,14 @@ class App {
 
   get foundReleasePemMsg () {
     return $(this.__found_release_pem_msg__)
+  }
+
+  get checkVerifyOfficialReleasePage () {
+    return $(this.__check_verify_official_release_page__)
+  }
+
+  get checkVerifyOfficialReleaseLenSassamanIsUsingOpenssl (){
+    return $(this.__check_verify_official_release_len_sassaman_is_using_openssl__)
   }
 
 }

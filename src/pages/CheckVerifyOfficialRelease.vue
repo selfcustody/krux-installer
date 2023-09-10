@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container id="check-verify-official-release-page">
     <v-row>
       <v-col>
         <AsciiMorph
@@ -8,6 +8,7 @@
           :canvas="canvas"
           :timeout="timeout"
           :fontSize="fontSize"
+          id="check-verify-official-release-len-sassaman-is-using-openssl"
         />
       </v-col>
     </v-row>
@@ -30,29 +31,30 @@ const fontSize: Ref<string> = ref('12px')
 const list: Ref<string[][]> = ref([
   [ " " ],
   [ 
-    "        :.:'' ,,xiW,\"4x, ''       ",
-    "        :  ,dWWWXXXXi,4WX,         ",
-    "        ' dWWWXXX7\"     `X,       ",
-    "        lWWWXX7   __   _ X         ",
-    "        :WWWXX7 ,xXX7' \"^^X       ",
-    "        lWWWX7, _.+,, _.+.,        ",
-    "        :WWW7,. `^\"-\" ,^-'       ",
-    "        WW\",X:        X,          ",
-    "        \"7^^Xl.    _(_x7'         ",
-    "        l ( :X:       __ _         ",
-    "        `. \" XX  ,xxWWWWX7        ",
-    "          )X- \"\" 4X\" .___.      ",
-    "        ,W X     :Xi  _,,_         ",
-    "        WW X      4XiyXWWXd        ",
-    "        \"\" ,,      4XWWWWXX      ",
-    "        , R7X,       \"^447^       ",
-    "        R, \"4RXk,      _, ,       ",
-    "        TWk  \"4RXXi,   X',x       ",
-    "        lTWk,  \"4RRR7' 4 XH       ",
-    "        :lWWWk,  ^\"     `4        ",
-    "        ::TTXWWi,_  Xll :..        ",
-    "                                   ",
-    " verifying sha256sum and signature " 
+    "         :.:'' ,,xiW,\"4x, ''          ",
+    "         :  ,dWWWXXXXi,4WX,            ",
+    "         ' dWWWXXX7\"     `X,          ",
+    "         lWWWXX7   __   _ X            ",
+    "         :WWWXX7 ,xXX7' \"^^X          ",
+    "         lWWWX7, _.+,, _.+.,           ",
+    "         :WWW7,. `^\"-\" ,^-'          ",
+    "         WW\",X:        X,             ",
+    "         \"7^^Xl.    _(_x7'            ",
+    "         l ( :X:       __ _            ",
+    "         `. \" XX  ,xxWWWWX7           ",
+    "           )X- \"\" 4X\" .___.         ",
+    "         ,W X     :Xi  _,,_            ",
+    "         WW X      4XiyXWWXd           ",
+    "         \"\" ,,      4XWWWWXX         ",
+    "         , R7X,       \"^447^          ",
+    "         R, \"4RXk,      _, ,          ",
+    "         TWk  \"4RXXi,   X',x          ",
+    "         lTWk,  \"4RRR7' 4 XH          ",
+    "         :lWWWk,  ^\"     `4           ",
+    "         ::TTXWWi,_  Xll :..           ",
+    "                                       ",
+    "   Len Sassaman is using openssl to    ",
+    "   verify sha256sum and signature...  " 
   ],
   [ " " ]
 ])

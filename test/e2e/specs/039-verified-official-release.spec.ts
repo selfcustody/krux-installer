@@ -102,13 +102,9 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
   it('should show sha256sum intergrity sha256 summed result', async () => {
     await instance.verifiedOfficialReleasePageSha2256IntegritySha256.waitForExist()
     await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toBeDisplayed()
-    if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v22.08.2/krux-v22.08.2.zip\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
-    } else if (process.platform === 'win32') {      
-      await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v22.08.2\\krux-v22.08.2.zip\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
-    }
+    await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v22.08.2/krux-v22.08.2.zip\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
   })
-
+  
   it('should show openssl authenticity title', async () => {
     await instance.verifiedOfficialReleasePageSignatureTitle.waitForExist()
     await expectWDIO(instance.verifiedOfficialReleasePageSignatureTitle).toBeDisplayed()     

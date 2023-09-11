@@ -96,11 +96,7 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
   it('should show sha256sum intergrity sha256.txt', async () => {
     await instance.verifiedOfficialReleasePageSha2256IntegritySha256txt.waitForExist()
     await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toBeDisplayed()
-    if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toHaveText('Expected result from file v22.08.2/krux-v22.08.2.zip.sha256.txt\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
-    } else if (process.platform === 'win32') {      
-      await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toHaveText('Expected result from file v22.08.2\\krux-v22.08.2.zip.sha256.txt\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
-    }
+    await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toHaveText('Expected result from file v22.08.2/krux-v22.08.2.zip.sha256.txt\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
   })
 
   it('should show sha256sum intergrity sha256 summed result', async () => {
@@ -109,7 +105,7 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
     if (process.platform === 'linux' || process.platform === 'darwin') {
       await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v22.08.2/krux-v22.08.2.zip\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
     } else if (process.platform === 'win32') {      
-      await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v22.08.2/krux-v22.08.2.zip\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
+      await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v22.08.2\\krux-v22.08.2.zip\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
     }
   })
 
@@ -124,13 +120,17 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
     await expectWDIO(instance.verifiedOfficialReleasePageSignatureCommand).toBeDisplayed()
     
     let resources = ''
+    let openssl = ''
     if (process.env.CI && process.env.GITHUB_ACTION) {
       if (process.platform  === 'linux') {
         resources = '/home/runner/krux-installer'
+        openssl = 'openssl'
       } else if (process.platform  === 'win32') {
         resources = 'C:\\Users\\runneradmin\\Documents\\krux-installer'
+        openssl = 'openssl.exe'
       } else if (process.platform  === 'darwin') {
         resources = '/Users/runner/Documents/krux-installer'
+        openssl = 'openssl'
       }
     } else {
       const lang = osLangSync()
@@ -149,10 +149,10 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
     const resourceSig = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sig')
     const command = [
       '$>',
-      `openssl sha256 <${resourceZip}`,
+      `${openssl} sha256 <${resourceZip}`,
       '-binary',
       '|',
-      'openssl',
+      openssl,
       'pkeyutl',
       '-verify',
       '-pubin',

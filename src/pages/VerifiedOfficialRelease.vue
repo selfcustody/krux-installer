@@ -1,10 +1,10 @@
 <template>
-  <v-container>
+  <v-container id="verified-official-release-page">
     <v-item-group>
       <v-row>
         <v-col>
           <v-card variant="text">
-            <v-card-title>
+            <v-card-title id="verified-official-release-page-sha256-integrity-title">
               Sha256sum integrity
             </v-card-title>
           </v-card>
@@ -16,7 +16,10 @@
       >
         <v-col>
           <v-card variant="text">
-            <v-card-text v-html="getSubtitleNameWithHash(h)" />
+            <v-card-text
+              v-html="getSubtitleNameWithHash(h)"
+              :id="getSubtitleIdName(h)"
+            />
           </v-card>
         </v-col>
       </v-row>
@@ -25,14 +28,18 @@
           <v-card
             variant="text"
           >
-            <v-card-title>
+            <v-card-title id="verified-official-release-page-signature-title">
               Signature authenticity
             </v-card-title>
             <v-card-text class="text-justify">
-              <span style="font-size: 13px; color: yellowgreen">$> {{ command }}</span>
+              <span style="font-size: 13px; color: yellowgreen" id="verified-official-release-page-signature-command">
+                $> {{ command }}
+              </span>
               <br/>
               <br/>
-              <span style="font-size: 13px; color: red">{{ sign }}</span> 
+              <span style="font-size: 13px; color: red" id="verified-official-release-page-signature-result">
+                {{ sign }}
+              </span> 
             </v-card-text>
           </v-card>
         </v-col>
@@ -42,6 +49,7 @@
           <v-card
             pa-2
             variant="outlined"
+            id="verified-official-release-page-back-button"
             @click="backToFn"
           >
             Back
@@ -88,9 +96,28 @@ function getSubtitleNameWithHash(toBeHash: Record<string, string>) {
   } else {
     wrapped = `Summed result of file <span style="color: yellowgreen;"> ${toBeHash.name} </span>`
   }
-  return `<div style="color: white;">${wrapped}</div><div style="color: red;">${splited}</div>`
+  return `<div id="${getValueIdName(toBeHash)}"style="color: white;">${wrapped}</div><div style="color: red;">${splited}</div>`
 }
 
+function getSubtitleIdName(toBeHash: Record<string, string>): string {
+  let name = toBeHash.name.replace(/\./g, '-')
+  name = name.replace(/\//g, '-')
+  name = name.replace(/\./g, '-')
+  
+  // windows need to replace \ to -
+  name = name.replace(/\\/g, '-')
+  return `verified-official-release-page-sha256-integrity-${name}`
+}
+
+function getValueIdName(toBeHash: Record<string, string>): string {
+  let name = toBeHash.name.replace(/\./g, '-')
+  name = name.replace(/\//g, '-')
+  name = name.replace(/\./g, '-')
+  
+  // windows need to replace \ to -
+  name = name.replace(/\\/g, '-')
+  return `verified-official-release-page-sha256-integrity-value-${name}`
+}
 async function backToFn () {
   await window.api.invoke('krux:store:get', { from: 'VerifiedOfficialRelease', keys: ['device', 'version', 'os'] })
   await window.api.invoke('krux:change:page', { page: 'Main' })

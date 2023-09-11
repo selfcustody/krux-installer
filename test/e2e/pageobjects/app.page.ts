@@ -101,8 +101,19 @@ class App {
 
   private __check_verify_official_release_page__: string;
   private __check_verify_official_release_len_sassaman_is_using_openssl__: string;
+
+  private __verified_official_release_page__: string
+  private __verified_official_release_page_sha256_integrity_title__: string;
   
-  constructor () {
+  private __verified_official_release_page_sha256_integrity_txt__: string; 
+  private __verified_official_release_page_sha256_integrity__: string;
+  private __verified_official_release_page_signature_title__: string;
+  private __verified_official_release_page_signature_command__: string;
+  private __verified_official_release_page_signature_result__: string;
+  private __verified_official_release_page_back_button__: string;
+
+  
+  constructor () {  
     this.__app__ = '#app'
     this.__main__ = '#app>div>main'
     this.__logo__ = "pre#krux-installer-logo"
@@ -203,6 +214,14 @@ class App {
     this.__check_verify_official_release_page__ = 'div#check-verify-official-release-page'
     this.__check_verify_official_release_len_sassaman_is_using_openssl__ = 'pre#check-verify-official-release-len-sassaman-is-using-openssl'
     
+    this.__verified_official_release_page__ = 'div#verified-official-release-page'
+    this.__verified_official_release_page_sha256_integrity_title__ = 'div#verified-official-release-page-sha256-integrity-title'
+    this.__verified_official_release_page_sha256_integrity_txt__ = 'div#verified-official-release-page-sha256-integrity-v22-08-2-krux-v22-08-2-zip-sha256-txt' 
+    this.__verified_official_release_page_sha256_integrity__ = 'div#verified-official-release-page-sha256-integrity-v22-08-2-krux-v22-08-2-zip'
+    this.__verified_official_release_page_signature_title__ = 'div#verified-official-release-page-signature-title'
+    this.__verified_official_release_page_signature_command__ = 'span#verified-official-release-page-signature-command'
+    this.__verified_official_release_page_signature_result__ = 'span#verified-official-release-page-signature-result'
+    this.__verified_official_release_page_back_button__ = 'div#verified-official-release-page-back-button'
   }
 
   get title () {
@@ -546,6 +565,38 @@ class App {
     return $(this.__check_verify_official_release_len_sassaman_is_using_openssl__)
   }
 
+  get verifiedOfficialReleasePage () {
+    return $(this.__verified_official_release_page__)
+  }
+
+  get verifiedOfficialReleasePageSha2256IntegrityTitle () {
+    return $(this.__verified_official_release_page_sha256_integrity_title__)
+  }
+  
+  get verifiedOfficialReleasePageSha2256IntegritySha256txt () {
+    return $(this.__verified_official_release_page_sha256_integrity_txt__)
+  }
+
+  get verifiedOfficialReleasePageSha2256IntegritySha256 () {
+    return $(this.__verified_official_release_page_sha256_integrity__)
+  }
+
+  get verifiedOfficialReleasePageSignatureTitle () {
+    return $(this.__verified_official_release_page_signature_title__)
+  }
+  
+  get verifiedOfficialReleasePageSignatureCommand () {
+    return $(this.__verified_official_release_page_signature_command__)
+  }
+  
+  get verifiedOfficialReleasePageSignatureResult () {
+    return $(this.__verified_official_release_page_signature_result__)
+  }
+
+  get verifiedOfficialReleasePageBackButton () {
+    return $(this.__verified_official_release_page_back_button__)
+  }
+  
 }
 
 module.exports = App

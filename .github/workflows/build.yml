@@ -1,0 +1,34 @@
+name: Build
+
+on:
+  push:
+    branches: 
+      - main
+      - new-ui
+    paths-ignore:
+      - "**.md"
+      #- "**.spec.js"
+      - ".idea"
+      - ".vscode"
+      - ".dockerignore"
+      - "Dockerfile"
+      #- ".gitignore"
+      #- ".github/**"
+      #- "!.github/workflows/build.yml"
+
+jobs:
+
+  build-linux-appimage:
+    uses: ./.github/workflows/build-linux-appimage.yml
+    secrets: 
+      token: ${{ secrets.github_token }}
+
+  build-windows-nsis:
+    uses: ./.github/workflows/build-windows-nsis.yml 
+    secrets: 
+      token: ${{ secrets.github_token }}
+
+  build-mac-dmg:
+    uses: ./.github/workflows/build-mac-dmg.yml 
+    secrets: 
+      token: ${{ secrets.github_token }}

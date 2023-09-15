@@ -1,196 +1,81 @@
-name: CI/CD
+name: CI
 
 on:
-  push:
+  pull_request_target:
     branches:
       - main
-      - linux*
-      - win32*
 
-    pull_request:
-      - branches:
-        - main
+permissions:
+  pull-requests: write
 
 jobs:
+  job1:
+    name: Check Not Allowed File Changes
+    runs-on: ubuntu-latest
+    outputs:
+      markdown_change: ${{ steps.filter_markdown.outputs.change }}
+      markdown_files: ${{ steps.filter_markdown.outputs.change_files }}
+    steps:
 
-  lint:
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    uses: ./.github/workflows/lint.yml
-    with:
-      os: ${{ matrix.os }}
- 
-  build-linux:
-    needs: lint
-    strategy:
-      matrix:
-        build: [AppImage]
-    uses: ./.github/workflows/build-linux.yml
-    secrets: 
-      token: ${{ secrets.github_token }}
-    with:
-      build: ${{ matrix.build }}
+      - name: Check Not Allowed File Changes
+        uses: dorny/paths-filter@v2
+        id: filter_not_allowed
+        with:
+          list-files: json
+          filters: |
+            change:
+              - 'package-lock.json'
+              - 'yarn.lock'
+              - 'pnpm-lock.yaml'
 
-  build-win:
-    needs: lint
-    strategy:
-      matrix:
-        build: [nsis]
-    uses: ./.github/workflows/build-win.yml
-    secrets:
-      token: ${{ secrets.github_token }}
-    with:
-      build: ${{ matrix.build }}
+      # ref: https://github.com/github/docs/blob/main/.github/workflows/triage-unallowed-contributions.yml
+      - name: Comment About Changes We Can't Accept
+        if: ${{ steps.filter_not_allowed.outputs.change == 'true' }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            let workflowFailMessage = "It looks like you've modified some files that we can't accept as contributions."
+            try {
+              const badFilesArr = [
+                'package-lock.json',
+                'yarn.lock',
+                'pnpm-lock.yaml',
+              ]
+              const badFiles = badFilesArr.join('\n- ')
+              const reviewMessage = `👋 Hey there kruxer. It looks like you've modified some files that we can't accept as contributions. The complete list of files we can't accept are:\n- ${badFiles}\n\nYou'll need to revert all of the files you changed in that list using [GitHub Desktop](https://docs.github.com/en/free-pro-team@latest/desktop/contributing-and-collaborating-using-github-desktop/managing-commits/reverting-a-commit) or \`git checkout origin/main <file name>\`. Once you get those files reverted, we can continue with the review process. :octocat:\n\nMore discussion:\n- https://github.com/electron-vite/electron-vite-vue/issues/192`
+              createdComment = await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.payload.number,
+                body: reviewMessage,
+              })
+              workflowFailMessage = `${workflowFailMessage} Please see ${createdComment.data.html_url} for details.`
+            } catch(err) {
+              console.log("Error creating comment.", err)
+            }
+            core.setFailed(workflowFailMessage)
 
-  config-linux:
-    needs: build-linux
-    strategy:
-      matrix:
-        build: [AppImage]
-    uses: ./.github/workflows/config-linux.yml
-    with:
-      build: ${{ matrix.build }}
-
-  config-win:
-    needs: build-win
-    uses: ./.github/workflows/config-win.yml
-
-  test-main-linux:
-    needs: config-linux
-    strategy:
-      matrix:
-        build: [AppImage]
-    uses: ./.github/workflows/test-linux.yml
-    with:
-      test: main
-      build: ${{ matrix.build }}
-
-  test-main-win:
-    needs: config-win
-    strategy:
-      matrix:
-        build: [nsis]
-    uses: ./.github/workflows/test-win.yml
-    with:
-      test: main
-      build: ${{ matrix.build }}
-
-  test-select-device-linux:
-    needs: test-main-linux
-    strategy:
-      matrix:
-        build: [AppImage]
-    uses: ./.github/workflows/test-linux.yml
-    with:
-      test: select-device
-      build: ${{ matrix.build }}
-
-  test-select-device-win:
-    needs: test-main-win
-    strategy:
-      matrix:
-        build: [nsis]
-    uses: ./.github/workflows/test-win.yml
-    with:
-      test: select-device
-      build: ${{ matrix.build }}
-
-  test-select-version-linux:
-    needs: test-select-device-linux
-    strategy:
-      max-parallel: 1
-      matrix:
-        include:
-          - sub-test: init
-            build: AppImage
-
-          - sub-test: release
-            build: AppImage
-          
-          - sub-test: sha256
-            build: AppImage
-          
-          - sub-test: sig
-            build: AppImage
-
-          - sub-test: pem
-            build: AppImage
-   
-          - sub-test: verify
-            build: AppImage
-
-    uses: ./.github/workflows/test-linux.yml
-    with:
-      test: select-version
-      sub-test: ${{ matrix.sub-test }}
-      build: ${{ matrix.build }}
-
-  test-select-version-win:
-    needs: test-select-device-win 
-    strategy:
-      max-parallel: 1
-      matrix:
-        include:
-          - sub-test: init
-            build: nsis
-
-          - sub-test: release
-            build: nsis
-          
-          - sub-test: sha256
-            build: nsis
-          
-          - sub-test: sig
-            build: nsis
-
-          - sub-test: pem
-            build: nsis
-    
-          - sub-test: verify
-   
-    uses: ./.github/workflows/test-win.yml
-    with:
-      test: select-version
-      sub-test: ${{ matrix.sub-test }}
-      build: ${{ matrix.build }}
+      - name: Check Not Linted Markdown
+        if: ${{ always() }}
+        uses: dorny/paths-filter@v2
+        id: filter_markdown
+        with:
+          list-files: shell
+          filters: |
+            change:
+              - added|modified: '*.md'
 
 
-  test-flash-linux:
-    needs: test-select-version-linux
-    strategy:
-      max-parallel: 1
-      matrix:
-        build: [AppImage]
-        sub-test: [init, version]
-    uses: ./.github/workflows/test-linux.yml
-    with:
-      test: flash
-      sub-test: ${{ matrix.sub-test }}
-      build: ${{ matrix.build }}
+  job2:
+    name: Lint Markdown
+    runs-on: ubuntu-latest
+    needs: job1
+    if: ${{ always() && needs.job1.outputs.markdown_change == 'true' }}
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
 
-  test-flash-win:
-    needs: test-select-version-win
-    strategy:
-      max-parallel: 1
-      matrix:
-        build: [nsis]
-        sub-test: [init, version]
-    uses: ./.github/workflows/test-win.yml
-    with:
-      test: flash
-      sub-test: ${{ matrix.sub-test }}
-      build: ${{ matrix.build }}
-
-  upload-linux:
-    needs: test-flash-linux
-    strategy:
-      matrix:
-        build: [AppImage]
-    uses: ./.github/workflows/upload-linux.yml
-    with:
-      build: ${{ matrix.build }}
-
-  upload-win:
-    needs: test-flash-win
-    uses: ./.github/workflows/upload-win.yml
+      - name: Lint markdown
+        run: npx markdownlint-cli ${{ needs.job1.outputs.markdown_files }} --ignore node_modules

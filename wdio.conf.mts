@@ -72,7 +72,6 @@ if (hasFilter.length > 0) {
   if (hasFilter[0] === '--filter' || hasFilter[0] === '-f') {
     const filter = new RegExp(hasFilter[1], 'g')
     specs.map(async function (file: string) {
-      console.log(file.match(filter))
       if (file.match(filter)) {
         debug(`Excluding ${file}`)
         SPECS_TO_EXCLUDE.push(file)
@@ -86,16 +85,13 @@ if (hasFilter.length > 0) {
 // - Positive: add it to SPECS_TO_EXCLUDE
 // - Negative: add it to SPECS_TO_TEST
 specs.map(async function (file: string) {
-  debug(`  checking ${file}`)
   if (
     file === 'test/e2e/specs/014.select-version-selfcustody-release-zip.spec.ts' ||
     file === 'test/e2e/specs/018.already-downloaded-selfcustody-release-zip-click-download-again.spec.ts' 
   ) {
     try {
       const r = join(resources, 'v22.08.2', 'krux-v22.08.2.zip')
-      debug(`    checking ${r}`)
       accessSync(r)
-      debug(`    ${r} exists`)
       SPECS_TO_EXCLUDE.push(file)
     } catch (error) {
       SPECS_TO_TEST.push(file)
@@ -106,9 +102,7 @@ specs.map(async function (file: string) {
   ) {
     try {
       const r = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sha256.txt')
-      debug(`    checking ${r}`)
       accessSync(r)
-      debug(`    ${r} exists`)
       SPECS_TO_EXCLUDE.push(file)
     } catch (error) {
       SPECS_TO_TEST.push(file)
@@ -119,9 +113,7 @@ specs.map(async function (file: string) {
   ) {
     try {
       const r = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sig')
-      debug(`    checking ${r}`)
       accessSync(r)
-      debug(`    ${r} exists`)
       SPECS_TO_EXCLUDE.push(file)
     } catch (error) {
       SPECS_TO_TEST.push(file)
@@ -131,9 +123,7 @@ specs.map(async function (file: string) {
   ) {
     try {
       const r = join(resources, 'main', 'selfcustody.pem')
-      debug(`    checking ${r}`)
       accessSync(r)
-      debug(`    ${r} exists`)
       SPECS_TO_EXCLUDE.push(file)
     } catch (error) {
       SPECS_TO_TEST.push(file)

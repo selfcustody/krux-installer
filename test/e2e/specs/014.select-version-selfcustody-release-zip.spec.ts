@@ -39,25 +39,25 @@ describe('KruxInstaller SelectVersion page (download release)', () => {
     await instance.selectVersionOdudexText.waitForExist()
   })
 
-  it('should click on \'selfcustody/krux/tags/v22.08.2\' and go to ConsoleLoad page', async () => {
+  it('should click on \'selfcustody/krux/tags/v23.09.0\' and go to ConsoleLoad page', async () => {
     await instance.selectVersionSelfcustodyButton.click()
     await instance.selectVersionPage.waitForExist({ reverse: true })
     await expectWDIO(instance.selectVersionPage).not.toBeDisplayed()
   })
 
-  it('should \'Checking v22.08.2/krux-v22.08.2.zip\' message appears', async () => {
+  it('should \'Checking v23.09.0/krux-v23.09.0.zip\' message appears', async () => {
     await instance.checkingReleaseZipMsg.waitForExist()
     await expectWDIO(instance.checkingReleaseZipMsg).toBeDisplayed()
-    await expectWDIO(instance.checkingReleaseZipMsg).toHaveText('Checking v22.08.2/krux-v22.08.2.zip')
+    await expectWDIO(instance.checkingReleaseZipMsg).toHaveText('Checking v23.09.0/krux-v23.09.0.zip')
   })
 
-  it('should \'v22.08.2/krux-v22.08.2.zip not found\' message appears', async () => {
+  it('should \'v23.09.0/krux-v23.09.0.zip not found\' message appears', async () => {
     await instance.notFoundReleaseZipMsg.waitForExist()
     await expectWDIO(instance.notFoundReleaseZipMsg).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.notFoundReleaseZipMsg).toHaveText('v22.08.2/krux-v22.08.2.zip not found')
+      await expectWDIO(instance.notFoundReleaseZipMsg).toHaveText('v23.09.0/krux-v23.09.0.zip not found')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.notFoundReleaseZipMsg).toHaveText('v22.08.2\\krux-v22.08.2.zip not found')
+      await expectWDIO(instance.notFoundReleaseZipMsg).toHaveText('v23.09.0\\krux-v23.09.0.zip not found')
     }
   })
 
@@ -72,10 +72,10 @@ describe('KruxInstaller SelectVersion page (download release)', () => {
     await expectWDIO(instance.downloadOfficialReleaseZipTitle).toHaveText('Downloading')
   })
 
-  it('should DownloadOfficialReleaseZip page have \'https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip\' subtitle', async () => {
+  it('should DownloadOfficialReleaseZip page have \'https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip\' subtitle', async () => {
     await instance.downloadOfficialReleaseZipTitle.waitForExist()
     await expectWDIO(instance.downloadOfficialReleaseZipSubtitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleaseZipSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip')
+    await expectWDIO(instance.downloadOfficialReleaseZipSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip')
   })
 
   it('should DownloadOfficialReleaseZip page progress until 100%', async () => {
@@ -86,7 +86,7 @@ describe('KruxInstaller SelectVersion page (download release)', () => {
       const percent = parseFloat(percentText.split('%')[0])
       return percent === 100.00
     }, {
-      timeout: 60000,
+      timeout: 600000,
       interval: 50
     })
   })

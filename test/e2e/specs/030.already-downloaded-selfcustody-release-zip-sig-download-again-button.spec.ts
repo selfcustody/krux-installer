@@ -87,10 +87,10 @@ describe('KruxInstaller SelectVersion page (already downloaded  release signatur
     await expectWDIO(instance.downloadOfficialReleaseZipSigTitle).toHaveText('Downloading')
   })
 
-  it('should DownloadOfficialReleaseSig page have \'https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sig\' subtitle', async () => {
+  it('should DownloadOfficialReleaseSig page have \'https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip.sig\' subtitle', async () => {
     await instance.downloadOfficialReleaseZipSigSubtitle.waitForExist()
     await expectWDIO(instance.downloadOfficialReleaseZipSigSubtitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleaseZipSigSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sig')
+    await expectWDIO(instance.downloadOfficialReleaseZipSigSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip.sig')
   })
 
   it('should DownloadOfficialReleaseSig page progress until 100%', async () => {

@@ -72,10 +72,10 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click d
     await expectWDIO(instance.downloadOfficialReleaseZipTitle).toHaveText('Downloading')
   })
 
-  it('should DownloadOfficialReleaseZip page have \'https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip\' subtitle', async () => {
+  it('should DownloadOfficialReleaseZip page have \'https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip\' subtitle', async () => {
     await instance.downloadOfficialReleaseZipTitle.waitForExist()
     await expectWDIO(instance.downloadOfficialReleaseZipSubtitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleaseZipSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip')
+    await expectWDIO(instance.downloadOfficialReleaseZipSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip')
   })
 
   it('should DownloadOfficialReleaseZip page progress until 100%', async () => {

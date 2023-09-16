@@ -42,13 +42,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release - show on
     await instance.checkingReleaseZipMsg.waitForExist()
   })
 
-  it('should \'v22.08.2/krux-v22.08.2.zip found\' message appears', async () => {
+  it('should \'v23.09.0/krux-v23.09.0.zip found\' message appears', async () => {
     await instance.foundReleaseZipMsg.waitForExist()
     await expectWDIO(instance.foundReleaseZipMsg).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.foundReleaseZipMsg).toHaveText('v22.08.2/krux-v22.08.2.zip found')
+      await expectWDIO(instance.foundReleaseZipMsg).toHaveText('v23.09.0/krux-v23.09.0.zip found')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.foundReleaseZipMsg).toHaveText('v22.08.2\\krux-v22.08.2.zip found')
+      await expectWDIO(instance.foundReleaseZipMsg).toHaveText('v23.09.0\\krux-v23.09.0.zip found')
     }
   })
 
@@ -57,13 +57,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release - show on
     await expectWDIO(instance.warningDownloadPage).toBeDisplayed()
   }) 
 
-  it('should \'v22.08.2/krux-v22.08.2.zip already downloaded\' message be displayed', async () => {
+  it('should \'v23.09.0/krux-v23.09.0.zip already downloaded\' message be displayed', async () => {
     await instance.warningAlreadyDownloadedText.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedText).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2/krux-v22.08.2.zip already downloaded')
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v23.09.0/krux-v23.09.0.zip already downloaded')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2\\krux-v22.08.2.zip already downloaded')
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v23.09.0\\krux-v23.09.0.zip already downloaded')
     }
   })
 

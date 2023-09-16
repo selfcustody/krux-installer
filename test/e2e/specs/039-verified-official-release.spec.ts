@@ -96,13 +96,13 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
   it('should show sha256sum intergrity sha256.txt', async () => {
     await instance.verifiedOfficialReleasePageSha2256IntegritySha256txt.waitForExist()
     await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toBeDisplayed()
-    await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toHaveText('Expected result from file v22.08.2/krux-v22.08.2.zip.sha256.txt\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
+    await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toHaveText('Expected result from file v23.09.0/krux-v23.09.0.zip.sha256.txt\n4a 8a a4 0b 71 f7 df 35 5b d1 54 ff ac 9c 9f 10 99 e8 7a 89 c0 53 32 58 7e bc 02 a2 15 92 ec 1b')
   })
 
   it('should show sha256sum intergrity sha256 summed result', async () => {
     await instance.verifiedOfficialReleasePageSha2256IntegritySha256.waitForExist()
     await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toBeDisplayed()
-    await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v22.08.2/krux-v22.08.2.zip\n26 f9 01 a1 73 90 2e 76 b4 d8 4a 95 ee 3d 55 24 51 bc 08 f6 a0 54 e4 72 d5 a5 4e 62 36 31 27 63')
+    await expectWDIO(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText('Summed result of file v23.09.0/krux-v23.09.0.zip\n4a 8a a4 0b 71 f7 df 35 5b d1 54 ff ac 9c 9f 10 99 e8 7a 89 c0 53 32 58 7e bc 02 a2 15 92 ec 1b')
   })
   
   it('should show openssl authenticity title', async () => {
@@ -131,6 +131,11 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
     } else {
       const lang = osLangSync()
       const home = homedir()
+      if (process.platform  === 'linux' || process.platform === 'darwin') {
+        openssl = 'openssl'
+      } else if (process.platform  === 'win32') {
+        openssl = 'openssl.exe'
+      }
       if ( lang.match(/en-*/g)) {
         resources = join(home, 'Documents', 'krux-installer')
       } else if ( lang.match(/pt-*/g)) {
@@ -140,9 +145,9 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
       }
     }
 
-    const resourceZip = join(resources, 'v22.08.2', 'krux-v22.08.2.zip')
+    const resourceZip = join(resources, 'v23.09.0', 'krux-v23.09.0.zip')
     const resourcePem = join(resources, 'main', 'selfcustody.pem')
-    const resourceSig = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sig')
+    const resourceSig = join(resources, 'v23.09.0', 'krux-v23.09.0.zip.sig')
     const command = [
       '$>',
       `${openssl} sha256 <${resourceZip}`,

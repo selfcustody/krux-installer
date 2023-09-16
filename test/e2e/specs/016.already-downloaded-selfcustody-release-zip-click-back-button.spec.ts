@@ -64,9 +64,9 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click b
     await expectWDIO(instance.mainPage).toBeDisplayed()
   })
 
-  it('should \'Select version\' button changed to \'Version: selfcustody/krux/releases/tag/v22.08.2\'', async () => {
+  it('should \'Select version\' button changed to \'Version: selfcustody/krux/releases/tag/v23.09.0\'', async () => {
     await instance.mainSelectVersionText.waitForExist()
     await expectWDIO(instance.mainSelectVersionText).toBeDisplayed()
-    await expectWDIO(instance.mainSelectVersionText).toHaveText('Version: selfcustody/krux/releases/tag/v22.08.2')
+    await expectWDIO(instance.mainSelectVersionText).toHaveText('Version: selfcustody/krux/releases/tag/v23.09.0')
   })
 })

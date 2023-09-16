@@ -3,7 +3,8 @@
  */
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "org.selfcustody.krux-installer",
+  "productName": "krux-installer",
   "asar": true,
   "directories": {
     "output": "release/${version}"
@@ -20,6 +21,16 @@
     "target": [
       "dmg"
     ]
+  },
+  "linux": {
+    "category": "Utility",
+    "icon": "public/icon.png",
+    "desktop": {
+      "Icon": "org.selfcustody.krux-installer",
+      "Keywords": "electron;krux;vite;vuetify;vue3;vue",
+      "Terminal": false
+    },
+    "target": [ "AppImage" ]
   },
   "win": {
     "target": [

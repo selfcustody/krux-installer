@@ -72,14 +72,14 @@ describe('KruxInstaller SelectVersion page (show only)', () => {
     await expectWDIO(instance.selectVersionPage).toBeDisplayed()
   })
   
-  it('should \'selfcustody/krux/releases/tag/v22.08.2\' button appear', async () => {
+  it('should \'selfcustody/krux/releases/tag/v23.09.0\' button appear', async () => {
     await instance.selectVersionSelfcustodyButton.waitForExist()
     await expectWDIO(instance.selectVersionSelfcustodyButton).toBeDisplayed()
   })
 
-  it('should \'selfcustody/krux/releases/tag/v22.08.2\' button have \'selfcustody/krux/releases/tag/v22.08.2\' text', async () => {
+  it('should \'selfcustody/krux/releases/tag/v23.09.0\' button have \'selfcustody/krux/releases/tag/v23.09.0\' text', async () => {
     await instance.selectVersionSelfcustodyText.waitForExist()
-    await expectWDIO(instance.selectVersionSelfcustodyText).toHaveText('selfcustody/krux/releases/tag/v22.08.2')
+    await expectWDIO(instance.selectVersionSelfcustodyText).toHaveText('selfcustody/krux/releases/tag/v23.09.0')
   })
 
   it('should \'odudex/krux_binaries\' button appear', async () => {

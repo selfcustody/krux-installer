@@ -78,16 +78,16 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTitle).toHaveText('Resource details')
   })
 
-  it ('should overlay subtitle be \'v22.08.2/krux-v22.08.2.zip.sha256.txt\'', async () => {
+  it ('should overlay subtitle be \'v23.09.0/krux-v23.09.0.zip.sha256.txt\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTitle.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v22.08.2/krux-v22.08.2.zip.sha256.txt')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v23.09.0/krux-v23.09.0.zip.sha256.txt')
   })
 
-  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt\'', async () => {
+  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip.sha256.txt\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTextRemote.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toBeDisplayed()
-    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt')
+    await expectWDIO(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip.sha256.txt')
   })
 
   it ('should a overlay text have properly local resource', async () => {
@@ -115,7 +115,7 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
       }
     }
 
-    const resource = join(resources, 'v22.08.2', 'krux-v22.08.2.zip.sha256.txt')
+    const resource = join(resources, 'v23.09.0', 'krux-v23.09.0.zip.sha256.txt')
     await expectWDIO(instance.warningAlreadyDownloadedOverlayTextLocal).toHaveText(`Local:\n${resource}`)
   })
 

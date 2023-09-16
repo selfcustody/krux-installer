@@ -3,7 +3,7 @@
  */
 {
   "$schema": "https://raw.githubusercontent.com/electron-userland/electron-builder/master/packages/app-builder-lib/scheme.json",
-  "appId": "YourAppID",
+  "appId": "org.selfcustody.krux-installer",
   "asar": true,
   "directories": {
     "output": "release/${version}"
@@ -19,6 +19,22 @@
     "artifactName": "${productName}_${version}.${ext}",
     "target": [
       "dmg"
+    ]
+  },
+  "linux": {
+    "target": [
+      {
+        "target": "AppImage",
+        "license": "LICENSE",
+        "synopsis": "Flash Krux firmware on K210 based devices",
+        "category": "Utility",
+        "desktop": {
+          "Name": "${productName}",
+          "Comment": "Flash Krux firmware on K210 based devices",
+          "Icon": "public/icon.png",
+          "Terminal": False  
+        }
+      }
     ]
   },
   "win": {

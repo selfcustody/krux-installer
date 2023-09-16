@@ -65,13 +65,13 @@ describe('KruxInstaller SelectVersion page (already downloaded  release signatur
     await instance.warningDownloadPage.waitForExist({ reverse: true })
   })
 
-  it ('should \'v22.08.2/krux-v22.08.2.zip.sig found\' message appears', async () => {
+  it ('should \'v23.09.0/krux-v23.09.0.zip.sig found\' message appears', async () => {
     await instance.checkingReleaseZipSigMsg.waitForExist()
     await expectWDIO(instance.foundReleaseZipSigMsg).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.foundReleaseZipSigMsg).toHaveText('v22.08.2/krux-v22.08.2.zip.sig found')
+      await expectWDIO(instance.foundReleaseZipSigMsg).toHaveText('v23.09.0/krux-v23.09.0.zip.sig found')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.foundReleaseZipSigMsg).toHaveText('v22.08.2\\krux-v22.08.2.zip.sig found')
+      await expectWDIO(instance.foundReleaseZipSigMsg).toHaveText('v23.09.0\\krux-v23.09.0.zip.sig found')
     }
   })
 
@@ -80,13 +80,13 @@ describe('KruxInstaller SelectVersion page (already downloaded  release signatur
     await expectWDIO(instance.warningDownloadPage).toBeDisplayed()
   }) 
 
-  it('should \'v22.08.2/krux-v22.08.2.zip.sig already downloaded\' message be displayed', async () => {
+  it('should \'v23.09.0/krux-v23.09.0.zip.sig already downloaded\' message be displayed', async () => {
     await instance.warningAlreadyDownloadedText.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedText).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2/krux-v22.08.2.zip.sig already downloaded')
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v23.09.0/krux-v23.09.0.zip.sig already downloaded')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2\\krux-v22.08.2.zip.sig already downloaded')
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v23.09.0\\krux-v23.09.0.zip.sig already downloaded')
     }
   })
 

@@ -54,13 +54,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await instance.warningDownloadPage.waitForExist({ reverse: true })
   })
 
-  it ('should \'v22.08.2/krux-v22.08.2.zip.sha256.txt found\' message appears', async () => {
+  it ('should \'v23.09.0/krux-v23.09.0.zip.sha256.txt found\' message appears', async () => {
     await instance.checkingReleaseZipSha256txtMsg.waitForExist()
     await expectWDIO(instance.checkingReleaseZipSha256txtMsg).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.foundReleaseZipSha256txtMsg).toHaveText('v22.08.2/krux-v22.08.2.zip.sha256.txt found')
+      await expectWDIO(instance.foundReleaseZipSha256txtMsg).toHaveText('v23.09.0/krux-v23.09.0.zip.sha256.txt found')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.foundReleaseZipSha256txtMsg).toHaveText('v22.08.2\\krux-v22.08.2.zip.sha256.txt found')
+      await expectWDIO(instance.foundReleaseZipSha256txtMsg).toHaveText('v23.09.0\\krux-v23.09.0.zip.sha256.txt found')
     }
   })
 
@@ -69,13 +69,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await expectWDIO(instance.warningDownloadPage).toBeDisplayed()
   }) 
 
-  it('should \'v22.08.2/krux-v22.08.2.zip.sha256.txt already downloaded\' message be displayed', async () => {
+  it('should \'v23.09.0/krux-v23.09.0.zip.sha256.txt already downloaded\' message be displayed', async () => {
     await instance.warningAlreadyDownloadedText.waitForExist()
     await expectWDIO(instance.warningAlreadyDownloadedText).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2/krux-v22.08.2.zip.sha256.txt already downloaded')
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v23.09.0/krux-v23.09.0.zip.sha256.txt already downloaded')
     } else if (process.platform === 'win32') {
-      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v22.08.2\\krux-v22.08.2.zip.sha256.txt already downloaded')
+      await expectWDIO(instance.warningAlreadyDownloadedText).toHaveText('v23.09.0\\krux-v23.09.0.zip.sha256.txt already downloaded')
     }
   })
 

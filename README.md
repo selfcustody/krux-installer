@@ -1,10 +1,151 @@
-[![Build new-ui branch](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml/badge.svg?branch=new-ui)](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml)
+[![Build main branch](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml)
 
 # Krux Installer
 
 Krux Installer (alpha versions) aims to be a GUI based tool to build, flash and debug [Krux](https://github.com/selfcustody/krux)
 
 As it now, the generated application execute, without typing any command in terminal,[flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device), for Linux and Windows.
+
+## Install
+
+- See [releases page](https://github.com/selfcustody/krux-installer/releases); or 
+- [Build from source](/#build-from-source)
+
+## Build from source
+
+### Download nodejs
+
+First of all, you will need [Node.js](https://nodejs.org) installed in you system. We recommend use the latest LTS version.
+
+#### Download from Node.js binaries
+
+You can install node.js in your system downloading it from official [nodejs website](https://nodejs.org/en/download) and following provided instructions.
+
+#### Download from NVM (Node Version Manager)
+
+Alternatively, if you have a linux or macos system, you can have multiple versions of Node.js using [nvm](https://github.com/nvm-sh/nvm).
+
+To install nvm, follow the [instructions](https://github.com/nvm-sh/nvm#installing-and-updating).
+
+Once installed, we recomend to install the latest LTS node:
+
+```
+nvm install --lts
+``` 
+
+### Download repository
+
+Now you can download the source code:
+
+```bash
+git clone https://github.com/qlrd/krux-installer.git
+```
+
+### Install dependencies
+
+Install all dependencies:
+
+```bash
+yarn install
+```
+
+Additionaly, you can upgrade dependencies to its latest versions. Have some caution with this command,
+once that executing this command can broke some functionalities, mainly those related to the use of 
+chrome (base for electron applications) and chromiumdriver (used for E2e tests):
+
+```bash
+yarn upgrade-interactive --latest
+```
+
+### Live compile to development environment
+
+When a change is made, we recommend to execute `dev` subcommand:
+
+```bash
+yarn run dev
+```
+
+if you want to show some debug messages:
+
+```bash
+DEBUG=krux:* yarn run dev
+```
+
+### Test
+
+#### Prepare tests
+
+To test, you need to write `specification` tests under `pageobjects` definitions:
+
+- You can write your own [E2E](https://webdriver.io) specification test files on `test/e2e/specs` folder;
+- You can define the [PageObjects] on `test/e2e/pageobjects` folder.
+
+Before run tests, you will need to **build** the application.
+
+#### Build
+
+Before running build, verify [builder config](electron-builder.json5) to setup the build `target` on specific `os` (Operational System).
+
+The `<target>` depends depends on the running platform (i.e., `linux`, `darwin` -- MacOS, and `win32` -- Windows):
+
+* `linux`:   
+    * `AppImage`
+    * `deb`
+    * `snap`
+
+* `win32`: 
+    * `nsis`
+    * `portable`
+    * `AppX`
+
+* `darwin`:
+    * `dmg`
+    * `pkg`
+    * `mas`
+
+#### Run all tests:
+
+The `wdio.conf.mts` is configured to check if your system have `krux.zip.*` resources. If not, it will, run all tests, including download tests. If yes, it will skip tests that download resources:
+
+```bash
+yarn run build --<os> <target>
+```
+
+If you want to debug some messages:
+
+```bash
+DEBUG=krux:* yarn run build --<os> <target>
+```
+
+
+##### Filter tests
+
+Additionaly, you can filter some tests with `--filter` option and a based regular expression argument.
+
+For example, if you want to exclude tests until `25th` test, you can do this:
+
+```bash
+yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.ts'
+```
+
+if you want to debug some messages:
+
+
+```bash
+DEBUG=krux:* yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.ts'
+```
+
+#### WARNING: Builtin OpenSSL for windows in KruxInstaller
+
+When downloading official krux firmware versions, it is necessary to verify the signature through the OpenSSL tool, as a way to verify the authenticity of the downloaded binaries.
+
+On Unix like releases (Linux and MacOS), verification is easily done since such tool exists natively in operating system.
+
+In windows release, we are faced with the peculiarity of the operating system in question not having such a tool (see this [issue](https://github.com/qlrd/krux-installer/issues/2)).
+
+So, we packaged a stable version of OpenSSL, compiled from the [source](https://github.com/openssl/openssl). The compilation process is done entirely in a reproducible virtual environment and, therefore, not locally, with the github-action [compile-openssl-windows-action](https://github.com/qlrd/compile-openssl-windows-action/actions).
+
+Since it is compiled in a virtual environment on github, it is expected to be fully verifiable and free of malicious code. You can check the build steps in [actions](https://github.com/qlrd/krux-installer/actions).
 
 ## TODOs
 
@@ -13,6 +154,7 @@ As it now, the generated application execute, without typing any command in term
   - [x] Flash to Sipeed Amigo;
   - [x] Flash to Sipeed Bit;
   - [x] Flash to Sipeed Dock;
+  - [ ] Flash to Yahboom Aimotion
   - [ ] Build from source to M5stickV;
   - [ ] Build from source to Sipeed Amigo;
   - [ ] Build from source to Sipeed Bit;
@@ -38,79 +180,3 @@ As it now, the generated application execute, without typing any command in term
   - [x] Build DMG installer;
   - [ ] Build PKG installer;
   - [ ] Build MAS installer;
-
-## Install
-
-You can download compiled binaries on [releases page](https://github.com/selfcustody/krux-installer/releases) or Build from source:
-
-## Build from source
-
-### Download
-
-```bash
-git clone https://github.com/qlrd/krux-installer.git
-```
-
-### Install dependencies
-
-```bash
-yarn install
-```
-
-### Develop
-
-When a change is made, we recommend to `lint`, `dev`, `build` and `test` procedures before make a commit or a PR:
-
-#### Lint
-
-Verify code style and syntax errors:
-
-```bash
-yarn lint
-```
-
-#### Compiles to a development electron application
- 
-Run electron application with the (vite)[https://vitejs.dev/] server:
-
-```bash
-yarn dev
-```
-
-### Compiles and minifies for production
-
-Before running build, verify [builder config](electron-builder.json5) to setup the build targets. The `<target>` depends depends on the running platform (i.e., linux, darwin, win32):
-
-* Linux:   
-    * `AppImage`
-    * `deb`
-    * `snap`
-
-* Windows: 
-    * `nsis`
-    * `portable`
-    * `AppX`
-
-* Mac:
-    * `dmg`
-    * `pkg`
-    * `mas`
-
-
-Then run:
-
-```bash
-yarn build <target> 
-```
-
-#### Builtin OpenSSL for windows in KruxInstaller
-
-When downloading official krux firmware versions, it is necessary to verify the signature through the OpenSSL tool, as a way to verify the authenticity of the downloaded binaries.
-
-On Unix like releases (Linux and MacOS), verification is easily done since such tool exists natively in operating system.
-
-In windows release, we are faced with the peculiarity of the operating system in question not having such a tool (see this [issue](https://github.com/qlrd/krux-installer/issues/2)).
-
-So, we packaged a stable version of OpenSSL, compiled from the [source](https://github.com/openssl/openssl). The compilation process is done entirely in a reproducible virtual environment and, therefore, not locally, with the github-action [compile-openssl-windows-action](https://github.com/qlrd/compile-openssl-windows-action/actions).
-
-Since it is compiled in a virtual environment on github, it is expected to be fully verifiable and free of malicious code. You can check the build steps in [actions](https://github.com/qlrd/krux-installer/actions).

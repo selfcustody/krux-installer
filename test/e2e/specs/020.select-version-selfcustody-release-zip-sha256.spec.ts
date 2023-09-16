@@ -57,12 +57,12 @@ describe('KruxInstaller SelectVersion page (download release sha256.txt)', () =>
     await instance.warningDownloadPage.waitForExist({ reverse: true })
   })
 
-  it ('should \'checking v22.08.2/krux-v22.08.2.zip.sha256.txt\' message appears', async () => {
+  it ('should \'checking v23.09.0/krux-v23.09.0.zip.sha256.txt\' message appears', async () => {
     await instance.checkingReleaseZipSha256txtMsg.waitForExist()
     await expectWDIO(instance.checkingReleaseZipSha256txtMsg).toBeDisplayed()
   })
 
-  it ('should \'v22.08.2/krux-v22.08.2.zip.sha256.txt not found\' message appears', async () => {
+  it ('should \'v23.09.0/krux-v23.09.0.zip.sha256.txt not found\' message appears', async () => {
     await instance.notFoundReleaseZipSha256txtMsg.waitForExist()
     await expectWDIO(instance.notFoundReleaseZipSha256txtMsg).toBeDisplayed()
   })
@@ -78,10 +78,10 @@ describe('KruxInstaller SelectVersion page (download release sha256.txt)', () =>
     await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageTitle).toHaveText('Downloading')
   })
 
-  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt\' subtitle', async () => {
+  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip.sha256.txt\' subtitle', async () => {
     await instance.downloadOfficialReleaseZipSha256txtPageSubtitle.waitForExist()
     await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toBeDisplayed()
-    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v22.08.2/krux-v22.08.2.zip.sha256.txt')
+    await expectWDIO(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v23.09.0/krux-v23.09.0.zip.sha256.txt')
   })
 
   it('should DownloadOfficialReleaseZipSha256 page progress until 100%', async () => {

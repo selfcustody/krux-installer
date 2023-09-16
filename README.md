@@ -26,7 +26,9 @@ For more information, see [flash the firmware onto the device](https://selfcusto
 
 ## Install
 
-- See [releases page](https://github.com/selfcustody/krux-installer/releases); or 
+- See [releases page](https://github.com/selfcustody/krux-installer/releases);
+or
+
 - [Build from source](/#build-from-source)
 
 ## Build from source
@@ -125,17 +127,17 @@ to setup the build `target` on specific `os` (Operational System).
 The `<target>` depends depends on the running platform
 (i.e., `linux`, `darwin` -- MacOS, and `win32` -- Windows).
 
-For more information, see
-[Electron Builder configuration](https://www.electron.build/configuration/configuration)
+For more information,
+see [Electron Builder](https://www.electron.build/configuration/configuration)
+page.
 
-#### Run all tests:
+#### Run all tests
 
 The `wdio.conf.mts` is configured to check
 if your system have `krux.zip.*` resources.
 
 - If not, it will, run all tests, including download tests;
 - If yes, it will skip tests that download resources.
-
 
 ```bash
 yarn run build
@@ -152,7 +154,6 @@ If you want to debug some messages, add the
 `DEBUG` environment variable.
 
 In linux/mac:
-
 
 ```bash
 DEBUG=krux:* yarn run build --<os> <target>
@@ -171,7 +172,6 @@ yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.ts'
 ```
 
 if you want to debug some messages:
-
 
 ```bash
 DEBUG=krux:* yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.ts'
@@ -198,6 +198,7 @@ The compilation process is done entirely in a reproducible virtual environment a
 therefore, not locally, with the github-action [compile-openssl-windows-action](https://github.com/qlrd/compile-openssl-windows-action/actions).
 
 Since it is compiled in a virtual environment on github:
+
 - it is expected to be fully verifiable and free of malicious code;
 - it is expected that, if you're developing in Windows machine,
 some difficulties will be appear.

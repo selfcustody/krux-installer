@@ -188,7 +188,7 @@ export default class App extends Base {
 
     app.on('activate', () => {
       this.log('Checking existence of other windows')
-      const allWindows =  Electron.BrowserWindow.getAllWindows()
+      const allWindows = BrowserWindow.getAllWindows()
       if (allWindows.length) {
         allWindows[0].focus()
       } else {

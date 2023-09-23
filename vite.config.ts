@@ -3,6 +3,8 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vuetify from 'vite-plugin-vuetify'
 import electron from 'vite-plugin-electron'
+import { createHtmlPlugin } from 'vite-plugin-html'
+
 
 //import renderer from 'vite-plugin-electron-renderer'
 import pkg from './package.json'
@@ -65,7 +67,15 @@ export default defineConfig(({ command }) => {
             },
           }
         }
-      ])
+      ]),
+      createHtmlPlugin({
+        minify: true,
+        inject: {
+          data: {
+            title: `${pkg.name} ${pkg.version}${pkg.revision !== '' ? '.' + pkg.revision : ''}`
+          }
+        }
+      })
     ],
     server: process.env.VSCODE_DEBUG && (() => {
       const url = new URL(pkg.vscode.debug.env.VITE_DEV_SERVER_URL)

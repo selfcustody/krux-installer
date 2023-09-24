@@ -24,12 +24,12 @@ jobs:
         shell: pwsh
         run: |
           $loc = Get-Location
-          $firmware_version = "v22.08.2"
+          $firmware_version = "v23.09.0"
           $zipname = "krux-$firmware_version.zip"
           $signame = "krux-$firmware_version.zip.sig"
           $pemname = "selfcustody.pem"
           $extraResources = "$loc\extraResources"
-          $opensslVersion = "3.1.1"
+          $opensslVersion = "3.1.3"
           $release_url = "https://github.com/selfcustody/krux/releases/download"
           $raw_url = "https://raw.githubusercontent.com/selfcustody/krux/main"
           $app_version = node -e "console.log(require('./package.json').version)"
@@ -128,7 +128,7 @@ jobs:
       - name: Install chromedriver.exe
         shell: pwsh
         run: |
-          $url = "https://chromedriver.storage.googleapis.com/114.0.5735.90/chromedriver_win32.zip"
+          $url = "https://chromedriver.storage.googleapis.com/106.0.5249.61/chromedriver_win32.zip"
           $tmp_path = ".\chromedriver_win32.zip"
           $dest_path = "node_modules\chromedriver\bin"
           Invoke-WebRequest -Uri $url -OutFile $tmp_path

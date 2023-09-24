@@ -3,8 +3,7 @@ name: Build
 on:
   push:
     branches: 
-      #- main
-      - fix-macs
+      - main
     paths-ignore:
       - "**.md"
       #- "**.spec.js"
@@ -18,15 +17,15 @@ on:
 
 jobs:
 
-  #build-linux-appimage:
-  #  uses: ./.github/workflows/build-linux-appimage.yml
-  #  secrets: 
-  #    token: ${{ secrets.github_token }}
+  build-linux-appimage:
+    uses: ./.github/workflows/build-linux-appimage.yml
+    secrets: 
+      token: ${{ secrets.github_token }}
 
-  #build-windows-nsis:
-  #  uses: ./.github/workflows/build-windows-nsis.yml 
-  #  secrets: 
-  #    token: ${{ secrets.github_token }}
+  build-windows-nsis:
+    uses: ./.github/workflows/build-windows-nsis.yml 
+    secrets: 
+      token: ${{ secrets.github_token }}
 
   build-mac-dmg:
     uses: ./.github/workflows/build-mac-dmg.yml 

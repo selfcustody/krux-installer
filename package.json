@@ -71,7 +71,7 @@
     "vite-plugin-html": "^3.2.0",
     "vue": "^3.2.47",
     "vue-tsc": "^1.8.6",
-    "wdio-electron-service": "^4.3.0"
+    "wdio-electron-service": "^5.3.0"
   },
   "dependencies": {
     "@o/electron-sudo": "^2.8.23",

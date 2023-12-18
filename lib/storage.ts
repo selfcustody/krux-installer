@@ -46,9 +46,6 @@ export default class Storage extends Base {
         type: 'string',
         regex: /maixpy_(m5stickv5|amigo|dock|bit)/g
       },
-      sdcard: {
-        type: 'string'
-      },
       showFlash: {
         type: 'boolean'
       }
@@ -126,7 +123,6 @@ export default class Storage extends Base {
       const versions = []
       const version = 'Select version'
       const device = 'Select device'
-      const sdcard = ''
       let isMac10 = false
       const showFlash = false
 
@@ -141,7 +137,6 @@ export default class Storage extends Base {
       store.set('versions', versions)
       store.set('version', version)
       store.set('device', device)
-      store.set('sdcard', sdcard)
       store.set('showFlash', showFlash)
 
       const keys = Object.keys(this.config)

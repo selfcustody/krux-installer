@@ -13,22 +13,10 @@ const debug = createDebug('krux:wdio:e2e')
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-// force TEST to be true
-if (!process.env.TEST || process.env.TEST !== 'true') {
-  debug('Force TEST=true')
-  process.env.TEST = 'true'
-}
-
-// force WDIO_ELECTRON to be true
-if (!process.env.WDIO_ELECTRON || process.env.WDIO_ELECTRON !== 'true') {
-  debug('Force WDIO_ELECTRON=true')
-  process.env.WDIO_ELECTRON = 'true'
-}
-
-// force VITE_COVERAGE to be true
-if (!process.env.VITE_COVERAGE || process.env.VITE_COVERAGE !== 'true') {
-  debug('Force VITE_COVERAGE=true')
-  process.env.VITE_COVERAGE = 'true'
+enum OS {
+  linux = 'linux',
+  win32 = 'win32',
+  darwin = 'macOS'
 }
 
 // Define which specs to
@@ -61,7 +49,7 @@ if (process.env.CI && process.env.GITHUB_ACTION) {
 }
 
 // Define where specs are located
-const specs = globSync('./test/e2e/specs/*.spec.ts')
+const specs = globSync('./test/e2e/specs/*.spec.mts')
 
 // If you want to filter some test, you could use
 // a `--filter` with regular expression
@@ -204,19 +192,16 @@ export const config = {
         // grid with only 5 firefox instances available you can make sure that not more than
         // 5 instances get started at a time.
         maxInstances: 1,
-        browserName: 'chrome',
-        //acceptInsecureCerts: true
-        'goog:chromeOptions': {
-          args: []
+        browserName: 'electron',
+        'wdio:electronServiceOptions': {
+          appBinaryPath: join(__dirname, 'release', version, `${OS[process.platform]}-unpacked`, 'krux-installer'),
+          appArgs: [
+            '--disable-infobars',
+            '--disable-dev-shm-usage',
+            '--no-sandbox',
+            '--remote-debugging-port=9222'
+          ],
         }
-        //  prefs: {
-        //    enable_do_not_track: true
-        //  }
-        //}
-        // If outputDir is provided WebdriverIO can capture driver session logs
-        // it is possible to configure which logTypes to include/exclude.
-        // excludeDriverLogs: ['*'], // pass '*' to exclude all driver session logs
-        // excludeDriverLogs: ['bugreport', 'server'],
     }],
     //
     // ===================
@@ -265,28 +250,7 @@ export const config = {
     // Services take over a specific job you don't want to take care of. They enhance
     // your test setup with almost no effort. Unlike plugins, they don't add new
     // commands. Instead, they hook themselves up into the test process.
-    services: [
-      [
-        'electron',
-        {
-          appPath: join(__dirname, 'release', version),
-          appName: 'krux-installer',
-          //binaryPath: APP_PATH,
-          appArgs: [
-            '--disable-infobars',
-            '--disable-dev-shm-usage',
-            '--no-sandbox',
-            '--remote-debugging-port=9222'
-          ],
-          chromedriver: {
-            port: 9519,
-            logFileName: 'wdio-chromedriver.log',
-            //chromedriverCustomPath: createRequire(import.meta.url).resolve(join('chromedriver', 'bin', 'chromedriver'))
-          },
-          electronVersion: devDependencies.electron.split("^")[1]
-        }
-      ]
-    ],
+    services: ['electron'],
     // Framework you want to run your specs with.
     // The following are supported: Mocha, Jasmine, and Cucumber
     // see also: https://webdriver.io/docs/frameworks

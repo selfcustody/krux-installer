@@ -22,8 +22,6 @@ For more information, see [flash the firmware onto the device](https://selfcusto
 
 - MacOS
 
-**Help Wanted**: we need mac users!
-
 ## Install
 
 - See [releases page](https://github.com/selfcustody/krux-installer/releases);
@@ -102,6 +100,13 @@ if you want to show some debug messages:
 DEBUG=krux:* yarn run dev
 ```
 
+##### VSCode/VSCodium
+
+If you're codding with VSCode/VSCodium, go to `Run and Debug`
+tab and select `Debug App`:
+
+![VScodium Debug](images/vscodium_debug.png)
+
 ### Test
 
 #### Prepare tests
@@ -159,6 +164,22 @@ In linux/mac:
 DEBUG=krux:* yarn run build --<os> <target>
 ```
 
+##### Run tests
+
+To run all tests in command line:
+
+```bash
+NODE_ENV=test yarn run e2e
+```
+
+##### VSCode/VSCodium
+
+If you're codding with VSCode/VSCodium, the `NODE_ENV`
+variable is already configured. To run, tests, go to `Run and Debug`
+tab and select `Test E2E App`:
+
+![VScodium E2E test](images/vscodium.png)
+
 ##### Filter tests
 
 Additionaly, you can filter some tests with
@@ -168,13 +189,13 @@ For example, if you want to exclude tests until `25th` test,
 you can do this:
 
 ```bash
-yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.ts'
+yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.mts'
 ```
 
 if you want to debug some messages:
 
 ```bash
-DEBUG=krux:* yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.ts'
+DEBUG=krux:* yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.mts'
 ```
 
 #### WARNING: Builtin OpenSSL for windows in KruxInstaller

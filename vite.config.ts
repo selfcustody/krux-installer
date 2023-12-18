@@ -72,7 +72,7 @@ export default defineConfig(({ command }) => {
         minify: true,
         inject: {
           data: {
-            title: `${pkg.name} ${pkg.version}${pkg.revision !== '' ? '.' + pkg.revision : ''}`
+            title: `${pkg.name} ${pkg.version}`
           }
         }
       })

@@ -4,28 +4,10 @@ ipcRenderer.on('main-process-message', (_event, args) => {
   console.log(args)
 })
 
-if (process.env.TEST === 'true') {
-  const validChannels = [
-    'wdio-electron',
-    'wdio-electron.app'
-  ];
-  const invoke = async (channel, ...data) => {
-    if (!validChannels.includes(channel)) {
-        throw new Error(`Channel "${channel}" is invalid`);
-    }
-    if (!process.env.WDIO_ELECTRON) {
-        throw new Error('Electron APIs can not be invoked outside of WDIO');
-    }
-    return ipcRenderer.invoke(channel, ...data);
-  };
+if (process.env.NODE_ENV === 'test') {
   contextBridge.exposeInMainWorld('wdioElectron', {
-    app: {
-        invoke: (funcName, ...args) => invoke('wdio-electron.app', funcName, ...args),
-    },
-    custom: {
-        invoke: (...args) => invoke('wdio-electron', ...args),
-    }
-  });
+    execute: (script, args) => ipcRenderer.invoke("wdio-electron.execute", script, args)
+  })
 }
 
 contextBridge.exposeInMainWorld('api', {

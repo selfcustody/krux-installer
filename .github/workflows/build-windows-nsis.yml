@@ -128,7 +128,7 @@ jobs:
       - name: Install chromedriver.exe
         shell: pwsh
         run: |
-          $url = "https://chromedriver.storage.googleapis.com/120.0.6099.56/chromedriver_win32.zip"
+          $url = "https://edgedl.me.gvt1.com/edgedl/chrome/chrome-for-testing/120.0.6099.56/win32/chrome-win32.zip"
           $tmp_path = ".\chromedriver_win32.zip"
           $dest_path = "node_modules\chromedriver\bin"
           Invoke-WebRequest -Uri $url -OutFile $tmp_path

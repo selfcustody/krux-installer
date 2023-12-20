@@ -339,29 +339,40 @@ export const config = {
           // Linux and darwin have similar ways to do this (`kill` command);
           // on windows, we will use powershell `Stop-Process -Id` arg
           // TODO: provide a cmd alternative on windows without powershell
-          let store = ''
-          let killCmd = ''
-          if (process.platform === 'linux') {
-            store = join(process.env.HOME as string, '.config', 'krux-installer')
-            killCmd = `kill ${app.pid}`
-          } else if (process.platform === 'win32') {
-            store = join(process.env.APPDATA as string, 'krux-installer')
-          } else if (process.platform === 'darwin') {
-            store = join(process.env.HOME as string, 'Library', 'Application Support', 'krux-installer')
-            killCmd = `Stop-Process -Id ${app.pid}`
-          }
-
-          setTimeout(function () {
-            exec(killCmd, function(err) {
-              if (err) {
-                debug(err)
-                reject(err)
-              }
-              debug(`killed process ${app.pid}`)
-              resolve()
-            })
-          }, 10000)
+          if (process.platform !== 'linux' && process.platform !== 'win32' && process.platform !== 'darwin') {
+            const err = new Error(`Not implement for ${process.platform}`)
+            debug(err)
+            reject(err)
+          } else {
+            let store = ''
+            let killCmd = ''
+            
+            if (process.platform === 'linux') {
+              store = join(process.env.HOME as string, '.config', 'krux-installer')
+              killCmd = `kill ${app.pid}`
+            }
           
+            if (process.platform === 'win32') {
+              store = join(process.env.APPDATA as string, 'krux-installer')
+              killCmd = `Stop-Process -Id ${app.pid}`
+            } 
+          
+            if (process.platform === 'darwin') {
+              store = join(process.env.HOME as string, 'Library', 'Application Support', 'krux-installer')
+              killCmd = `kill ${app.pid}`
+            }
+
+            setTimeout(function () {
+              exec(killCmd, function(err) {
+                if (err) {
+                  debug(err)
+                  reject(err)
+                }
+                debug(`killed process ${app.pid}`)
+                resolve()
+              })
+            }, 10000)
+          }
         } else {
           resolve()
         }

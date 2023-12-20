@@ -3,8 +3,6 @@ import { join } from 'path'
 import { expect } from 'chai'
 import { browser } from '@wdio/globals'
 import { describe, it } from 'mocha'
-import { createRequire } from 'module'
-const { version } = createRequire(import.meta.url)('../../../package.json')
 
 describe('KruxInstaller configuration', () => {
 

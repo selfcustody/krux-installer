@@ -14,13 +14,19 @@ const debug = createDebug('krux:wdio:e2e')
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-enum OS {
-  linux = 'linux',
-  win32 = 'win32',
-  darwin = 'macOS'
+// select the correct binary
+// for each OS
+let APP_PATH: string
+if (process.platform === 'linux') {
+  APP_PATH = join(__dirname, 'release', version, 'linux-unpacked', 'krux-installer')
+} else if (process.platform === 'win32') {
+  APP_PATH = join(__dirname, 'release', version, 'win-unpacked', 'krux-installer.exe')
+} else if (process.platform === 'darwin') {
+  APP_PATH = join(__dirname, 'release', version, 'mac', 'krux-installer.app', 'Contents', 'MacOS', 'krux-installer')
+} else {
+  throw new Error(`Platform '${process.platform}' not implemented`)
 }
 
-const APP_PATH = join(__dirname, 'release', version, `${OS[process.platform]}-unpacked`, 'krux-installer')
 const APP_ARGS = [
   '--disable-infobars',
   '--disable-dev-shm-usage',

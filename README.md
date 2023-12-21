@@ -100,7 +100,7 @@ if you want to show some debug messages:
 DEBUG=krux:* yarn run dev
 ```
 
-##### VSCode/VSCodium
+#### Debug development app with VSCode/VSCodium
 
 If you're codding with VSCode/VSCodium, go to `Run and Debug`
 tab and select `Debug App`:
@@ -172,7 +172,7 @@ To run all tests in command line:
 NODE_ENV=test yarn run e2e
 ```
 
-##### VSCode/VSCodium
+#### Debug test in VSCode/VSCodium
 
 If you're codding with VSCode/VSCodium, the `NODE_ENV`
 variable is already configured. To run, tests, go to `Run and Debug`

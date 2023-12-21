@@ -59,7 +59,6 @@ export default class DownloadResourcesHandler extends Handler {
       this.log(options)
       
       const destinationResource = dirname(resourceTo)
-      console.log(destinationResource)
 
       try {
         // First check if destination resource exists

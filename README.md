@@ -189,13 +189,13 @@ For example, if you want to exclude tests until `25th` test,
 you can do this:
 
 ```bash
-yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.mts'
+NODE_ENV=test yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.mts'
 ```
 
 if you want to debug some messages:
 
 ```bash
-DEBUG=krux:* yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.mts'
+DEBUG=krux:* NODE_ENV=test yarn run e2e --filter '0([0-1][0-9]|2[0-4]).*.spec.mts'
 ```
 
 #### WARNING: Builtin OpenSSL for windows in KruxInstaller

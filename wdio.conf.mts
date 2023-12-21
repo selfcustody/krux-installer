@@ -338,7 +338,7 @@ export const config = {
           // and stop the process killing it providing it pid.
           // Linux and darwin have similar ways to do this (`kill` command);
           // on windows, we will use powershell `Stop-Process -Id` arg
-          // TODO: provide a cmd alternative on windows without powershell
+          // or cmd with `Taskkill /F /PID`
           if (process.platform !== 'linux' && process.platform !== 'win32' && process.platform !== 'darwin') {
             const err = new Error(`Not implement for ${process.platform}`)
             debug(err)
@@ -346,7 +346,7 @@ export const config = {
           } else {
             let store = ''
             let killCmd = ''
-            
+
             if (process.platform === 'linux') {
               store = join(process.env.HOME as string, '.config', 'krux-installer')
               killCmd = `kill ${app.pid}`
@@ -354,7 +354,8 @@ export const config = {
           
             if (process.platform === 'win32') {
               store = join(process.env.APPDATA as string, 'krux-installer')
-              killCmd = `Stop-Process -Id ${app.pid}`
+              killCmd = `Taskkill /F /PID ${app.pid}`
+              //killCmd = `Stop-Process -Id ${app.pid}`
             } 
           
             if (process.platform === 'darwin') {

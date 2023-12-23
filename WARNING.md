@@ -6,16 +6,16 @@ to `python/kivy`.
 ## Why the change?
 
 The decision was made among the members of the `selfcustody`
-team due to:
+team for the following reasons:
 
-- Unify software development in Python;
+- To unify software development in Python;
 - Behaviors with SSL routines, in windows,
   that differ from what would be considered "normalized";
-- Fail to flash in MacOS.
+- Failure to flash in MacOS.
 
 ### Why unify software development in Python
 
-Maintenance and review of codes can be more extensive.
+Maintenance and review of code can be more extensive.
 
 ### What systems differ in behavior with SSL routines?
 
@@ -25,7 +25,7 @@ Maintenance and review of codes can be more extensive.
 ### Why we need SSL routines?
 
 When downloading official krux firmware versions, it is necessary to verify
-the signature through a external OpenSSL tool, as a way to verify the authenticity
+the signature through an external OpenSSL tool, as a way to verify the authenticity
 of the downloaded binaries.
 
 ## Why behaviors with SSL routines differ?
@@ -35,15 +35,15 @@ We need to pack an external `openssl` into `krux-installer` package.
 ### Why?
 
 On "Unix like" releases (Linux and MacOS), verification is easily done
-since such tool exists natively in operating system.
+since such tool exists natively in the operating system.
 In windows release, we are faced with the peculiarity of the operating
-system in question do not have such a tool
+system in question.  Windows does not natively have such a tool
 (see this [issue](https://github.com/qlrd/krux-installer/issues/2)).
 
 ### How has it been resolved so far?
 
 We compiled a stable version of OpenSSL from the
-[source](https://github.com/openssl/openssl) an packaged it on our software.
+[source](https://github.com/openssl/openssl) and packaged it on our software.
 
 #### This isn't insecure?
 
@@ -52,7 +52,7 @@ is done entirely in a reproducible virtual environment and,
 therefore, not locally, with the github-action
 [compile-openssl-windows-action](https://github.com/qlrd/compile-openssl-windows-action/actions).
 
-## MacOS: how flash fail?
+## MacOS: how flash fails?
 
 The application works until you try to flash the device. Once you try
 to flash, a message like this will appear:
@@ -79,11 +79,11 @@ in `krux-installer` failed to be executed.
 
 ### Why this happen?
 
-Although we don't know for sure, we conjecture a hypotheses:
+Although we don't know for sure, we suspect that:
 
 - (1) The `krux-installer` download `ktool-mac` from a source
-that `apple` did not recognize as safer;
-- (2) If it isnt safer, `macOS` add an [extended file permission](https://apple.stackexchange.com/questions/42177/what-does-signify-in-unix-file-permissions);
+that `apple` did not recognize as "safe";
+- (2) If it isn't "safe", `macOS` adds an [extended file permission](https://apple.stackexchange.com/questions/42177/what-does-signify-in-unix-file-permissions);
 - (3) This extended file permission puts the `ktool-mac` in a quarantine;
 - (4) flash will not work.
 
@@ -119,14 +119,14 @@ to check this curve using javascript code in electron.
 
 ## These can be solved with a python module?
 
-We believe that yes;
+Yes, we believe so;
 
 ### Which module?
 
 [pyOpenSSL](https://pypi.org/project/pyOpenSSL/);
 
-### And why you can believe that?
+### And why do you believe that?
 
-We already made an experiment with
+We've already made an experiment with
 [`krux-file-signer`](https://github.com/selfcustody/krux-file-signer/blob/c541dbc730f833d64c068245fae30a42bc3f2580/src/cli/verifyer.py#L97)
 in linux and windows.

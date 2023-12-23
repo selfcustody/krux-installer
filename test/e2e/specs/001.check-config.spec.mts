@@ -6,14 +6,14 @@ const { version } = createRequire(import.meta.url)('../../../package.json')
 
 describe('Check created configuration', () => {
 
-  it('should \'appVersion\' property be equal to the defined in package.json', async () => {
+  it('\'appVersion\' property should be equal to the value defined in package.json', async () => {
     const appVersion = await browser.electron.execute(function (electron) {
       return electron.app.getVersion()
     })
     expect(appVersion).to.equal(version)
   })
 
-  it('should \'resources\' property be properly set for the platform', async () => {
+  it('\'resources\' property should be properly set for the platform', async () => {
     const resources = await browser.electron.execute(function (electron) {
       return electron.app.store.get('resources')
     })
@@ -50,14 +50,14 @@ describe('Check created configuration', () => {
     }
   })
 
-  it('should \'os\' property be properly set for the platform', async () => {
+  it('\'os\' property should be properly set for the platform', async () => {
     const os = await browser.electron.execute(function (electron) {
       return electron.app.store.get('os')
     })
     expect(os).to.equal(process.platform) 
   })
 
-  it('should \'versions\' property to be an Array with 0 elements', async () => {
+  it('\'versions\' property should be an Array with 0 elements', async () => {
     const versions = await browser.electron.execute(function (electron) {
       return electron.app.store.get('versions')
     })
@@ -65,21 +65,21 @@ describe('Check created configuration', () => {
     expect(versions.length).to.equal(0)
   })
 
-  it('should \'version\' property to be equal \'Select version\'', async () => {
+  it('\'version\' property should be equal to \'Select version\'', async () => {
     const version = await browser.electron.execute(function (electron) {
       return electron.app.store.get('version')
     })
     expect(version).to.equal('Select version')
   })
 
-  it('should \'device\' property to be equal \'Select device\'', async () => {
+  it('\'device\' property should be equal to \'Select device\'', async () => {
     const device = await browser.electron.execute(function (electron) {
       return electron.app.store.get('device')
     })
     expect(device).to.equal('Select device')
   })
 
-  it('should \'showFlash\' property to be equal \'false\'', async () => {
+  it('\'device\' property should be equal to \'Select device\'', async () => {
     const showFlash = await browser.electron.execute(function (electron) {
       return electron.app.store.get('showFlash')
     })

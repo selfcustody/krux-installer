@@ -11,14 +11,14 @@ describe('KruxInstaller start up', () => {
     expect(isReady).to.be.equal(true)
   })
 
-  it('should name be correct', async () => {
+  it('application name should be correct', async () => {
     const name = await browser.electron.execute(function (electron) {
       return electron.app.getName()
     })
     expect(name).to.be.equal('krux-installer')
   })
 
-  it('should version be correct', async () => {
+  it('application version should be correct', async () => {
     const version = await browser.electron.execute(function (electron) {
       return electron.app.getVersion()
     })

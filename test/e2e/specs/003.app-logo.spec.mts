@@ -31,21 +31,21 @@ describe('KruxInstaller initialization', () => {
     instance = new App()
   })
 
-  it('should #app html exist', async () => { 
+  it('\'#app\' html tag should exist', async () => { 
     await instance.app.waitForExist({ timeout: 5000 })
   })
 
-  it('should main tag exist', async () => { 
+  it('\'#main\' html tag should exist', async () => { 
     await instance.main.waitForExist({ timeout: 5000 })
   })
 
-  it('should krux-installer logo appears', async () => { 
+  it('krux-installer logo should appears', async () => { 
     await instance.logo.waitForExist({ timeout: 3000 })
     await expect(instance.logo).toBeDisplayed()
     await expect(instance.logo).toHaveText(KRUX_INSTALLER_LOGO)
   })
 
-  it('should krux-installer logo disappears', async () => { 
+  it('krux-installer logo should disappear', async () => { 
     await instance.logo.waitForExist({ timeout: 3000, reverse: true })
   })
 })

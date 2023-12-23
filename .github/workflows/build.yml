@@ -11,7 +11,7 @@ on:
       - ".vscode"
       - ".dockerignore"
       - "Dockerfile"
-      #- ".gitignore"
+      - ".gitignore"
       #- ".github/**"
       #- "!.github/workflows/build.yml"
 
@@ -22,12 +22,17 @@ jobs:
     secrets: 
       token: ${{ secrets.github_token }}
 
+  build-linux-deb:
+    uses: ./.github/workflows/build-linux-deb.yml
+    secrets: 
+      token: ${{ secrets.github_token }}
+
   build-windows-nsis:
     uses: ./.github/workflows/build-windows-nsis.yml 
     secrets: 
       token: ${{ secrets.github_token }}
 
-  build-mac-dmg:
-    uses: ./.github/workflows/build-mac-dmg.yml 
-    secrets: 
-      token: ${{ secrets.github_token }}
+  #build-mac-dmg:
+  #  uses: ./.github/workflows/build-mac-dmg.yml 
+  #  secrets: 
+  #    token: ${{ secrets.github_token }}

@@ -54,7 +54,6 @@ function toDashes(msg: string) {
   // windows need to replace \ to -
   tag = tag.replace(/\\/g, '-')
   
-  console.log(tag)
   return tag
 }
 </script>

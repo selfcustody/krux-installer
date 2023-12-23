@@ -20,92 +20,67 @@ const kruxInstaller = new App(`KruxInstaller | v${version}`)
 kruxInstaller.start(async ({ app, win, ipcMain}) => {
   // Create storage
   const storageBuilder = new Storage(app)
-  const store = await storageBuilder.build()
+  app.store = await storageBuilder.build()
 
   // Reset configurations
-  store.set('device', 'Select device')
-  store.set('version', 'Select version')
-  store.set('versions', [])
+  app.store.set('device', 'Select device')
+  app.store.set('version', 'Select version')
+  app.store.set('versions', [])
 
   // Create download resource handler
-  const changePage = new ChangePageHandler(win, store, ipcMain)
+  const changePage = new ChangePageHandler(win, app.store, ipcMain)
   changePage.build()
 
   // Create download resource handler
-  const downloadResource = new DownloadResourcesHandler(win, store, ipcMain)
+  const downloadResource = new DownloadResourcesHandler(win, app.store, ipcMain)
   downloadResource.build()
 
   // Create check resource handler
-  const checkResource = new CheckResourcesHandler(win, store, ipcMain)
+  const checkResource = new CheckResourcesHandler(win, app.store, ipcMain)
   checkResource.build()
 
   // Create unzip resource handler
-  const unzipResource = new UnzipResourceHandler(win, store, ipcMain)
+  const unzipResource = new UnzipResourceHandler(win, app.store, ipcMain)
   unzipResource.build()
 
   // Create fetcher for newest official release handler
-  const verifyOfficialReleasesFetch = new VerifyOfficialReleasesFetchHandler(win, store, ipcMain)
+  const verifyOfficialReleasesFetch = new VerifyOfficialReleasesFetchHandler(win, app.store, ipcMain)
   verifyOfficialReleasesFetch.build()
 
   // Create handler for official release sha256.txt
-  const verifyOfficialReleasesHash = new VerifyOfficialReleasesHashHandler(win, store, ipcMain)
+  const verifyOfficialReleasesHash = new VerifyOfficialReleasesHashHandler(win, app.store, ipcMain)
   verifyOfficialReleasesHash.build()
 
   // Create handler for official release .sig and .pem handler
-  const verifyOfficialReleasesSign = new VerifyOfficialReleasesSignHandler(win, store, ipcMain)
+  const verifyOfficialReleasesSign = new VerifyOfficialReleasesSignHandler(win, app.store, ipcMain)
   verifyOfficialReleasesSign.build()
 
   // Create handler for verify existence of openssl
-  const verifyOpenssl = new VerifyOpensslHandler(win, store, ipcMain)
+  const verifyOpenssl = new VerifyOpensslHandler(win, app.store, ipcMain)
   verifyOpenssl.build()
 
   // Create store setter handler
-  const storeSet = new StoreSetHandler(win, store, ipcMain)
+  const storeSet = new StoreSetHandler(win, app.store, ipcMain)
   storeSet.build()
 
   // Create store getter handler
-  const storeGet = new StoreGetHandler(win, store, ipcMain)
+  const storeGet = new StoreGetHandler(win, app.store, ipcMain)
   storeGet.build()
 
   // Create 'check if it will flash' handler
-  const checkIfItWillFlashHandler = new CheckIfItWillFlashHandler(win, store, ipcMain)
+  const checkIfItWillFlashHandler = new CheckIfItWillFlashHandler(win, app.store, ipcMain)
   checkIfItWillFlashHandler.build()
 
   // Create flash' handler
-  const flashHandler = new FlashHandler(win, store, ipcMain)
+  const flashHandler = new FlashHandler(win, app.store, ipcMain)
   flashHandler.build()
 
   // Create Wdio test handlers
   // if environment variable WDIO_ELECTRON equals 'true'
-  if (process.env.TEST === 'true' && process.env.WDIO_ELECTRON === 'true') {
-    win.webContents.send('building ipcMain.handle for \'wdio-electron.app\'') 
-    ipcMain.handle('wdio-electron.app', (_event, funcName, ...args) => {
-      const appProp = app[funcName];
-      if (typeof appProp === 'function') {
-        return appProp.apply(app, args);
-      }
-      return appProp;
-    });
-
-    win.webContents.send('building ipcMain.handle for \'wdio-electron\'') 
-    ipcMain.handle('wdio-electron', (_events, ...args) => {
-      return {
-        appData: app.getPath('appData'),
-        documents: app.getPath('documents'),
-        store: {
-          appVersion: store.get('appVersion'),
-          resources: store.get('resources'),
-          os: store.get('os'),
-          versions: store.get('versions'),
-          version: store.get('version'),
-          device: store.get('device'),
-          sdcard: store.get('sdcard'),
-          showFlash: store.get('showFlash')
-        }
-      }
+  if (process.env.NODE_ENV === 'test') {
+    const _electron = await import('electron')
+    ipcMain.handle("wdio-electron.execute", (_, script, args) => {
+      return new Function(`return (${script}).apply(this, arguments)`)(_electron, ...args);
     })
-  } else { 
-    win.webContents.send("skip build ipcMain.handle for 'wdio-electron.app'")  
-    win.webContents.send("skip build ipcMain.handle for 'wdio-electron'") 
   }
 })

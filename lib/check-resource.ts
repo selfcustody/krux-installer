@@ -42,7 +42,6 @@ export default class CheckResourcesHandler extends Handler {
   build () {
     super.build(async (options) => {
       try {
-        console.log(options)
         const resources = this.storage.get('resources') as string
         const destinationResource = join(resources, options.resource)
       

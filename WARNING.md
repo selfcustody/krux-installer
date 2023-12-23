@@ -8,8 +8,9 @@ to `python/kivy`.
 The decision was made among the members of the `selfcustody`
 team due to:
 
-- Unify software development in Python; 
-- Behaviors with SSL routines, in windows, that differ from what would be considered "normalized";
+- Unify software development in Python;
+- Behaviors with SSL routines, in windows,
+  that differ from what would be considered "normalized";
 - Fail to flash in MacOS.
 
 ### Why unify software development in Python
@@ -27,14 +28,15 @@ When downloading official krux firmware versions, it is necessary to verify
 the signature through a external OpenSSL tool, as a way to verify the authenticity
 of the downloaded binaries.
 
-## Why behaviors with SSL routines, in windows, differ from what would be considered "normalized"?
+## Why behaviors with SSL routines differ?
 
 We need to pack an external `openssl` into `krux-installer` package.
 
 ### Why?
 
 On "Unix like" releases (Linux and MacOS), verification is easily done
-since such tool exists natively in operating system. In windows release, we are faced with the peculiarity of the operating
+since such tool exists natively in operating system.
+In windows release, we are faced with the peculiarity of the operating
 system in question do not have such a tool
 (see this [issue](https://github.com/qlrd/krux-installer/issues/2)).
 
@@ -72,7 +74,8 @@ or external archive
 
 ### What this means?
 
-This means that the `ktool-mac`, aka the "flasher", in `krux-installer` failed to be executed.
+This means that the `ktool-mac`, aka the "flasher",
+in `krux-installer` failed to be executed.
 
 ### Why this happen?
 

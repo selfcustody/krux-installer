@@ -54,7 +54,6 @@ import onKruxFlash from './utils/onKruxFlash';
 import onKruxFlashData from './utils/onKruxFlashData';
 import onKruxUnzipData from './utils/onKruxUnzipData';
 
-
 /**
  * Reference for which component will be used as showing page
  */

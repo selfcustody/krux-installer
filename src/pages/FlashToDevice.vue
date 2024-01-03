@@ -7,8 +7,10 @@
             <v-card
               variant="outlined"
             >
-              <v-card-title > {{ !done ? 'Flashing...' : 'Done' }} </v-card-title>
-              <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : 'Shutdown your device and unplug it' }} </v-card-subtitle>
+              <v-card-title > {{ !done ? 'Flashing...' : 'Do not trust, verify! ' }} </v-card-title>
+              <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : 'Before quit:' }} </v-card-subtitle>
+              <v-card-subtitle> {{ !done ? '' : '(1) Scroll down the output to check what happened to your device;' }} </v-card-subtitle>
+              <v-card-subtitle> {{ !done ? '' : '(2) shutdown your device and unplug it' }} </v-card-subtitle>
               <v-card-text>
                 <div class="console" v-html="!done ? output : allOutput" />
               </v-card-text>  
@@ -17,12 +19,22 @@
         </v-col>
         <v-col v-if="done">
           <v-item>
-            <v-card
+            <v-btn
               variant="outlined"
+              color="green"
               @click="backToFn"
             >
               Back
-            </v-card>
+            </v-btn>
+          </v-item>
+          <v-item>
+            <v-btn
+              variant="outlined"
+              color="red"
+              @click="exitAppFn"
+            >
+              Quit
+            </v-btn>
           </v-item>
         </v-col>
       </v-row>
@@ -42,12 +54,17 @@ const props = defineProps<{
 const { output, done } = toRefs(props)
 
 const allOutput: Ref<string> = ref('')
+
 /**
   Methods
  */
 async function backToFn () {
   output.value = output.value.split(' ').splice(0).join('')
   await window.api.invoke('krux:store:get', { from: 'FlashToDevice', keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
+}
+
+async function exitAppFn () {
+  await window.api.invoke('krux:quit')
 }
 
 onMounted(async function () {

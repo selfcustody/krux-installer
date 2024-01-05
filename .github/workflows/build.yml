@@ -22,11 +22,16 @@ jobs:
     secrets: 
       token: ${{ secrets.github_token }}
 
-  build-linux-pkg:
-    uses: ./.github/workflows/build-linux-pkg.yml
+  build-linux-deb:
+    uses: ./.github/workflows/build-linux-deb.yml
     secrets: 
       token: ${{ secrets.github_token }}
 
+  build-linux-rpm:
+    uses: ./.github/workflows/build-linux-rpm.yml
+    secrets: 
+      token: ${{ secrets.github_token }}
+      
   build-windows-nsis:
     uses: ./.github/workflows/build-windows-nsis.yml 
     secrets: 

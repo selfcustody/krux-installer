@@ -1,4 +1,4 @@
-name: Build electron application as deb/rpm package on linux
+name: Build electron application as deb package on linux
 
 on:
   workflow_call:
@@ -10,19 +10,12 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        pkg: [deb, rpm]
    
     steps:
 
       - name: Checkout Git repository
         uses: actions/checkout@v3
 
-      - name: Install RPM dependencies
-        if: ${{ matrix.pkg == 'rpm' }}
-        run: sudo apt-get install rpm
-        
       - name: Install node
         uses: actions/setup-node@v3
         with:
@@ -46,13 +39,13 @@ jobs:
       - name: Build electron app
         env:
           GH_TOKEN: ${{ secrets.token }}
-        run: yarn run build --linux ${{ matrix.pkg }}
+        run: yarn run build --linux deb
 
       - name: Hash electron app (Linux)
         uses: qlrd/sha256sum-action@v2
         with:
           working-directory: ./release/${{ steps.setup.outputs.app-version }}
-          file: ${{ steps.setup.outputs.app-name }}.${{ matrix.pkg }}
+          file: ${{ steps.setup.outputs.app-name }}.deb
           ext: sha256.txt
 
       - name: List release files
@@ -73,8 +66,8 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ github.ref_name == 'main' }}
         with:
-          name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-${{ matrix.pkg }}
+          name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-deb
           retention-days: 5
           path: |
-            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.${{ matrix.pkg }}
-            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.${{ matrix.pkg }}.sha256.txt
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.deb
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.deb.sha256.txt

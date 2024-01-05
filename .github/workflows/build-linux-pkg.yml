@@ -10,9 +10,9 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    matrix:
-      strategy:
-        - pkg: [deb, rpm]
+    strategy:
+      matrix:
+        pkg: [deb, rpm]
    
     steps:
 

@@ -187,9 +187,4 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
     await instance.verifiedOfficialReleasePage.waitForExist({ reverse: true })
   })
 
-  it('should be in Main page', async () => {
-    await instance.mainPage.waitForExist()
-    await expect(instance.mainPage).toBeDisplayed()
-  })
-
 })

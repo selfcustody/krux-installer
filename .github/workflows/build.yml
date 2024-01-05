@@ -22,8 +22,8 @@ jobs:
     secrets: 
       token: ${{ secrets.github_token }}
 
-  build-linux-deb:
-    uses: ./.github/workflows/build-linux-deb.yml
+  build-linux-pkg:
+    uses: ./.github/workflows/build-linux-pkg.yml
     secrets: 
       token: ${{ secrets.github_token }}
 

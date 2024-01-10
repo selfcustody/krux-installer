@@ -6,7 +6,7 @@ import { tmpdir, homedir } from 'os'
 import { createRequire } from 'module'
 import { osLangSync } from 'os-lang'
 import createDebug from 'debug'
-import { accessSync } from 'fs';
+import { accessSync, readFileSync } from 'fs';
 import { exec, execFile } from 'child_process';
 
 const { devDependencies, version } = createRequire(import.meta.url)('./package.json')
@@ -18,7 +18,11 @@ const __dirname = dirname(__filename);
 // for each OS
 let APP_PATH: string
 if (process.platform === 'linux') {
-  APP_PATH = join(__dirname, 'release', version, 'linux-unpacked', 'krux-installer')
+  if (process.arch === 'arm64') {
+    APP_PATH = join(__dirname, 'release', version, 'linux-arm64-unpacked', 'krux-installer')
+  } else {
+    APP_PATH = join(__dirname, 'release', version, 'linux-unpacked', 'krux-installer')
+  }
 } else if (process.platform === 'win32') {
   APP_PATH = join(__dirname, 'release', version, 'win-unpacked', 'krux-installer.exe')
 } else if (process.platform === 'darwin') {
@@ -58,8 +62,15 @@ if (process.env.CI && process.env.GITHUB_ACTION) {
     resources = join(home, 'Documents', 'krux-installer')
   } else if ( lang.match(/pt-*/g)) {
     resources = join(home, 'Documentos', 'krux-installer')
+  } else if ( lang.match(/POSIX/) ) {
+    // Check if is running under docker container (containerized build for arm64)
+    if (process.env.NODE_DOCKER) {
+      resources = join(process.env.DOCUMENTS, 'krux-installer')
+    } else {
+       throw new Error('Failed to check if is running under docker')
+    }
   } else {
-    throw new Error(`${lang} not implemented. Please implement it with correct \'Documents\' folder name`)
+    throw new Error(`'${lang}'' lang not implemented. Please implement it with correct \'Documents\' folder name`)
   }
 }
 

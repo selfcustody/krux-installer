@@ -30,7 +30,7 @@
       "Keywords": "electron;krux;vite;vuetify;vue3;vue",
       "Terminal": false
     },
-    "target": [ "AppImage" ]
+    "target": [ "AppImage", "deb", "rpm" ]
   },
   "win": {
     "target": [

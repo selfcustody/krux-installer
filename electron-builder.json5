@@ -25,27 +25,12 @@
   "linux": {
     "category": "Utility",
     "icon": "public/icon.png",
-    "target": [
-      { 
-        "target": "AppImage"
-      },
-      {
-        "target": "deb",
-        "desktop": {
-          "Icon": "/usr/share/icons/hicolor/0x0/apps/krux-installer.png",
-          "Keywords": "electron;krux;vite;vuetify;vue3;vue",
-          "Terminal": false
-        }
-      },
-      {
-        "target": "rpm",
-        "desktop": {
-          "Icon": "/usr/share/icons/hicolor/0x0/apps/krux-installer.png",
-          "Keywords": "electron;krux;vite;vuetify;vue3;vue",
-          "Terminal": false
-        }
-      }
-    ]
+    "desktop": {
+      "Icon": "/usr/share/icons/hicolor/0x0/apps/krux-installer.png",
+      "Keywords": "electron;krux;vite;vuetify;vue3;vue",
+      "Terminal": false
+    },
+    "target": ["AppImage", "deb", "rpm"]
   },
   "win": {
     "icon": "public/icon.png",

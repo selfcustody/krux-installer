@@ -70,7 +70,7 @@ if (process.env.CI && process.env.GITHUB_ACTION) {
        throw new Error('Failed to check if is running under docker')
     }
   } else {
-    throw new Error(`'${lang}'' lang not implemented. Please implement it with correct \'Documents\' folder name`)
+    throw new Error(`'${lang}' lang not implemented`)
   }
 }
 

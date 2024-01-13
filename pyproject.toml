@@ -7,6 +7,10 @@ authors = [
 ]
 license = "LICENSE"
 readme = "README.md"
+packages = [
+    { include = "src/utils" },
+    { include = "src/constants"}
+]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<=3.11.7"
@@ -22,6 +26,7 @@ pyinstaller = "^6.3.0"
 poethepoet = "^0.24.4"
 
 [tool.poe.tasks]
+cli = "python src/krux-installer.py"
 test = "pytest --cache-clear --cov src/ --cov-report html ./tests"
 
 [build-system]

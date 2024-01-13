@@ -1,0 +1,29 @@
+[tool.poetry]
+name = "krux-installer"
+version = "0.0.2"
+description = "A GUI based application to flash Krux firmware on K210 based devices"
+authors = [
+  "qlrd <qlrddev@gmail.com>"
+]
+license = "LICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<=3.11.7"
+kivy = "^2.2.1"
+kivysome = "^0.2.1"
+pyopenssl = "^23.3.0"
+pytest-cov = "^4.1.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.12.1"
+pylint = "^3.0.3"
+pyinstaller = "^6.3.0"
+poethepoet = "^0.24.4"
+
+[tool.poe.tasks]
+test = "pytest --cache-clear --cov src/ --cov-report html ./tests"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

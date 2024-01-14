@@ -7,10 +7,6 @@ authors = [
 ]
 license = "LICENSE"
 readme = "README.md"
-packages = [
-    { include = "src/utils" },
-    { include = "src/constants"}
-]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<=3.11.7"
@@ -27,6 +23,12 @@ poethepoet = "^0.24.4"
 
 [tool.poe.tasks]
 cli = "python src/krux-installer.py"
+format-src= "black ./src"
+format-tests= "black ./tests"
+format = ["format-src", "format-tests"]
+lint-src = "pylint ./src"
+lint-tests = "pylint --disable=C0114,C0115,C0116 ./tests"
+lint = ["lint-src", "lint-tests"]
 test = "pytest --cache-clear --cov src/ --cov-report html ./tests"
 
 [build-system]

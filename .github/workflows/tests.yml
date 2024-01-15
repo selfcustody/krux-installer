@@ -106,7 +106,7 @@ jobs:
         run: poetry install
       
       - name: Build coverage file
-        run: poetry run poe coverage
+        run: poetry run poe coverage-xml
       
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3

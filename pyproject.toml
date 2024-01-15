@@ -31,7 +31,8 @@ lint-src = "pylint ./src"
 lint-tests = "pylint --disable=C0114,C0115,C0116 ./tests"
 lint = ["lint-src", "lint-tests"]
 test = "pytest --cache-clear ./tests"
-coverage = "pytest --cache-clear --cov src/ --cov-report html ./tests"
+coverage-html = "pytest --cache-clear --cov src/ --cov-report html ./tests"
+coverage-xml = "pytest --cache-clear --cov src/ --cov-report xml ./tests"
 
 [build-system]
 requires = ["poetry-core"]

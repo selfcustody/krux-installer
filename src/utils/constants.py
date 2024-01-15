@@ -25,9 +25,14 @@ constants.py
 Some constants to be used accros application
 """
 
-import os
-import tomllib
 from typing import Any
+import sys
+import os
+
+if sys.version_info <= (3, 10):
+    import tomli as tomllib
+if sys.version_info >= (3, 11):
+    import tomllib
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 

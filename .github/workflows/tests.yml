@@ -50,7 +50,8 @@ jobs:
           python3 -m pip install poetry
 
       - name: Install project and its dependencies
-      
+        run: poetry install
+        
       - name: Lint
         run: poetry run poe lint
                    

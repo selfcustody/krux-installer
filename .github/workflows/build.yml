@@ -27,6 +27,25 @@ jobs:
     secrets: 
       token: ${{ secrets.github_token }}
 
+  #build-linux-deb-arm64:
+  #  uses: ./.github/workflows/build-linux-deb-arm64.yml
+  #  secrets: 
+  #    token: ${{ secrets.github_token }}
+  #    DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  #    DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  
+  #build-linux-rpm-arm64:
+  #  uses: ./.github/workflows/build-linux-rpm-arm64.yml
+  #  secrets: 
+  #    token: ${{ secrets.github_token }}
+  #    DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+  #    DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      
+  build-linux-rpm:
+    uses: ./.github/workflows/build-linux-rpm.yml
+    secrets: 
+      token: ${{ secrets.github_token }}
+      
   build-windows-nsis:
     uses: ./.github/workflows/build-windows-nsis.yml 
     secrets: 

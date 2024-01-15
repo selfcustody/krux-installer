@@ -1,0 +1,82 @@
+name: Build electron application as rpm package on linux (arm64)
+
+on:
+  workflow_call:
+    secrets:
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_PASSWORD:
+        required: true
+      token:
+        required: true
+
+jobs:
+
+  build-linux-rpm-arm64:
+    runs-on: ubuntu-latest
+    env:      
+      DOCKER_IMAGE: krux-installer-rpm
+      DOCKER_TARGET_PLATFORM: ubuntu/arm64/v8
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+   
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+      
+      - name: Setup variables      
+        id: setup      
+        run: |        
+          echo "docker-platform=${DOCKER_TARGET_PLATFORM}" >> $GITHUB_OUTPUT        
+          echo "docker-image=${DOCKER_IMAGE}/${DOCKER_TARGET_PLATFORM}" >> $GITHUB_OUTPUT        
+          echo "docker-version=${GITHUB_RUN_NUMBER}" >> $GITHUB_OUTPUT          
+          KRUX_VERSION=`node -e "console.log(require('./package.json').version)"`
+          echo "app-version=$KRUX_VERSION" >> $GITHUB_OUTPUT          
+          echo "app-name=krux-installer-${KRUX_VERSION}.aarch64" >> $GITHUB_OUTPUT
+
+      - name: Docker Login
+        run: echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin 
+
+      - name: Create release folder
+        run: mkdir -p ./release/${{ steps.setup.outputs.app-version }}
+      
+      - name: Run Buildx      
+        run: |
+          docker buildx build \
+            --file ./dockerfiles/rpm/Dockerfile \
+            --platform ${{ steps.setup.outputs.docker-platform }} \
+            --tag ${{ steps.setup.outputs.docker-image }}:${{ steps.setup.outputs.docker-version }} \
+            --output type=local,dest=./release .
+     
+      - name: Hash electron app
+        uses: qlrd/sha256sum-action@v2
+        with:
+          working-directory: release/${{ steps.setup.outputs.app-version }}
+          file: ${{ steps.setup.outputs.app-name }}.rpm
+          ext: sha256.txt
+
+      - name: List releases
+        run: ls ./release/${{ steps.setup.outputs.app-version }}
+        
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        if: ${{ github.ref_name == 'main' }}
+        with:
+          name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-rpm
+          retention-days: 5
+          path: |
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.rpm
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.rpm.sha256.txt

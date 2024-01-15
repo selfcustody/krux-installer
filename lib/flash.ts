@@ -140,6 +140,15 @@ export default class FlashHandler extends Handler {
 
       flasher.stdout.on('data', (data: any) => {
         output = Buffer.from(data, 'utf-8').toString()
+        if (output.match(/\[ERROR\].*/g)) {
+          output = output.replace("\x1b[31m", "")
+          output = output.replace("\x1b[1m", "")
+          output = output.replace("\x1b[0m", "")
+          output = output.replace("\x1b[32m", "")
+          output = output.replace("\x1b[0m \n", "")
+          output = output.replace("[ERROR]", "")
+          err = new Error(output) 
+        }
         this.send(`${this.name}:data`, output)
       })
 
@@ -151,7 +160,7 @@ export default class FlashHandler extends Handler {
   
       flasher.on('close', (code: any) => {
         if (err) {
-          this.send(`${this.name}:error`, { name: err.name, message: err.message, stack: err.stack })
+          this.send(`${this.name}:error`, { done: false , name: err.name, message: err.message, stack: err.stack })
         } else {
           this.send(`${this.name}:success`, { done: true })
         }

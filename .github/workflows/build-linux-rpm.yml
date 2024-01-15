@@ -1,4 +1,4 @@
-name: Build electron application as deb package on linux
+name: Build electron application as rpm package on linux
 
 on:
   workflow_call:
@@ -16,6 +16,9 @@ jobs:
       - name: Checkout Git repository
         uses: actions/checkout@v3
 
+      - name: Install RPM dependencies
+        run: sudo apt-get install rpm
+        
       - name: Install node
         uses: actions/setup-node@v3
         with:
@@ -27,7 +30,7 @@ jobs:
           KRUX_VERSION=`node -e "console.log(require('./package.json').version)"`
           echo "app-version=$KRUX_VERSION" >> $GITHUB_OUTPUT
           KRUX_NAME=krux-installer
-          echo "app-name=${KRUX_NAME}_${KRUX_VERSION}_amd64" >> $GITHUB_OUTPUT
+          echo "app-name=${KRUX_NAME}-${KRUX_VERSION}.x86_64" >> $GITHUB_OUTPUT
           echo "::group::Variables"
           echo "app-version=$KRUX_VERSION"
           echo "app-name=$KRUX_NAME"
@@ -39,13 +42,13 @@ jobs:
       - name: Build electron app
         env:
           GH_TOKEN: ${{ secrets.token }}
-        run: yarn run build --linux deb
+        run: yarn run build --linux rpm
 
       - name: Hash electron app (Linux)
         uses: qlrd/sha256sum-action@v2
         with:
           working-directory: ./release/${{ steps.setup.outputs.app-version }}
-          file: ${{ steps.setup.outputs.app-name }}.deb
+          file: ${{ steps.setup.outputs.app-name }}.rpm
           ext: sha256.txt
 
       - name: List release files
@@ -66,8 +69,8 @@ jobs:
         uses: actions/upload-artifact@v3
         if: ${{ github.ref_name == 'main' }}
         with:
-          name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-deb
+          name: ${{ runner.os }}-${{ steps.setup.outputs.app-name }}-rpm
           retention-days: 5
           path: |
-            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.deb
-            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.deb.sha256.txt
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.rpm
+            release/${{ steps.setup.outputs.app-version }}/${{ steps.setup.outputs.app-name }}.rpm.sha256.txt

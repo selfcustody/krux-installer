@@ -2,31 +2,37 @@
   <v-layout>
     <v-flex xs12 sm6 offset-sm3>
       <v-card
-    variant="plain"
-    flat
-  >
-    <v-card-text w>
-      <AsciiMorph
-        :list="list"
-        :canvas="{ x: 6, y: 6 }"
-        :index="index"
-        :timeout="30"
-        fontSize="10px"
-      />
-    </v-card-text>
-    <v-card-actions class="justify-center">
-      <v-btn
-        variant="text"
-        color="red"
-        @click="backToFn"
+        variant="plain"
+        flat
       >
-        Back
-      </v-btn>
-    </v-card-actions>
-  </v-card>
+        <v-card-text w>
+          <AsciiMorph
+            :list="list"
+            :canvas="{ x: 6, y: 6 }"
+            :index="index"
+            :timeout="30"
+            fontSize="10px"
+          />
+        </v-card-text>
+        <v-card-actions class="justify-center">
+          <v-btn
+            variant="outlined"
+            color="green"
+            @click="backToFn"
+          >
+            Back
+          </v-btn>
+          <v-btn
+            variant="outlined"
+            color="red"
+            @click="exitAppFn"
+          >
+            Quit
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-flex>
   </v-layout>
-  
 </template>
 
 <script setup lang="ts">
@@ -62,6 +68,11 @@ async function backToFn () {
   await delay(50)
   await window.api.invoke('krux:store:get', { from: 'ErrorMsg', keys: ['device', 'version', 'os', 'isMac10'] })
   await window.api.invoke('krux:change:page', { page: backTo.value })
+}
+
+
+async function exitAppFn () {
+  await window.api.invoke('krux:quit')
 }
 
 /**

@@ -25,10 +25,11 @@ selector.py
 Generic selector to select devices or versions
 """
 
-import json
-from urllib.request import Request, urlopen
 from http.client import HTTPResponse
+from typing import Any
+import requests
 from kivy.cache import Cache
+
 
 VALID_DEVICES = ("m5stickv", "amigo_tft", "amigo_ips", "dock", "bit", "yahboom")
 VALID_VERSIONS = ["odudex/krux_binaries"]
@@ -52,7 +53,7 @@ def get_device() -> str:
     return Cache.get("krux-installer", "device")
 
 
-def request_krux_releases() -> HTTPResponse:
+def get_releases() -> HTTPResponse:
     """
     Get the all available releases at
     https://github.com/selfcustody/krux/releases
@@ -62,16 +63,32 @@ def request_krux_releases() -> HTTPResponse:
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
-    req = Request(url, headers=headers)
-    return urlopen(req)
+    try:
+        response = requests.get(url, headers=headers, timeout=60)
+        response.raise_for_status()
+
+    except requests.exceptions.Timeout as t_exc:
+        raise RuntimeError(f"Timeout error: {t_exc.__cause__ }") from t_exc
+
+    except requests.exceptions.ConnectionError as c_exc:
+        raise RuntimeError(f"Connection error: {c_exc.__cause__}") from c_exc
+
+    except requests.exceptions.HTTPError as h_exc:
+        raise RuntimeError(
+            f"HTTP error {response.status_code}: {h_exc.__cause__}"
+        ) from h_exc
+
+    if response.status_code == 200:
+        return response.json()
+
+    raise RuntimeError(f"Status code: {response.status_code}")
 
 
-def get_releases_tags(response: HTTPResponse) -> list:
+def list_by_key(response: list[dict[str, Any]], key: str) -> list:
     """
     Filter from a response all releases tags
     """
-    data = response.read()
-    return [d["tag_name"] for d in json.loads(data)]
+    return [d[key] for d in response]
 
 
 def set_firmware_version(version: str):

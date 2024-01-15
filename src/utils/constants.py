@@ -29,10 +29,10 @@ from typing import Any
 import sys
 import os
 
-if sys.version_info <= (3, 10):
-    import tomli as tomllib
-if sys.version_info >= (3, 11):
-    import tomllib
+if sys.version_info.minor <= 10:
+    from tomli import loads as load_toml
+if sys.version_info.minor > 10:
+    from tomllib import loads as load_toml
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
@@ -48,7 +48,7 @@ def _open_pyproject() -> dict[str, Any]:
         )
         with open(pyproject_filename, "r", encoding="utf8") as pyproject_file:
             data = pyproject_file.read()
-            return tomllib.loads(data)
+            return load_toml(data)
     except FileNotFoundError as exc:
         raise FileNotFoundError(f"{pyproject_filename} isnt found") from exc
     except ValueError as exc:

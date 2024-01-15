@@ -32,7 +32,6 @@ from kivy.cache import Cache
 
 
 VALID_DEVICES = ("m5stickv", "amigo_tft", "amigo_ips", "dock", "bit", "yahboom")
-VALID_VERSIONS = ["odudex/krux_binaries"]
 
 
 def set_device(device: str):
@@ -84,10 +83,13 @@ def get_releases() -> HTTPResponse:
     raise RuntimeError(f"Status code: {response.status_code}")
 
 
-def list_by_key(response: list[dict[str, Any]], key: str) -> list:
+def get_releases_by_key(response: list[dict[str, Any]], key: str) -> list:
     """
     Filter from a response all releases tags
     """
+    if len(response) == 0:
+        raise ValueError("Empty list")
+
     return [d[key] for d in response]
 
 
@@ -96,7 +98,14 @@ def set_firmware_version(version: str):
     Cache a valid firmware version name to be memorized after,
     when it will be used to flash
     """
-    Cache.append("krux-installer", "firmware-version", version)
+    releases = get_releases()
+    valid_firmwares = get_releases_by_key(releases, "tag_name")
+    valid_firmwares.append("odudex/krux_binaries")
+
+    if version in valid_firmwares:
+        Cache.append("krux-installer", "firmware-version", version)
+    else:
+        raise ValueError(f"Firmware '{version}' is not valid")
 
 
 def get_firmware_version() -> str:

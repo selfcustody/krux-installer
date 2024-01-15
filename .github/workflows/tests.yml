@@ -1,0 +1,106 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - kivy
+      
+  pull_request:
+
+jobs:
+  lint-black:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./src"
+      
+      - uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "./tests"
+          
+  lint-pylint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pylint
+      
+      - name: Lint src folder
+        run: pylint ./src
+
+      - name: Lint test folder
+        runt: pylint --disable=C0114,C0115,C0116 ./tests
+                   
+  run-tests:
+
+    strategy:
+      matrix:
+        version: ["3.10", "3.11"]
+        
+    runs-on: ubuntu-latest
+    
+    steps:
+      
+      - uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '${{ matrix.version }}'
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+      
+      - name: Install project and its dependencies
+        run: poetry install
+      
+      - name: Run tests
+        run: poetry run poe test
+
+  coverage:
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+    
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+      
+      - name: Install project and its dependencies
+        run: poetry install
+      
+      - name: Build coverage file
+        run: poetry run poe coverage
+      
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v3

@@ -32,6 +32,7 @@ import os
 if sys.version_info.minor <= 10:
     from tomli import loads as load_toml
 if sys.version_info.minor > 10:
+    # pylint: disable=import-error
     from tomllib import loads as load_toml
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))

@@ -482,6 +482,20 @@ files = [
 test = ["pytest (>=6)"]
 
 [[package]]
+name = "fake-useragent"
+version = "1.4.0"
+description = "Up-to-date simple useragent faker with real world database"
+optional = false
+python-versions = "*"
+files = [
+    {file = "fake-useragent-1.4.0.tar.gz", hash = "sha256:5426e4015d8ccc5bb25f64d3dfcfd3915eba30ffebd31b86b60dc7a4c5d65528"},
+    {file = "fake_useragent-1.4.0-py3-none-any.whl", hash = "sha256:9acce439ee2c6cf9c3772fa6c200f62dc8d56605063327a4d8c5d0e47f414b85"},
+]
+
+[package.dependencies]
+importlib-resources = {version = ">=5.0", markers = "python_version < \"3.10\""}
+
+[[package]]
 name = "feedparser"
 version = "6.0.11"
 description = "Universal feed parser, handles RSS 0.9x, RSS 1.0, RSS 2.0, CDF, Atom 0.3, and Atom 1.0 feeds"
@@ -535,6 +549,24 @@ zipp = ">=0.5"
 docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
 perf = ["ipython"]
 testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-perf (>=0.9.2)", "pytest-ruff"]
+
+[[package]]
+name = "importlib-resources"
+version = "6.1.1"
+description = "Read resources from Python packages"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "importlib_resources-6.1.1-py3-none-any.whl", hash = "sha256:e8bf90d8213b486f428c9c39714b920041cb02c184686a3dee24905aaa8105d6"},
+    {file = "importlib_resources-6.1.1.tar.gz", hash = "sha256:3893a00122eafde6894c59914446a512f728a0c1a45f9bb9b63721b6bacf0b4a"},
+]
+
+[package.dependencies]
+zipp = {version = ">=3.1.0", markers = "python_version < \"3.10\""}
+
+[package.extras]
+docs = ["furo", "jaraco.packaging (>=9.3)", "jaraco.tidelift (>=1.4)", "rst.linker (>=1.9)", "sphinx (<7.2.5)", "sphinx (>=3.5)", "sphinx-lint"]
+testing = ["pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=2.2)", "pytest-mypy (>=0.9.1)", "pytest-ruff", "zipp (>=3.17)"]
 
 [[package]]
 name = "iniconfig"
@@ -1474,4 +1506,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<=3.11.7"
-content-hash = "420b521d9c12d2123579c160ab6c7992646f79d52921f062e92a498c6b048375"
+content-hash = "beac9c766aa79f3cf4c5e3c1d514b5533eecec83d4906c2edef3012f601ad19c"

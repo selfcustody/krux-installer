@@ -30,7 +30,7 @@ format = ["format-src", "format-tests"]
 lint-src = "pylint ./src"
 lint-tests = "pylint --disable=C0114,C0115,C0116 ./tests"
 lint = ["lint-src", "lint-tests"]
-test = "pytest --cache-clear ./tests"
+test = "pytest --capture=tee-sys --verbose --cache-clear ./tests "
 coverage-html = "pytest --cache-clear --cov src/ --cov-report html ./tests"
 coverage-xml = "pytest --cache-clear --cov src/ --cov-report xml ./tests"
 

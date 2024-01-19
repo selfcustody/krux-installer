@@ -77,8 +77,7 @@ def get_releases() -> HTTPResponse:
             f"HTTP error {response.status_code}: {h_exc.__cause__}"
         ) from h_exc
 
-    if response.status_code == 200:
-        return response.json()
+    return response.json()
 
 
 def get_releases_by_key(response: list[dict[str, Any]], key: str) -> list:

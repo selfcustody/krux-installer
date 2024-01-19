@@ -80,8 +80,6 @@ def get_releases() -> HTTPResponse:
     if response.status_code == 200:
         return response.json()
 
-    raise RuntimeError(f"Status code: {response.status_code}")
-
 
 def get_releases_by_key(response: list[dict[str, Any]], key: str) -> list:
     """

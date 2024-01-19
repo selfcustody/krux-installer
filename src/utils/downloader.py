@@ -143,6 +143,5 @@ def download_zip_release(
         # Write buffer to file
         with open(destfile, "wb") as zip_file:
             zip_file.write(zip_buffer.getvalue())
-            zip_buffer.close()
 
     return destfile

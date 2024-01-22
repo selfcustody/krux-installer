@@ -127,3 +127,4 @@ class TestSelector(TestCase):
                 call("cache::get::krux-installer::device=None"),
             ]
         )
+        mock_get.assert_called_once()

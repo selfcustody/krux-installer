@@ -31,7 +31,6 @@ import time
 import typing
 import tempfile
 import requests
-import inspect
 from .trigger import Trigger
 
 
@@ -101,7 +100,6 @@ class StreamDownloader(Trigger):
         if bar_amount == self.progress_bar_size:
             print()
 
-
     def download_file_stream(self, url: str) -> str:
         """
         Given a :attr:`url`, download a large file in a streaming manner to given
@@ -124,8 +122,8 @@ class StreamDownloader(Trigger):
                 "Accept-Encoding": "gzip, deflate, br",
             }
             self.debug(
-                "download_file_stream::requests.get=< url: " +
-                f"{url}, stream: True, headers: {headers}, timeout: 30 >"
+                "download_file_stream::requests.get=< url: "
+                + f"{url}, stream: True, headers: {headers}, timeout: 30 >"
             )
             res = requests.get(url=url, stream=True, headers=headers, timeout=30)
 
@@ -157,14 +155,17 @@ class StreamDownloader(Trigger):
         for chunk in res.iter_content(chunk_size=self.chunk_size):
             if self.on_data is not None:
                 self.downloaded_len += len(chunk)
-                self.debug(f"download_file_stream::downloaded_len={self.downloaded_len}")
+                self.debug(
+                    f"download_file_stream::downloaded_len={self.downloaded_len}"
+                )
                 self.on_data(data=chunk)
             else:
-                raise NotImplementedError("on_data function not implemented to callback data")
-            
+                raise NotImplementedError(
+                    "on_data function not implemented to callback data"
+                )
+
         self.debug("downloaded_file_stream::closing_connection")
         res.close()
-
 
 
 class StreamDownloaderZipRelease(StreamDownloader):
@@ -172,13 +173,13 @@ class StreamDownloaderZipRelease(StreamDownloader):
 
     url: str = None
     """The url of version to be downloaded"""
-    
+
     destdir: str = None
     """Destination dir where the downloaded file will be placed"""
 
     _callback_on_write_to_buffer: typing.Callable = None
     """The callback to execute after writing to buffer"""
-    
+
     def __init__(self, version: str, destdir: str = tempfile.gettempdir()):
         super().__init__()
         self.set_destdir(destdir)
@@ -186,16 +187,24 @@ class StreamDownloaderZipRelease(StreamDownloader):
         self.set_on_data(self.write_to_buffer)
 
     def set_destdir(self, destdir):
+        """
+        Set the destination on system of downloaded stream
+        """
         self.destdir = destdir
         self.debug(f"set_destdir::destdir={self.destdir}")
 
-    def set_url(self, version: str):        
-        self.url = "".join([
-            "https://github.com/selfcustody/krux/releases/download/",
-            f"{version}/krux-{version}.zip"
-        ])
+    def set_url(self, version: str):
+        """
+        Set the URL of the desired asset to be downloaded
+        """
+        self.url = "".join(
+            [
+                "https://github.com/selfcustody/krux/releases/download/",
+                f"{version}/krux-{version}.zip",
+            ]
+        )
         self.debug(f"set_url::url={self.url}")
-        
+
     def write_to_buffer(self, data: bytes):
         """
         Callback to be used when writing streamed data to buffer
@@ -205,12 +214,7 @@ class StreamDownloaderZipRelease(StreamDownloader):
             self.buffer.write(data)
             self._callback_on_write_to_buffer(data)
         else:
-            raise NotImplementedError(
-                """
-                Callback to execute after writing to buffer is not
-                implemented with `set_callback_on_write_to_buffer`
-                """
-            )
+            raise NotImplementedError("Use 'set_callback_on_write_to_buffer'")
 
     def set_callback_on_write_to_buffer(self, callback: typing.Callable):
         """
@@ -219,7 +223,6 @@ class StreamDownloaderZipRelease(StreamDownloader):
         self.debug("set_callback_on_write_to_buffer::_calback_on_write_to_buffer")
         self._callback_on_write_to_buffer = callback
 
-    
     def download(self) -> str:
         """
         Download some zip release given its version and put it

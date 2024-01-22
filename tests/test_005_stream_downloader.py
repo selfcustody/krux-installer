@@ -10,18 +10,18 @@ MOCKED_FOUND_API = [
     {"author": "test", "tag_name": "v1.0.0"},
 ]
 
-class TestStreamDownloader(TestCase):
 
+class TestStreamDownloader(TestCase):
     @patch("src.utils.downloader.StreamDownloader.debug")
     def test_init_debug(self, mock_debug):
         StreamDownloader()
         mock_debug.assert_called_once_with("set_on_data::on_data")
-        
+
     @patch("src.utils.downloader.StreamDownloader.set_on_data")
     def test_init_set_on_data(self, mock_set):
         StreamDownloader()
         mock_set.assert_called_once()
-    
+
     @patch("src.utils.downloader.sys.stdout", new_callable=io.StringIO)
     def test_progress_bar_cli(self, mock_stdout):
         # mock sys.stdout.write function
@@ -52,7 +52,6 @@ class TestStreamDownloader(TestCase):
     @patch("src.utils.downloader.requests")
     @patch("src.utils.downloader.StreamDownloader.debug")
     def test_download_file_stream(self, mock_debug, mock_requests):
-        
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -60,26 +59,29 @@ class TestStreamDownloader(TestCase):
 
         sd = StreamDownloader()
         sd.download_file_stream(url="https://any.call/test.zip")
-        mock_debug.assert_any_call('set_on_data::on_data')
+        mock_debug.assert_any_call("set_on_data::on_data")
         mock_debug.assert_any_call("download_file_stream::filename=test.zip")
-        mock_debug.assert_any_call('download_file_stream::raise_for_status')
-        mock_debug.assert_any_call('download_file_stream::content_len=1')
-        mock_debug.assert_any_call('downloaded_file_stream::closing_connection')
-        mock_debug.assert_any_call("download_file_stream::requests.get=< url: https://any.call/test.zip, stream: True, headers: {'Content-Disposition': 'attachment filename=test.zip', 'Connection': 'keep-alive', 'Cache-Control': 'max-age=0', 'Accept-Encoding': 'gzip, deflate, br'}, timeout: 30 >")
+        mock_debug.assert_any_call("download_file_stream::raise_for_status")
+        mock_debug.assert_any_call("download_file_stream::content_len=1")
+        mock_debug.assert_any_call("downloaded_file_stream::closing_connection")
+
+        # pylint: disable=line-too-long
+        mock_debug.assert_any_call(
+            "download_file_stream::requests.get=< url: https://any.call/test.zip, stream: True, headers: {'Content-Disposition': 'attachment filename=test.zip', 'Connection': 'keep-alive', 'Cache-Control': 'max-age=0', 'Accept-Encoding': 'gzip, deflate, br'}, timeout: 30 >"
+        )
         mock_requests.get.assert_called_once_with(
             url="https://any.call/test.zip",
             stream=True,
             headers={
-                "Content-Disposition": "attachment filename=test.zip", 
-                "Connection": "keep-alive", 
-                "Cache-Control": "max-age=0", 
-                "Accept-Encoding": "gzip, deflate, br"
+                "Content-Disposition": "attachment filename=test.zip",
+                "Connection": "keep-alive",
+                "Cache-Control": "max-age=0",
+                "Accept-Encoding": "gzip, deflate, br",
             },
-            timeout=30
+            timeout=30,
         )
         mock_requests.get.return_value.iter_content.assert_called_with(chunk_size=1024)
 
-    
     @patch("src.utils.downloader.requests")
     def test_server_fail_download_file_stream(self, mock_requests):
         mock_response = MagicMock(status_code=500)
@@ -100,7 +102,7 @@ class TestStreamDownloader(TestCase):
         mock_requests.exceptions = requests.exceptions
         mock_requests.get.return_value = mock_response
 
-        with self.assertRaises(RuntimeError) as exc_info:            
+        with self.assertRaises(RuntimeError) as exc_info:
             sd = StreamDownloader()
             sd.download_file_stream(url="https://any.request/test.zip")
 
@@ -121,10 +123,8 @@ class TestStreamDownloader(TestCase):
 
         self.assertEqual(str(exc_info.exception), "Connection error: None")
 
-    
     @patch("src.utils.downloader.requests")
     def test_on_data_callback(self, mock_requests):
-
         # fake a zip file to be downloaded
         file = io.BytesIO()
 
@@ -137,23 +137,22 @@ class TestStreamDownloader(TestCase):
         stream = [
             [bytes(b) for b in file.read(i + 7)] for i in range(file.__sizeof__())
         ]
-        
+
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.iter_content.return_value = stream
         mock_requests.get.return_value = mock_response
 
-        mock_on_data = MagicMock()      
+        mock_on_data = MagicMock()
 
         sd = StreamDownloader()
         sd.set_on_data(callback=mock_on_data)
         sd.download_file_stream("https://some.zipped/file.zip")
 
         mock_on_data.assert_called()
-        
+
     @patch("src.utils.downloader.requests")
     def test_fail_on_data_callback(self, mock_requests):
-
         # fake a zip file to be downloaded
         file = io.BytesIO()
 
@@ -166,7 +165,7 @@ class TestStreamDownloader(TestCase):
         stream = [
             [bytes(b) for b in file.read(i + 7)] for i in range(file.__sizeof__())
         ]
-        
+
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.iter_content.return_value = stream
@@ -177,4 +176,6 @@ class TestStreamDownloader(TestCase):
             sd.set_on_data(callback=None)
             sd.download_file_stream("https://some.zipped/file.zip")
 
-        self.assertEqual(str(exc_info.exception), "on_data function not implemented to callback data")
+        self.assertEqual(
+            str(exc_info.exception), "on_data function not implemented to callback data"
+        )

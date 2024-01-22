@@ -31,117 +31,207 @@ import time
 import typing
 import tempfile
 import requests
+import inspect
+from .trigger import Trigger
 
 
-def progress_bar_cli(
-    data: bytes,  # pylint: disable=unused-argument
-    content_len: int,
-    downloaded_len: int,
-    started_at: int,
-    bar_size: int = 100,
-):
+class StreamDownloader(Trigger):
     """
-    Default :attr:`on_data` for :function:`download_zip_file`. It writes
-    a progress bar, the percent of amount downloaded and the velocity
-    of download.
+    Download files in a stream mode
     """
-    percent = downloaded_len / content_len
-    bar_amount = int(bar_size * percent)
-    total_bars = "=" * bar_amount
-    missing_bars = " " * (bar_size - bar_amount)
-    velocity = (downloaded_len // (time.perf_counter() - started_at)) / 1000000
-    percent = f"{percent * 100:.2f}"
-    cli_bar = f"\r[{total_bars}{missing_bars}]"
-    dld_mb = f"{downloaded_len / 1000000:.2f}"
-    tot_mb = f"{content_len / 1000000:.2f}"
-    sys.stdout.write(
-        f"{cli_bar} {dld_mb} of {tot_mb} Mb ({percent}%) {velocity:.2f} Mb/s"
-    )
-    if bar_amount == bar_size:
-        print()
+
+    buffer: typing.SupportsBytes = io.BytesIO()
+    """Buffer to store streamed data"""
+
+    filename: str = None
+    """Filename based on a given url"""
+
+    content_len: int = 0
+    """The length of streamed data"""
+
+    downloaded_len: int = 0
+    """The amount of downloaded data by increments of chunk_size"""
+
+    started_at: int = 0
+    """The start time of stream"""
+
+    on_data: typing.Callable
+    """The callback to be used in each increment of downloaded stream"""
+
+    chunk_size: int = 1024
+    """The increment size of data"""
+
+    progress_bar_size = 128
+    """The size of utf8 bar in CLI mode"""
+
+    def __init__(self):
+        super().__init__()
+        self.set_on_data(self.progress_bar_size)
+
+    def set_on_data(self, callback: typing.Callable):
+        """
+        Set callback to handle stream iteration
+        """
+        self.debug("set_on_data::on_data")
+        self.on_data = callback
+
+    def progress_bar_cli(
+        self,
+        data: bytes,  # pylint: disable=unused-argument
+    ):
+        """
+        Default :attr:`on_data` for :function:`download_zip_file`. It writes
+        a progress bar, the percent of amount downloaded and the velocity
+        of download.
+        """
+        percent = self.downloaded_len / self.content_len
+        bar_amount = int(self.progress_bar_size * percent)
+        total_bars = "=" * bar_amount
+        missing_bars = " " * (self.progress_bar_size - bar_amount)
+        velocity = (
+            self.downloaded_len // (time.perf_counter() - self.started_at)
+        ) / 1000000
+        percent = f"{percent * 100:.2f}"
+        cli_bar = f"\r[{total_bars}{missing_bars}]"
+        dld_mb = f"{self.downloaded_len / 1000000:.2f}"
+        tot_mb = f"{self.content_len / 1000000:.2f}"
+        sys.stdout.write(
+            f"{cli_bar} {dld_mb} of {tot_mb} Mb ({percent}%) {velocity:.2f} Mb/s"
+        )
+        if bar_amount == self.progress_bar_size:
+            print()
 
 
-def download_file_stream(
-    url: str, chunk_size: int = 1024, on_data: typing.Callable = progress_bar_cli
-) -> str:
-    """
-    Given a :attr:`url`, download a large file in a streaming manner to given
-    destination folder (:attr:`dest_dir`)
+    def download_file_stream(self, url: str) -> str:
+        """
+        Given a :attr:`url`, download a large file in a streaming manner to given
+        destination folder (:attr:`dest_dir`)
 
-    When a chunk of received data is write to buffer, you can intercept
-    some information with :attr:`on_data` as function (total_len, downloaded_len, start_time)
-    until reaches the 100%.
+        When a chunk of received data is write to buffer, you can intercept
+        some information with :attr:`on_data` as function (total_len, downloaded_len, start_time)
+        until reaches the 100%.
 
-    Then return the name
-    """
-    filename = os.path.basename(url)
-    headers = {
-        "Content-Disposition": f"attachment filename={filename}",
-        "Connection": "keep-alive",
-        "Cache-Control": "max-age=0",
-        "Accept-Encoding": "gzip, deflate, br",
-    }
+        Then return the name
+        """
+        try:
+            self.filename = os.path.basename(url)
+            self.debug(f"download_file_stream::filename={self.filename}")
 
-    # Request and check if its ok
-    try:
-        res = requests.get(url=url, stream=True, headers=headers, timeout=10)
-        res.raise_for_status()
+            headers = {
+                "Content-Disposition": f"attachment filename={self.filename}",
+                "Connection": "keep-alive",
+                "Cache-Control": "max-age=0",
+                "Accept-Encoding": "gzip, deflate, br",
+            }
+            self.debug(
+                "download_file_stream::requests.get=< url: " +
+                f"{url}, stream: True, headers: {headers}, timeout: 30 >"
+            )
+            res = requests.get(url=url, stream=True, headers=headers, timeout=30)
 
-    except requests.exceptions.Timeout as t_exc:
-        raise RuntimeError(f"Timeout error: {t_exc.__cause__ }") from t_exc
+            self.debug("download_file_stream::raise_for_status")
+            res.raise_for_status()
 
-    except requests.exceptions.ConnectionError as c_exc:
-        raise RuntimeError(f"Connection error: {c_exc.__cause__}") from c_exc
+        except requests.exceptions.Timeout as t_exc:
+            raise RuntimeError(f"Timeout error: {t_exc.__cause__ }") from t_exc
 
-    except requests.exceptions.HTTPError as h_exc:
-        raise RuntimeError(
-            f"HTTP error {res.status_code}: {h_exc.__cause__}"
-        ) from h_exc
+        except requests.exceptions.ConnectionError as c_exc:
+            raise RuntimeError(f"Connection error: {c_exc.__cause__}") from c_exc
 
-    if res.status_code == 200:
-        start = time.perf_counter()
+        except requests.exceptions.HTTPError as h_exc:
+            raise RuntimeError(
+                f"HTTP error {res.status_code}: {h_exc.__cause__}"
+            ) from h_exc
 
         # get some contents to calculate the amount
         # of downloaded data
-        total_len = int(res.headers.get("Content-Length"))
-        downloaded_len = 0
+        self.content_len = int(res.headers.get("Content-Length"))
+        self.debug(f"download_file_stream::content_len={self.content_len}")
+
+        # start to count time if using
+        # sortedme type of deownload's velocity meter
+        self.started_at = time.perf_counter()
+        self.debug(f"download_file_stream::started_at={self.started_at}")
 
         # Add chunks to BufferError
-        for chunk in res.iter_content(chunk_size=chunk_size):
-            downloaded_len += len(chunk)
-            on_data(
-                data=chunk,
-                content_len=total_len,
-                downloaded_len=downloaded_len,
-                started_at=start,
-            )
+        for chunk in res.iter_content(chunk_size=self.chunk_size):
+            if self.on_data is not None:
+                self.downloaded_len += len(chunk)
+                self.debug(f"download_file_stream::downloaded_len={self.downloaded_len}")
+                self.on_data(data=chunk)
+            else:
+                raise NotImplementedError("on_data function not implemented to callback data")
+            
+        self.debug("downloaded_file_stream::closing_connection")
         res.close()
 
 
-def download_zip_release(
-    version: str,
-    dest_dir: str = tempfile.gettempdir(),
-    on_data: typing.Callable = progress_bar_cli,
-) -> str:
-    """
-    Download some zip release given its version and put it
-    on a destination directory (default: OS temporary dir)
-    """
-    url = f"https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-{version}.zip"
-    filename = os.path.basename(url)
-    destfile = os.path.join(dest_dir, filename)
 
-    # create a buffer to file
-    with io.BytesIO() as zip_buffer:
+class StreamDownloaderZipRelease(StreamDownloader):
+    """Subclass of :class:`StreamDownloader` for versioned zip releases"""
 
-        def write_to_buffer(data, content_len, downloaded_len, started_at):
-            zip_buffer.write(data)
-            on_data(data, content_len, downloaded_len, started_at)
+    url: str = None
+    """The url of version to be downloaded"""
+    
+    destdir: str = None
+    """Destination dir where the downloaded file will be placed"""
 
-        download_file_stream(url=url, on_data=write_to_buffer)
+    _callback_on_write_to_buffer: typing.Callable = None
+    """The callback to execute after writing to buffer"""
+    
+    def __init__(self, version: str, destdir: str = tempfile.gettempdir()):
+        super().__init__()
+        self.set_destdir(destdir)
+        self.set_url(version)
+        self.set_on_data(self.write_to_buffer)
 
-        # Write buffer to file
+    def set_destdir(self, destdir):
+        self.destdir = destdir
+        self.debug(f"set_destdir::destdir={self.destdir}")
+
+    def set_url(self, version: str):        
+        self.url = "".join([
+            "https://github.com/selfcustody/krux/releases/download/",
+            f"{version}/krux-{version}.zip"
+        ])
+        self.debug(f"set_url::url={self.url}")
+        
+    def write_to_buffer(self, data: bytes):
+        """
+        Callback to be used when writing streamed data to buffer
+        and pass the same data to :attr:`_callback_on_write_to_buffer`
+        """
+        if self._callback_on_write_to_buffer:
+            self.buffer.write(data)
+            self._callback_on_write_to_buffer(data)
+        else:
+            raise NotImplementedError(
+                """
+                Callback to execute after writing to buffer is not
+                implemented with `set_callback_on_write_to_buffer`
+                """
+            )
+
+    def set_callback_on_write_to_buffer(self, callback: typing.Callable):
+        """
+        Set the callback to execute after writed to buffer
+        """
+        self.debug("set_callback_on_write_to_buffer::_calback_on_write_to_buffer")
+        self._callback_on_write_to_buffer = callback
+
+    
+    def download(self) -> str:
+        """
+        Download some zip release given its version and put it
+        on a destination directory (default: OS temporary dir)
+        """
+        self.download_file_stream(url=self.url)
+
+        destfile = os.path.join(self.destdir, self.filename)
+        self.debug(f"download::destfile={destfile}")
+
         with open(destfile, "wb") as zip_file:
-            zip_file.write(zip_buffer.getvalue())
+            self.debug(f"download::zip_file.write={self.buffer.getvalue()}")
+            zip_file.write(self.buffer.getvalue())
 
-    return destfile
+        return destfile

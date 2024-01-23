@@ -1,6 +1,7 @@
 # Krux Installer
 
 [![Build main branch](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/qlrd/krux-installer/graph/badge.svg?token=KD41H20MYS)](https://codecov.io/gh/qlrd/krux-installer)
 
 Krux Installer (alpha versions) aims to be a GUI based tool to build,
 flash and debug [Krux](https://github.com/selfcustody/krux)

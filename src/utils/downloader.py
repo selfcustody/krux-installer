@@ -216,7 +216,7 @@ class StreamDownloaderZipRelease(StreamDownloader):
         else:
             raise NotImplementedError("Use 'set_callback_on_write_to_buffer'")
 
-    def set_callback_on_write_to_buffer(self, callback: typing.Callable):
+    def set_on_write_to_buffer(self, callback: typing.Callable):
         """
         Set the callback to execute after writed to buffer
         """

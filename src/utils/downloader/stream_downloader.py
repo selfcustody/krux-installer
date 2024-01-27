@@ -20,59 +20,100 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-downloader.py
-
-some functions to mange download process
+stream_downloader.py
 """
 import os
-import io
 import sys
-import time
 import typing
-import tempfile
 import requests
-from .trigger import Trigger
+from .trigger_downloader import TriggerDownloader
 
 
-class StreamDownloader(Trigger):
+class StreamDownloader(TriggerDownloader):
     """
     Download files in a stream mode
     """
 
-    buffer: typing.SupportsBytes = io.BytesIO()
-    """Buffer to store streamed data"""
-
-    filename: str = None
-    """Filename based on a given url"""
-
-    content_len: int = 0
-    """The length of streamed data"""
-
-    downloaded_len: int = 0
-    """The amount of downloaded data by increments of chunk_size"""
-
-    started_at: int = 0
-    """The start time of stream"""
-
-    on_data: typing.Callable
-    """The callback to be used in each increment of downloaded stream"""
-
-    chunk_size: int = 1024
-    """The increment size of data"""
-
-    progress_bar_size = 128
-    """The size of utf8 bar in CLI mode"""
-
     def __init__(self):
         super().__init__()
-        self.set_on_data(self.progress_bar_size)
+        self.content_len = 0
+        self.filename = None
+        self.downloaded_len = 0
+        self.chunk_size = 1024
+        self.progress_bar_size = 128
+        self.on_data = self.progress_bar_cli
 
-    def set_on_data(self, callback: typing.Callable):
-        """
-        Set callback to handle stream iteration
-        """
-        self.debug("set_on_data::on_data")
-        self.on_data = callback
+    @property
+    def content_len(self) -> int:
+        """Getter for the content's length of the file to be downloaded"""
+        self.debug(f"content_len::getter={self._content_len}")
+        return self._content_len
+
+    @content_len.setter
+    def content_len(self, value: int):
+        """Setter for the content's length of the file to be downloaded"""
+        self._content_len = value
+        self.debug(f"content_len::setter={value}")
+
+    @property
+    def filename(self) -> str:
+        """Getter for the downloaded filename"""
+        self.debug(f"filename::getter={self._filename}")
+        return self._filename
+
+    @filename.setter
+    def filename(self, value: str):
+        """Setter for the downloaded filename"""
+        self._filename = value
+        self.debug(f"filename::setter={self._filename}")
+
+    @property
+    def downloaded_len(self) -> int:
+        """Getter for the ammount of downloaded data"""
+        self.debug(f"downloaded_len::getter={self._downloaded_len}")
+        return self._downloaded_len
+
+    @downloaded_len.setter
+    def downloaded_len(self, value: int):
+        """Setter for the ammount of downloaded data"""
+        self._downloaded_len = value
+        self.debug(f"downloaded_len:setter={self._downloaded_len}")
+
+    @property
+    def chunk_size(self) -> int:
+        """Getter for the size of chunks on downloaded data"""
+        self.debug(f"chunk_size::getter={self._chunk_size}")
+        return self._chunk_size
+
+    @chunk_size.setter
+    def chunk_size(self, value: int):
+        """Setter for the size of chunks on downloaded data"""
+        self._chunk_size = value
+        self.debug(f"chunk_size::setter={self._chunk_size}")
+
+    @property
+    def progress_bar_size(self) -> int:
+        """Getter for the size of progress_bar_cli"""
+        self.debug(f"progress_bar_size::getter={self._progress_bar_size}")
+        return self._progress_bar_size
+
+    @progress_bar_size.setter
+    def progress_bar_size(self, value: int):
+        """Setter for the size of progress_bar_cli"""
+        self._progress_bar_size = value
+        self.debug(f"progress_bar_size::setter={self._progress_bar_size}")
+
+    @property
+    def on_data(self) -> typing.Callable:
+        """Getter for callback to be used in each increment of downloaded stream"""
+        self.debug(f"on_data::getter={self._on_data}")
+        return self._on_data
+
+    @on_data.setter
+    def on_data(self, value: typing.Callable):
+        """Setter for the callback to be used in each increment of downloaded stream"""
+        self._on_data = value
+        self.debug(f"on_data::setter={value}")
 
     def progress_bar_cli(
         self,
@@ -87,16 +128,11 @@ class StreamDownloader(Trigger):
         bar_amount = int(self.progress_bar_size * percent)
         total_bars = "=" * bar_amount
         missing_bars = " " * (self.progress_bar_size - bar_amount)
-        velocity = (
-            self.downloaded_len // (time.perf_counter() - self.started_at)
-        ) / 1000000
         percent = f"{percent * 100:.2f}"
         cli_bar = f"\r[{total_bars}{missing_bars}]"
         dld_mb = f"{self.downloaded_len / 1000000:.2f}"
         tot_mb = f"{self.content_len / 1000000:.2f}"
-        sys.stdout.write(
-            f"{cli_bar} {dld_mb} of {tot_mb} Mb ({percent}%) {velocity:.2f} Mb/s"
-        )
+        sys.stdout.write(f"{cli_bar} {dld_mb} of {tot_mb} Mb ({percent}%)")
         if bar_amount == self.progress_bar_size:
             print()
 
@@ -146,14 +182,9 @@ class StreamDownloader(Trigger):
         self.content_len = int(res.headers.get("Content-Length"))
         self.debug(f"download_file_stream::content_len={self.content_len}")
 
-        # start to count time if using
-        # sortedme type of deownload's velocity meter
-        self.started_at = time.perf_counter()
-        self.debug(f"download_file_stream::started_at={self.started_at}")
-
         # Add chunks to BufferError
         for chunk in res.iter_content(chunk_size=self.chunk_size):
-            if self.on_data is not None:
+            if self._on_data is not None:
                 self.downloaded_len += len(chunk)
                 self.debug(
                     f"download_file_stream::downloaded_len={self.downloaded_len}"
@@ -166,75 +197,3 @@ class StreamDownloader(Trigger):
 
         self.debug("downloaded_file_stream::closing_connection")
         res.close()
-
-
-class StreamDownloaderZipRelease(StreamDownloader):
-    """Subclass of :class:`StreamDownloader` for versioned zip releases"""
-
-    url: str = None
-    """The url of version to be downloaded"""
-
-    destdir: str = None
-    """Destination dir where the downloaded file will be placed"""
-
-    _callback_on_write_to_buffer: typing.Callable = None
-    """The callback to execute after writing to buffer"""
-
-    def __init__(self, version: str, destdir: str = tempfile.gettempdir()):
-        super().__init__()
-        self.set_destdir(destdir)
-        self.set_url(version)
-        self.set_on_data(self.write_to_buffer)
-
-    def set_destdir(self, destdir):
-        """
-        Set the destination on system of downloaded stream
-        """
-        self.destdir = destdir
-        self.debug(f"set_destdir::destdir={self.destdir}")
-
-    def set_url(self, version: str):
-        """
-        Set the URL of the desired asset to be downloaded
-        """
-        self.url = "".join(
-            [
-                "https://github.com/selfcustody/krux/releases/download/",
-                f"{version}/krux-{version}.zip",
-            ]
-        )
-        self.debug(f"set_url::url={self.url}")
-
-    def write_to_buffer(self, data: bytes):
-        """
-        Callback to be used when writing streamed data to buffer
-        and pass the same data to :attr:`_callback_on_write_to_buffer`
-        """
-        if self._callback_on_write_to_buffer:
-            self.buffer.write(data)
-            self._callback_on_write_to_buffer(data)
-        else:
-            raise NotImplementedError("Use 'set_callback_on_write_to_buffer'")
-
-    def set_on_write_to_buffer(self, callback: typing.Callable):
-        """
-        Set the callback to execute after writed to buffer
-        """
-        self.debug("set_callback_on_write_to_buffer::_calback_on_write_to_buffer")
-        self._callback_on_write_to_buffer = callback
-
-    def download(self) -> str:
-        """
-        Download some zip release given its version and put it
-        on a destination directory (default: OS temporary dir)
-        """
-        self.download_file_stream(url=self.url)
-
-        destfile = os.path.join(self.destdir, self.filename)
-        self.debug(f"download::destfile={destfile}")
-
-        with open(destfile, "wb") as zip_file:
-            self.debug(f"download::zip_file.write={self.buffer.getvalue()}")
-            zip_file.write(self.buffer.getvalue())
-
-        return destfile

@@ -9,6 +9,7 @@
 *.kff
 *.dis
 *.exe
+*.bak
 
 # Packages
 ############

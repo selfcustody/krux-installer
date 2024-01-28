@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 
-# Copyright (c) 2021-2023 Krux contributors
+# Copyright (c) 2021-2024 Krux contributors
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,6 @@ Some constants to be used accros application
 from typing import Any
 import sys
 import os
-
 if sys.version_info.minor <= 10:
     from tomli import loads as load_toml
 if sys.version_info.minor > 10:

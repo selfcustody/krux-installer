@@ -3,7 +3,7 @@ from unittest import TestCase
 from unittest.mock import patch, MagicMock
 import requests
 from src.utils.downloader.stream_downloader import StreamDownloader
-from .property_instance_mock import PropertyInstanceMock
+from .shared_mocks import PropertyInstanceMock
 
 MOCKED_FOUND_API = [
     {"author": "test", "tag_name": "v0.0.1"},

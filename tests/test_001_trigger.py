@@ -49,18 +49,18 @@ class TestTrigger(TestCase):
 
         self.assertEqual(str(exc_info.exception), "'Not recognized LOGLEVEL: lol'")
 
-    @patch("src.utils.trigger.inspect")
-    def test_mro_info(self, mock_inspect):
+    @patch("src.utils.trigger.currentframe")
+    def test_mro_info(self, mock_currentframe):
         mock_f_code = MagicMock()
         mock_f_code.co_varnames = ["test.test_000_trigger.TestTrigger"]
 
         mock_f_back = MagicMock()
         mock_f_back.f_code = mock_f_code
 
-        mock_inspect.currentframe.return_value = mock_f_back
+        mock_currentframe.return_value = mock_f_back
 
         mro = Trigger.mro_info()
-        mock_inspect.currentframe.assert_called_once()
+        mock_currentframe.assert_called_once()
         self.assertEqual(mro, None)
 
     @patch("src.utils.trigger.Trigger.mro_info", return_value="TestTrigger")

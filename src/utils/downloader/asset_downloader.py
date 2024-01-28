@@ -132,7 +132,7 @@ class AssetDownloader(StreamDownloader):
                 file.write(self.buffer.getvalue())
 
         if self._write_mode == "w":
-            with open(destfile, self.write_mode, encoding="utf8"):
+            with open(destfile, self.write_mode, encoding="utf8") as file:
                 value = self.buffer.getvalue()
                 text = value.decode("utf8")
                 file.write(text)

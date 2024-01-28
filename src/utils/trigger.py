@@ -28,7 +28,7 @@ Base class to be used accross project
 # Standard libraries
 ####################
 import os
-import inspect
+from inspect import currentframe, unwrap
 
 #######################
 # Third party libraries
@@ -64,7 +64,7 @@ class Trigger:
         """
 
         # get the call frame of the calling method
-        frame = inspect.currentframe().f_back
+        frame = currentframe().f_back
         try:
             # find the name of the first variable in the calling
             # function - which is hopefully the "self"
@@ -95,7 +95,7 @@ class Trigger:
 
                 # unwrap the method just in case there are any decorators
                 try:
-                    method = inspect.unwrap(method)
+                    method = unwrap(method)
                 except ValueError:
                     pass
 

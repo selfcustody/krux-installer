@@ -18,6 +18,7 @@ Get from https://stackoverflow.com/
 questions/37553552/assert-that-a-propertymock-
 was-called-on-a-specific-instance
 """
+
 from unittest.mock import MagicMock, PropertyMock
 
 

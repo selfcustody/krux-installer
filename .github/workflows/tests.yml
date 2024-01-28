@@ -18,18 +18,22 @@ jobs:
         with:
           python-version: '3.11'
       
-      - uses: psf/black@stable
-        with:
-          options: "--check --verbose"
-          src: "./src"
-      
-      - uses: psf/black@stable
-        with:
-          options: "--check --verbose"
-          src: "./tests"
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+          poetry install
+
+      - name: Check format in src/
+        run: poetry run poe format-src --check --verbose
+
+      - name: Check format in tests/
+        run: poetry run poe format-tests --check --verbose
           
   lint-pylint:
 
+    needs: lint-black
+    
     strategy:
       matrix:
         version: ["3.10", "3.11"]
@@ -57,6 +61,8 @@ jobs:
                    
   run-tests:
 
+    needs: lint-pylint
+    
     strategy:
       matrix:
         version: ["3.10", "3.11"]
@@ -84,7 +90,9 @@ jobs:
         run: poetry run poe test
 
   coverage:
-    
+
+    needs: run-tests
+
     runs-on: ubuntu-latest
     
     steps:

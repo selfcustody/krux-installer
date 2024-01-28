@@ -28,6 +28,7 @@ Some constants to be used accros application
 from typing import Any
 import sys
 import os
+
 if sys.version_info.minor <= 10:
     from tomli import loads as load_toml
 if sys.version_info.minor > 10:

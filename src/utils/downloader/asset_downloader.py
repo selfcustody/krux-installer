@@ -33,7 +33,7 @@ class AssetDownloader(StreamDownloader):
     Subclass of :class:`StreamDownloader` for versioned asset releases.
     """
 
-    REGEXP = r"https:\/\/(raw\.)?github(usercontent)?\.com\/selfcustody\/krux\/"
+    REGEXP = r"https:\/\/(raw\.)?github(usercontent)?\.com\/(selfcustody|odudex)\/krux(\_binaries)?"
 
     def __init__(self, url: str, destdir: str, write_mode: str):
         super().__init__()

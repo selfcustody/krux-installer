@@ -27,3 +27,4 @@ from .zip_downloader import ZipDownloader
 from .sha256_downloader import Sha256Downloader
 from .sig_downloader import SigDownloader
 from .pem_downloader import PemDownloader
+from .beta_downloader import BetaDownloader

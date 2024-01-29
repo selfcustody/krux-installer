@@ -1,30 +1,30 @@
 from unittest import TestCase
 from unittest.mock import patch
-from src.utils.downloader import Sha256Downloader
+from src.utils.downloader import PemDownloader
 
 
-URL = "https://github.com/selfcustody/krux/releases/download/v0.0.1/krux-v0.0.1.zip.sha256.txt"
+URL = "https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem"
 
 
-class TestSha256Downloader(TestCase):
+class TestPemDownloader(TestCase):
 
     @patch("tempfile.gettempdir")
     def test_init_url(self, mock_gettempdir):
         mock_gettempdir.return_value = "/tmp/dir"
 
-        z = Sha256Downloader(version="v0.0.1")
+        z = PemDownloader()
         self.assertEqual(z.url, URL)
 
     @patch("tempfile.gettempdir")
     def test_init_destdir(self, mock_gettempdir):
         mock_gettempdir.return_value = "/tmp/dir"
 
-        z = Sha256Downloader(version="v0.0.1", destdir=mock_gettempdir())
+        z = PemDownloader(destdir=mock_gettempdir())
         self.assertEqual(z.destdir, "/tmp/dir")
 
     @patch("tempfile.gettempdir")
     def test_init_write_mode(self, mock_gettempdir):
         mock_gettempdir.return_value = "/tmp/dir"
 
-        z = Sha256Downloader(version="v0.0.1", destdir=mock_gettempdir())
+        z = PemDownloader(destdir=mock_gettempdir())
         self.assertEqual(z.write_mode, "w")

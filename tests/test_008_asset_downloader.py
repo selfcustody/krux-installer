@@ -6,50 +6,6 @@ from .shared_mocks import PropertyInstanceMock
 
 
 class TestAssetDownloader(TestCase):
-    @patch("tempfile.gettempdir")
-    def test_fail_init(self, mock_gettempdir):
-        mock_gettempdir.return_value = "/tmp/dir"
-
-        with self.assertRaises(ValueError) as exc_info:
-            AssetDownloader(
-                url="https://some.url/asset.zip",
-                destdir=mock_gettempdir(),
-                write_mode="w",
-            )
-        self.assertEqual(
-            str(exc_info.exception), "Invalid url: https://some.url/asset.zip"
-        )
-
-    @patch("tempfile.gettempdir")
-    def test_fail_init_write_mode(self, mock_gettempdir):
-        mock_gettempdir.return_value = "/tmp/dir"
-
-        with self.assertRaises(ValueError) as exc_info:
-            AssetDownloader(
-                url="https://github.com/selfcustody/krux/asset.zip",
-                destdir=mock_gettempdir(),
-                write_mode="r",
-            )
-
-        self.assertEqual(str(exc_info.exception), "Write Mode 'r' not supported")
-
-    @patch(
-        "src.utils.downloader.asset_downloader.AssetDownloader.url",
-        new_callable=PropertyInstanceMock,
-    )
-    @patch("tempfile.gettempdir")
-    def test_init_url(self, mock_gettempdir, mock_url):
-        mock_gettempdir.return_value = "/tmp/dir"
-
-        a = AssetDownloader(
-            url="https://github.com/selfcustody/krux/asset.zip",
-            destdir=mock_gettempdir(),
-            write_mode="w",
-        )
-
-        mock_url.assert_called_once_with(
-            a, "https://github.com/selfcustody/krux/asset.zip"
-        )
 
     @patch(
         "src.utils.downloader.asset_downloader.AssetDownloader.destdir",
@@ -82,6 +38,19 @@ class TestAssetDownloader(TestCase):
         )
 
         mock_mode.assert_called_once_with(a, "w")
+
+    @patch("tempfile.gettempdir")
+    def test_fail_init_write_mode(self, mock_gettempdir):
+        mock_gettempdir.return_value = "/tmp/dir"
+
+        with self.assertRaises(ValueError) as exc_info:
+            AssetDownloader(
+                url="https://github.com/selfcustody/krux/asset.zip",
+                destdir=mock_gettempdir(),
+                write_mode="r",
+            )
+
+        self.assertEqual(str(exc_info.exception), "Write Mode 'r' not supported")
 
     @patch(
         "src.utils.downloader.asset_downloader.AssetDownloader.on_data",

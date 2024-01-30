@@ -23,7 +23,6 @@
 asset_downloader.py
 """
 import os
-import re
 import typing
 from .stream_downloader import StreamDownloader
 
@@ -33,30 +32,12 @@ class AssetDownloader(StreamDownloader):
     Subclass of :class:`StreamDownloader` for versioned asset releases.
     """
 
-    REGEXP = r"https:\/\/(raw\.)?github(usercontent)?\.com\/(selfcustody|odudex)\/krux(\_binaries)?"
-
     def __init__(self, url: str, destdir: str, write_mode: str):
-        super().__init__()
-        self.url = url
+        super().__init__(url=url)
         self.destdir = destdir
         self.on_data = self.write_to_buffer
         self.on_write_to_buffer = self.progress_bar_cli
         self.write_mode = write_mode
-
-    @property
-    def url(self) -> str:
-        """The asset's url to be downloaded"""
-        self.debug(f"url::getter={self._url}")
-        return self._url
-
-    @url.setter
-    def url(self, value: str):
-        """The asset's url to be downloaded"""
-        if re.findall(AssetDownloader.REGEXP, value):
-            self.debug(f"url::setter={value}")
-            self._url = value
-        else:
-            raise ValueError(f"Invalid url: {value}")
 
     @property
     def destdir(self) -> str:

@@ -22,25 +22,65 @@
 """
 trigger_downloader.py
 """
-from io import BytesIO
-import typing
-from ..trigger import Trigger
+from .base_downloader import BaseDownloader
 
 
-class TriggerDownloader(Trigger):
+class TriggerDownloader(BaseDownloader):
     """
-    Base class for downloader
+    Downloader with some configurations adds
     """
 
-    def __init__(self):
-        super().__init__()
-        self._buffer = BytesIO()
+    def __init__(self, url: str):
+        super().__init__(url=url)
+        self.content_len = 0
+        self.filename = None
+        self.downloaded_len = 0
+        self.chunk_size = 1024
 
     @property
-    def buffer(self) -> typing.SupportsBytes:
-        """Getter for the buffer of the file to be downloaded"""
-        return self._buffer
+    def content_len(self) -> int:
+        """Getter for the content's length of the file to be downloaded"""
+        self.debug(f"content_len::getter={self._content_len}")
+        return self._content_len
 
-    @buffer.setter
-    def buffer(self, value):
-        raise AttributeError("You're forbidden to set buffer")
+    @content_len.setter
+    def content_len(self, value: int):
+        """Setter for the content's length of the file to be downloaded"""
+        self._content_len = value
+        self.debug(f"content_len::setter={value}")
+
+    @property
+    def filename(self) -> str:
+        """Getter for the downloaded filename"""
+        self.debug(f"filename::getter={self._filename}")
+        return self._filename
+
+    @filename.setter
+    def filename(self, value: str):
+        """Setter for the downloaded filename"""
+        self._filename = value
+        self.debug(f"filename::setter={self._filename}")
+
+    @property
+    def downloaded_len(self) -> int:
+        """Getter for the ammount of downloaded data"""
+        self.debug(f"downloaded_len::getter={self._downloaded_len}")
+        return self._downloaded_len
+
+    @downloaded_len.setter
+    def downloaded_len(self, value: int):
+        """Setter for the ammount of downloaded data"""
+        self._downloaded_len = value
+        self.debug(f"downloaded_len:setter={self._downloaded_len}")
+
+    @property
+    def chunk_size(self) -> int:
+        """Getter for the size of chunks on downloaded data"""
+        self.debug(f"chunk_size::getter={self._chunk_size}")
+        return self._chunk_size
+
+    @chunk_size.setter
+    def chunk_size(self, value: int):
+        """Setter for the size of chunks on downloaded data"""
+        self._chunk_size = value
+        self.debug(f"chunk_size::setter={self._chunk_size}")

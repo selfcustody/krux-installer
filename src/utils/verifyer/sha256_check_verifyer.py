@@ -23,21 +23,17 @@
 sha256_check_verifyer.py
 """
 
-import os
-from .base_verifyer import BaseVerifyer
+from .check_verifyer import CheckVerifyer
 
 
-class Sha256CheckVerifyer(BaseVerifyer):
+class Sha256CheckVerifyer(CheckVerifyer):
     """Simple loader of a .sha256.txt file"""
 
     def __init__(self, filename: str):
-        if os.path.exists(filename):
-            super().__init__(f"{filename}.sha256.txt", "r")
-        else:
-            raise ValueError(f"File {filename}.sha256.txt do not exist")
+        super().__init__(filename=filename, read_mode="r", regexp=r".*\.sha256\.txt")
 
     def load(self):
         """Load data in file"""
         self.debug(f"load::{self.filename}::{self.read_mode}::utf8")
         with open(self.filename, self.read_mode, encoding="utf8") as f_data:
-            self.data = f_data.read().decode("utf8")
+            self.data = f_data.read()

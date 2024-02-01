@@ -25,28 +25,33 @@ sha256_verifyer.py
 
 import typing
 from ssl import SSLWantReadError, SSLSyscallError, SSLError
-from OpenSSL import crypto
+from OpenSSL.crypto import (
+    X509,
+    load_publickey,
+    FILETYPE_PEM,
+    verify as openssl_verify
+)
 from .check_verifyer import CheckVerifyer
 
 
 class SigVerifyer(CheckVerifyer):
     """Verify file signature agains .sig and .pem data"""
 
-    def __init__(self, filename: str, signature: typing.SupportsBytes, pubkey: str):
-        super().__init__(filename=filename, read_mode="rb", regexp=r"*\.zip")
-        self.x509 = crypto.X509()
-        _pubkey = crypto.load_publickey(crypto.FILETYPE_PEM, pubkey)
+    def __init__(self, filename: str, signature: str, pubkey: str):
+        super().__init__(filename=filename, read_mode="rb", regexp=r".*\.zip")
+        self.x509 = X509()
+        _pubkey = load_publickey(FILETYPE_PEM, pubkey)
         self.x509.set_pubkey(_pubkey)
         self.signature = signature
 
     @property
-    def x509(self) -> crypto.X509:
+    def x509(self) -> X509:
         """Getter for x509 object"""
         self.debug(f"x509::getter={self._x509}")
         return self._x509
 
     @x509.setter
-    def x509(self, value: crypto.X509):
+    def x509(self, value: X509):
         self.debug(f"x509::setter={value}")
         self._x509 = value
 
@@ -65,7 +70,7 @@ class SigVerifyer(CheckVerifyer):
     def verify(self):
         """Apply signature verification against a signature data and public key data"""
         try:
-            crypto.verify(self.x509, self.signature, self.data, "sha256")
+            openssl_verify(self.x509, self.signature, self.data, "sha256")
             return "Signature Verified Successfully"
         except SSLError as exc_info:
             raise ValueError(

@@ -36,33 +36,22 @@ class Sha256Verifyer(BaseVerifyer):
             super().__init__(filename, "rb")
         else:
             raise ValueError(f"File {filename} do not exist")
-        self.sha256sum = None
-
-    @property
-    def sha256sum(self) -> str:
-        """Getter for sha256_hash"""
-        self.debug(f"sha256sum::getter={self._sha256sum}")
-        return self._sha256sum
-
-    @sha256sum.setter
-    def sha256sum(self, value: str):
-        """Setter for sha256_hash"""
-        self.debug(f"sha256_hash::setter={value}")
-        self._sha256sum = value
 
     def load(self):
-        """Load data from"""
+        """Load data from file and assigns its sha256sum"""
         sha256_hash = hashlib.sha256()
 
         self.debug(f"load::{self.filename}::{self.read_mode}")
-        with open(self.filename, self.read_mode, encoding="utf8") as f_data:
+
+        # pylint: disable=unspecified-encoding
+        with open(self.filename, self.read_mode) as f_data:
             # Read and update hash string value in blocks of 1K
             for byte_block in iter(lambda: f_data.read(1024), b""):
                 self.debug(f"load::block={byte_block}")
                 sha256_hash.update(byte_block)
 
-            self.sha256sum = sha256_hash.hexdigest()
+            self.data = sha256_hash.hexdigest()
 
     def verify(self, sha256sum: str) -> bool:
         """Verify self.hash against a providede sha256_hash"""
-        return self.sha256sum == sha256sum
+        return self.data == sha256sum

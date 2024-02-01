@@ -52,7 +52,7 @@
     "@types/debug": "^4.1.7",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.10.5",
-    "@vitejs/plugin-vue": "^4.1.0",
+    "@vitejs/plugin-vue": "^5.0.3",
     "@wdio/cli": "^8.27.0",
     "@wdio/globals": "^8.27.0",
     "@wdio/local-runner": "^8.27.0",

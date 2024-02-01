@@ -31,9 +31,3 @@ class Sha256CheckVerifyer(CheckVerifyer):
 
     def __init__(self, filename: str):
         super().__init__(filename=filename, read_mode="r", regexp=r".*\.sha256\.txt")
-
-    def load(self):
-        """Load data in file"""
-        self.debug(f"load::{self.filename}::{self.read_mode}::utf8")
-        with open(self.filename, self.read_mode, encoding="utf8") as f_data:
-            self.data = f_data.read()

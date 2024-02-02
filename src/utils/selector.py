@@ -25,6 +25,7 @@ selector.py
 Generic selector to select devices or versions
 """
 
+import typing
 from http.client import HTTPResponse
 import requests
 from kivy.cache import Cache
@@ -47,19 +48,10 @@ class Selector(Trigger):
         super().__init__()
         self.debug("cache::register::krux-installer={limit: 10, timeout: 60}")
         Cache.register("krux-installer", limit=10, timeout=600)
+        self.releases = self._fetch_releases()
 
-    def set_device(self, device: str):
-        """
-        Cache a valid device name to be memorized after,
-        when it will be used to flash
-        """
-        if device in Selector.VALID_DEVICES:
-            self.debug(f"cache::set::krux-installer::device={device}")
-            Cache.append("krux-installer", "device", device)
-        else:
-            raise ValueError(f"Device '{device}' is not valid")
-
-    def get_device(self) -> str:
+    @property
+    def device(self) -> str:
         """
         Get the current device memorized on cache
         """
@@ -67,17 +59,62 @@ class Selector(Trigger):
         self.debug(f"cache::get::krux-installer::device={device}")
         return device
 
-    def get_releases(self, timeout: int = 10) -> HTTPResponse:
+    @device.setter
+    def device(self, value: str):
+        """
+        Cache a valid device name to be memorized after,
+        when it will be used to flash
+        """
+        if value in Selector.VALID_DEVICES:
+            self.debug(f"cache::set::krux-installer::device={value}")
+            Cache.append("krux-installer", "device", value)
+        else:
+            raise ValueError(f"Device '{value}' is not valid")
+
+    @property
+    def firmware(self) -> str:
+        """
+        Get the current firmware version name memorized on cache
+        """
+        version = Cache.get("krux-installer", "firmware")
+        self.debug(f"cache::get::krux-installer::version={version}")
+        return version
+
+    @firmware.setter
+    def firmware(self, version: str):
+        """
+        Cache a valid firmware version name to be memorized after,
+        when it will be used to flash
+        """
+        if version in self.releases:
+            self.debug(f"cache::append::krux-installer::firmware={version}")
+            Cache.append("krux-installer", "firmware", version)
+        else:
+            raise ValueError(f"Firmware '{version}' is not valid")
+
+    @property
+    def releases(self) -> typing.List[dict]:
+        """Getter of releases"""
+        self.debug(f"releases::getter={self._releases}")
+        return self._releases
+
+    @releases.setter
+    def releases(self, value: typing.List[dict]):
+        """Set a list of releases"""
+        self.debug(f"releases::setter={value}")
+        self._releases = value
+
+    def _fetch_releases(self, timeout: int = 10) -> HTTPResponse:
         """
         Get the all available releases at
         https://github.com/selfcustody/krux/releases
         """
         try:
-            self.debug(f"get_releases::URL={Selector.URL}")
+            self.debug(f"releases::getter::URL={Selector.URL}")
             accept = Selector.HEADERS["Accept"]
             api = Selector.HEADERS["X-GitHub-Api-Version"]
-            self.debug(f"get_releases::HEADER=Accept: {accept}")
-            self.debug(f"get_releases::HEADER=X-Github-Api-Version: {api}")
+            self.debug(f"releases::getter::HEADER=Accept: {accept}")
+            self.debug(f"releases::getter::HEADER=X-Github-Api-Version: {api}")
             response = requests.get(
                 url=Selector.URL, headers=Selector.HEADERS, timeout=timeout
             )
@@ -95,48 +132,19 @@ class Selector(Trigger):
             ) from h_exc
 
         res = response.json()
-        self.debug(f"get_releases::response='{res}'")
-        return res
+        self.debug(f"releases::getter::response='{res}'")
 
-    def get_releases_by_key(self, key: str) -> list:
-        """
-        Filter from a response all releases tags
-        """
-        response = self.get_releases()
-        self.debug(f"get_releases_by_key::key={key}")
-
-        if len(response) == 0:
-            raise ValueError("Empty data")
+        if len(res) == 0:
+            raise ValueError(f"{Selector.URL} returned empty data")
 
         obj = []
-        for data in response:
-            if not data.get(key):
-                raise KeyError(f"Invalid key: {key}")
-            obj.append(data[key])
+        for data in res:
+            if not data.get("tag_name"):
+                raise KeyError("Invalid key: 'tag_name' do not exist on api")
 
-        self.debug(f"get_releases_by_key::value={obj}")
+            obj.append(data["tag_name"])
+
+        self.debug(f"releases::getter={obj}")
+        self.debug("releases::getter::append=odudex/krux_binaries")
+        obj.append("odudex/krux_binaries")
         return obj
-
-    def set_firmware_version(self, version: str):
-        """
-        Cache a valid firmware version name to be memorized after,
-        when it will be used to flash
-        """
-        valid_firmwares = self.get_releases_by_key("tag_name")
-
-        self.debug("set_firmware_version::append=odudex/krux_binaries")
-        valid_firmwares.append("odudex/krux_binaries")
-
-        if version in valid_firmwares:
-            self.debug(f"cache::append::krux-installer::firmware-version={version}")
-            Cache.append("krux-installer", "firmware-version", version)
-        else:
-            raise ValueError(f"Firmware '{version}' is not valid")
-
-    def get_firmware_version(self) -> str:
-        """
-        Get the current firmware version name memorized on cache
-        """
-        version = Cache.get("krux-installer", "firmware-version")
-        self.debug(f"cache::get::krux-installer::version={version}")
-        return version

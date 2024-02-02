@@ -25,12 +25,7 @@ sha256_verifyer.py
 
 import typing
 from ssl import SSLWantReadError, SSLSyscallError, SSLError
-from OpenSSL.crypto import (
-    X509,
-    load_publickey,
-    FILETYPE_PEM,
-    verify as openssl_verify
-)
+from OpenSSL.crypto import X509, load_publickey, FILETYPE_PEM, verify as openssl_verify
 from .check_verifyer import CheckVerifyer
 
 

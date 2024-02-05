@@ -23,19 +23,22 @@
 base_unzip.py
 """
 import os
+import tempfile
 import typing
-from zipfile import (
-    ZipFile,
-    BadZipFile
-)
-from ..verifyer.base_verifyer import BaseVerifyer
+from zipfile import ZipFile, BadZipFile
+from ..verifyer.check_verifyer import CheckVerifyer
 
 
-class BaseUnzip(BaseVerifyer):
+class BaseUnzip(CheckVerifyer):
     """Base class to unzip files"""
 
-    def __init__(self, filename: str, members: typing.List[str], output=str):
-        super().__init__(filename=filename, read_mode="rb", regexp=r".*\.zip")
+    def __init__(
+        self,
+        filename: str,
+        members: typing.List[str],
+        output: str = tempfile.gettempdir(),
+    ):
+        super().__init__(filename=filename, read_mode="r", regexp=r".*\.zip")
         self.members = members
         self.output = output
 
@@ -66,17 +69,23 @@ class BaseUnzip(BaseVerifyer):
         else:
             raise ValueError(f"Given path not exist: {value}")
 
-    def extract(self):
+    def load(self):
         """Extract from given zip file only the ones that was defined as members"""
         try:
-            with ZipFile(self.filename, self.read_mode) as zipObj:
-                namelist = zipObj.namelist()
+            with ZipFile(self.filename, self.read_mode) as zip_obj:
+                namelist = zip_obj.namelist()
+
+                if len([m for m, n in zip(self.members, namelist) if n == m]) == 0:
+                    raise ValueError(
+                        f"Not find any {list(self.members)} in {self.filename}"
+                    )
+
                 for name in namelist:
                     if name in self.members:
                         self.debug(f"extract::{self.filename}={name}")
-                        zipObj.extract(name, path=self.output)
-                    else:
-                        self.debug(f"extract::{self.filename}::skip={name}")
-                        
+                        zip_obj.extract(name, path=self.output)
+
         except BadZipFile as exc_info:
-            raise RuntimeError(f"Cannot open {self.filename}: {exc_info.__cause__}")
+            raise RuntimeError(
+                f"Cannot open {self.filename}: {exc_info.__cause__}"
+            ) from exc_info

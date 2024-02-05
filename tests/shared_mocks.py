@@ -1,10 +1,15 @@
 """
 shared_mocks.py
 
-authors: Don Kirkby, Intrastellar Explorer
+authors[PropertyInstanceMock]:
+Don Kirkby, Intrastellar Explorer
+
+authors[MockZipFile]:
+nneonneo
+
 edited by: qlrd
 
-Changes:
+Changes[PropertyInstanceMock]:
 
 - added `obj_type=None` to avoid pylint warning
 W0222: Signature differs from overridden
@@ -19,7 +24,7 @@ questions/37553552/assert-that-a-propertymock-
 was-called-on-a-specific-instance
 """
 
-from unittest.mock import MagicMock, PropertyMock
+from unittest.mock import Mock, MagicMock, PropertyMock
 
 
 class PropertyInstanceMock(PropertyMock):
@@ -36,3 +41,36 @@ class PropertyInstanceMock(PropertyMock):
     def __set__(self, obj, val):
         """Return a setter of @property.setter"""
         self(obj, val)
+
+
+class MockZipFile:
+    """
+    Instead of having mockZip.__enter__ return an empty list,
+    have it return an object like the following
+    """
+
+    def __init__(self):
+        self.files = [
+            Mock(filename="README.md"),
+            Mock(filename="pyproject.toml"),
+            Mock(filename="LICENSE"),
+            Mock(filename=".pylintrc"),
+        ]
+
+    def __iter__(self):
+        return iter(self.files)
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        return True
+
+    def infolist(self):
+        return self.files
+
+    def namelist(self):
+        return [data.filename for data in self.files]
+
+    def extract(self, name: str, path: str):
+        pass

@@ -74,7 +74,6 @@ class BaseUnzip(CheckVerifyer):
         try:
             with ZipFile(self.filename, self.read_mode) as zip_obj:
                 namelist = zip_obj.namelist()
-
                 if len([m for m, n in zip(self.members, namelist) if n == m]) == 0:
                     raise ValueError(
                         f"Not find any {list(self.members)} in {self.filename}"
@@ -84,6 +83,8 @@ class BaseUnzip(CheckVerifyer):
                     if name in self.members:
                         self.debug(f"extract::{self.filename}={name}")
                         zip_obj.extract(name, path=self.output)
+                    else:
+                        self.debug(f"skip::extract::{self.filename}={name}")
 
         except BadZipFile as exc_info:
             raise RuntimeError(

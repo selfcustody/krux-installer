@@ -39,6 +39,8 @@ class BaseUnzip(CheckVerifyer):
         output: str = tempfile.gettempdir(),
     ):
         super().__init__(filename=filename, read_mode="r", regexp=r".*\.zip")
+
+        # make an unordered list of members
         self.members = members
         self.output = output
 
@@ -46,13 +48,16 @@ class BaseUnzip(CheckVerifyer):
     def members(self) -> typing.List[str]:
         """Getter for the name of members files to be extracted from zip"""
         self.debug(f"members::getter={self._filename}")
-        return self._members
+        return list(self._members)
 
     @members.setter
     def members(self, value: typing.List[str]):
         """Setter for the name of file to be extracted"""
-        self.debug(f"members::setter={value}")
-        self._members = value
+        if len(value) > 0:
+            self.debug(f"members::setter={value}")
+            self._members = set(value)
+        else:
+            raise ValueError("Members cannot be empty")
 
     @property
     def output(self) -> str:
@@ -69,22 +74,23 @@ class BaseUnzip(CheckVerifyer):
         else:
             raise ValueError(f"Given path not exist: {value}")
 
+    @staticmethod
+    def sanitized_base_name(filename):
+        """Extract the name of zip release without folder tree and .zip extension"""
+        base_name = os.path.basename(filename)
+        return base_name.replace(".zip", "")
+
     def load(self):
         """Extract from given zip file only the ones that was defined as members"""
         try:
+            self.debug(f"load::opening={self.filename}")
             with ZipFile(self.filename, self.read_mode) as zip_obj:
-                namelist = zip_obj.namelist()
-                if len([m for m, n in zip(self.members, namelist) if n == m]) == 0:
-                    raise ValueError(
-                        f"Not find any {list(self.members)} in {self.filename}"
-                    )
-
+                namelist = set(zip_obj.namelist())
+                self.debug(f"load::namelist={namelist}")
                 for name in namelist:
                     if name in self.members:
-                        self.debug(f"extract::{self.filename}={name}")
+                        self.debug(f"load::extract::{self.filename}={name}")
                         zip_obj.extract(name, path=self.output)
-                    else:
-                        self.debug(f"skip::extract::{self.filename}={name}")
 
         except BadZipFile as exc_info:
             raise RuntimeError(

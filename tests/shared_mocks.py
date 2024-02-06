@@ -24,6 +24,7 @@ questions/37553552/assert-that-a-propertymock-
 was-called-on-a-specific-instance
 """
 
+import typing
 from unittest.mock import Mock, MagicMock, PropertyMock
 
 
@@ -57,6 +58,14 @@ class MockZipFile:
             Mock(filename=".pylintrc"),
         ]
 
+    @property
+    def files(self):
+        return self._files
+
+    @files.setter
+    def files(self, value: typing.List[Mock]):
+        self._files = value
+
     def __iter__(self):
         return iter(self.files)
 
@@ -74,3 +83,36 @@ class MockZipFile:
 
     def extract(self, name: str, path: str):
         pass
+
+
+class MockKruxZipFile(MockZipFile):
+
+    def __init__(self):
+        super().__init__()
+        self.files = [
+            Mock(filename="test/"),
+            Mock(filename="test/maixpy_m5stickv"),
+            Mock(filename="test/maixpy_m5stickv/firmware.bin"),
+            Mock(filename="test/maixpy_m5stickv/firmware.bin.sig"),
+            Mock(filename="test/maixpy_m5stickv/kboot.kfpkg"),
+            Mock(filename="test/maixpy_amigo_tft"),
+            Mock(filename="test/maixpy_amigo_tft/firmware.bin"),
+            Mock(filename="test/maixpy_amigo_tft/firmware.bin.sig"),
+            Mock(filename="test/maixpy_amigo_tft/kboot.kfpkg"),
+            Mock(filename="test/maixpy_amigo_ips"),
+            Mock(filename="test/maixpy_amigo_ips/firmware.bin"),
+            Mock(filename="test/maixpy_amigo_ips/firmware.bin.sig"),
+            Mock(filename="test/maixpy_amigo_ips/kboot.kfpkg"),
+            Mock(filename="test/maixpy_dock"),
+            Mock(filename="test/maixpy_dock/firmware.bin"),
+            Mock(filename="test/maixpy_dock/firmware.bin.sig"),
+            Mock(filename="test/maixpy_dock/kboot.kfpkg"),
+            Mock(filename="test/maixpy_bit"),
+            Mock(filename="test/maixpy_bit/firmware.bin"),
+            Mock(filename="test/maixpy_bit/firmware.bin.sig"),
+            Mock(filename="test/maixpy_bit/kboot.kfpkg"),
+            Mock(filename="test/maixpy_yahboom"),
+            Mock(filename="test/maixpy_yahboom/firmware.bin"),
+            Mock(filename="test/maixpy_yahboom/firmware.bin.sig"),
+            Mock(filename="test/maixpy_yahboom/kboot.kfpkg"),
+        ]

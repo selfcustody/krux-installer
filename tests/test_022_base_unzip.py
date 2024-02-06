@@ -17,13 +17,25 @@ class TestBaseUnzip(TestCase):
         self.assertEqual(unzip.output, tempfile.gettempdir())
 
     @patch("os.path.exists", side_effect=[True, False])
-    def test_fail_init(self, mock_exist):
+    def test_fail_init_not_exists(self, mock_exist):
         with self.assertRaises(ValueError) as exc_info:
             BaseUnzip(filename="test.zip", members=["README.md"])
             mock_exist.assert_has_calls([call("test.zip"), call(tempfile.gettempdir())])
         self.assertEqual(
             str(exc_info.exception), f"Given path not exist: {tempfile.gettempdir()}"
         )
+
+    @patch("src.utils.unzip.base_unzip.ZipFile")
+    @patch("os.path.exists", return_value=True)
+    def test_fail_init_empty_zip(self, mock_exists, mock_zipfile):
+
+        with self.assertRaises(ValueError) as exc_info:
+            BaseUnzip(filename="test.zip", members=[])
+            mock_exists.assert_has_calls(
+                [call("test.zip"), call(tempfile.gettempdir())]
+            )
+            mock_zipfile.assert_called_once_with("test.zip", "r")
+        self.assertEqual(str(exc_info.exception), "Members cannot be empty")
 
     @patch(
         "src.utils.unzip.base_unzip.BaseUnzip.members",
@@ -47,20 +59,6 @@ class TestBaseUnzip(TestCase):
 
     @patch("src.utils.unzip.base_unzip.ZipFile")
     @patch("os.path.exists", return_value=True)
-    def test_load_namelist(self, mock_exists, mock_zipfile):
-        mock_zipfile.return_value = MockZipFile()
-        mock_zipfile.return_value.open = mock_open
-
-        with patch.object(MockZipFile, "namelist") as mock_namelist:
-            unzip = BaseUnzip(filename="test.zip", members=["README.md"])
-            mock_exists.assert_has_calls(
-                [call("test.zip"), call(tempfile.gettempdir())]
-            )
-            unzip.load()
-            mock_namelist.assert_called_once()
-
-    @patch("src.utils.unzip.base_unzip.ZipFile")
-    @patch("os.path.exists", return_value=True)
     def test_load_extract(self, mock_exists, mock_zipfile):
         mock_zipfile.return_value = MockZipFile()
         mock_zipfile.return_value.open = mock_open
@@ -77,22 +75,6 @@ class TestBaseUnzip(TestCase):
 
     @patch("src.utils.unzip.base_unzip.ZipFile")
     @patch("os.path.exists", return_value=True)
-    def test_fail_load_empty_zip(self, mock_exists, mock_zipfile):
-
-        with self.assertRaises(ValueError) as exc_info:
-            unzip = BaseUnzip(filename="test.zip", members=["README.md"])
-            mock_exists.assert_has_calls(
-                [call("test.zip"), call(tempfile.gettempdir())]
-            )
-
-            unzip.load()
-            mock_zipfile.assert_called_once_with("test.zip", "r")
-        self.assertEqual(
-            str(exc_info.exception), "Not find any ['README.md'] in test.zip"
-        )
-
-    @patch("src.utils.unzip.base_unzip.ZipFile")
-    @patch("os.path.exists", return_value=True)
     def test_fail_load_badfile(self, mock_exists, mock_zipfile):
 
         mock_zipfile.side_effect = zipfile.BadZipfile
@@ -105,3 +87,8 @@ class TestBaseUnzip(TestCase):
 
             unzip.load()
         self.assertEqual(str(exc_info.exception), "Cannot open test.zip: None")
+
+    def test_sanitized_base_name(self):
+        path = f"{tempfile.gettempdir()}/test/mock.zip"
+        sanitized = BaseUnzip.sanitized_base_name(path)
+        self.assertEqual(sanitized, "mock")

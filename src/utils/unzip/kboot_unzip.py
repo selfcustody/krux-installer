@@ -30,6 +30,9 @@ class KbootUnzip(BaseUnzip):
     """Unzip packaged firmware"""
 
     def __init__(self, filename: str, device: str, output: str = tempfile.gettempdir()):
+        base_name = BaseUnzip.sanitized_base_name(filename)
         super().__init__(
-            filename=filename, members=[f"maixpy_{device}/kboot.kfpkg"], output=output
+            filename=filename,
+            members=[f"{base_name}/maixpy_{device}/kboot.kfpkg"],
+            output=output,
         )

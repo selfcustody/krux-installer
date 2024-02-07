@@ -1,0 +1,6 @@
+[submodule "src/kboot"]
+	path = src/kboot
+	url = https://github.com/selfcustody/Kboot.git
+[submodule "src/utils/kboot"]
+	path = src/utils/kboot
+	url = https://github.com/selfcustody/Kboot.git

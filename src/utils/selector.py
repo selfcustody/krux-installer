@@ -31,6 +31,8 @@ import requests
 from kivy.cache import Cache
 from .trigger import Trigger
 
+VALID_DEVICES = ("m5stickv", "amigo_tft", "amigo_ips", "dock", "bit", "yahboom")
+
 
 class Selector(Trigger):
     """
@@ -42,7 +44,6 @@ class Selector(Trigger):
         "Accept": "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
     }
-    VALID_DEVICES = ("m5stickv", "amigo_tft", "amigo_ips", "dock", "bit", "yahboom")
 
     def __init__(self):
         super().__init__()
@@ -65,7 +66,7 @@ class Selector(Trigger):
         Cache a valid device name to be memorized after,
         when it will be used to flash
         """
-        if value in Selector.VALID_DEVICES:
+        if value in VALID_DEVICES:
             self.debug(f"cache::set::krux-installer::device={value}")
             Cache.append("krux-installer", "device", value)
         else:

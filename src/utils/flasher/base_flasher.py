@@ -24,12 +24,12 @@ base_flasher.py
 """
 import os
 import re
-import tempfile
-import typing
+from io import StringIO
 from ..trigger import Trigger
-from ..selector import Selector.VALID_DEVICES
+from ..selector import VALID_DEVICES
+from ..kboot.build.ktool import KTool
 
-            
+
 class BaseFlasher(Trigger):
     """
     Base class to flash kboot.kfpkg on devices
@@ -38,43 +38,60 @@ class BaseFlasher(Trigger):
     -----
         device: str ->
             One of :attr:`selector.Selector.VALID_DEVICES`
-    
+
         on_print_progress_bar: typing.Callable ->
             a callback(prefix: str, percent: float, suffix: str)
     """
 
-    def __init__(
-        self,
-        device: str,
-        on_log: typing.Callable
-    ):
+    def __init__(self, device: str, firmware: str):
         super().__init__()
         self.device = device
-        self.on_log = on_log
-        
+        self.firmware = firmware
 
     @property
     def device(self) -> str:
         """Getter for device to be flashed"""
         self.debug(f"device::getter={self._device}")
+        return self._device
 
-    @device.setter(self, value: str):
+    @device.setter
+    def device(self, value: str):
         """Setter for device to be flashed"""
-        if device in VALID_DEVICES:
+        if value in VALID_DEVICES:
             self.debug(f"device::setter={value}")
             self._device = value
         else:
             raise ValueError(f"Invalid device: {value}")
 
     @property
-    def on_log(self) -> typing.Callable:
-        """Getter for callback on any :attr:`KTool.log`"""
-        self.debug(f"on_print_progress_bar::getter={self._on_log}")
-        return self._on_log
+    def firmware(self) -> str:
+        """Getter for firmware's filename"""
+        self.debug(f"firmware::getter={self._firmware}")
+        return self._firmware
 
-    @on_log.setter
-    def on_log(self, value: typing.Callable):
-        """Setter for callback atr :attr:`KTool.log` """
-        self.debug(f"on_log:setter={value}")
-        self._on_log = value
+    @firmware.setter
+    def firmware(self, value: str):
+        """Setter for firmware's filename"""
+        regexp = r".*\.kfpkg"
+        if not re.findall(regexp, value):
+            raise ValueError(f"Invalid file: {value} do not assert with {regexp}")
 
+        if not os.path.exists(value):
+            raise ValueError(f"File {value} do not exist")
+
+        self.debug(f"firmware::setter={value}")
+        self._firmware = value
+
+    @property
+    def ktool(self) -> KTool:
+        """Return a new instance of ktool"""
+        ktool = KTool()
+        self.debug(f"ktool::getter={ktool}")
+        return ktool
+
+    @property
+    def buffer(self) -> StringIO:
+        """Return a new instance of StringIO"""
+        buffer = StringIO()
+        self.debug(f"buffer::getter={buffer}")
+        return buffer

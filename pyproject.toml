@@ -15,6 +15,7 @@ kivysome = "^0.2.1"
 pyopenssl = "^24.0.0"
 pytest-cov = "^4.1.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
+pyserial = "^3.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"
@@ -27,7 +28,7 @@ cli = "python src/krux-installer.py"
 format-src= "black ./src"
 format-tests= "black ./tests"
 format = ["format-src", "format-tests"]
-lint-src = "pylint ./src"
+lint-src = "pylint --ignore-paths=./src/utils/kboot ./src"
 lint-tests = "pylint --disable=C0114,C0115,C0116,R0904 ./tests"
 lint = ["lint-src", "lint-tests"]
 test = "pytest --capture=tee-sys --verbose --cache-clear ./tests "

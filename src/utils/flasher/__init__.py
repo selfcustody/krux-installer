@@ -49,30 +49,26 @@ class Flasher(BaseFlasher):
         ktool = self.ktool
         device = self.device
         with redirect_stdout(buffer):
-            board = ""
-            if device == "m5stickv":
-                board = "goE"
-            if device == "amigo_tft":
-                board = "goE"
-            if device == "amigo_ips":
-                board = "goE"
+            # Default board for amigo, yahboom, bit 
+            board = "goE"
+
+            # Change the board if it is dock
+            # (Tadeu approach)
             if device == "dock":
                 board = "dan"
-            if device == "bit":
-                board = "goE"
 
+            # Get the ktool path
+            # and give admin privilege
+            # only for ktool.py
             ktool_path = inspect.getfile(ktool.__class__)
             elevate(ktool_path)
 
-            if self.has_admin_privilege():
-                try:
-                    self.ktool.process(
-                        False, "DEFAULT", 1500000, board, file=self.full_path
-                    )
-                    callback(buffer.getvalue())
-                except Exception as exc_info:
-                    raise RuntimeError(
-                        f"Unable to flash: {exc_info.__cause__}"
-                    ) from exc_info
-            else:
-                raise RuntimeError("Do not have proper privilege to execute flash")
+            try:
+                self.ktool.process(
+                    False, "DEFAULT", 1500000, board, file=self.full_path
+                )
+                callback(buffer.getvalue())
+            except Exception as exc_info:
+                raise RuntimeError(
+                    f"Unable to flash: {exc_info.__cause__}"
+                ) from exc_info

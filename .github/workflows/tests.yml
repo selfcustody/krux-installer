@@ -42,7 +42,9 @@ jobs:
     
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          submodules: recursive
+
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -72,6 +74,8 @@ jobs:
     steps:
       
       - uses: actions/checkout@v4
+        with:
+          submodules: recursive
       
       - name: Setup Python
         uses: actions/setup-python@v4

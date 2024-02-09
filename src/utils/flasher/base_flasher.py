@@ -23,7 +23,6 @@
 base_flasher.py
 """
 import os
-import re
 from io import StringIO
 from ..trigger import Trigger
 from ..selector import VALID_DEVICES
@@ -43,10 +42,10 @@ class BaseFlasher(Trigger):
             a callback(prefix: str, percent: float, suffix: str)
     """
 
-    def __init__(self, device: str, firmware: str):
+    def __init__(self, device: str, root_path: str):
         super().__init__()
         self.device = device
-        self.firmware = firmware
+        self.root_path = root_path
 
     @property
     def device(self) -> str:
@@ -64,23 +63,33 @@ class BaseFlasher(Trigger):
             raise ValueError(f"Invalid device: {value}")
 
     @property
-    def firmware(self) -> str:
-        """Getter for firmware's filename"""
-        self.debug(f"firmware::getter={self._firmware}")
-        return self._firmware
+    def root_path(self) -> str:
+        """Getter for root_path's filename"""
+        self.debug(f"root_path::getter={self._root_path}")
+        return self._root_path
 
-    @firmware.setter
-    def firmware(self, value: str):
-        """Setter for firmware's filename"""
-        regexp = r".*\.kfpkg"
-        if not re.findall(regexp, value):
-            raise ValueError(f"Invalid file: {value} do not assert with {regexp}")
+    @root_path.setter
+    def root_path(self, value: str):
+        """Setter for firmware's root_path's/full_path"""
+        full_path = os.path.join(value, f"maixpy_{self.device}", "kboot.kfpkg")
 
         if not os.path.exists(value):
-            raise ValueError(f"File {value} do not exist")
+            raise ValueError(f"Directory {value} do not exist")
 
-        self.debug(f"firmware::setter={value}")
-        self._firmware = value
+        if not os.path.exists(full_path):
+            raise ValueError(f"File {full_path} do not exist")
+
+        self.debug(f"root_path::setter={value}")
+        self._root_path = value
+
+        self.debug(f"full_path::setter={full_path}")
+        self._full_path = full_path
+
+    @property
+    def full_path(self) -> str:
+        """Getter for firmware's full_path's"""
+        self.debug(f"root_path::getter={self._full_path}")
+        return self._full_path
 
     @property
     def ktool(self) -> KTool:
@@ -95,3 +104,10 @@ class BaseFlasher(Trigger):
         buffer = StringIO()
         self.debug(f"buffer::getter={buffer}")
         return buffer
+
+    @property
+    def has_admin_privilege(self) -> bool:
+        """Getter for has_admin_privilege"""
+        is_root = os.getuid() == 0
+        self.debug(f"has_admin_privilege::getter={is_root}")
+        return is_root

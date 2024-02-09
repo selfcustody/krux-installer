@@ -23,42 +23,56 @@
 __init__.py
 """
 
+import inspect
 import typing
 from contextlib import redirect_stdout
+from raiseup import elevate
 from .base_flasher import BaseFlasher
 
 
 class Flasher(BaseFlasher):
     """
-    A class to parse KTool outputs
-
-    We don't want to modify the KTool structure,
-    instead, only redirect what happens in :attr:`KTool.process`.
-
-    Following odudex approach, it uses :attr:`contextlib.redirect_stdout`
-    to do this.
-
-    TODO: add sudoer GUI
+    A class to parse KTool outputs: We don't want to modify the
+    KTool structure, instead, only redirect what happens in
+    :attr:`KTool.process`. Following odudex approach, it uses
+    :attr:`contextlib.redirect_stdout` to do this. Additionaly,
+    it uses raiseup to elevate privileges to src/utils/kboot/ktool.py
+    (pkexec->Linux, UAC->Windows, AppleScript->MacOS)
     """
 
-    def __init__(self, device: str, firmware: str):
-        super().__init__(device=device, firmware=firmware)
+    def __init__(self, device: str, root_path: str):
+        super().__init__(device=device, root_path=root_path)
 
     def flash(self, callback: typing.Callable = print):
         """Execute :attr:`KTool.process` with stdout redirection"""
         buffer = self.buffer
+        ktool = self.ktool
+        device = self.device
         with redirect_stdout(buffer):
             board = ""
-            if self.device == "m5stickv":
+            if device == "m5stickv":
                 board = "goE"
-            if self.device == "amigo_tft":
+            if device == "amigo_tft":
                 board = "goE"
-            if self.device == "amigo_ips":
+            if device == "amigo_ips":
                 board = "goE"
-            if self.device == "dock":
+            if device == "dock":
                 board = "dan"
-            if self.device == "bit":
+            if device == "bit":
                 board = "goE"
 
-            self.ktool.process(False, "DEFAULT", 1500000, board, file=self.firmware)
-            callback(buffer.getvalue())
+            ktool_path = inspect.getfile(ktool.__class__)
+            elevate(ktool_path)
+
+            if self.has_admin_privilege():
+                try:
+                    self.ktool.process(
+                        False, "DEFAULT", 1500000, board, file=self.full_path
+                    )
+                    callback(buffer.getvalue())
+                except Exception as exc_info:
+                    raise RuntimeError(
+                        f"Unable to flash: {exc_info.__cause__}"
+                    ) from exc_info
+            else:
+                raise RuntimeError("Do not have proper privilege to execute flash")

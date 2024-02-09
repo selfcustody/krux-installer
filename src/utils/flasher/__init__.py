@@ -49,7 +49,7 @@ class Flasher(BaseFlasher):
         ktool = self.ktool
         device = self.device
         with redirect_stdout(buffer):
-            # Default board for amigo, yahboom, bit 
+            # Default board for amigo, yahboom, bit
             board = "goE"
 
             # Change the board if it is dock

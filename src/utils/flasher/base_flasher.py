@@ -32,14 +32,6 @@ from ..kboot.build.ktool import KTool
 class BaseFlasher(Trigger):
     """
     Base class to flash kboot.kfpkg on devices
-
-    Args:
-    -----
-        device: str ->
-            One of :attr:`selector.Selector.VALID_DEVICES`
-
-        on_print_progress_bar: typing.Callable ->
-            a callback(prefix: str, percent: float, suffix: str)
     """
 
     def __init__(self, device: str, root_path: str):
@@ -71,25 +63,26 @@ class BaseFlasher(Trigger):
     @root_path.setter
     def root_path(self, value: str):
         """Setter for firmware's root_path's/full_path"""
-        full_path = os.path.join(value, f"maixpy_{self.device}", "kboot.kfpkg")
-
         if not os.path.exists(value):
             raise ValueError(f"Directory {value} do not exist")
 
-        if not os.path.exists(full_path):
-            raise ValueError(f"File {full_path} do not exist")
-
         self.debug(f"root_path::setter={value}")
         self._root_path = value
-
-        self.debug(f"full_path::setter={full_path}")
-        self._full_path = full_path
+        self.full_path = os.path.join(value, f"maixpy_{self.device}", "kboot.kfpkg")
 
     @property
     def full_path(self) -> str:
         """Getter for firmware's full_path's"""
-        self.debug(f"root_path::getter={self._full_path}")
+        self.debug(f"full_path::getter={self._full_path}")
         return self._full_path
+
+    @full_path.setter
+    def full_path(self, value: str):
+        """Setter for firmware's full_path"""
+        if not os.path.exists(value):
+            raise ValueError(f"File {value} do not exist")
+        self.debug(f"full_path::setter={value}")
+        self._full_path = value
 
     @property
     def ktool(self) -> KTool:

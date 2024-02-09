@@ -36,6 +36,11 @@ test = "pytest --capture=tee-sys --verbose --cache-clear ./tests "
 coverage-html = "pytest --cache-clear --cov src/ --cov-report html ./tests"
 coverage-xml = "pytest --cache-clear --cov src/ --cov-report xml ./tests"
 
+[tool.coverage.run]
+omit = [
+  "src/utils/kboot/build/ktool.py"
+]
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"

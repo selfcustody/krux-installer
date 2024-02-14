@@ -13,15 +13,14 @@ python = ">=3.8,<=3.11.7"
 kivy = "^2.2.1"
 kivysome = "^0.2.1"
 pyopenssl = "^24.0.0"
-pytest-cov = "^4.1.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
 pyserial = "^3.5"
-raiseup = "^0.2"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"
 pylint = "^3.0.3"
 pyinstaller = "^6.3.0"
+pytest-cov = "^4.1.0"
 poethepoet = "^0.24.4"
 
 [tool.poe.tasks]

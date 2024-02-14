@@ -23,9 +23,7 @@
 base_flasher.py
 """
 import os
-from io import StringIO
 from ..trigger import Trigger
-from ..selector import VALID_DEVICES
 from ..kboot.build.ktool import KTool
 
 
@@ -34,73 +32,40 @@ class BaseFlasher(Trigger):
     Base class to flash kboot.kfpkg on devices
     """
 
-    def __init__(self, device: str, root_path: str):
+    VALID_BOARDS = ("goE", "dan")
+
+    def __init__(self, firmware: str):
         super().__init__()
-        self.device = device
-        self.root_path = root_path
+        self.firmware = firmware
+        self.board = "goE"
+        self.ktool = KTool()
 
     @property
-    def device(self) -> str:
-        """Getter for device to be flashed"""
-        self.debug(f"device::getter={self._device}")
-        return self._device
+    def firmware(self) -> str:
+        """Getter for firmware's full path"""
+        self.debug(f"firmware::getter={self._firmware}")
+        return self._firmware
 
-    @device.setter
-    def device(self, value: str):
-        """Setter for device to be flashed"""
-        if value in VALID_DEVICES:
-            self.debug(f"device::setter={value}")
-            self._device = value
+    @firmware.setter
+    def firmware(self, value: str):
+        """Setter for firmware's firmware's full path"""
+        if not os.path.exists(value):
+            raise ValueError(f"File do not exist: {value}")
+
+        self.debug(f"firmware::setter={value}")
+        self._firmware = value
+
+    @property
+    def board(self) -> str:
+        """Return a new instance of board"""
+        self.debug(f"board::getter={self._board}")
+        return self._board
+
+    @board.setter
+    def board(self, value: str):
+        """Setter for board"""
+        if value in BaseFlasher.VALID_BOARDS:
+            self.debug(f"board::setter={value}")
+            self._board = value
         else:
-            raise ValueError(f"Invalid device: {value}")
-
-    @property
-    def root_path(self) -> str:
-        """Getter for root_path's filename"""
-        self.debug(f"root_path::getter={self._root_path}")
-        return self._root_path
-
-    @root_path.setter
-    def root_path(self, value: str):
-        """Setter for firmware's root_path's/full_path"""
-        if not os.path.exists(value):
-            raise ValueError(f"Directory {value} do not exist")
-
-        self.debug(f"root_path::setter={value}")
-        self._root_path = value
-        self.full_path = os.path.join(value, f"maixpy_{self.device}", "kboot.kfpkg")
-
-    @property
-    def full_path(self) -> str:
-        """Getter for firmware's full_path's"""
-        self.debug(f"full_path::getter={self._full_path}")
-        return self._full_path
-
-    @full_path.setter
-    def full_path(self, value: str):
-        """Setter for firmware's full_path"""
-        if not os.path.exists(value):
-            raise ValueError(f"File {value} do not exist")
-        self.debug(f"full_path::setter={value}")
-        self._full_path = value
-
-    @property
-    def ktool(self) -> KTool:
-        """Return a new instance of ktool"""
-        ktool = KTool()
-        self.debug(f"ktool::getter={ktool}")
-        return ktool
-
-    @property
-    def buffer(self) -> StringIO:
-        """Return a new instance of StringIO"""
-        buffer = StringIO()
-        self.debug(f"buffer::getter={buffer}")
-        return buffer
-
-    @property
-    def has_admin_privilege(self) -> bool:
-        """Getter for has_admin_privilege"""
-        is_root = os.getuid() == 0
-        self.debug(f"has_admin_privilege::getter={is_root}")
-        return is_root
+            raise ValueError(f"Invalid board: {value}")

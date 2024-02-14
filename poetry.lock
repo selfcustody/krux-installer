@@ -1279,17 +1279,6 @@ files = [
 ]
 
 [[package]]
-name = "raiseup"
-version = "0.2"
-description = "Python library for requesting root privileges"
-optional = false
-python-versions = "*"
-files = [
-    {file = "raiseup-0.2-py3-none-any.whl", hash = "sha256:9d02ce70927533cacabfaa5706c055b144063a739a86c936c8510742246b5a48"},
-    {file = "raiseup-0.2.tar.gz", hash = "sha256:a00d1a90c94b0603084e7b5ba3c98d44754f05cb2a387d57419c9d9d5d94b24e"},
-]
-
-[[package]]
 name = "remotezip"
 version = "0.9.4"
 description = "Access zip file content hosted remotely without downloading the full file."
@@ -1499,4 +1488,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8,<=3.11.7"
-content-hash = "22c70067f5c7888f1ec3e8d07ab3af68fc1305420b36afa5152251e27522cf2b"
+content-hash = "53fc93a8eda523e4369a57e30ff002bdeecd45989a9c29dbe56bc6ecc5c275f3"

@@ -23,10 +23,10 @@
 __init__.py
 """
 
-import inspect
+import os
+import re
 import typing
-from contextlib import redirect_stdout
-from raiseup import elevate
+from serial.serialutil import SerialException
 from .base_flasher import BaseFlasher
 
 
@@ -40,35 +40,28 @@ class Flasher(BaseFlasher):
     (pkexec->Linux, UAC->Windows, AppleScript->MacOS)
     """
 
-    def __init__(self, device: str, root_path: str):
-        super().__init__(device=device, root_path=root_path)
-
     def flash(self, callback: typing.Callable = print):
         """Execute :attr:`KTool.process` with stdout redirection"""
-        buffer = self.buffer
-        ktool = self.ktool
-        device = self.device
-        with redirect_stdout(buffer):
-            # Default board for amigo, yahboom, bit
-            board = "goE"
+        if re.findall(r".*maixpy_dock/kboot.kfpkg", self.board):
+            self.board = "dan"
 
-            # Change the board if it is dock
-            # (Tadeu approach)
-            if device == "dock":
-                board = "dan"
+        # pylint: disable=unused-argument
+        def get_progress(file_type_str, iteration, total, suffix):
+            percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
+            filled_length = int(100 * iteration // total)
+            barascii = "=" * filled_length + "-" * (100 - filled_length)
+            msg = f"\r%|{barascii}| {percent}%% {suffix}"
+            callback(msg)
 
-            # Get the ktool path
-            # and give admin privilege
-            # only for ktool.py
-            ktool_path = inspect.getfile(ktool.__class__)
-            elevate(ktool_path)
-
-            try:
-                self.ktool.process(
-                    False, "DEFAULT", 1500000, board, file=self.full_path
-                )
-                callback(buffer.getvalue())
-            except Exception as exc_info:
-                raise RuntimeError(
-                    f"Unable to flash: {exc_info.__cause__}"
-                ) from exc_info
+        try:
+            self.ktool.process(
+                terminal=False,
+                dev="DEFAULT",
+                baudrate=1500000,
+                board=self.board,
+                sram=False,
+                file=self.firmware,
+                callback=get_progress,
+            )
+        except Exception as exc:
+            raise exc

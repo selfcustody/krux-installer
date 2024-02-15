@@ -62,11 +62,11 @@ class SigVerifyer(CheckVerifyer):
         self.debug(f"signature::setter={value}")
         self._signature = value
 
-    def verify(self):
+    def verify(self) -> bool:
         """Apply signature verification against a signature data and public key data"""
         try:
             openssl_verify(self.x509, self.signature, self.data, "sha256")
-            return "Signature Verified Successfully"
+            return True
         except SSLError as exc_info:
             raise ValueError(
                 f"SSLError {exc_info.strerror}: {exc_info.reason}"

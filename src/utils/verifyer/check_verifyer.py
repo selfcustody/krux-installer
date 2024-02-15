@@ -46,7 +46,7 @@ class CheckVerifyer(BaseVerifyer):
         self.debug(f"load::{self.filename}::{self.read_mode}")
         if self.read_mode == "r":
             with open(self.filename, self.read_mode, encoding="utf8") as f_data:
-                self.data = f_data.read()
+                self.data = f_data.read().strip()
 
         if self.read_mode == "rb":
             # pylint: disable=unspecified-encoding

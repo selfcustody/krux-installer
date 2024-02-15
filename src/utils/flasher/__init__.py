@@ -23,10 +23,9 @@
 __init__.py
 """
 
-import os
 import re
+import sys
 import typing
-from serial.serialutil import SerialException
 from .base_flasher import BaseFlasher
 
 
@@ -40,7 +39,7 @@ class Flasher(BaseFlasher):
     (pkexec->Linux, UAC->Windows, AppleScript->MacOS)
     """
 
-    def flash(self, callback: typing.Callable = print):
+    def flash(self, callback: typing.Callable = sys.stdout.write):
         """Execute :attr:`KTool.process` with stdout redirection"""
         if re.findall(r".*maixpy_dock/kboot.kfpkg", self.board):
             self.board = "dan"

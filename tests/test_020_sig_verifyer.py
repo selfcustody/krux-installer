@@ -36,4 +36,4 @@ class TestSigVerifyerDownloader(TestCase):
 
         mock_exists.assert_called_once_with("test.zip")
         open_mock.assert_called_once_with("test.zip", "rb")
-        self.assertEqual(result, "Signature Verified Successfully")
+        self.assertEqual(result, True)

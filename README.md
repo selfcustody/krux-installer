@@ -61,7 +61,7 @@ poetry run black ./tests
 
 ### Lint
 
-After forma:
+After format:
 
 ```
 poetry run poe lint
@@ -100,4 +100,45 @@ That is simlar to:
 
 ```bash
 poetry run pytest --cache-clear --cov src/ --cov-report html ./tests
+```
+
+## CLI
+
+At the moment, the script `krux-installer.py` can be executed in a `poetry shell` like a CLI (Command Line Interface).
+
+To do this, you must do:
+
+```
+$> poetry shell
+```
+
+Once new shell is spwaned, execute `python ./krux-installer` followed by two dashes (`--`) and the command arguments:
+
+```
+$> python ./krux-installer.py -- --help                     
+[INFO   ] [Logger      ] Record log in /home/user/.kivy/logs/kivy_some_date.txt
+[INFO   ] [Kivy        ] v2.3.0
+[INFO   ] [Kivy        ] Installed at "/home/user/.cache/pypoetry/virtualenvs/krux-installer-blabla3.11/lib/python3.11/site-packages/kivy/__init__.py"
+[INFO   ] [Python      ] v3.11.7 (main, some date, some hour) [GCC some gcc]
+[INFO   ] [Python      ] Interpreter at "/home/user/.cache/pypoetry/virtualenvs/krux-installer-blabla-py3.11/bin/python"
+[INFO   ] [Logger      ] Purge log fired. Processing...
+[INFO   ] [Logger      ] Purge finished!
+usage: krux-installer [-h] [-v] [-a] [-A] [-d FIRMWARE_DEVICE] [-f FIRMWARE_VERSION] [-D DESTDIR] [-F]
+
+A GUI based application to flash Krux firmware on K210 based devices
+
+options:
+  -h, --help            show this help message and exit
+  -v, --version         Show version
+  -a, --available-firmwares
+                        Show available versions (require internet connection)
+  -A, --available-devices
+                        Show available devices
+  -d FIRMWARE_DEVICE, --firmware-device FIRMWARE_DEVICE
+                        Select a device to be flashed
+  -f FIRMWARE_VERSION, --firmware-version FIRMWARE_VERSION
+                        Select a firmware version to be flashed
+  -D DESTDIR, --destdir DESTDIR
+                        Directory where assets will be stored (default: OS tmpdir)
+  -F, --flash           If set, download the kboot.kfpkg firmware and flash. Otherwise, download firmware.bin and store in destdir
 ```

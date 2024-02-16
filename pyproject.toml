@@ -9,7 +9,7 @@ license = "LICENSE"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<=3.11.7"
+python = ">=3.8,<3.13"
 kivy = "^2.2.1"
 kivysome = "^0.2.1"
 pyopenssl = "^24.0.0"

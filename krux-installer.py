@@ -56,7 +56,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
     parser = ArgumentParser(prog=get_name(), description=get_description())
 
-    if sys.platform in ("linux", "darwin", "freebsd"):
+    if sys.platform in ("linux", "darwin", "freebsd", "win32"):
         parser.add_argument("-v", "--version", help="Show version", action="store_true")
         parser.add_argument(
             "-a",
@@ -85,36 +85,6 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         parser.add_argument(
             "-F",
             "--flash",
-            help=" ".join(["If set, download the kboot.kfpkg firmware and flash.",
-                           "Otherwise, download firmware.bin and store in destdir"]),
-            action="store_true",
-        )
-    elif sys.platform in ("win32"):
-        parser.add_argument("/v", "/version", help="Show version", action="store_true")
-        parser.add_argument(
-            "/a",
-            "/available-firmwares",
-            help="Show available versions (require internet connection)",
-            action="store_true",
-        )
-        parser.add_argument(
-            "/A",
-            "/available-devices",
-            help="Show available devices",
-            action="store_true",
-        )
-        parser.add_argument(
-            "/d", "/firmware-device", help="Select a device to be flashed"
-        )
-        parser.add_argument(
-            "/f", "/firmware-version", help="Select a firmware version to be flashed"
-        )
-        parser.add_argument(
-            "/D", "/destdir", help="Directory where assets will be stored"
-        )
-        parser.add_argument(
-            "/F",
-            "/flash",
             help=" ".join(["If set, download the kboot.kfpkg firmware and flash.",
                            "Otherwise, download firmware.bin and store in destdir"]),
             action="store_true",

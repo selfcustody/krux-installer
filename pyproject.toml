@@ -15,6 +15,7 @@ kivysome = "^0.2.1"
 pyopenssl = "^24.0.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
 pyserial = "^3.5"
+requests = "^2.31.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"

@@ -27,7 +27,7 @@ python -m pipx install poetry
 
 Clone the repository
 ```bash
-git clone --branch kivy https://github.com/krux-installer.git
+git clone --recurse-submodules --branch kivy https://github.com/krux-installer.git
 ```
 
 Install python dependencies:

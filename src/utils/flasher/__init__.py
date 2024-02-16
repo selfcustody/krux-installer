@@ -29,6 +29,16 @@ import typing
 from .base_flasher import BaseFlasher
 
 
+# pylint: disable=unused-argument
+def get_progress(file_type_str, iteration, total, suffix):
+    """Default callback for flashing (repeat the one from ktool)"""
+    percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
+    filled_length = int(100 * iteration // total)
+    barascii = "=" * filled_length + "-" * (100 - filled_length)
+    msg = f"\r%|{barascii}| {percent}%% {suffix}"
+    sys.stdout.write(msg)
+
+
 class Flasher(BaseFlasher):
     """
     A class to parse KTool outputs: We don't want to modify the
@@ -39,18 +49,10 @@ class Flasher(BaseFlasher):
     (pkexec->Linux, UAC->Windows, AppleScript->MacOS)
     """
 
-    def flash(self, callback: typing.Callable = sys.stdout.write):
+    def flash(self, callback: typing.Callable = get_progress):
         """Execute :attr:`KTool.process` with stdout redirection"""
         if re.findall(r".*maixpy_dock/kboot.kfpkg", self.board):
             self.board = "dan"
-
-        # pylint: disable=unused-argument
-        def get_progress(file_type_str, iteration, total, suffix):
-            percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
-            filled_length = int(100 * iteration // total)
-            barascii = "=" * filled_length + "-" * (100 - filled_length)
-            msg = f"\r%|{barascii}| {percent}%% {suffix}"
-            callback(msg)
 
         try:
             self.ktool.process(
@@ -60,7 +62,7 @@ class Flasher(BaseFlasher):
                 board=self.board,
                 sram=False,
                 file=self.firmware,
-                callback=get_progress,
+                callback=callback,
             )
         except Exception as exc:
-            raise exc
+            raise RuntimeError(exc.__cause__) from exc

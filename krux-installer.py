@@ -182,24 +182,48 @@ if re.findall(regcli, " ".join(sys.argv)):
                 print("✅ Signature Verified Successfully")
 
             return zipfile
+
+        def download_kboot_beta():
+            print()
+            print(f"⚡ Downloading firmware to {args.destdir}/kboot.kfpkg")
+            beta = BetaDownloader(device=args.firmware_device, binary_type="kboot", destdir=args.destdir)
+            beta.download()
+            print()  
+             
+        def download_bin_beta():
+            print()
+            print(f"⚡ Downloading firmware to {args.destdir}/firmware.bin")
+            beta = BetaDownloader(device=args.firmware_device, binary_type="firmware", destdir=args.destdir)
+            beta.download()
+            print()                
             
         if re.findall(r"odudex/krux_binaries", args.firmware_version):
             if args.flash:
                 print()
-                print(f"⚡ Downloading firmware to {args.destdir}/maixpy_{args.firmware_device}/kboot.kfpkg")
-                beta = BetaDownloader(device=args.firmware_device, binary_type="kboot", destdir=args.destdir)
-                beta.load()
-                print()                
-                print(f"✎ Flashing firmware from {args.destdir}/maixpy_{args.firmware_device}/kboot.kfpkg")
-                flasher = Flasher(firmware=f"{beta.destdir}/maixpy_{args.firmware_device}/kboot.kfpkg")
+                print(f"🔍 Verifying {args.destdir}/kboot.kfpkg")
+                if not os.path.exists(f"{args.destdir}/kboot.kfpkg"):
+                    download_kboot_beta()
+                else:
+                    answer = input(f"⚠  Do you want to download {args.destdir}/kboot.kfpkg for '{args.firmware_device}' again? [y/n]")
+                    if answer == "y":
+                        download_kboot_beta()
+
+                print()
+                print(f"✎ Flashing firmware from {args.destdir}/kboot.kfpkg")
+                flasher = Flasher(firmware=f"{args.destdir}/kboot.kfpkg")
                 flasher.flash()
-            else:                
+            else:                         
                 print()
-                print(f"⚡ Downloading firmware to {args.destdir}/maixpy_{args.firmware_device}/firmware.bin(.sig)")
-                beta = BetaDownloader(device=args.firmware_device, binary_type="firmware", destdir=args.destdir)
-                beta.load()
-                print()
+                print(f"🔍 Verifying {args.destdir}/firmware.bin")
+                if not os.path.exists(f"{args.destdir}/firmware.bin"):
+                    download_bin_beta()
+
+                else:
+                    answer = input(f"⚠  Do you want to download {args.destdir}/firmware.bin for '{args.firmware_device}' again? [y/n]")
+                    if answer == "y":
+                        download_bin_beta()
     
+                print(f"Copy {args.destdir}/firmware.bin for '{args.firmware_device}' to your SDCard")
     
         elif re.findall(r"v2\d\.\d+\.\d+", args.firmware_version):
             if args.flash:

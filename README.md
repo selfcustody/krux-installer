@@ -30,6 +30,11 @@ Clone the repository
 git clone --recurse-submodules --branch kivy https://github.com/krux-installer.git
 ```
 
+* If already cloned the repo without using `--recurse-submodules`, use the command below to clone the needed submodules:
+```bash
+git submodule update --init
+```
+
 Install python dependencies:
 
 ```b̀ash

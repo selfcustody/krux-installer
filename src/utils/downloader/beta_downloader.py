@@ -31,7 +31,7 @@ class BetaDownloader(AssetDownloader):
 
     VALID_DEVICES = ("amigo_ips", "amigo_tft", "dock", "bit", "m5stickv", "yahboom")
 
-    VALID_BINARY_TYPES = ("firmware", "kboot")
+    VALID_BINARY_TYPES = ("firmware.bin", "kboot.kfpkg")
 
     def __init__(
         self,
@@ -39,11 +39,11 @@ class BetaDownloader(AssetDownloader):
         binary_type: str,
         destdir: str = tempfile.gettempdir(),
     ):
+        base_url = "https://raw.githubusercontent.com/odudex/krux_binaries/main"
+        url = f"{base_url}/maixpy_{device}/{binary_type}"
+        super().__init__(url=url, destdir=destdir, write_mode="wb")
         self.device = device
         self.binary_type = binary_type
-        base_url = "https://raw.githubusercontent.com/odudex/krux_binaries/main"
-        url = f"{base_url}/maixpy_{self.device}/{self.binary_type}"
-        super().__init__(url=url, destdir=destdir, write_mode="wb")
 
     @property
     def device(self):
@@ -71,11 +71,6 @@ class BetaDownloader(AssetDownloader):
         """Setter for the binary_type of beta version to be downloaded (firmware or kboot)"""
         if value in BetaDownloader.VALID_BINARY_TYPES:
             self.debug(f"binary::setter={value}")
-            if value == "firmware":
-                self._binary_type = "firmware.bin"
-
-            if value == "kboot":
-                self._binary_type = "kboot.kfpkg"
-
+            self._binary_type = value
         else:
             raise ValueError(f"Invalid binary_type {value}")

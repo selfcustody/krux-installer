@@ -26,6 +26,7 @@ __init__.py
 import re
 import sys
 import typing
+from serial.tools import list_ports
 from .base_flasher import BaseFlasher
 
 
@@ -35,8 +36,12 @@ def get_progress(file_type_str, iteration, total, suffix):
     percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
     filled_length = int(100 * iteration // total)
     barascii = "=" * filled_length + "-" * (100 - filled_length)
-    msg = f"\r%|{barascii}| {percent}%% {suffix}"
-    sys.stdout.write(msg)
+    msg = f"\r%|{barascii}| {percent}% {suffix}"
+    if percent == 100:
+        print()
+        print(msg)
+    else:
+        sys.stdout.write(msg)
 
 
 class Flasher(BaseFlasher):
@@ -51,13 +56,23 @@ class Flasher(BaseFlasher):
 
     def flash(self, callback: typing.Callable = get_progress):
         """Execute :attr:`KTool.process` with stdout redirection"""
-        if re.findall(r".*maixpy_dock/kboot.kfpkg", self.board):
-            self.board = "dan"
-
         try:
+            # amigo, m5stickv
+            goE = list(list_ports.grep("0403"))
+
+            # dock
+            dan = list(list_ports.grep("7523"))
+
+            if len(goE) > 0:
+                port = goE[0].device
+
+            elif len(dan) > 0:
+                port = dan[0].device
+                self.board = "dan"
+            
             self.ktool.process(
                 terminal=False,
-                dev="DEFAULT",
+                dev=port,
                 baudrate=1500000,
                 board=self.board,
                 sram=False,
@@ -65,4 +80,4 @@ class Flasher(BaseFlasher):
                 callback=callback,
             )
         except Exception as exc:
-            raise RuntimeError(exc.__cause__) from exc
+            raise Exception(str(exc)) from exc

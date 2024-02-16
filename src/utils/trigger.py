@@ -24,16 +24,8 @@ trigger.py
 
 Base class to be used accross project
 """
-####################
-# Standard libraries
-####################
 import os
 from inspect import currentframe, unwrap
-
-#######################
-# Third party libraries
-#######################
-from kivy.logger import Logger, LOG_LEVELS
 
 
 class Trigger:
@@ -45,15 +37,10 @@ class Trigger:
     """
 
     def __init__(self):
-        loglevel = os.environ.get("LOGLEVEL")
-        if LOG_LEVELS.get(loglevel):
-            Logger.setLevel(LOG_LEVELS[loglevel])
-        else:
-            if loglevel is None:
-                Logger.setLevel(LOG_LEVELS["info"])
-            else:
-                raise KeyError(f"Not recognized LOGLEVEL: {loglevel}")
-
+        self._loglevel = "info"
+        if os.environ.get("LOGLEVEL"):
+            self._loglevel = os.environ.get("LOGLEVEL")
+        
     @staticmethod
     def mro_info():
         """
@@ -112,37 +99,18 @@ class Trigger:
             del frame
 
     @staticmethod
-    def _create_msg(msg):
+    def create_msg(msg):
         """
         Create the logged message with current
         class caller
         """
-        return f"{Trigger.mro_info()}: {msg}"
-
-    def info(self, msg):
-        """
-        Create the info message with the current
-        class caller
-        """
-        Logger.info(self._create_msg(msg))
+        return f"[{Trigger.mro_info()}]: {msg}"
 
     def debug(self, msg):
         """
         Create the debug message with the current
         class caller
         """
-        Logger.debug(self._create_msg(msg))
-
-    def warning(self, msg):
-        """
-        Create the warning message with the current
-        class caller
-        """
-        Logger.warning(self._create_msg(msg))
-
-    def error(self, msg):
-        """
-        Create the error message with the current
-        class caller
-        """
-        Logger.error(self._create_msg(msg))
+        if self._loglevel == "debug":
+            print(f"[DEBUG] {Trigger.create_msg(msg)}")
+        

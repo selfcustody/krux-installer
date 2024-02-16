@@ -28,10 +28,9 @@ Generic selector to select devices or versions
 import typing
 from http.client import HTTPResponse
 import requests
-from kivy.cache import Cache
 from .trigger import Trigger
 
-VALID_DEVICES = ("m5stickv", "amigo_tft", "amigo_ips", "dock", "bit", "yahboom")
+VALID_DEVICES = (None, "m5stickv", "amigo", "amigo_tft", "amigo_ips", "dock", "bit", "yahboom")
 
 
 class Selector(Trigger):
@@ -47,51 +46,42 @@ class Selector(Trigger):
 
     def __init__(self):
         super().__init__()
-        self.debug("cache::register::krux-installer={limit: 10, timeout: 60}")
-        Cache.register("krux-installer", limit=10, timeout=600)
+        self.device = None
         self.releases = self._fetch_releases()
+        self.firmware = None
 
     @property
     def device(self) -> str:
         """
-        Get the current device memorized on cache
+        Get the current device
         """
-        device = Cache.get("krux-installer", "device")
-        self.debug(f"cache::get::krux-installer::device={device}")
+        self.debug(f"device::getter={self._device}")
         return device
 
     @device.setter
     def device(self, value: str):
-        """
-        Cache a valid device name to be memorized after,
-        when it will be used to flash
-        """
+        """Setter for the current device"""
+        self.debug(f"device::setter={value}")
         if value in VALID_DEVICES:
-            self.debug(f"cache::set::krux-installer::device={value}")
-            Cache.append("krux-installer", "device", value)
+            self.debug(f"device::setter={value}")
+            self._device = value
         else:
             raise ValueError(f"Device '{value}' is not valid")
 
     @property
     def firmware(self) -> str:
-        """
-        Get the current firmware version name memorized on cache
-        """
-        version = Cache.get("krux-installer", "firmware")
-        self.debug(f"cache::get::krux-installer::version={version}")
-        return version
+        """Getter for the current firmware version"""
+        self.debug(f"firmware::getter={self._firmware}")
+        return self._firmware
 
     @firmware.setter
-    def firmware(self, version: str):
-        """
-        Cache a valid firmware version name to be memorized after,
-        when it will be used to flash
-        """
-        if version in self.releases:
-            self.debug(f"cache::append::krux-installer::firmware={version}")
-            Cache.append("krux-installer", "firmware", version)
+    def firmware(self, value: str):
+        """Setter for the current firmware version"""
+        if value in self.releases or value == None:
+            self.debug(f"firmware::setter={value}")
+            self._firmware = value
         else:
-            raise ValueError(f"Firmware '{version}' is not valid")
+            raise ValueError(f"Firmware '{value}' is not valid")
 
     @property
     def releases(self) -> typing.List[dict]:

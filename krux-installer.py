@@ -85,8 +85,12 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         parser.add_argument(
             "-F",
             "--flash",
-            help=" ".join(["If set, download the kboot.kfpkg firmware and flash.",
-                           "Otherwise, download firmware.bin and store in destdir"]),
+            help=" ".join(
+                [
+                    "If set, download the kboot.kfpkg firmware and flash.",
+                    "Otherwise, download firmware.bin and store in destdir",
+                ]
+            ),
             action="store_true",
         )
     elif sys.platform in ("win32"):
@@ -115,8 +119,12 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         parser.add_argument(
             "/F",
             "/flash",
-            help=" ".join(["If set, download the kboot.kfpkg firmware and flash.",
-                           "Otherwise, download firmware.bin and store in destdir"]),
+            help=" ".join(
+                [
+                    "If set, download the kboot.kfpkg firmware and flash.",
+                    "Otherwise, download firmware.bin and store in destdir",
+                ]
+            ),
             action="store_true",
         )
     else:
@@ -133,7 +141,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             print(f"* {version}")
 
     elif args.available_devices:
-        for device in VALID_DEVICES:
+        for device in VALID_DEVICES[1:len(VALID_DEVICES)]:
             print(f"* {device}")
 
     elif args.firmware_device and not args.firmware_version:
@@ -145,7 +153,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         FIRMWARE_NAME = ""
         ZIPFILE = ""
         answer = ""
-        
+
         def download_zip():
             """Download zip release and prints message"""
             print()
@@ -184,7 +192,9 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             """Make sha256sum of .zip release and check it against the .sha256.txt file"""
             print()
             print(f"⚠  Verifying {filename}.zip with {filename}.sha256.txt")
-            sha256_check_verifyer = Sha256CheckVerifyer(filename=f"{filename}.sha256.txt")
+            sha256_check_verifyer = Sha256CheckVerifyer(
+                filename=f"{filename}.sha256.txt"
+            )
             sha256_verifyer = Sha256Verifyer(filename=filename)
             sha256_check_verifyer.load()
             sha256_verifyer.load()
@@ -209,7 +219,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             return sig_verifyer.verify()
 
         def download_and_verify():
-            """"Check files, download if needed, verify integrity and authenticity"""
+            """ "Check files, download if needed, verify integrity and authenticity"""
             FIRMWARE_NAME = f"{args.destdir}/krux-{args.firmware_version}.zip"
             print()
             print(f"🔍 Verifying {FIRMWARE_NAME}")
@@ -225,9 +235,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                     zipd = f"{args.destdir}/krux-{args.firmware_version}.zip"
 
             print()
-            print(
-                f"🔍 Verifying {FIRMWARE_NAME}.sha256.txt"
-            )
+            print(f"🔍 Verifying {FIRMWARE_NAME}.sha256.txt")
             if not os.path.exists(f"{FIRMWARE_NAME}.sha256.txt"):
                 download_zip_sha256sum()
             else:
@@ -242,7 +250,9 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             if not os.path.exists(f"{FIRMWARE_NAME}.sig"):
                 download_zip_sig()
             else:
-                answer = input(f"⚠ Do you want to download {FIRMWARE_NAME}.sig again? [y/n]")
+                answer = input(
+                    f"⚠ Do you want to download {FIRMWARE_NAME}.sig again? [y/n]"
+                )
                 if answer == "y":
                     download_zip_sig()
 
@@ -269,7 +279,6 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
             return zipd
 
-
         def download_kboot_beta():
             """Download odudex's beta kboot.kfpkg and prints message"""
             print()
@@ -277,7 +286,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             beta = BetaDownloader(
                 device=args.firmware_device,
                 binary_type="kboot.kfpkg",
-                destdir=args.destdir
+                destdir=args.destdir,
             )
             beta.download()
             print()
@@ -303,8 +312,12 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                     download_kboot_beta()
                 else:
                     answer = input(
-                        " ".join([f"⚠  Do you want to download {KBOOT_NAME} for",
-                                  f"'{args.firmware_device}' again? [y/n]"])
+                        " ".join(
+                            [
+                                f"⚠  Do you want to download {KBOOT_NAME} for",
+                                f"'{args.firmware_device}' again? [y/n]",
+                            ]
+                        )
                     )
                     if answer == "y":
                         download_kboot_beta()
@@ -322,8 +335,12 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
                 else:
                     answer = input(
-                        " ".join([f"⚠  Do you want to download {FIRMWARE_NAME} for",
-                                  f"'{args.firmware_device}' again? [y/n]"])
+                        " ".join(
+                            [
+                                f"⚠  Do you want to download {FIRMWARE_NAME} for",
+                                f"'{args.firmware_device}' again? [y/n]",
+                            ]
+                        )
                     )
                     if answer == "y":
                         download_bin_beta()
@@ -343,12 +360,14 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 )
                 unzip.load()
 
-                KBOOT_NAME = "/".join([
-                    args.destdir,
-                    f"krux-{args.firmware_version}",
-                    f"/maixpy_{args.firmware_device}",
-                    "kboot.kfpkg"
-                ])
+                KBOOT_NAME = "/".join(
+                    [
+                        args.destdir,
+                        f"krux-{args.firmware_version}",
+                        f"/maixpy_{args.firmware_device}",
+                        "kboot.kfpkg",
+                    ]
+                )
 
                 print()
                 print(f"✎ Flashing {args.firmware_version} for {args.firmware_device}")
@@ -365,17 +384,15 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 )
                 unzip.load()
 
-                FIRMWARE_NAME = "/".join([
-                    args.destdir,
-                    f"krux-{args.firmware_version}",
-                    f"/maixpy_{args.firmware_device}",
-                    "firmware.bin"
-                ])
+                FIRMWARE_NAME = "/".join(
+                    [
+                        args.destdir,
+                        f"krux-{args.firmware_version}",
+                        f"/maixpy_{args.firmware_device}",
+                        "firmware.bin",
+                    ]
+                )
                 print()
 
-                print(
-                    f"Copy {FIRMWARE_NAME} to your SDCard"
-                )
-                print(
-                    f"Copy {FIRMWARE_NAME}.sig to your SDCard"
-                )
+                print(f"Copy {FIRMWARE_NAME} to your SDCard")
+                print(f"Copy {FIRMWARE_NAME}.sig to your SDCard")

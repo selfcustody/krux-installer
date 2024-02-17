@@ -1,7 +1,8 @@
 from unittest import TestCase
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, call
 import requests
 from src.utils.selector import Selector
+from .shared_mocks import PropertyInstanceMock
 
 MOCKED_EMPTY_API = []
 MOCKED_WRONG_API = [
@@ -118,8 +119,8 @@ class TestSelector(TestCase):
         self.assertEqual(str(exc_info.exception), "Connection error: None")
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_device_m5stickv(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.device", new_callable=PropertyInstanceMock)
+    def test_set_device_m5stickv(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -127,10 +128,14 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.device = "m5stickv"
-        mock_append.assert_called_once_with("krux-installer", "device", "m5stickv")
+        mock_set.assert_has_calls([call(selector, None), call(selector, "m5stickv")])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.get", return_value="m5stickv")
+    @patch(
+        "src.utils.selector.Selector.device",
+        new_callable=PropertyInstanceMock,
+        return_value="m5stickv",
+    )
     def test_get_device_m5stickv(self, mock_get, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -139,11 +144,11 @@ class TestSelector(TestCase):
 
         selector = Selector()
         self.assertEqual(selector.device, "m5stickv")
-        mock_get.assert_called_once_with("krux-installer", "device")
+        mock_get.assert_has_calls([call(selector, None), call(selector)])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_device_amigo_tft(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.device", new_callable=PropertyInstanceMock)
+    def test_set_device_amigo_tft(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -151,10 +156,14 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.device = "amigo_tft"
-        mock_append.assert_called_once_with("krux-installer", "device", "amigo_tft")
+        mock_set.assert_has_calls([call(selector, None), call(selector, "amigo_tft")])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.get", return_value="amigo_tft")
+    @patch(
+        "src.utils.selector.Selector.device",
+        new_callable=PropertyInstanceMock,
+        return_value="amigo_tft",
+    )
     def test_get_device_amigo_tft(self, mock_get, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -163,11 +172,11 @@ class TestSelector(TestCase):
 
         selector = Selector()
         self.assertEqual(selector.device, "amigo_tft")
-        mock_get.assert_called_once_with("krux-installer", "device")
+        mock_get.assert_has_calls([call(selector, None), call(selector)])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_device_amigo_ips(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.device", new_callable=PropertyInstanceMock)
+    def test_set_device_amigo_ips(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -175,10 +184,14 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.device = "amigo_ips"
-        mock_append.assert_called_once_with("krux-installer", "device", "amigo_ips")
+        mock_set.assert_has_calls([call(selector, None), call(selector, "amigo_ips")])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.get", return_value="amigo_ips")
+    @patch(
+        "src.utils.selector.Selector.device",
+        new_callable=PropertyInstanceMock,
+        return_value="amigo_ips",
+    )
     def test_get_device_amigo_ips(self, mock_get, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -187,11 +200,11 @@ class TestSelector(TestCase):
 
         selector = Selector()
         self.assertEqual(selector.device, "amigo_ips")
-        mock_get.assert_called_once_with("krux-installer", "device")
+        mock_get.assert_has_calls([call(selector, None), call(selector)])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_device_dock(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.device", new_callable=PropertyInstanceMock)
+    def test_set_device_dock(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -199,10 +212,14 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.device = "dock"
-        mock_append.assert_called_once_with("krux-installer", "device", "dock")
+        mock_set.assert_has_calls([call(selector, None), call(selector, "dock")])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.get", return_value="amigo_dock")
+    @patch(
+        "src.utils.selector.Selector.device",
+        new_callable=PropertyInstanceMock,
+        return_value="dock",
+    )
     def test_get_device_dock(self, mock_get, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -210,12 +227,12 @@ class TestSelector(TestCase):
         mock_requests.get.return_value = mock_response
 
         selector = Selector()
-        self.assertEqual(selector.device, "amigo_dock")
-        mock_get.assert_called_once_with("krux-installer", "device")
+        self.assertEqual(selector.device, "dock")
+        mock_get.assert_has_calls([call(selector, None), call(selector)])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_device_bit(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.device", new_callable=PropertyInstanceMock)
+    def test_set_device_bit(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -223,10 +240,14 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.device = "bit"
-        mock_append.assert_called_once_with("krux-installer", "device", "bit")
+        mock_set.assert_has_calls([call(selector, None), call(selector, "bit")])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.get", return_value="amigo_bit")
+    @patch(
+        "src.utils.selector.Selector.device",
+        new_callable=PropertyInstanceMock,
+        return_value="bit",
+    )
     def test_get_device_bit(self, mock_get, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -234,12 +255,12 @@ class TestSelector(TestCase):
         mock_requests.get.return_value = mock_response
 
         selector = Selector()
-        self.assertEqual(selector.device, "amigo_bit")
-        mock_get.assert_called_once_with("krux-installer", "device")
+        self.assertEqual(selector.device, "bit")
+        mock_get.assert_has_calls([call(selector, None), call(selector)])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_device_yahboom(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.device", new_callable=PropertyInstanceMock)
+    def test_set_device_yahboom(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -247,10 +268,14 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.device = "yahboom"
-        mock_append.assert_called_once_with("krux-installer", "device", "yahboom")
+        mock_set.assert_has_calls([call(selector, None), call(selector, "yahboom")])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.get", return_value="yahboom")
+    @patch(
+        "src.utils.selector.Selector.device",
+        new_callable=PropertyInstanceMock,
+        return_value="yahboom",
+    )
     def test_get_device_yahboom(self, mock_get, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -259,7 +284,7 @@ class TestSelector(TestCase):
 
         selector = Selector()
         self.assertEqual(selector.device, "yahboom")
-        mock_get.assert_called_once_with("krux-installer", "device")
+        mock_get.assert_has_calls([call(selector, None), call(selector)])
 
     @patch("src.utils.selector.requests")
     def test_fail_set_device(self, mock_requests):
@@ -275,8 +300,8 @@ class TestSelector(TestCase):
         self.assertEqual(str(exc_info.exception), "Device 'mock' is not valid")
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_firmware_official(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.firmware", new_callable=PropertyInstanceMock)
+    def test_set_firmware_official(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -284,10 +309,14 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.firmware = "v0.0.1"
-        mock_append.assert_called_once_with("krux-installer", "firmware", "v0.0.1")
+        mock_set.assert_has_calls([call(selector, None), call(selector, "v0.0.1")])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.get", return_value="v0.0.1")
+    @patch(
+        "src.utils.selector.Selector.firmware",
+        new_callable=PropertyInstanceMock,
+        return_value="v0.0.1",
+    )
     def test_get_firmware_official(self, mock_get, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -296,11 +325,11 @@ class TestSelector(TestCase):
 
         selector = Selector()
         self.assertEqual(selector.firmware, "v0.0.1")
-        mock_get.assert_called_once_with("krux-installer", "firmware")
+        mock_get.assert_has_calls([call(selector, None), call(selector)])
 
     @patch("src.utils.selector.requests")
-    @patch("src.utils.selector.Cache.append")
-    def test_set_firmware_odudex(self, mock_append, mock_requests):
+    @patch("src.utils.selector.Selector.firmware", new_callable=PropertyInstanceMock)
+    def test_set_firmware_odudex(self, mock_set, mock_requests):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -308,8 +337,8 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.firmware = "odudex/krux_binaries"
-        mock_append.assert_called_once_with(
-            "krux-installer", "firmware", "odudex/krux_binaries"
+        mock_set.assert_has_calls(
+            [call(selector, None), call(selector, "odudex/krux_binaries")]
         )
 
     @patch("src.utils.selector.requests")

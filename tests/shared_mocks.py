@@ -116,3 +116,16 @@ class MockKruxZipFile(MockZipFile):
             Mock(filename="test/maixpy_yahboom/firmware.bin.sig"),
             Mock(filename="test/maixpy_yahboom/kboot.kfpkg"),
         ]
+
+
+class MockListPorts:
+
+    @property
+    def devices(self):
+        return [
+            Mock(vendorid="0403", device="/mock/path"),
+            Mock(vendorid="7523", device="/mock/path"),
+        ]
+
+    def grep(self, p):
+        return (d for d in self.devices if d.vendorid == p)

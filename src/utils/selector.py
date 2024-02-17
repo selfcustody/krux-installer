@@ -30,7 +30,16 @@ from http.client import HTTPResponse
 import requests
 from .trigger import Trigger
 
-VALID_DEVICES = (None, "m5stickv", "amigo", "amigo_tft", "amigo_ips", "dock", "bit", "yahboom")
+VALID_DEVICES = (
+    None,
+    "m5stickv",
+    "amigo",
+    "amigo_tft",
+    "amigo_ips",
+    "dock",
+    "bit",
+    "yahboom",
+)
 
 
 class Selector(Trigger):
@@ -56,7 +65,7 @@ class Selector(Trigger):
         Get the current device
         """
         self.debug(f"device::getter={self._device}")
-        return device
+        return self._device
 
     @device.setter
     def device(self, value: str):
@@ -77,7 +86,7 @@ class Selector(Trigger):
     @firmware.setter
     def firmware(self, value: str):
         """Setter for the current firmware version"""
-        if value in self.releases or value == None:
+        if value in self.releases or value is None:
             self.debug(f"firmware::setter={value}")
             self._firmware = value
         else:

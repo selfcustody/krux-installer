@@ -23,7 +23,6 @@
 __init__.py
 """
 
-import re
 import sys
 import typing
 from serial.tools import list_ports
@@ -57,7 +56,9 @@ class Flasher(BaseFlasher):
     def flash(self, callback: typing.Callable = get_progress):
         """Execute :attr:`KTool.process` with stdout redirection"""
         try:
+            port = ""
             # amigo, m5stickv
+            # pylint: disable=invalid-name
             goE = list(list_ports.grep("0403"))
 
             # dock
@@ -69,7 +70,7 @@ class Flasher(BaseFlasher):
             elif len(dan) > 0:
                 port = dan[0].device
                 self.board = "dan"
-            
+
             self.ktool.process(
                 terminal=False,
                 dev=port,
@@ -79,5 +80,6 @@ class Flasher(BaseFlasher):
                 file=self.firmware,
                 callback=callback,
             )
+        # pylint: disable=broad-exception-raised
         except Exception as exc:
-            raise Exception(str(exc)) from exc
+            raise RuntimeError(str(exc)) from exc

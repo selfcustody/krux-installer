@@ -40,7 +40,7 @@ class Trigger:
         self._loglevel = "info"
         if os.environ.get("LOGLEVEL"):
             self._loglevel = os.environ.get("LOGLEVEL")
-        
+
     @staticmethod
     def mro_info():
         """
@@ -106,6 +106,14 @@ class Trigger:
         """
         return f"[{Trigger.mro_info()}]: {msg}"
 
+    def info(self, msg):
+        """
+        Create the info message with the current
+        class caller
+        """
+        if self._loglevel == "info":
+            print(f"[INFO ] {Trigger.create_msg(msg)}")
+
     def debug(self, msg):
         """
         Create the debug message with the current
@@ -113,4 +121,3 @@ class Trigger:
         """
         if self._loglevel == "debug":
             print(f"[DEBUG] {Trigger.create_msg(msg)}")
-        

@@ -21,30 +21,25 @@ class TestBetaDownloader(TestCase):
         mock_gettempdir.return_value = "/tmp/dir"
 
         devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware", "kboot")
+        binary_types = ("firmware.bin", "kboot.kfpkg")
 
         for device in devices:
             for _bin in binary_types:
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
                 )
-                mock_device.assert_has_calls([call(b, device), call(b)])
-                mock_binary_type.assert_has_calls([call(b, _bin), call(b)])
+                mock_device.assert_has_calls([call(b, device)])
+                mock_binary_type.assert_has_calls([call(b, _bin)])
 
     @patch("tempfile.gettempdir")
     def test_init_url(self, mock_gettempdir):
         devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware", "kboot")
+        binary_types = ("firmware.bin", "kboot.kfpkg")
 
         mock_gettempdir.return_value = "/tmp/dir"
         for device in devices:
             for _bin in binary_types:
-                if _bin == "firmware":
-                    mock_url = f"{BASE_URL}/maixpy_{device}/{_bin}.bin"
-
-                if _bin == "kboot":
-                    mock_url = f"{BASE_URL}/maixpy_{device}/{_bin}.kfpkg"
-
+                mock_url = f"{BASE_URL}/maixpy_{device}/{_bin}"
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
                 )
@@ -75,7 +70,7 @@ class TestBetaDownloader(TestCase):
     @patch("tempfile.gettempdir")
     def test_init_destdir(self, mock_gettempdir):
         devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware", "kboot")
+        binary_types = ("firmware.bin", "kboot.kfpkg")
 
         mock_gettempdir.return_value = "/tmp/dir"
         for device in devices:
@@ -88,7 +83,7 @@ class TestBetaDownloader(TestCase):
     @patch("tempfile.gettempdir")
     def test_init_write_mode(self, mock_gettempdir):
         devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware", "kboot")
+        binary_types = ("firmware.bin", "kboot.kfpkg")
 
         mock_gettempdir.return_value = "/tmp/dir"
         for device in devices:

@@ -23,9 +23,11 @@
 __init__.py
 """
 
+import io
 import sys
 import typing
 from serial.tools import list_ports
+from contextlib import redirect_stdout
 from .base_flasher import BaseFlasher
 
 
@@ -53,27 +55,36 @@ class Flasher(BaseFlasher):
     (pkexec->Linux, UAC->Windows, AppleScript->MacOS)
     """
 
+    def configure_device(self):
+        """"""
+        port = ""
+        
+        # amigo, m5stickv
+        # pylint: disable=invalid-name
+        goE = list(list_ports.grep("0403"))
+
+        # dock
+        dan = list(list_ports.grep("7523"))
+
+        if len(goE) > 0:
+            self.board = "goE"
+            self.port = goE[0].device
+        elif len(dan) > 0:
+            self.board = "dan"
+            self.port = dan[0].device
+        else:
+            raise ValueError("No-existent valid port")
+        
     def flash(self, callback: typing.Callable = get_progress):
-        """Execute :attr:`KTool.process` with stdout redirection"""
+        """
+        Setup proper :attr:`dev`, :attr:`board` and :attr:file` for
+        execute :attr:`KTool.process` to write proper krux firmware
+        """
         try:
-            port = ""
-            # amigo, m5stickv
-            # pylint: disable=invalid-name
-            goE = list(list_ports.grep("0403"))
-
-            # dock
-            dan = list(list_ports.grep("7523"))
-
-            if len(goE) > 0:
-                port = goE[0].device
-
-            elif len(dan) > 0:
-                port = dan[0].device
-                self.board = "dan"
-
+            self.configure_device()
             self.ktool.process(
                 terminal=False,
-                dev=port,
+                dev=self.port,
                 baudrate=1500000,
                 board=self.board,
                 sram=False,
@@ -81,5 +92,52 @@ class Flasher(BaseFlasher):
                 callback=callback,
             )
         # pylint: disable=broad-exception-raised
+        except Exception as exc:
+            raise RuntimeError(str(exc)) from exc
+
+
+class Wiper(Trigger):
+
+    def __init__(self):
+        self.board = ""
+    def configure_device(self):
+        """"""
+        port = ""
+        
+        # amigo, m5stickv
+        # pylint: disable=invalid-name
+        goE = list(list_ports.grep("0403"))
+
+        # dock
+        dan = list(list_ports.grep("7523"))
+
+        if len(goE) > 0:
+            self.board = "goE"
+            self.port = goE[0].device
+        elif len(dan) > 0:
+            self.board = "dan"
+            self.port = dan[0].device
+        else:
+            raise ValueError("No-existent valid port")
+        
+    def wipe(self, callback: typing.Callable = print):
+        """Erase all data in device"""
+        try:
+            self.configure_device()
+
+            buffer = io.String()
+            with redirect_stdout(buffer):
+                
+                # As suggested by odudex
+                sys.argv.extend([
+                    "-B",
+                    self.board,
+                    "-b",
+                    1500000,
+                    "-E"
+                ])
+                self.ktool.process()
+                callback(buffer.getvalue())
+                
         except Exception as exc:
             raise RuntimeError(str(exc)) from exc

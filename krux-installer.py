@@ -52,7 +52,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         PemCheckVerifyer,
     )
     from src.utils.unzip import KbootUnzip, FirmwareUnzip
-    from src.utils.flasher import Flasher
+    from src.utils.flasher import Flasher, Wiper
 
     parser = ArgumentParser(prog=get_name(), description=get_description())
 
@@ -93,6 +93,17 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             ),
             action="store_true",
         )
+        parser.add_argument(
+            "-w",
+            "--wipe",
+            help=" ".join(
+                [
+                    "Erase all device's data and firmware (CAUTION: this will make",
+                    "the device unable to work until you install a new firmware)"
+                ]
+            ),
+            action="store_true",
+        )
     else:
         raise RuntimeError(f"Not implementated for {sys.platform}")
 
@@ -110,9 +121,14 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         for device in VALID_DEVICES[1:len(VALID_DEVICES)]:
             print(f"* {device}")
 
+    elif args.wipe:
+        print("🔥 Wiping firmware and data. Please be patient and wait until process finish.")
+        w = Wiper()
+        w.wipe()
+    
     elif args.firmware_device and not args.firmware_version:
         raise RuntimeError(
-            f"Firmware version {args.firmware_version} should be paired with {args.firmware_device}"
+            f"--firmware-device should be paired with --firmware-version option"
         )
 
     elif args.firmware_device and args.firmware_version:
@@ -193,7 +209,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 zipd = download_zip()
             else:
                 answer = input(
-                    f"⚠  Do you want to download {FIRMWARE_NAME} again? [y/n]"
+                    f"⚠️i Do you want to download {FIRMWARE_NAME} again? [y/n]"
                 )
                 if answer == "y":
                     zipd = download_zip()
@@ -206,7 +222,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 download_zip_sha256sum()
             else:
                 answer = input(
-                    f"⚠  Do you want to download {FIRMWARE_NAME}.sha256.txt again? [y/n]"
+                    f"⚠️  Do you want to download {FIRMWARE_NAME}.sha256.txt again? [y/n]"
                 )
                 if answer == "y":
                     download_zip_sha256sum()
@@ -217,7 +233,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 download_zip_sig()
             else:
                 answer = input(
-                    f"⚠ Do you want to download {FIRMWARE_NAME}.sig again? [y/n]"
+                    f"⚠️  Do you want to download {FIRMWARE_NAME}.sig again? [y/n]"
                 )
                 if answer == "y":
                     download_zip_sig()
@@ -228,7 +244,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 pemfile = download_pem()
             else:
                 answer = input(
-                    f"⚠ Do you want to download {args.destdir}/selfcustody.pem again? [y/n]"
+                    f"⚠️  Do you want to download {args.destdir}/selfcustody.pem again? [y/n]"
                 )
                 if answer == "y":
                     pemfile = download_pem()
@@ -247,7 +263,6 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
         def download_kboot_beta():
             """Download odudex's beta kboot.kfpkg and prints message"""
-            print()
             print(f"⚡ Downloading firmware to {args.destdir}/kboot.kfpkg")
             beta = BetaDownloader(
                 device=args.firmware_device,
@@ -259,7 +274,6 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
         def download_bin_beta():
             """Download odudex's beta firmware.bin and prints message"""
-            print()
             print(f"⚡ Downloading firmware to {args.destdir}/firmware.bin")
             beta = BetaDownloader(
                 device=args.firmware_device,
@@ -280,7 +294,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                     answer = input(
                         " ".join(
                             [
-                                f"⚠  Do you want to download {KBOOT_NAME} for",
+                                f"⚠️  Do you want to download {KBOOT_NAME} for",
                                 f"'{args.firmware_device}' again? [y/n]",
                             ]
                         )
@@ -289,7 +303,9 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                         download_kboot_beta()
 
                 print()
-                print(f"✎ Flashing firmware from {KBOOT_NAME}")
+                print(f"✏️/ Flashing firmware from {KBOOT_NAME}")
+                input(f"✋ Please connect your '{args.firmware_device}' and press enter")
+                
                 flasher = Flasher(firmware=KBOOT_NAME)
                 flasher.flash()
             else:
@@ -303,7 +319,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                     answer = input(
                         " ".join(
                             [
-                                f"⚠  Do you want to download {FIRMWARE_NAME} for",
+                                f"⚠️  Do you want to download {FIRMWARE_NAME} for",
                                 f"'{args.firmware_device}' again? [y/n]",
                             ]
                         )
@@ -336,7 +352,8 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 )
 
                 print()
-                print(f"✎ Flashing {args.firmware_version} for {args.firmware_device}")
+                print(f"✏️  Flashing {args.firmware_version} for {args.firmware_device}")
+                input(f"✋ Please connect your '{args.firmware_device}' and press enter")
                 flasher = Flasher(firmware=KBOOT_NAME)
                 flasher.flash()
 

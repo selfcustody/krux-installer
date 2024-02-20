@@ -113,6 +113,7 @@ class Trigger:
         """
         if self._loglevel == "info":
             print(f"[INFO ] {Trigger.create_msg(msg)}")
+            
 
     def debug(self, msg):
         """

@@ -20,8 +20,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-__init__.py
+wiper.py
 """
+import io
+import sys
+import typing
+from contextlib import redirect_stdout
+from threading import Thread
+from .base_flasher import BaseFlasher
 
-from .flasher import Flasher
-from .wiper import Wiper
+
+class Wiper(BaseFlasher):
+    """Class to wipe some specific board"""
+    
+    def __init__(self):
+        super().__init__()
+        
+    def wipe(self, callback: typing.Callable = print):
+        """Erase all data in device"""
+        try:
+            self.ktool.print_callback = callback
+            self.configure_device()
+            sys.argv = []
+            sys.argv.extend([
+                "-B",
+                self.board,
+                "-b",
+                "1500000",
+                "-E"
+            ])
+            
+            self.ktool.process()
+            sys.exit(0)
+                
+        except Exception as exc:
+            raise RuntimeError(str(exc)) from exc

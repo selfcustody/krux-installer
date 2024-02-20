@@ -23,6 +23,7 @@
 base_flasher.py
 """
 import os
+from serial.tools import list_ports
 from ..trigger import Trigger
 from ..kboot.build.ktool import KTool
 
@@ -34,11 +35,31 @@ class BaseFlasher(Trigger):
 
     VALID_BOARDS = ("goE", "dan")
 
-    def __init__(self, firmware: str):
+    def __init__(self):
         super().__init__()
-        self.firmware = firmware
-        self.board = "goE"
         self.ktool = KTool()
+
+    def configure_device(self):
+        """Configure port and board"""
+        port = ""
+        
+        # amigo, m5stickv
+        # pylint: disable=invalid-name
+        goE = list(list_ports.grep("0403"))
+
+        # dock
+        dan = list(list_ports.grep("7523"))
+
+        if len(goE) > 0:
+            self.board = "goE"
+            self.port = goE[0].device
+        
+        if len(dan) > 0:
+            self.board = "dan"
+            self.port = dan[0].device
+        
+        if len(goE) == 0 and len(dan) == 0:
+            raise ValueError("Unavailable port: check if a valid device is connected")
 
     @property
     def firmware(self) -> str:

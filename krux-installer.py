@@ -71,10 +71,10 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             action="store_true",
         )
         parser.add_argument(
-            "-d", "--firmware-device", help="Select a device to be flashed"
+            "-d", "--device", help="Select a device to be flashed"
         )
         parser.add_argument(
-            "-f", "--firmware-version", help="Select a firmware version to be flashed"
+            "-f", "--firmware", help="Select a firmware version to be flashed"
         )
         parser.add_argument(
             "-D",
@@ -126,12 +126,12 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         w = Wiper()
         w.wipe()
     
-    elif args.firmware_device and not args.firmware_version:
+    elif args.device and not args.firmware:
         raise RuntimeError(
-            f"--firmware-device should be paired with --firmware-version option"
+            f"--device should be paired with --firmware option"
         )
 
-    elif args.firmware_device and args.firmware_version:
+    elif args.device and args.firmware:
         FIRMWARE_NAME = ""
         ZIPFILE = ""
         answer = ""
@@ -140,27 +140,27 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             """Download zip release and prints message"""
             print()
             print(
-                f"⚡ Downloading {args.destdir}/krux-{args.firmware_version}.zip release"
+                f"⚡ Downloading {args.destdir}/krux-{args.firmware}.zip release"
             )
-            zipd = ZipDownloader(version=args.firmware_version, destdir=args.destdir)
+            zipd = ZipDownloader(version=args.firmware, destdir=args.destdir)
             return zipd.download()
 
         def download_zip_sha256sum():
             """Download zip.sha256.txt release and prints message"""
             print()
             print(
-                f"⚡ Downloading {args.destdir}/krux-{args.firmware_version}.zip.sha256.txt"
+                f"⚡ Downloading {args.destdir}/krux-{args.firmware}.zip.sha256.txt"
             )
             sha256 = Sha256Downloader(
-                version=args.firmware_version, destdir=args.destdir
+                version=args.firmware, destdir=args.destdir
             )
             return sha256.download()
 
         def download_zip_sig():
             """Download zip.sig release and prints message"""
             print()
-            print(f"⚡ Downloading {args.destdir}/krux-{args.firmware_version}.zip.sig")
-            sig = SigDownloader(version=args.firmware_version, destdir=args.destdir)
+            print(f"⚡ Downloading {args.destdir}/krux-{args.firmware}.zip.sig")
+            sig = SigDownloader(version=args.firmware, destdir=args.destdir)
             return sig.download()
 
         def download_pem():
@@ -202,7 +202,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
         def download_and_verify():
             """ "Check files, download if needed, verify integrity and authenticity"""
-            FIRMWARE_NAME = f"{args.destdir}/krux-{args.firmware_version}.zip"
+            FIRMWARE_NAME = f"{args.destdir}/krux-{args.firmware}.zip"
             print()
             print(f"🔍 Verifying {FIRMWARE_NAME}")
             if not os.path.exists(FIRMWARE_NAME):
@@ -214,7 +214,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 if answer == "y":
                     zipd = download_zip()
                 else:
-                    zipd = f"{args.destdir}/krux-{args.firmware_version}.zip"
+                    zipd = f"{args.destdir}/krux-{args.firmware}.zip"
 
             print()
             print(f"🔍 Verifying {FIRMWARE_NAME}.sha256.txt")
@@ -265,7 +265,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             """Download odudex's beta kboot.kfpkg and prints message"""
             print(f"⚡ Downloading firmware to {args.destdir}/kboot.kfpkg")
             beta = BetaDownloader(
-                device=args.firmware_device,
+                device=args.device,
                 binary_type="kboot.kfpkg",
                 destdir=args.destdir,
             )
@@ -276,14 +276,14 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             """Download odudex's beta firmware.bin and prints message"""
             print(f"⚡ Downloading firmware to {args.destdir}/firmware.bin")
             beta = BetaDownloader(
-                device=args.firmware_device,
+                device=args.device,
                 binary_type="firmware.bin",
                 destdir=args.destdir,
             )
             beta.download()
             print()
 
-        if re.findall(r"odudex/krux_binaries", args.firmware_version):
+        if re.findall(r"odudex/krux_binaries", args.firmware):
             if args.flash:
                 KBOOT_NAME = f"{args.destdir}/kboot.kfpkg"
                 print()
@@ -295,7 +295,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                         " ".join(
                             [
                                 f"⚠️  Do you want to download {KBOOT_NAME} for",
-                                f"'{args.firmware_device}' again? [y/n]",
+                                f"'{args.device}' again? [y/n]",
                             ]
                         )
                     )
@@ -304,7 +304,10 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
                 print()
                 print(f"✏️/ Flashing firmware from {KBOOT_NAME}")
-                input(f"✋ Please connect your '{args.firmware_device}' and press enter")
+                input(" ".join([
+                    f"✋ Please make sure to CONNECT YOUR DEVICE ('{args.device}')",
+                    "to the USB port, then press and press ENTER"
+                ]))
                 
                 flasher = Flasher(firmware=KBOOT_NAME)
                 flasher.flash()
@@ -320,7 +323,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                         " ".join(
                             [
                                 f"⚠️  Do you want to download {FIRMWARE_NAME} for",
-                                f"'{args.firmware_device}' again? [y/n]",
+                                f"'{args.device}' again? [y/n]",
                             ]
                         )
                     )
@@ -328,32 +331,39 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                         download_bin_beta()
 
                 print(
-                    f"Copy {FIRMWARE_NAME} for '{args.firmware_device}' to your SDCard"
+                    "\n".join([
+                        f"Copy {FIRMWARE_NAME} for '{args.device}' to your SDCard",
+                        "then insert the SDCard on the device and turn it on ",
+                        "to upgrade the firmware."
+                    ])
                 )
 
-        elif re.findall(r"v2\d\.\d+\.\d+", args.firmware_version):
+        elif re.findall(r"v2\d\.\d+\.\d+", args.firmware):
             if args.flash:
                 ZIPFILE = download_and_verify()
 
                 print()
-                print(f"📤 Unzipping {ZIPFILE} for {args.firmware_device}")
+                print(f"📤 Unzipping {ZIPFILE} for {args.device}")
                 unzip = KbootUnzip(
-                    filename=ZIPFILE, device=args.firmware_device, output=args.destdir
+                    filename=ZIPFILE, device=args.device, output=args.destdir
                 )
                 unzip.load()
 
                 KBOOT_NAME = "/".join(
                     [
                         args.destdir,
-                        f"krux-{args.firmware_version}",
-                        f"/maixpy_{args.firmware_device}",
+                        f"krux-{args.firmware}",
+                        f"/maixpy_{args.device}",
                         "kboot.kfpkg",
                     ]
                 )
 
                 print()
-                print(f"✏️  Flashing {args.firmware_version} for {args.firmware_device}")
-                input(f"✋ Please connect your '{args.firmware_device}' and press enter")
+                print(f"✏️  Flashing {args.firmware} for {args.device}")
+                input(" ".join([
+                    f"✋ Please make sure to CONNECT YOUR DEVICE ('{args.device}')",
+                    "to the USB port, then press and press ENTER"
+                ]))
                 flasher = Flasher(firmware=KBOOT_NAME)
                 flasher.flash()
 
@@ -361,21 +371,26 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 ZIPFILE = download_and_verify()
 
                 print()
-                print(f"📤 Unzipping {ZIPFILE} for {args.firmware_device}")
+                print(f"📤 Unzipping {ZIPFILE} for {args.device}")
                 unzip = FirmwareUnzip(
-                    filename=ZIPFILE, device=args.firmware_device, output=args.destdir
+                    filename=ZIPFILE, device=args.device, output=args.destdir
                 )
                 unzip.load()
 
                 FIRMWARE_NAME = "/".join(
                     [
                         args.destdir,
-                        f"krux-{args.firmware_version}",
-                        f"/maixpy_{args.firmware_device}",
+                        f"krux-{args.firmware}",
+                        f"/maixpy_{args.device}",
                         "firmware.bin",
                     ]
                 )
                 print()
 
-                print(f"Copy {FIRMWARE_NAME} to your SDCard")
-                print(f"Copy {FIRMWARE_NAME}.sig to your SDCard")
+                print(
+                    "\n".join([
+                        f"Copy {FIRMWARE_NAME} and {FIRMWARE_NAME}.sig for '{args.device}' to your SDCard",
+                        "then insert the SDCard on the device and turn it on ",
+                        "to upgrade the firmware."
+                    ])
+                )

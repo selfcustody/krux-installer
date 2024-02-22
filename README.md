@@ -117,7 +117,7 @@ To do this, you must do:
 $> poetry shell
 ```
 
-Once new shell is spwaned, execute `python ./krux-installer` followed by two dashes (`--`) and the command arguments:
+Once new shell is spwaned, execute `python ./krux-installer` followed by `--help`:
 
 ```
 A GUI based application to flash Krux firmware on K210 based devices

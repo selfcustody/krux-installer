@@ -129,3 +129,15 @@ class MockListPorts:
 
     def grep(self, p):
         return (d for d in self.devices if d.vendorid == p)
+
+
+class MockSerial:
+
+    def __init__(self, port):
+        self.port = port
+
+    def open(self):
+        pass
+
+    def close(self):
+        pass

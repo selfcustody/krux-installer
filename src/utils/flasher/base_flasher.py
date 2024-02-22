@@ -23,6 +23,8 @@
 base_flasher.py
 """
 import os
+import sys
+from serial import Serial
 from serial.tools import list_ports
 from ..trigger import Trigger
 from ..kboot.build.ktool import KTool
@@ -82,8 +84,23 @@ class BaseFlasher(Trigger):
     @port.setter
     def port(self, value: str):
         """Setter for ports's full path"""
-        self.debug(f"port::setter={value}")
-        self._port = value
+        if sys.platform in ("linux", "darwin"):
+            if os.path.exists(value):
+                self.debug(f"port::setter={value}")
+                self._port = value
+            else:
+                raise OSError(f"Port do not exist: {value}")
+
+        elif sys.platform == "win32":
+            try:
+                s = Serial(value)
+                s.close()
+                self.debug(f"port::setter={value}")
+                self._port = value
+            except OSError as exc:
+                raise OSError(f"Unable to load port {value}: {exc.__cause__}") from exc
+        else:
+            raise EnvironmentError(f"Unsupported platform: {sys.platform}")
 
     @property
     def board(self) -> str:

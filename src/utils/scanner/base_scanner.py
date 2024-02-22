@@ -20,26 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-wiper.py
+base_scanner.py
 """
-import sys
-import typing
-from .base_flasher import BaseFlasher
+
+import cv2
+from ..trigger import Trigger
 
 
-class Wiper(BaseFlasher):
-    """Class to wipe some specific board"""
+class BaseScanner(Trigger):
+    """Base class for Scanner"""
 
-    def wipe(self, callback: typing.Callable = print):
-        """Erase all data in device"""
-        try:
-            self.ktool.print_callback = callback
-            self.configure_device()
-            sys.argv = []
-            sys.argv.extend(["-B", self.board, "-b", "1500000", "-E"])
+    def __init__(self, capture_dev: int = 0):
+        super().__init__()
+        self.video_capture = cv2.VideoCapture(capture_dev)
 
-            self.ktool.process()
-            sys.exit(0)
+    @property
+    def video_capture(self) -> cv2.VideoCapture:
+        """Getter for video capture"""
+        self.debug(f"video_capture::getter={self._video_capture}")
+        return self._video_capture
 
-        except Exception as exc:
-            raise RuntimeError(str(exc)) from exc
+    @video_capture.setter
+    def video_capture(self, value: cv2.VideoCapture):
+        self.debug(f"video_capture::setter={value}")
+        self._video_capture = value
+
+    def close_cli_capture(self):
+        """Close video capture for cli"""
+        self.video_capture.release()
+        cv2.destroyAllWindows()
+
+    @staticmethod
+    def show_freeze_image(frame):
+        """Freeze a frame and show it"""
+        cv2.imgshow("frame", frame)
+
+    @staticmethod
+    def on_click_quit(button: str = "q"):
+        """Capture if q quit button is pressed on keyboard"""
+        return cv2.waitKey(1) & ord(button) == 0xFF

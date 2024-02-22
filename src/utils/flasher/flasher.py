@@ -23,11 +23,8 @@
 __init__.py
 """
 
-import io
 import sys
 import typing
-from serial.tools import list_ports
-from contextlib import redirect_stdout
 from .base_flasher import BaseFlasher
 
 
@@ -54,6 +51,7 @@ class Flasher(BaseFlasher):
     it uses raiseup to elevate privileges to src/utils/kboot/ktool.py
     (pkexec->Linux, UAC->Windows, AppleScript->MacOS)
     """
+
     def __init__(self, firmware: str):
         super().__init__()
         self.firmware = firmware
@@ -74,7 +72,7 @@ class Flasher(BaseFlasher):
                     baudrate=1500000,
                     board=self.board,
                     sram=False,
-                    file=self.firmware
+                    file=self.firmware,
                 )
             else:
                 self.ktool.process(
@@ -84,10 +82,8 @@ class Flasher(BaseFlasher):
                     board=self.board,
                     sram=False,
                     file=self.firmware,
-                    callback=callback
+                    callback=callback,
                 )
         # pylint: disable=broad-exception-raised
         except Exception as exc:
             raise RuntimeError(str(exc)) from exc
-
-

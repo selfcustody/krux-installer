@@ -41,24 +41,21 @@ class BaseFlasher(Trigger):
 
     def configure_device(self):
         """Configure port and board"""
-        port = ""
-        
-        # amigo, m5stickv
-        # pylint: disable=invalid-name
-        goE = list(list_ports.grep("0403"))
+        # amigo, m5stickv, yahboom
+        goe_devices = list(list_ports.grep("0403"))
 
         # dock
-        dan = list(list_ports.grep("7523"))
+        dan_devices = list(list_ports.grep("7523"))
 
-        if len(goE) > 0:
+        if len(goe_devices) > 0:
             self.board = "goE"
-            self.port = goE[0].device
-        
-        if len(dan) > 0:
+            self.port = goe_devices[0].device
+
+        if len(dan_devices) > 0:
             self.board = "dan"
-            self.port = dan[0].device
-        
-        if len(goE) == 0 and len(dan) == 0:
+            self.port = dan_devices[0].device
+
+        if len(goe_devices) == 0 and len(dan_devices) == 0:
             raise ValueError("Unavailable port: check if a valid device is connected")
 
     @property
@@ -75,6 +72,18 @@ class BaseFlasher(Trigger):
 
         self.debug(f"firmware::setter={value}")
         self._firmware = value
+
+    @property
+    def port(self) -> str:
+        """Getter for firmware's full path"""
+        self.debug(f"port::getter={self._port}")
+        return self._port
+
+    @port.setter
+    def port(self, value: str):
+        """Setter for ports's full path"""
+        self.debug(f"port::setter={value}")
+        self._port = value
 
     @property
     def board(self) -> str:

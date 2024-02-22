@@ -20,26 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-wiper.py
+cli_scanner.py
 """
-import sys
+
 import typing
-from .base_flasher import BaseFlasher
+from pyzbar.pyzbar import decode, PyZbarError
+from .base_scanner import BaseScanner
 
 
-class Wiper(BaseFlasher):
-    """Class to wipe some specific board"""
+class CliScanner(BaseScanner):
+    """Scanner for krux-installer as CLI"""
 
-    def wipe(self, callback: typing.Callable = print):
-        """Erase all data in device"""
-        try:
-            self.ktool.print_callback = callback
-            self.configure_device()
-            sys.argv = []
-            sys.argv.extend(["-B", self.board, "-b", "1500000", "-E"])
+    def __init__(self):
+        super().__init__(capture_dev=0)
 
-            self.ktool.process()
-            sys.exit(0)
+    def scan(self) -> typing.List:
+        """Open scan window and detect/decode a QRCode"""
 
-        except Exception as exc:
-            raise RuntimeError(str(exc)) from exc
+        while True:
+            try:
+                _ret, frame = self.video_capture.read()
+                qrcode = decode(frame)
+            except PyZbarError as exc_info:
+                raise RuntimeError(exc_info.__cause__) from exc_info
+            except Exception as exc_info:
+                raise RuntimeError(exc_info.__cause__) from exc_info
+
+            if qrcode:
+                break
+
+            CliScanner.show_freeze_image(frame)
+
+            if CliScanner.on_click_quit():
+                break
+
+        self.close_cli_capture()
+        return qrcode[0].data

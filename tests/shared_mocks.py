@@ -25,6 +25,7 @@ was-called-on-a-specific-instance
 """
 
 import typing
+import sys
 from unittest.mock import Mock, MagicMock, PropertyMock
 
 
@@ -122,9 +123,15 @@ class MockListPorts:
 
     @property
     def devices(self):
+        devices = []
+        if sys.platform in ("linux", "darwin"):
+            devices = ["/mock/path", "/mock/path"]
+        elif sys.platform == "win32":
+            devices = ["COM0", "COM1"]
+
         return [
-            Mock(vendorid="0403", device="/mock/path"),
-            Mock(vendorid="7523", device="/mock/path"),
+            Mock(vendorid="0403", device=devices[0]),
+            Mock(vendorid="7523", device=devices[1]),
         ]
 
     def grep(self, p):

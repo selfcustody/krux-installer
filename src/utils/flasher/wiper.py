@@ -39,7 +39,6 @@ class Wiper(BaseFlasher):
             sys.argv.extend(["-B", self.board, "-b", "1500000", "-E"])
 
             self.ktool.process()
-            sys.exit(0)
 
         except Exception as exc:
             raise RuntimeError(str(exc)) from exc

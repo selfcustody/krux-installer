@@ -95,7 +95,7 @@ class TestAssetDownloader(TestCase):
 
         if sys.platform == "win32":
             mock_gettempdir.return_value = "C:\\tmp\\dir"
-            
+
         file = io.BytesIO()
 
         # pylint: disable=line-too-long
@@ -119,10 +119,10 @@ class TestAssetDownloader(TestCase):
         a.download()
 
         if sys.platform in ("linux", "darwin"):
-            open_mock.assert_called_once_with("/tmp/dir/asset.zip", "w", encoding="utf8")
+            open_mock.assert_called_once_with("/tmp/dir/asset.zip", "wb")
 
         if sys.platform == "win32":
-            open_mock.assert_called_once_with("C:\\tmp\\dir\\asset.zip", "w", encoding="utf8")
+            open_mock.assert_called_once_with("C:\\tmp\\dir\\asset.zip", "wb")
 
     @patch("builtins.open", new_callable=mock_open)
     @patch("tempfile.gettempdir")
@@ -133,7 +133,7 @@ class TestAssetDownloader(TestCase):
 
         if sys.platform == "win32":
             mock_gettempdir.return_value = "C:\\tmp\\dir"
-            
+
         file = io.BytesIO()
 
         # pylint: disable=line-too-long
@@ -157,7 +157,11 @@ class TestAssetDownloader(TestCase):
         a.download()
 
         if sys.platform in ("linux", "darwin"):
-            open_mock.assert_called_once_with("/tmp/dir/asset.txt", "w", encoding="utf8")
+            open_mock.assert_called_once_with(
+                "/tmp/dir/asset.txt", "w", encoding="utf8"
+            )
 
         if sys.platform == "win32":
-            open_mock.assert_called_once_with("C:\\tmp\\dir\\asset.txt", "w", encoding="utf8")
+            open_mock.assert_called_once_with(
+                "C:\\tmp\\dir\\asset.txt", "w", encoding="utf8"
+            )

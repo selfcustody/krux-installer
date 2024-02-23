@@ -1,4 +1,5 @@
 import io
+import sys
 from unittest import TestCase
 from unittest.mock import MagicMock, patch, mock_open, call
 from src.utils.downloader.asset_downloader import AssetDownloader
@@ -89,8 +90,12 @@ class TestAssetDownloader(TestCase):
     @patch("tempfile.gettempdir")
     @patch("src.utils.downloader.stream_downloader.requests")
     def test_download_wb(self, mock_requests, mock_gettempdir, open_mock):
-        mock_gettempdir.return_value = "/tmp/dir"
+        if sys.platform in ("linux", "darwin"):
+            mock_gettempdir.return_value = "/tmp/dir"
 
+        if sys.platform == "win32":
+            mock_gettempdir.return_value = "C:\\tmp\\dir"
+            
         file = io.BytesIO()
 
         # pylint: disable=line-too-long
@@ -112,14 +117,23 @@ class TestAssetDownloader(TestCase):
         )
 
         a.download()
-        open_mock.assert_called_once_with("/tmp/dir/asset.zip", "wb")
+
+        if sys.platform in ("linux", "darwin"):
+            open_mock.assert_called_once_with("/tmp/dir/asset.zip", "w", encoding="utf8")
+
+        if sys.platform == "win32":
+            open_mock.assert_called_once_with("C:\\tmp\\dir\\asset.zip", "w", encoding="utf8")
 
     @patch("builtins.open", new_callable=mock_open)
     @patch("tempfile.gettempdir")
     @patch("src.utils.downloader.stream_downloader.requests")
     def test_download_w(self, mock_requests, mock_gettempdir, open_mock):
-        mock_gettempdir.return_value = "/tmp/dir"
+        if sys.platform in ("linux", "darwin"):
+            mock_gettempdir.return_value = "/tmp/dir"
 
+        if sys.platform == "win32":
+            mock_gettempdir.return_value = "C:\\tmp\\dir"
+            
         file = io.BytesIO()
 
         # pylint: disable=line-too-long
@@ -141,4 +155,9 @@ class TestAssetDownloader(TestCase):
         )
 
         a.download()
-        open_mock.assert_called_once_with("/tmp/dir/asset.txt", "w", encoding="utf8")
+
+        if sys.platform in ("linux", "darwin"):
+            open_mock.assert_called_once_with("/tmp/dir/asset.txt", "w", encoding="utf8")
+
+        if sys.platform == "win32":
+            open_mock.assert_called_once_with("C:\\tmp\\dir\\asset.txt", "w", encoding="utf8")

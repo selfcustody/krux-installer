@@ -98,7 +98,7 @@ class BaseFlasher(Trigger):
                 self.debug(f"port::setter={value}")
                 self._port = value
             except OSError as exc:
-                raise OSError(f"Unable to load port {value}: {exc.__cause__}") from exc
+                raise OSError(f"Unable to load port {value}: {str(exc)}") from exc
         else:
             raise EnvironmentError(f"Unsupported platform: {sys.platform}")
 

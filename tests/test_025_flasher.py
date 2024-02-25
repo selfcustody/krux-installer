@@ -92,11 +92,14 @@ class TestFlasher(TestCase):
     def test_fail_flash_windows_inexistent_port(
         self, mock_process, mock_list_ports, mock_exists
     ):
+        msgs = [
+            "[Errno 2] could not open port COM0: [Errno 2] No such file or directory: 'COM0'",
+            "could not open port 'COM0': "
+            + "FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)",
+        ]
+
         with self.assertRaises(RuntimeError) as exc_info:
             f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
             f.flash()
-        self.assertEqual(
-            str(exc_info.exception),
-            "Unable to load port COM0: [Errno 2] could not open port COM0: "
-            + "[Errno 2] No such file or directory: 'COM0'",
-        )
+
+        self.assertIn(str(exc_info.exception), msgs)

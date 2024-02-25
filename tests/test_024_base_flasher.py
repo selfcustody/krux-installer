@@ -76,8 +76,7 @@ class TestBaseFlasher(TestCase):
             f.port = "COM0"
         self.assertEqual(
             str(exc_info.exception),
-            "Unable to load port COM0: [Errno 2] could not open port COM0:"
-            + " [Errno 2] No such file or directory: 'COM0'",
+            "[Errno 2] could not open port COM0: [Errno 2] No such file or directory: 'COM0'",
         )
 
     @patch("sys.platform", "oracle")

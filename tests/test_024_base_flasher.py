@@ -71,13 +71,16 @@ class TestBaseFlasher(TestCase):
 
     @patch("sys.platform", "win32")
     def test_fail_os_set_port_win(self):
+        msgs = [
+            "[Errno 2] could not open port COM0: [Errno 2] No such file or directory: 'COM0'",
+            "could not open port 'COM0':"
+            + " FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)",
+        ]
         with self.assertRaises(OSError) as exc_info:
             f = BaseFlasher()
             f.port = "COM0"
-        self.assertEqual(
-            str(exc_info.exception),
-            "[Errno 2] could not open port COM0: [Errno 2] No such file or directory: 'COM0'",
-        )
+
+        self.assertIn(str(exc_info.exception), msgs)
 
     @patch("sys.platform", "oracle")
     def test_fail_set_port_oracle(self):

@@ -1,0 +1,53 @@
+name: Build
+
+# Only trigger, when the build workflow succeeded
+on:
+  workflow_run:
+    workflows: [Tests]
+    types: [completed]
+    branches: [kivy]
+  
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-12]
+        version: ["3.10", "3.11", "3.12", "3.13"]
+        
+    runs-on: ${{ matrix.os }
+    
+    steps:
+      
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+          poetry install
+
+      - name: Build
+        run: poetry run poe build
+
+      - name: Hash
+        uses: qlrd/sha256sum-action@v2
+        id: hash
+        with:
+          working-directory: ./dist
+          file: krux-installer
+          ext: 'sha256.txt'
+
+      - name: Upload
+        uses: actions/upload-artifact@v4         
+        with:
+          name: krux-installer-${{ matrix.os }}-py${{ matrix.version}}
+          path:
+            - dist/krux-installer
+            - ${{ steps.hash.outputs.hash-file }}

@@ -61,29 +61,24 @@ class Flasher(BaseFlasher):
         Setup proper :attr:`dev`, :attr:`board` and :attr:file` for
         execute :attr:`KTool.process` to write proper krux firmware
         """
-        try:
-
-            self.configure_device()
-            if not callback:
-                self.ktool.print_callback = print
-                self.ktool.process(
-                    terminal=False,
-                    dev=self.port,
-                    baudrate=1500000,
-                    board=self.board,
-                    sram=False,
-                    file=self.firmware,
-                )
-            else:
-                self.ktool.process(
-                    terminal=False,
-                    dev=self.port,
-                    baudrate=1500000,
-                    board=self.board,
-                    sram=False,
-                    file=self.firmware,
-                    callback=callback,
-                )
-        # pylint: disable=broad-exception-raised
-        except Exception as exc:
-            raise RuntimeError(str(exc)) from exc
+        self.configure_device()
+        if not callback:
+            self.ktool.print_callback = print
+            self.ktool.process(
+                terminal=False,
+                dev=self.port,
+                baudrate=1500000,
+                board=self.board,
+                sram=False,
+                file=self.firmware,
+            )
+        else:
+            self.ktool.process(
+                terminal=False,
+                dev=self.port,
+                baudrate=1500000,
+                board=self.board,
+                sram=False,
+                file=self.firmware,
+                callback=callback,
+            )

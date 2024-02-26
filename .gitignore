@@ -26,6 +26,8 @@
 ######################
 build/
 build-*/
+dist/
+*.spec
 
 # Test failure outputs
 ######################

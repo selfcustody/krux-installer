@@ -40,6 +40,7 @@ lint = ["lint-src", "lint-tests"]
 test = "pytest --capture=tee-sys --verbose --cache-clear ./tests "
 coverage-html = "pytest --cache-clear --cov=src/utils/*.py --cov=src/utils/downloader --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/verifyer --cov-report html ./tests"
 coverage-xml = "pytest --cache-clear --cov=src/utils/*.py --cov=src/utils/downloader --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/verifyer  --cov-report xml ./tests"
+build = "python scripts/build.py"
 
 [build-system]
 requires = ["poetry-core"]

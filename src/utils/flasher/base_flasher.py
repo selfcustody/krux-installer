@@ -46,7 +46,6 @@ class BaseFlasher(Trigger):
 
         if device in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit"):
             goe_devices = list(list_ports.grep("0403"))
-            print(goe_devices)
             if len(goe_devices) > 0:
                 self.board = "goE"
                 self.port = goe_devices[0].device
@@ -55,7 +54,6 @@ class BaseFlasher(Trigger):
 
         if device == "dock":
             dan_devices = list(list_ports.grep("7523"))
-            print(dan_devices)
             if len(dan_devices) > 0:
                 self.board = "dan"
                 self.port = dan_devices[0].device
@@ -64,7 +62,6 @@ class BaseFlasher(Trigger):
 
         if device == "yahboom":
             yah_devices = list(list_ports.grep("7523"))
-            print(yah_devices)
             if len(yah_devices) > 0:
                 self.board = "goE"
                 self.port = yah_devices[0].device

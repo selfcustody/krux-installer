@@ -33,11 +33,15 @@ class Wiper(BaseFlasher):
     def wipe(self, device: str, callback: typing.Callable = print):
         """Erase all data in device"""
         try:
-            self.ktool.print_callback = callback
+            if callback:
+                self.ktool.print_callback = callback
+            else:
+                self.ktool.print_callback = print
+
             self.configure_device(device=device)
             sys.argv = []
-            sys.argv.extend(["-B", self.board, "-b", "1500000", "-E"])
-
+            newargs = ["-B", self.board, "-b", "1500000", "-p", self.port, "-E"]
+            sys.argv.extend(newargs)
             self.ktool.process()
 
         except Exception as exc:

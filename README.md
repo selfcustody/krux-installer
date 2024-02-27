@@ -107,19 +107,25 @@ That is simlar to:
 poetry run pytest --cache-clear --cov src/ --cov-report html ./tests
 ```
 
+## Build
+
+To build `krux-installer` as standalone executable, run:
+
+```bash
+poetry run poe build
+```
+
+It will export all project in a binary
+(without extension for linux and macOS and with `.exe` for windows)
+located at `./dist` folder.
+
+
 ## CLI
 
-At the moment, the script `krux-installer.py` can be executed in a `poetry shell` like a CLI (Command Line Interface).
+Running `./dist/krux-installer --help` (linux and macOS) or `./dist/krux-installer.exe --help` (windows),
+you will have this terminal output:
 
-To do this, you must do:
-
-```
-$> poetry shell
-```
-
-Once new shell is spwaned, execute `python ./krux-installer` followed by `--help`:
-
-```
+```bash
 A GUI based application to flash Krux firmware on K210 based devices
 
 options:
@@ -138,3 +144,7 @@ options:
   -F, --flash           If set, download the kboot.kfpkg firmware and flash. Otherwise, download firmware.bin and store in destdir
   -w, --wipe            Erase all device's data and firmware (CAUTION: this will make the device unable to work until you install a new firmware)
 ```
+
+## TODO
+
+- add `--gui` option to run an Graphical User Interface with kivy.

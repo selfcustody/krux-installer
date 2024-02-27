@@ -1,20 +1,21 @@
 name: Build
 
-# Only trigger, when the build workflow succeeded
 on:
   workflow_run:
     workflows: [Tests]
     types: [completed]
-    branches: [kivy]
   
 jobs:
   build:
+
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-12]
         version: ["3.10", "3.11", "3.12"]
-        
-    runs-on: ${{ matrix.os }
+      
+    runs-on: ${{ matrix.os }}
     
     steps:
       

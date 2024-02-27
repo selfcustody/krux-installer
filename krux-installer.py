@@ -119,15 +119,18 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         for device in VALID_DEVICES[1 : len(VALID_DEVICES)]:
             print(f"* {device}")
 
-    elif args.wipe:
+    elif args.wipe and not args.device:
+        raise RuntimeError("--wipe must be paired with --device option")
+
+    elif args.wipe and args.device:
         print(
             "🔥 Wiping firmware and data. Please be patient and wait until process finish."
         )
         w = Wiper()
-        w.wipe()
+        w.wipe(device=args.device)
 
     elif args.device and not args.firmware:
-        raise RuntimeError(f"--device should be paired with --firmware option")
+        raise RuntimeError("--device must be paired with --firmware option")
 
     elif args.device and args.firmware:
         FIRMWARE_NAME = ""

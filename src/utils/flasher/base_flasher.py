@@ -41,24 +41,35 @@ class BaseFlasher(Trigger):
         super().__init__()
         self.ktool = KTool()
 
-    def configure_device(self):
+    def configure_device(self, device: str):
         """Configure port and board"""
-        # amigo, m5stickv, yahboom
-        goe_devices = list(list_ports.grep("0403"))
 
-        # dock
-        dan_devices = list(list_ports.grep("7523"))
+        if device in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit"):
+            goe_devices = list(list_ports.grep("0403"))
+            print(goe_devices)
+            if len(goe_devices) > 0:
+                self.board = "goE"
+                self.port = goe_devices[0].device
+            else:
+                raise ValueError(f"Unavailable {device}: is it connected?")
 
-        if len(goe_devices) > 0:
-            self.board = "goE"
-            self.port = goe_devices[0].device
+        if device == "dock":
+            dan_devices = list(list_ports.grep("7523"))
+            print(dan_devices)
+            if len(dan_devices) > 0:
+                self.board = "dan"
+                self.port = dan_devices[0].device
+            else:
+                raise ValueError(f"Unavailable {device}: is it connected?")
 
-        if len(dan_devices) > 0:
-            self.board = "dan"
-            self.port = dan_devices[0].device
-
-        if len(goe_devices) == 0 and len(dan_devices) == 0:
-            raise ValueError("Unavailable port: check if a valid device is connected")
+        if device == "yahboom":
+            yah_devices = list(list_ports.grep("7523"))
+            print(yah_devices)
+            if len(yah_devices) > 0:
+                self.board = "goE"
+                self.port = yah_devices[0].device
+            else:
+                raise ValueError(f"Unavailable {device}: is it connected?")
 
     @property
     def firmware(self) -> str:

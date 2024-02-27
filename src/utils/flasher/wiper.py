@@ -30,11 +30,11 @@ from .base_flasher import BaseFlasher
 class Wiper(BaseFlasher):
     """Class to wipe some specific board"""
 
-    def wipe(self, callback: typing.Callable = print):
+    def wipe(self, device: str, callback: typing.Callable = print):
         """Erase all data in device"""
         try:
             self.ktool.print_callback = callback
-            self.configure_device()
+            self.configure_device(device=device)
             sys.argv = []
             sys.argv.extend(["-B", self.board, "-b", "1500000", "-E"])
 

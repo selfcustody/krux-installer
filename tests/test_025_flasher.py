@@ -13,12 +13,11 @@ class TestFlasher(TestCase):
     # pylint: disable=unused-argument
     def test_flash_linux(self, mock_process, mock_list_ports, mock_exists):
         f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-        f.flash()
+        f.flash(device="amigo")
 
         mock_exists.assert_has_calls(
             [
                 call("mock/maixpy_test/kboot.kfpkg"),
-                call("/mock/path"),
                 call("/mock/path"),
             ]
         )
@@ -27,7 +26,7 @@ class TestFlasher(TestCase):
             terminal=False,
             dev="/mock/path",
             baudrate=1500000,
-            board="dan",
+            board="goE",
             sram=False,
             file="mock/maixpy_test/kboot.kfpkg",
         )
@@ -42,7 +41,7 @@ class TestFlasher(TestCase):
     ):
         with self.assertRaises(ValueError) as exc_info:
             f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-            f.flash()
+            f.flash(device="amigo")
         self.assertEqual(
             str(exc_info.exception), "File do not exist: mock/maixpy_test/kboot.kfpkg"
         )
@@ -57,14 +56,14 @@ class TestFlasher(TestCase):
         self, mock_process, mock_list_ports, mock_serial, mock_exists
     ):
         f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-        f.flash()
+        f.flash(device="amigo")
 
         mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
         mock_process.assert_called_once_with(
             terminal=False,
-            dev="COM1",
+            dev="MOCK0",
             baudrate=1500000,
-            board="dan",
+            board="goE",
             sram=False,
             file="mock/maixpy_test/kboot.kfpkg",
         )
@@ -79,7 +78,7 @@ class TestFlasher(TestCase):
     ):
         with self.assertRaises(ValueError) as exc_info:
             f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-            f.flash()
+            f.flash(device="amigo")
         self.assertEqual(
             str(exc_info.exception), "File do not exist: mock/maixpy_test/kboot.kfpkg"
         )
@@ -93,13 +92,13 @@ class TestFlasher(TestCase):
         self, mock_process, mock_list_ports, mock_exists
     ):
         msgs = [
-            "[Errno 2] could not open port COM0: [Errno 2] No such file or directory: 'COM0'",
-            "could not open port 'COM0': "
+            "[Errno 2] could not open port MOCK0: [Errno 2] No such file or directory: 'MOCK0'",
+            "could not open port 'MOCK0': "
             + "FileNotFoundError(2, 'The system cannot find the file specified.', None, 2)",
         ]
 
         with self.assertRaises(RuntimeError) as exc_info:
             f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-            f.flash()
+            f.flash(device="amigo")
 
         self.assertIn(str(exc_info.exception), msgs)

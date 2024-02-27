@@ -127,15 +127,15 @@ class MockListPorts:
         if sys.platform in ("linux", "darwin"):
             devices = ["/mock/path", "/mock/path"]
         elif sys.platform == "win32":
-            devices = ["COM0", "COM1"]
+            devices = ["MOCK0", "MOCK1"]
 
         return [
-            Mock(vendorid="0403", device=devices[0]),
-            Mock(vendorid="7523", device=devices[1]),
+            Mock(vid="0403", device=devices[0]),
+            Mock(vid="7523", device=devices[1]),
         ]
 
     def grep(self, p):
-        return (d for d in self.devices if d.vendorid == p)
+        return (d for d in self.devices if d.vid == p)
 
 
 class MockSerial:

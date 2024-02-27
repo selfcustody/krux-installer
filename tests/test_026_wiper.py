@@ -23,7 +23,7 @@
 base_flasher.py
 """
 from unittest import TestCase
-from unittest.mock import patch, call
+from unittest.mock import patch
 from src.utils.flasher import Wiper
 from .shared_mocks import MockListPorts, MockSerial
 
@@ -37,15 +37,10 @@ class TestFlasher(TestCase):
     # pylint: disable=unused-argument
     def test_wipe_linux(self, mock_process, mock_list_ports, mock_exists):
         f = Wiper()
-        f.wipe()
+        f.wipe(device="amigo")
 
         mock_process.assert_called_once()
-        mock_exists.assert_has_calls(
-            [
-                call("/mock/path"),
-                call("/mock/path"),
-            ]
-        )
+        mock_exists.assert_called_once_with("/mock/path")
 
     @patch("sys.platform", "linux")
     @patch("os.path.exists", return_value=False)
@@ -55,15 +50,11 @@ class TestFlasher(TestCase):
     def test_fail_wipe_unix(self, mock_process, mock_list_ports, mock_exists):
         with self.assertRaises(RuntimeError) as exc_info:
             f = Wiper()
-            f.wipe()
+            f.wipe(device="amigo")
 
             mock_process.assert_called_once()
-            mock_exists.assert_has_calls(
-                [
-                    call("/mock/path"),
-                    call("/mock/path"),
-                ]
-            )
+            mock_exists.assert_called_once_with("/mock/path")
+
         self.assertEqual(str(exc_info.exception), "Port do not exist: /mock/path")
 
     @patch("sys.platform", "darwin")
@@ -73,15 +64,10 @@ class TestFlasher(TestCase):
     # pylint: disable=unused-argument
     def test_wiper_darwin(self, mock_process, mock_list_ports, mock_exists):
         f = Wiper()
-        f.wipe()
+        f.wipe(device="amigo")
 
         mock_process.assert_called_once()
-        mock_exists.assert_has_calls(
-            [
-                call("/mock/path"),
-                call("/mock/path"),
-            ]
-        )
+        mock_exists.assert_called_once_with("/mock/path")
 
     @patch("sys.platform", "win32")
     @patch("src.utils.flasher.base_flasher.Serial", side_effect=MockSerial)
@@ -90,6 +76,6 @@ class TestFlasher(TestCase):
     # pylint: disable=unused-argument
     def test_wiper_win(self, mock_process, mock_list_ports, mock_serial):
         f = Wiper()
-        f.wipe()
+        f.wipe(device="amigo")
 
         mock_process.assert_called_once()

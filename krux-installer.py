@@ -306,7 +306,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 )
 
                 flasher = Flasher(firmware=KBOOT_NAME)
-                flasher.flash()
+                flasher.flash(device=args.device)
             else:
                 FIRMWARE_NAME = f"{args.destdir}/firmware.bin"
                 print()
@@ -367,7 +367,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                     )
                 )
                 flasher = Flasher(firmware=KBOOT_NAME)
-                flasher.flash()
+                flasher.flash(device=args.device)
 
             else:
                 ZIPFILE = download_and_verify()

@@ -56,29 +56,32 @@ class Flasher(BaseFlasher):
         super().__init__()
         self.firmware = firmware
 
-    def flash(self, callback: typing.Callable = None):
+    def flash(self, device: str, callback: typing.Callable = None):
         """
         Setup proper :attr:`dev`, :attr:`board` and :attr:file` for
         execute :attr:`KTool.process` to write proper krux firmware
         """
-        self.configure_device()
-        if not callback:
-            self.ktool.print_callback = print
-            self.ktool.process(
-                terminal=False,
-                dev=self.port,
-                baudrate=1500000,
-                board=self.board,
-                sram=False,
-                file=self.firmware,
-            )
-        else:
-            self.ktool.process(
-                terminal=False,
-                dev=self.port,
-                baudrate=1500000,
-                board=self.board,
-                sram=False,
-                file=self.firmware,
-                callback=callback,
-            )
+        try:
+            self.configure_device(device=device)
+            if not callback:
+                self.ktool.print_callback = print
+                self.ktool.process(
+                    terminal=False,
+                    dev=self.port,
+                    baudrate=1500000,
+                    board=self.board,
+                    sram=False,
+                    file=self.firmware,
+                )
+            else:
+                self.ktool.process(
+                    terminal=False,
+                    dev=self.port,
+                    baudrate=1500000,
+                    board=self.board,
+                    sram=False,
+                    file=self.firmware,
+                    callback=callback,
+                )
+        except Exception as exc_info:
+            raise RuntimeError(str(exc_info)) from exc_info

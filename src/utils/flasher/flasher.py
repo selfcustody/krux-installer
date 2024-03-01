@@ -22,10 +22,9 @@
 """
 __init__.py
 """
-
 import sys
 import typing
-from .base_flasher import BaseFlasher
+from .trigger_flasher import TriggerFlasher
 
 
 # pylint: disable=unused-argument
@@ -42,14 +41,11 @@ def get_progress(file_type_str, iteration, total, suffix):
         sys.stdout.write(msg)
 
 
-class Flasher(BaseFlasher):
+class Flasher(TriggerFlasher):
     """
     A class to parse KTool outputs: We don't want to modify the
     KTool structure, instead, only redirect what happens in
-    :attr:`KTool.process`. Following odudex approach, it uses
-    :attr:`contextlib.redirect_stdout` to do this. Additionaly,
-    it uses raiseup to elevate privileges to src/utils/kboot/ktool.py
-    (pkexec->Linux, UAC->Windows, AppleScript->MacOS)
+    :attr:`KTool.process`.
     """
 
     def __init__(self, firmware: str):
@@ -58,30 +54,21 @@ class Flasher(BaseFlasher):
 
     def flash(self, device: str, callback: typing.Callable = None):
         """
-        Setup proper :attr:`dev`, :attr:`board` and :attr:file` for
-        execute :attr:`KTool.process` to write proper krux firmware
+        Detect available ports, try default flash process and
+        if not work, try custom port
         """
-        try:
-            self.configure_device(device=device)
-            if not callback:
-                self.ktool.print_callback = print
-                self.ktool.process(
-                    terminal=False,
-                    dev=self.port,
-                    baudrate=1500000,
-                    board=self.board,
-                    sram=False,
-                    file=self.firmware,
-                )
-            else:
-                self.ktool.process(
-                    terminal=False,
-                    dev=self.port,
-                    baudrate=1500000,
-                    board=self.board,
-                    sram=False,
-                    file=self.firmware,
+        self.detect_ports(device=device)
+
+        port = next(self.ports)
+        if self.is_port_working(port.device):
+            try:
+                self._process_flash(port=port.device, callback=callback)
+
+            # pylint: disable=broad-exception-caught
+            except Exception as exc_info:
+                self._process_exception(
+                    oldport=port,
+                    exc_info=exc_info,
+                    process=self._process_flash,
                     callback=callback,
                 )
-        except Exception as exc_info:
-            raise RuntimeError(str(exc_info)) from exc_info

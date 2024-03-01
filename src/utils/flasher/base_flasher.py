@@ -23,11 +23,8 @@
 base_flasher.py
 """
 import os
-import sys
-from serial import Serial
-from serial.tools import list_ports
+import typing
 from ..trigger import Trigger
-from ..kboot.build.ktool import KTool
 
 
 class BaseFlasher(Trigger):
@@ -36,37 +33,6 @@ class BaseFlasher(Trigger):
     """
 
     VALID_BOARDS = ("goE", "dan")
-
-    def __init__(self):
-        super().__init__()
-        self.ktool = KTool()
-
-    def configure_device(self, device: str):
-        """Configure port and board"""
-
-        if device in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit"):
-            goe_devices = list(list_ports.grep("0403"))
-            if len(goe_devices) > 0:
-                self.board = "goE"
-                self.port = goe_devices[0].device
-            else:
-                raise ValueError(f"Unavailable {device}: is it connected?")
-
-        if device == "dock":
-            dan_devices = list(list_ports.grep("7523"))
-            if len(dan_devices) > 0:
-                self.board = "dan"
-                self.port = dan_devices[0].device
-            else:
-                raise ValueError(f"Unavailable {device}: is it connected?")
-
-        if device == "yahboom":
-            yah_devices = list(list_ports.grep("7523"))
-            if len(yah_devices) > 0:
-                self.board = "goE"
-                self.port = yah_devices[0].device
-            else:
-                raise ValueError(f"Unavailable {device}: is it connected?")
 
     @property
     def firmware(self) -> str:
@@ -84,31 +50,16 @@ class BaseFlasher(Trigger):
         self._firmware = value
 
     @property
-    def port(self) -> str:
+    def ports(self) -> typing.Generator:
         """Getter for firmware's full path"""
-        self.debug(f"port::getter={self._port}")
-        return self._port
+        self.debug(f"ports::getter={self._ports}")
+        return self._ports
 
-    @port.setter
-    def port(self, value: str):
-        """Setter for ports's full path"""
-        if sys.platform in ("linux", "darwin"):
-            if os.path.exists(value):
-                self.debug(f"port::setter={value}")
-                self._port = value
-            else:
-                raise OSError(f"Port do not exist: {value}")
-
-        elif sys.platform == "win32":
-            try:
-                s = Serial(value)
-                s.close()
-                self.debug(f"port::setter={value}")
-                self._port = value
-            except OSError as exc:
-                raise OSError(str(exc)) from exc
-        else:
-            raise EnvironmentError(f"Unsupported platform: {sys.platform}")
+    @ports.setter
+    def ports(self, value: typing.Generator):
+        """Setter for available ports's full path"""
+        self.debug(f"port::setter={value}")
+        self._ports = value
 
     @property
     def board(self) -> str:

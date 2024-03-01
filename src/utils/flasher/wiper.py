@@ -22,27 +22,27 @@
 """
 wiper.py
 """
-import sys
 import typing
-from .base_flasher import BaseFlasher
+from .trigger_flasher import TriggerFlasher
 
 
-class Wiper(BaseFlasher):
+class Wiper(TriggerFlasher):
     """Class to wipe some specific board"""
 
-    def wipe(self, device: str, callback: typing.Callable = print):
+    def wipe(self, device: str, callback: typing.Callable = None):
         """Erase all data in device"""
-        try:
-            if callback:
-                self.ktool.print_callback = callback
-            else:
-                self.ktool.print_callback = print
+        self.detect_ports(device=device)
 
-            self.configure_device(device=device)
-            sys.argv = []
-            newargs = ["-B", self.board, "-b", "1500000", "-p", self.port, "-E"]
-            sys.argv.extend(newargs)
-            self.ktool.process()
+        port = next(self.ports)
+        if self.is_port_working(port.device):
+            try:
+                self._process_wipe(port=port.device, callback=callback)
 
-        except Exception as exc:
-            raise RuntimeError(str(exc)) from exc
+            # pylint: disable=broad-exception-caught
+            except Exception as exc_info:
+                self._process_exception(
+                    oldport=port,
+                    exc_info=exc_info,
+                    process=self._process_wipe,
+                    callback=callback,
+                )

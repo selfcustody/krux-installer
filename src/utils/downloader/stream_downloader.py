@@ -36,7 +36,7 @@ class StreamDownloader(TriggerDownloader):
 
     def __init__(self, url: str):
         super().__init__(url=url)
-        self.progress_bar_size = 128
+        self.progress_bar_size = 64
         self.on_data = self.progress_bar_cli
 
     @property
@@ -76,7 +76,7 @@ class StreamDownloader(TriggerDownloader):
         bar_amount = int(self.progress_bar_size * percent)
         total_bars = "=" * bar_amount
         missing_bars = " " * (self.progress_bar_size - bar_amount)
-        percent = f"{percent * 100:.2f}"
+        percent = f"{percent * 100.0:.2f}"
         cli_bar = f"\r[{total_bars}{missing_bars}]"
         dld_mb = f"{self.downloaded_len / 1000000:.2f}"
         tot_mb = f"{self.content_len / 1000000:.2f}"

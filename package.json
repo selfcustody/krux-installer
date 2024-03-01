@@ -59,7 +59,7 @@
     "@wdio/mocha-framework": "^8.27.0",
     "@wdio/spec-reporter": "^8.27.0",
     "chai": "^4.3.7",
-    "electron": "^28.1.1",
+    "electron": "^29.1.0",
     "electron-builder": "^24.4.0",
     "glob": "^10.3.3",
     "markdownlint-cli": "^0.38.0",

@@ -22,7 +22,7 @@ class TestStreamDownloader(TestCase):
     )
     def test_init_progress_bar_size(self, mock_progress_bar_size):
         s = StreamDownloader(url=URL)
-        mock_progress_bar_size.assert_called_once_with(s, 128)
+        mock_progress_bar_size.assert_called_once_with(s, 64)
 
     @patch(
         "src.utils.downloader.asset_downloader.StreamDownloader.on_data",

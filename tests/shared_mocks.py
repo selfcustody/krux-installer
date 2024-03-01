@@ -119,23 +119,16 @@ class MockKruxZipFile(MockZipFile):
         ]
 
 
-class MockListPorts:
+class MockListPorts(MagicMock):
 
-    @property
-    def devices(self):
+    def grep(self, p):
         devices = []
         if sys.platform in ("linux", "darwin"):
-            devices = ["/mock/path", "/mock/path"]
+            devices = ["/mock/path0", "/mock/path1"]
         elif sys.platform == "win32":
             devices = ["MOCK0", "MOCK1"]
 
-        return [
-            Mock(vid="0403", device=devices[0]),
-            Mock(vid="7523", device=devices[1]),
-        ]
-
-    def grep(self, p):
-        return (d for d in self.devices if d.vid == p)
+        return (d for d in devices)
 
 
 class MockSerial:

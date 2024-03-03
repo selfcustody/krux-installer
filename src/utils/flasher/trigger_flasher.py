@@ -63,7 +63,7 @@ class TriggerFlasher(BaseFlasher):
         except SerialException:
             return False
 
-    def _process_flash(self, port: str, callback: typing.Callable = None):
+    def process_flash(self, port: str, callback: typing.Callable = None):
         """
         Setup proper port, board and firmware to execute
         :attr:`KTool.process` to write proper krux
@@ -87,7 +87,7 @@ class TriggerFlasher(BaseFlasher):
                 callback=callback,
             )
 
-    def _process_wipe(self, port: str, callback: typing.Callable = None):
+    def process_wipe(self, port: str, callback: typing.Callable = None):
         """
         Setup proper port, board and firmware to execute
         :attr:`KTool.process` to erase device
@@ -102,13 +102,17 @@ class TriggerFlasher(BaseFlasher):
         sys.argv.extend(newargs)
         self.ktool.process()
 
-    def _process_exception(
+    def process_exception(
         self,
         oldport: str,
         exc_info: Exception,
         process: typing.Callable,
         callback: typing.Callable = None,
     ):
+        """
+        Generally, Amigos have two ports. If the first fail
+        use this function to process
+        """
         print(f"\033[31;1m[ERROR]\033[0m {str(exc_info)}")
         if re.findall(r"Greeting fail", str(exc_info)):
             port = next(self.ports)

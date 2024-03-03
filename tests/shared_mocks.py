@@ -119,22 +119,41 @@ class MockKruxZipFile(MockZipFile):
         ]
 
 
+class MonkeyPort:
+
+    # pylint: disable=too-few-public-methods
+    def __init__(self, vid: str, device: str):
+        self.vid = vid
+        self.device = device
+
+
 class MockListPorts(MagicMock):
 
-    def grep(self, p):
-        devices = []
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.devices = []
+
         if sys.platform in ("linux", "darwin"):
-            devices = ["/mock/path0", "/mock/path1"]
+            self.devices = [
+                Mock(vid="0403", device="/mock/path0"),
+                Mock(vid="0403", device="/mock/path1"),
+                Mock(vid="7523", device="/mock/path0"),
+            ]
         elif sys.platform == "win32":
-            devices = ["MOCK0", "MOCK1"]
+            self.devices = [
+                Mock(vid="0403", device="MOCK0"),
+                Mock(vid="0403", device="MOCK0"),
+                Mock(vid="7523", device="MOCK1"),
+            ]
 
-        return (d for d in devices)
+    def grep(self, p):
+        return iter(d for d in self.devices if p == d.vid)
 
 
-class MockSerial:
+class MockSerial(MagicMock):
 
-    def __init__(self, port):
-        self.port = port
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
     def open(self):
         pass

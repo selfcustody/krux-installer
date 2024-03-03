@@ -62,13 +62,13 @@ class Flasher(TriggerFlasher):
         port = next(self.ports)
         if self.is_port_working(port.device):
             try:
-                self._process_flash(port=port.device, callback=callback)
+                self.process_flash(port=port.device, callback=callback)
 
             # pylint: disable=broad-exception-caught
             except Exception as exc_info:
-                self._process_exception(
+                self.process_exception(
                     oldport=port,
                     exc_info=exc_info,
-                    process=self._process_flash,
+                    process=self.process_flash,
                     callback=callback,
                 )

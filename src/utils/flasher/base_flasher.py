@@ -24,6 +24,7 @@ base_flasher.py
 """
 import os
 import typing
+from serial.tools import list_ports
 from ..trigger import Trigger
 
 
@@ -57,9 +58,21 @@ class BaseFlasher(Trigger):
 
     @ports.setter
     def ports(self, value: typing.Generator):
-        """Setter for available ports's full path"""
-        self.debug(f"port::setter={value}")
-        self._ports = value
+        """Setter for available ports's full path by giving device name"""
+        if value in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit", "cube"):
+            self._ports = list_ports.grep("0403")
+            self.debug(f"ports::setter={list(self._ports)}")
+
+        elif value == "dock":
+            self._ports = list_ports.grep("7523")
+            self.debug(f"ports::setter={list(self._ports)}")
+
+        elif value == "yahboom":
+            self._ports = list_ports.grep("7523")
+            self.debug(f"ports::setter={list(self._ports)}")
+
+        else:
+            raise ValueError(f"Device not implemented: {value}")
 
     @property
     def board(self) -> str:
@@ -69,9 +82,18 @@ class BaseFlasher(Trigger):
 
     @board.setter
     def board(self, value: str):
-        """Setter for board"""
-        if value in BaseFlasher.VALID_BOARDS:
-            self.debug(f"board::setter={value}")
-            self._board = value
+        """Setter for board giving device name"""
+        if value in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit", "cube"):
+            self._board = "goE"
+            self.debug(f"board::setter={self._board}")
+
+        elif value == "dock":
+            self._board = "dan"
+            self.debug(f"board::setter={self._board}")
+
+        elif value == "yahboom":
+            self._board = "goE"
+            self.debug(f"ports::setter={self._board}")
+
         else:
-            raise ValueError(f"Invalid board: {value}")
+            raise ValueError(f"Device not implemented: {value}")

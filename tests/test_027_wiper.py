@@ -25,14 +25,14 @@ base_flasher.py
 from unittest import TestCase
 from unittest.mock import patch
 from src.utils.flasher import Wiper
-from .shared_mocks import MockListPorts, MockSerial
+from .shared_mocks import MockListPortsGrep, MockSerial
 
 
 class TestFlasher(TestCase):
 
     @patch("sys.platform", "linux")
     @patch("os.path.exists", return_value=True)
-    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPorts)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
     # pylint: disable=unused-argument
     def test_wipe_linux(self, mock_process, mock_list_ports, mock_exists):
@@ -44,7 +44,7 @@ class TestFlasher(TestCase):
 
     @patch("sys.platform", "linux")
     @patch("os.path.exists", return_value=False)
-    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPorts)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
     # pylint: disable=unused-argument
     def test_fail_wipe_unix(self, mock_process, mock_list_ports, mock_exists):
@@ -59,7 +59,7 @@ class TestFlasher(TestCase):
 
     @patch("sys.platform", "darwin")
     @patch("os.path.exists", return_value=True)
-    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPorts)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
     # pylint: disable=unused-argument
     def test_wiper_darwin(self, mock_process, mock_list_ports, mock_exists):
@@ -71,7 +71,7 @@ class TestFlasher(TestCase):
 
     @patch("sys.platform", "win32")
     @patch("src.utils.flasher.base_flasher.Serial", side_effect=MockSerial)
-    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPorts)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
     # pylint: disable=unused-argument
     def test_wiper_win(self, mock_process, mock_list_ports, mock_serial):

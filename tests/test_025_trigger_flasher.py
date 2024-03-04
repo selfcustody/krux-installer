@@ -1,8 +1,9 @@
+import sys
 from unittest import TestCase
 from unittest.mock import patch, MagicMock
 from serial.serialutil import SerialException
 from src.utils.flasher.trigger_flasher import TriggerFlasher
-from .shared_mocks import MockListPorts, MockSerial
+from .shared_mocks import MockSerial
 
 
 class TestTriggerFlasher(TestCase):
@@ -12,69 +13,6 @@ class TestTriggerFlasher(TestCase):
         self.assertEqual(f.ktool.killProcess, False)
         self.assertEqual(f.ktool.loader, None)
         self.assertEqual(f.ktool.print_callback, None)
-
-    @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep", new_callable=MockListPorts
-    )
-    def test_detect_port_amigo(self, mock_grep):
-        f = TriggerFlasher()
-        f.detect_ports(device="amigo")
-        mock_grep.assert_called_once_with("0403")
-        self.assertEqual(f.board, "goE")
-
-    @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep", new_callable=MockListPorts
-    )
-    def test_detect_port_amigo_tft(self, mock_grep):
-        f = TriggerFlasher()
-        f.detect_ports(device="amigo")
-        mock_grep.assert_called_once_with("0403")
-        self.assertEqual(f.board, "goE")
-
-    @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep", new_callable=MockListPorts
-    )
-    def test_detect_port_amigo_ips(self, mock_grep):
-        f = TriggerFlasher()
-        f.detect_ports(device="amigo")
-        mock_grep.assert_called_once_with("0403")
-        self.assertEqual(f.board, "goE")
-
-    @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep", new_callable=MockListPorts
-    )
-    def test_detect_port_m5stickv(self, mock_grep):
-        f = TriggerFlasher()
-        f.detect_ports(device="m5stickv")
-        mock_grep.assert_called_once_with("0403")
-        self.assertEqual(f.board, "goE")
-
-    @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep", new_callable=MockListPorts
-    )
-    def test_detect_port_bit(self, mock_grep):
-        f = TriggerFlasher()
-        f.detect_ports(device="m5stickv")
-        mock_grep.assert_called_once_with("0403")
-        self.assertEqual(f.board, "goE")
-
-    @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep", new_callable=MockListPorts
-    )
-    def test_detect_port_dock(self, mock_grep):
-        f = TriggerFlasher()
-        f.detect_ports(device="dock")
-        mock_grep.assert_called_once_with("7523")
-        self.assertEqual(f.board, "dan")
-
-    @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep", new_callable=MockListPorts
-    )
-    def test_detect_port_yahboom(self, mock_grep):
-        f = TriggerFlasher()
-        f.detect_ports(device="yahboom")
-        mock_grep.assert_called_once_with("7523")
-        self.assertEqual(f.board, "goE")
 
     @patch("src.utils.flasher.trigger_flasher.Serial", new_callable=MockSerial)
     def test_is_port_working(self, mock_serial):
@@ -92,9 +30,9 @@ class TestTriggerFlasher(TestCase):
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
-    def test_process_flash_no_callback(self, mock_process, mock_exists):
+    def test_process_flash_no_callback_amigo(self, mock_process, mock_exists):
         f = TriggerFlasher()
-        f.board = "goE"
+        f.board = "amigo"
         f.firmware = "mock/firmware.kfpkg"
         f.process_flash("/mock/path0")
         mock_exists.assert_called_once_with("mock/firmware.kfpkg")
@@ -108,12 +46,12 @@ class TestTriggerFlasher(TestCase):
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
-    def test_process_flash_callback(self, mock_process, mock_exists):
-        mock_callback = MagicMock()
+    def test_process_flash_callback_amigo(self, mock_process, mock_exists):
+        callback = MagicMock()
         f = TriggerFlasher()
-        f.board = "goE"
+        f.board = "amigo"
         f.firmware = "mock/firmware.kfpkg"
-        f.process_flash("/mock/path0", callback=mock_callback)
+        f.process_flash("/mock/path0", callback=callback)
         mock_exists.assert_called_once_with("mock/firmware.kfpkg")
         mock_process.assert_called_once_with(
             terminal=False,
@@ -121,15 +59,449 @@ class TestTriggerFlasher(TestCase):
             baudrate=1500000,
             board="goE",
             file="mock/firmware.kfpkg",
-            callback=mock_callback,
+            callback=callback,
         )
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
-    def test_process_wipe_no_callback(self, mock_process, mock_exists):
+    def test_process_flash_no_callback_amigo_tft(self, mock_process, mock_exists):
         f = TriggerFlasher()
-        f.board = "goE"
+        f.board = "amigo_tft"
         f.firmware = "mock/firmware.kfpkg"
-        f.process_wipe("/mock/path0")
+        f.process_flash("/mock/path0")
         mock_exists.assert_called_once_with("mock/firmware.kfpkg")
-        mock_process.assert_called_once()
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_callback_amigo_tft(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "amigo_tft"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0", callback=callback)
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+            callback=callback,
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_no_callback_amigo_ips(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "amigo_ips"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0")
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_callback_amigo_ips(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "amigo_ips"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0", callback=callback)
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+            callback=callback,
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_no_callback_m5stickv(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "m5stickv"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0")
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_callback_m5stickv(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "m5stickv"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0", callback=callback)
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+            callback=callback,
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_no_callback_dock(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "dock"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0")
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="dan",
+            file="mock/firmware.kfpkg",
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_callback_dock(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "dock"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0", callback=callback)
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="dan",
+            file="mock/firmware.kfpkg",
+            callback=callback,
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_no_callback_bit(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "bit"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0")
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_callback_bit(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "bit"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0", callback=callback)
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+            callback=callback,
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_no_callback_cube(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "cube"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0")
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_flash_callback_cube(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "cube"
+        f.firmware = "mock/firmware.kfpkg"
+        f.process_flash("/mock/path0", callback=callback)
+        mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="/mock/path0",
+            baudrate=1500000,
+            board="goE",
+            file="mock/firmware.kfpkg",
+            callback=callback,
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_amigo(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "amigo"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_amigo(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "amigo"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_amigo_tft(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "amigo_tft"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_amigo_tft(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "amigo_tft"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_amigo_ips(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "amigo_ips"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_amigo_ips(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "amigo_ips"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_dock(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "dock"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "dan", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_dock(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "dock"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "dan", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_m5stickv(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "m5stickv"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_m5stickv(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "m5stickv"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_bit(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "bit"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_bit(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "bit"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_cube(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "cube"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_cube(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "cube"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_no_callback_yahboom(self, mock_process, mock_exists):
+        f = TriggerFlasher()
+        f.board = "yahboom"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0")
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.kboot.build.ktool.KTool.process", side_effect=[True])
+    def test_process_wipe_callback_yahboom(self, mock_process, mock_exists):
+        callback = MagicMock()
+        f = TriggerFlasher()
+        f.board = "yahboom"
+        f.firmware = "mock/firmware.kfpkg"
+        with patch.object(sys, "argv", []):
+            f.process_wipe("/mock/path0", callback=callback)
+            mock_exists.assert_called_once_with("mock/firmware.kfpkg")
+            self.assertEqual(
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", "/mock/path0", "-E"]
+            )
+            mock_process.assert_called_once()
+            self.assertEqual(f.ktool.print_callback, callback)

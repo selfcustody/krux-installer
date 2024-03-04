@@ -127,7 +127,7 @@ class MonkeyPort:
         self.device = device
 
 
-class MockListPorts(MagicMock):
+class MockListPortsGrep(MagicMock):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -142,12 +142,12 @@ class MockListPorts(MagicMock):
         elif sys.platform == "win32":
             self.devices = [
                 Mock(vid="0403", device="MOCK0"),
-                Mock(vid="0403", device="MOCK0"),
-                Mock(vid="7523", device="MOCK1"),
+                Mock(vid="0403", device="MOCK1"),
+                Mock(vid="7523", device="MOCK0"),
             ]
 
     def grep(self, p):
-        return iter(d for d in self.devices if p == d.vid)
+        return MagicMock(return_value=iter(d for d in self.devices if p == d.vid))
 
 
 class MockSerial(MagicMock):

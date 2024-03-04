@@ -26,7 +26,6 @@ import re
 import sys
 import typing
 from serial import Serial
-from serial.tools import list_ports
 from serial.serialutil import SerialException
 from .base_flasher import BaseFlasher
 from ..kboot.build.ktool import KTool
@@ -38,21 +37,6 @@ class TriggerFlasher(BaseFlasher):
     def __init__(self):
         super().__init__()
         self.ktool = KTool()
-
-    def detect_ports(self, device: str):
-        """Configure port and board"""
-
-        if device in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit"):
-            self.ports = list_ports.grep("0403")
-            self.board = "goE"
-
-        if device == "dock":
-            self.ports = list_ports.grep("7523")
-            self.board = "dan"
-
-        if device == "yahboom":
-            self.ports = list_ports.grep("7523")
-            self.board = "goE"
 
     def is_port_working(self, port) -> bool:
         """Check if a port is working"""

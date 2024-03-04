@@ -57,7 +57,8 @@ class Flasher(TriggerFlasher):
         Detect available ports, try default flash process and
         if not work, try custom port
         """
-        self.detect_ports(device=device)
+        self.ports = device
+        self.board = device
 
         port = next(self.ports)
         if self.is_port_working(port.device):

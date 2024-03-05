@@ -124,13 +124,13 @@ class TestFlasher(TestCase):
         )
 
     @patch("os.path.exists", return_value=True)
-    @patch(
-        "src.utils.flasher.flasher.Flasher.get_port",
-        return_value=MagicMock(device="/mock/path0"),
-    )
+    @patch("src.utils.flasher.flasher.Flasher.get_port", new_callable=MockListPortsGrep)
     @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
-    @patch("src.utils.flasher.flasher.Flasher.process_flash")
-    @patch("src.utils.flasher.flasher.Flasher.process_exception", side_effect=True)
+    @patch(
+        "src.utils.flasher.flasher.Flasher.process_flash",
+        side_effect=Exception("Greeting fail: mock test"),
+    )
+    @patch("src.utils.flasher.flasher.Flasher.process_exception")
     # pylint: disable=too-many-arguments
     def test_flash_amigo_greeting_fail_no_callback(
         self,
@@ -140,22 +140,33 @@ class TestFlasher(TestCase):
         mock_get_port,
         mock_exists,
     ):
-        mock_process_flash.raiseError.sideEffect = MagicMock(
-            side_effect=Exception("Test")
-        )
         with self.assertRaises(Exception) as exc_info:
-            self.assertEqual(str(exc_info), "Hello")
             f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
             f.flash(device="amigo")
             mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
-            mock_get_port.assert_called_once_with(device="amigo_ips")
+            mock_get_port.assert_called_once_with(device="amigo")
             mock_is_port_working.assert_called_once_with("/mock/path0")
             mock_process_flash.assert_called_once_with(
                 port="/mock/path0", callback=None
             )
             mock_process_exception.assert_called_once_with(
                 oldport="/mock/path0",
-                exc_info=exc_info,
+                exc_info=exc_info.exception,
                 process=f.process_flash,
                 callback=None,
             )
+
+    @patch("os.path.exists", return_value=True)
+    @patch(
+        "src.utils.flasher.flasher.Flasher.get_port",
+        return_value=MagicMock(device="/mock/path0"),
+    )
+    @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=False)
+    def test_fail_flash_amigo(self, mock_is_port_working, mock_get_port, mock_exists):
+        with self.assertRaises(RuntimeError) as exc_info:
+            f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+            f.flash(device="amigo")
+            mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+            mock_get_port.assert_called_once_with(device="amigo")
+            mock_is_port_working.assert_called_once_with("/mock/path0")
+        self.assertEqual(str(exc_info.exception), "Port not working: /mock/path0")

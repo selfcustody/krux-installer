@@ -1,28 +1,161 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from src.utils.flasher import Flasher
 from .shared_mocks import MockListPortsGrep
 
 
 class TestFlasher(TestCase):
 
-    @patch("sys.platform", "linux")
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_amigo(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="amigo")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_amigo_tft(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="amigo_tft")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_amigo_ips(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="amigo_ips")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_dock(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="dock")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("7523")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_bit(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="bit")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_m5stickv(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="m5stickv")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_yahboom(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="yahboom")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("7523")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.flasher.next")
+    def test_get_port_cube(self, mock_next, mock_list_ports, mock_exists):
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.get_port(device="cube")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
     @patch("os.path.exists", return_value=True)
     @patch(
-        "src.utils.flasher.trigger_flasher.list_ports.grep",
-        new_callable=MockListPortsGrep,
+        "src.utils.flasher.flasher.Flasher.get_port",
+        return_value=MagicMock(device="/mock/path0"),
     )
-    def test_flash_linux_amigo_ttyusb0(self, mock_grep, mock_exists):
+    @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
+    @patch("src.utils.flasher.flasher.Flasher.process_flash")
+    def test_flash_amigo_no_callback(
+        self, mock_process_flash, mock_is_port_working, mock_get_port, mock_exists
+    ):
         f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
         f.flash(device="amigo")
         mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
-        mock_grep.assert_called_once_with("0403")
-        # mock_serial.assert_called_once_with("/mock/path0")
-        # mock_process.assert_called_once_with(
-        #    terminal=False,
-        #    dev="/mock/path0",
-        #    baudrate=1500000,
-        #    board="goE",
-        #    sram=False,
-        #    file="mock/maixpy_test/kboot.kfpkg",
-        # )
+        mock_get_port.assert_called_once_with(device="amigo")
+        mock_is_port_working.assert_called_once_with("/mock/path0")
+        mock_process_flash.assert_called_once_with(port="/mock/path0", callback=None)
+
+    @patch("os.path.exists", return_value=True)
+    @patch(
+        "src.utils.flasher.flasher.Flasher.get_port",
+        return_value=MagicMock(device="/mock/path0"),
+    )
+    @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
+    @patch("src.utils.flasher.flasher.Flasher.process_flash")
+    def test_flash_amigo_callback(
+        self, mock_process_flash, mock_is_port_working, mock_get_port, mock_exists
+    ):
+        callback = MagicMock()
+        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+        f.flash(device="amigo", callback=callback)
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_get_port.assert_called_once_with(device="amigo")
+        mock_is_port_working.assert_called_once_with("/mock/path0")
+        mock_process_flash.assert_called_once_with(
+            port="/mock/path0", callback=callback
+        )
+
+    @patch("os.path.exists", return_value=True)
+    @patch(
+        "src.utils.flasher.flasher.Flasher.get_port",
+        return_value=MagicMock(device="/mock/path0"),
+    )
+    @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
+    @patch("src.utils.flasher.flasher.Flasher.process_flash")
+    @patch("src.utils.flasher.flasher.Flasher.process_exception", side_effect=True)
+    # pylint: disable=too-many-arguments
+    def test_flash_amigo_greeting_fail_no_callback(
+        self,
+        mock_process_exception,
+        mock_process_flash,
+        mock_is_port_working,
+        mock_get_port,
+        mock_exists,
+    ):
+        mock_process_flash.raiseError.sideEffect = MagicMock(
+            side_effect=Exception("Test")
+        )
+        with self.assertRaises(Exception) as exc_info:
+            self.assertEqual(str(exc_info), "Hello")
+            f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+            f.flash(device="amigo")
+            mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+            mock_get_port.assert_called_once_with(device="amigo_ips")
+            mock_is_port_working.assert_called_once_with("/mock/path0")
+            mock_process_flash.assert_called_once_with(
+                port="/mock/path0", callback=None
+            )
+            mock_process_exception.assert_called_once_with(
+                oldport="/mock/path0",
+                exc_info=exc_info,
+                process=f.process_flash,
+                callback=None,
+            )

@@ -52,15 +52,19 @@ class Flasher(TriggerFlasher):
         super().__init__()
         self.firmware = firmware
 
+    def get_port(self, device: str):
+        """Get port for flash"""
+        self.ports = device
+        self.board = device
+        return next(self.ports)
+
     def flash(self, device: str, callback: typing.Callable = None):
         """
         Detect available ports, try default flash process and
         if not work, try custom port
         """
-        self.ports = device
-        self.board = device
 
-        port = next(self.ports)
+        port = self.get_port(device=device)
         if self.is_port_working(port.device):
             try:
                 self.process_flash(port=port.device, callback=callback)
@@ -73,3 +77,5 @@ class Flasher(TriggerFlasher):
                     process=self.process_flash,
                     callback=callback,
                 )
+        else:
+            raise RuntimeError(f"Port not working: {port.device}")

@@ -135,19 +135,16 @@ class MockListPortsGrep(MagicMock):
 
         if sys.platform in ("linux", "darwin"):
             self.devices = [
-                Mock(vid="0403", device="/mock/path0"),
-                Mock(vid="0403", device="/mock/path1"),
-                Mock(vid="7523", device="/mock/path0"),
+                MagicMock(vid="0403", device="/mock/path0"),
+                MagicMock(vid="0403", device="/mock/path1"),
+                MagicMock(vid="7523", device="/mock/path0"),
             ]
         elif sys.platform == "win32":
             self.devices = [
-                Mock(vid="0403", device="MOCK0"),
-                Mock(vid="0403", device="MOCK1"),
-                Mock(vid="7523", device="MOCK0"),
+                MagicMock(vid="0403", device="MOCK0"),
+                MagicMock(vid="0403", device="MOCK1"),
+                MagicMock(vid="7523", device="MOCK0"),
             ]
-
-    def grep(self, p):
-        return MagicMock(return_value=iter(d for d in self.devices if p == d.vid))
 
 
 class MockSerial(MagicMock):

@@ -1,9 +1,9 @@
 import sys
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, call, MagicMock
 from serial.serialutil import SerialException
 from src.utils.flasher.trigger_flasher import TriggerFlasher
-from .shared_mocks import MockSerial
+from .shared_mocks import MockSerial, MockListPortsGrep
 
 
 class TestTriggerFlasher(TestCase):
@@ -13,6 +13,94 @@ class TestTriggerFlasher(TestCase):
         self.assertEqual(f.ktool.killProcess, False)
         self.assertEqual(f.ktool.loader, None)
         self.assertEqual(f.ktool.print_callback, None)
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_amigo(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="amigo")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_amigo_tft(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="amigo_tft")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_amigo_ips(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="amigo_ips")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_dock(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="dock")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("7523")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_bit(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="bit")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_m5stickv(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="m5stickv")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_yahboom(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="yahboom")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("7523")
+        mock_next.assert_called_once()
+
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.trigger_flasher.next")
+    def test_get_port_cube(self, mock_next, mock_list_ports, mock_exists):
+        f = TriggerFlasher()
+        f.firmware = "mock/maixpy_test/kboot.kfpkg"
+        f.get_port(device="cube")
+        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
 
     @patch("src.utils.flasher.trigger_flasher.Serial", new_callable=MockSerial)
     def test_is_port_working(self, mock_serial):
@@ -505,3 +593,95 @@ class TestTriggerFlasher(TestCase):
             )
             mock_process.assert_called_once()
             self.assertEqual(f.ktool.print_callback, callback)
+
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch(
+        "src.utils.flasher.trigger_flasher.next",
+        return_value=MockListPortsGrep().devices[1],
+    )
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
+    def test_process_exception_no_callback_flash(
+        self, mock_process_flash, mock_next, mock_re
+    ):
+        exc = Exception("Greeting fail: mock test")
+        f = TriggerFlasher()
+        f.get_port(device="amigo")
+        f.process_exception(
+            oldport="/mock/path0", exc_info=exc, process=f.process_flash
+        )
+        mock_re.findall.assert_called_once_with(
+            r"Greeting fail", "Greeting fail: mock test"
+        )
+        mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+        mock_process_flash.assert_called_once_with(port="/mock/path1", callback=None)
+
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch(
+        "src.utils.flasher.trigger_flasher.next",
+        return_value=MockListPortsGrep().devices[1],
+    )
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
+    def test_process_exception_callback_flash(
+        self, mock_process_flash, mock_next, mock_re
+    ):
+        callback = MagicMock()
+        exc = Exception("Greeting fail: mock test")
+        f = TriggerFlasher()
+        f.get_port(device="amigo")
+        f.process_exception(
+            oldport="/mock/path0",
+            exc_info=exc,
+            process=f.process_flash,
+            callback=callback,
+        )
+        mock_re.findall.assert_called_once_with(
+            r"Greeting fail", "Greeting fail: mock test"
+        )
+        mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+        mock_process_flash.assert_called_once_with(
+            port="/mock/path1", callback=callback
+        )
+
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch(
+        "src.utils.flasher.trigger_flasher.next",
+        return_value=MockListPortsGrep().devices[1],
+    )
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_wipe")
+    def test_process_exception_no_callback_wipe(
+        self, mock_process_wipe, mock_next, mock_re
+    ):
+        exc = Exception("Greeting fail: mock test")
+        f = TriggerFlasher()
+        f.get_port(device="amigo")
+        f.process_exception(oldport="/mock/path0", exc_info=exc, process=f.process_wipe)
+        mock_re.findall.assert_called_once_with(
+            r"Greeting fail", "Greeting fail: mock test"
+        )
+        mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+        mock_process_wipe.assert_called_once_with(port="/mock/path1", callback=None)
+
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch(
+        "src.utils.flasher.trigger_flasher.next",
+        return_value=MockListPortsGrep().devices[1],
+    )
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_wipe")
+    def test_process_exception_callback_wipe(
+        self, mock_process_wipe, mock_next, mock_re
+    ):
+        callback = MagicMock()
+        exc = Exception("Greeting fail: mock test")
+        f = TriggerFlasher()
+        f.get_port(device="amigo")
+        f.process_exception(
+            oldport="/mock/path0",
+            exc_info=exc,
+            process=f.process_wipe,
+            callback=callback,
+        )
+        mock_re.findall.assert_called_once_with(
+            r"Greeting fail", "Greeting fail: mock test"
+        )
+        mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+        mock_process_wipe.assert_called_once_with(port="/mock/path1", callback=callback)

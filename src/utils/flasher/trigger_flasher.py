@@ -38,6 +38,12 @@ class TriggerFlasher(BaseFlasher):
         super().__init__()
         self.ktool = KTool()
 
+    def get_port(self, device: str):
+        """Get available port from device name"""
+        self.ports = device
+        self.board = device
+        return next(self.ports)
+
     def is_port_working(self, port) -> bool:
         """Check if a port is working"""
         try:

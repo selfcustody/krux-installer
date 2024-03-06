@@ -52,12 +52,6 @@ class Flasher(TriggerFlasher):
         super().__init__()
         self.firmware = firmware
 
-    def get_port(self, device: str):
-        """Get port for flash"""
-        self.ports = device
-        self.board = device
-        return next(self.ports)
-
     def flash(self, device: str, callback: typing.Callable = None):
         """
         Detect available ports, try default flash process and

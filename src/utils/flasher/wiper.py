@@ -31,10 +31,8 @@ class Wiper(TriggerFlasher):
 
     def wipe(self, device: str, callback: typing.Callable = None):
         """Erase all data in device"""
-        self.ports = device
-        self.board = device
 
-        port = next(self.ports)
+        port = self.get_port(device=device)
         if self.is_port_working(port.device):
             try:
                 self.process_wipe(port=port.device, callback=callback)
@@ -47,3 +45,5 @@ class Wiper(TriggerFlasher):
                     process=self.process_wipe,
                     callback=callback,
                 )
+        else:
+            raise RuntimeError(f"Port not working: {port.device}")

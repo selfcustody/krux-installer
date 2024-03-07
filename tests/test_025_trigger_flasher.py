@@ -594,13 +594,14 @@ class TestTriggerFlasher(TestCase):
             mock_process.assert_called_once()
             self.assertEqual(f.ktool.print_callback, callback)
 
+    @patch("sys.platform", "linux")
     @patch("src.utils.flasher.trigger_flasher.re")
     @patch(
         "src.utils.flasher.trigger_flasher.next",
         return_value=MockListPortsGrep().devices[1],
     )
     @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
-    def test_process_exception_no_callback_flash(
+    def test_process_exception_no_callback_flash_linux(
         self, mock_process_flash, mock_next, mock_re
     ):
         exc = Exception("Greeting fail: mock test")
@@ -615,13 +616,56 @@ class TestTriggerFlasher(TestCase):
         mock_next.assert_has_calls([call(f.ports), call(f.ports)])
         mock_process_flash.assert_called_once_with(port="/mock/path1", callback=None)
 
+    @patch("sys.platform", "darwin")
     @patch("src.utils.flasher.trigger_flasher.re")
     @patch(
         "src.utils.flasher.trigger_flasher.next",
         return_value=MockListPortsGrep().devices[1],
     )
     @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
-    def test_process_exception_callback_flash(
+    def test_process_exception_no_callback_flash_darwin(
+        self, mock_process_flash, mock_next, mock_re
+    ):
+        exc = Exception("Greeting fail: mock test")
+        f = TriggerFlasher()
+        f.get_port(device="amigo")
+        f.process_exception(
+            oldport="/mock/path0", exc_info=exc, process=f.process_flash
+        )
+        mock_re.findall.assert_called_once_with(
+            r"Greeting fail", "Greeting fail: mock test"
+        )
+        mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+        mock_process_flash.assert_called_once_with(port="/mock/path1", callback=None)
+
+    @patch("sys.platform", "win32")
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
+    def test_process_exception_no_callback_flash_win32(
+        self, mock_process_flash, mock_re
+    ):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            exc = Exception("Greeting fail: mock test")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(oldport="MOCK0", exc_info=exc, process=f.process_flash)
+            mock_re.findall.assert_called_once_with(
+                r"Greeting fail", "Greeting fail: mock test"
+            )
+            mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+            mock_process_flash.assert_called_once_with(port="MOCK1", callback=None)
+
+    @patch("sys.platform", "linux")
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch(
+        "src.utils.flasher.trigger_flasher.next",
+        return_value=MockListPortsGrep().devices[1],
+    )
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
+    def test_process_exception_callback_flash_linux(
         self, mock_process_flash, mock_next, mock_re
     ):
         callback = MagicMock()
@@ -642,6 +686,58 @@ class TestTriggerFlasher(TestCase):
             port="/mock/path1", callback=callback
         )
 
+    @patch("sys.platform", "darwin")
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch(
+        "src.utils.flasher.trigger_flasher.next",
+        return_value=MockListPortsGrep().devices[1],
+    )
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
+    def test_process_exception_callback_flash_darwin(
+        self, mock_process_flash, mock_next, mock_re
+    ):
+        callback = MagicMock()
+        exc = Exception("Greeting fail: mock test")
+        f = TriggerFlasher()
+        f.get_port(device="amigo")
+        f.process_exception(
+            oldport="/mock/path0",
+            exc_info=exc,
+            process=f.process_flash,
+            callback=callback,
+        )
+        mock_re.findall.assert_called_once_with(
+            r"Greeting fail", "Greeting fail: mock test"
+        )
+        mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+        mock_process_flash.assert_called_once_with(
+            port="/mock/path1", callback=callback
+        )
+
+    @patch("sys.platform", "win32")
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_flash")
+    def test_process_exception_callback_flash_win32(self, mock_process_flash, mock_re):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            callback = MagicMock()
+            exc = Exception("Greeting fail: mock test")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(
+                oldport="MOCK0",
+                exc_info=exc,
+                process=f.process_flash,
+                callback=callback,
+            )
+            mock_re.findall.assert_called_once_with(
+                r"Greeting fail", "Greeting fail: mock test"
+            )
+            mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+            mock_process_flash.assert_called_once_with(port="MOCK1", callback=callback)
+
     @patch("src.utils.flasher.trigger_flasher.re")
     @patch(
         "src.utils.flasher.trigger_flasher.next",
@@ -661,13 +757,14 @@ class TestTriggerFlasher(TestCase):
         mock_next.assert_has_calls([call(f.ports), call(f.ports)])
         mock_process_wipe.assert_called_once_with(port="/mock/path1", callback=None)
 
+    @patch("sys.platform", "linux")
     @patch("src.utils.flasher.trigger_flasher.re")
     @patch(
         "src.utils.flasher.trigger_flasher.next",
         return_value=MockListPortsGrep().devices[1],
     )
     @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_wipe")
-    def test_process_exception_callback_wipe(
+    def test_process_exception_callback_wipe_linux(
         self, mock_process_wipe, mock_next, mock_re
     ):
         callback = MagicMock()
@@ -685,3 +782,53 @@ class TestTriggerFlasher(TestCase):
         )
         mock_next.assert_has_calls([call(f.ports), call(f.ports)])
         mock_process_wipe.assert_called_once_with(port="/mock/path1", callback=callback)
+
+    @patch("sys.platform", "darwin")
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch(
+        "src.utils.flasher.trigger_flasher.next",
+        return_value=MockListPortsGrep().devices[1],
+    )
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_wipe")
+    def test_process_exception_callback_wipe_darwin(
+        self, mock_process_wipe, mock_next, mock_re
+    ):
+        callback = MagicMock()
+        exc = Exception("Greeting fail: mock test")
+        f = TriggerFlasher()
+        f.get_port(device="amigo")
+        f.process_exception(
+            oldport="/mock/path0",
+            exc_info=exc,
+            process=f.process_wipe,
+            callback=callback,
+        )
+        mock_re.findall.assert_called_once_with(
+            r"Greeting fail", "Greeting fail: mock test"
+        )
+        mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+        mock_process_wipe.assert_called_once_with(port="/mock/path1", callback=callback)
+
+    @patch("sys.platform", "win32")
+    @patch("src.utils.flasher.trigger_flasher.re")
+    @patch("src.utils.flasher.trigger_flasher.TriggerFlasher.process_wipe")
+    def test_process_exception_callback_wipe_win32(self, mock_process_wipe, mock_re):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            callback = MagicMock()
+            exc = Exception("Greeting fail: mock test")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(
+                oldport="MOCK0",
+                exc_info=exc,
+                process=f.process_wipe,
+                callback=callback,
+            )
+            mock_re.findall.assert_called_once_with(
+                r"Greeting fail", "Greeting fail: mock test"
+            )
+            mock_next.assert_has_calls([call(f.ports), call(f.ports)])
+            mock_process_wipe.assert_called_once_with(port="MOCK1", callback=callback)

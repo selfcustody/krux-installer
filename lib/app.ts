@@ -234,8 +234,8 @@ export default class App extends Base {
     
     this.log('Creating Browser Window')
     this.win = new BrowserWindow({
-      width: 840,
-      height: 640,
+      width: 880,
+      height: 880,
       title: this.title,
       icon: icon,
       show: false,

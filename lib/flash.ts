@@ -70,7 +70,17 @@ export default class FlashHandler extends Handler {
       // SEE https://github.com/odudex/krux_binaries#flash-instructions
       if (device.match(/maixpy_dock/g)) {
         flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000', kboot]
-      } else {
+      } else if (device.match(/maixpy_yahboom/g)){
+        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
+        if (os === 'linux') {
+          flash.args.push('-p'),
+          flash.args.push('/dev/ttyUSB0')
+        }
+        if (os === 'win32') {
+          flash.args.push('-p')
+          flash.args.push('COM0')
+        }
+      }else {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
       }
 

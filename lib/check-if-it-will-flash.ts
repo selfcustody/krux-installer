@@ -43,7 +43,7 @@ export default class CheckIfItWillFlashHandler extends Handler {
       const os = this.storage.get('os') as string
       const isMac10 = this.storage.get('isMac10') as boolean
 
-      if (device.match(/maixpy_(m5stickv|amigo_ips|amigo_tft|bit|dock)/g)) {
+      if (device.match(/maixpy_(m5stickv|amigo|amigo_ips|amigo_tft|bit|dock|yahboom|cube)/g)) {
         if (version.match(/selfcustody\/.*/g)) {
           const __version__ = version.split('tag/')[1]
           const destinationResourceZip = join(resources, __version__, `krux-${__version__}.zip`)

@@ -8,39 +8,43 @@ class TestFlasher(TestCase):
 
     @patch("sys.platform", "linux")
     @patch("os.path.exists", return_value=True)
-    @patch(
-        "src.utils.flasher.flasher.Flasher.get_port",
-        return_value=MockListPortsGrep().devices[0],
-    )
     @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
     @patch("src.utils.flasher.flasher.Flasher.process_flash")
     def test_flash_amigo_no_callback_linux(
-        self, mock_process_flash, mock_is_port_working, mock_get_port, mock_exists
+        self, mock_process_flash, mock_is_port_working, mock_exists
     ):
-        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-        f.flash(device="amigo")
-        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
-        mock_get_port.assert_called_once_with(device="amigo")
-        mock_is_port_working.assert_called_once_with("/mock/path0")
-        mock_process_flash.assert_called_once_with(port="/mock/path0", callback=None)
+        with patch(
+            "src.utils.flasher.flasher.Flasher.get_port",
+            return_value=MockListPortsGrep().devices[0],
+        ) as mock_get_port:
+            f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+            f.flash(device="amigo")
+            mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+            mock_get_port.assert_called_once_with(device="amigo")
+            mock_is_port_working.assert_called_once_with("/mock/path0")
+            mock_process_flash.assert_called_once_with(
+                port="/mock/path0", callback=None
+            )
 
     @patch("sys.platform", "darwin")
     @patch("os.path.exists", return_value=True)
-    @patch(
-        "src.utils.flasher.flasher.Flasher.get_port",
-        return_value=MockListPortsGrep().devices[0],
-    )
     @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
     @patch("src.utils.flasher.flasher.Flasher.process_flash")
     def test_flash_amigo_no_callback_darwin(
-        self, mock_process_flash, mock_is_port_working, mock_get_port, mock_exists
+        self, mock_process_flash, mock_is_port_working, mock_exists
     ):
-        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-        f.flash(device="amigo")
-        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
-        mock_get_port.assert_called_once_with(device="amigo")
-        mock_is_port_working.assert_called_once_with("/mock/path0")
-        mock_process_flash.assert_called_once_with(port="/mock/path0", callback=None)
+        with patch(
+            "src.utils.flasher.flasher.Flasher.get_port",
+            return_value=MockListPortsGrep().devices[0],
+        ) as mock_get_port:
+            f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+            f.flash(device="amigo")
+            mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+            mock_get_port.assert_called_once_with(device="amigo")
+            mock_is_port_working.assert_called_once_with("/mock/path0")
+            mock_process_flash.assert_called_once_with(
+                port="/mock/path0", callback=None
+            )
 
     @patch("sys.platform", "win32")
     @patch("os.path.exists", return_value=True)
@@ -49,7 +53,10 @@ class TestFlasher(TestCase):
     def test_flash_amigo_no_callback_win32(
         self, mock_process_flash, mock_is_port_working, mock_exists
     ):
-        with patch("src.utils.flasher.flasher.Flasher.get_port") as mock_get_port:
+        with patch(
+            "src.utils.flasher.flasher.Flasher.get_port",
+            return_value=MockListPortsGrep().devices[0],
+        ) as mock_get_port:
             mock_get_port.return_value = MockListPortsGrep().devices[0]
             f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
             f.flash(device="amigo")
@@ -58,26 +65,66 @@ class TestFlasher(TestCase):
             mock_is_port_working.assert_called_once_with("MOCK0")
             mock_process_flash.assert_called_once_with(port="MOCK0", callback=None)
 
-    @patch("sys.platform", "win32")
+    @patch("sys.platform", "linux")
     @patch("os.path.exists", return_value=True)
-    @patch(
-        "src.utils.flasher.flasher.Flasher.get_port",
-        return_value=MagicMock(device="/mock/path0"),
-    )
     @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
     @patch("src.utils.flasher.flasher.Flasher.process_flash")
-    def test_flash_amigo_callback(
-        self, mock_process_flash, mock_is_port_working, mock_get_port, mock_exists
+    def test_flash_amigo_callback_linux(
+        self, mock_process_flash, mock_is_port_working, mock_exists
     ):
-        callback = MagicMock()
-        f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
-        f.flash(device="amigo", callback=callback)
-        mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
-        mock_get_port.assert_called_once_with(device="amigo")
-        mock_is_port_working.assert_called_once_with("/mock/path0")
-        mock_process_flash.assert_called_once_with(
-            port="/mock/path0", callback=callback
-        )
+        with patch(
+            "src.utils.flasher.flasher.Flasher.get_port",
+            return_value=MockListPortsGrep().devices[0],
+        ) as mock_get_port:
+            callback = MagicMock()
+            f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+            f.flash(device="amigo", callback=callback)
+            mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+            mock_get_port.assert_called_once_with(device="amigo")
+            mock_is_port_working.assert_called_once_with("/mock/path0")
+            mock_process_flash.assert_called_once_with(
+                port="/mock/path0", callback=callback
+            )
+
+    @patch("sys.platform", "darwin")
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
+    @patch("src.utils.flasher.flasher.Flasher.process_flash")
+    def test_flash_amigo_callback_darwin(
+        self, mock_process_flash, mock_is_port_working, mock_exists
+    ):
+        with patch(
+            "src.utils.flasher.flasher.Flasher.get_port",
+            return_value=MockListPortsGrep().devices[0],
+        ) as mock_get_port:
+            callback = MagicMock()
+            f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+            f.flash(device="amigo", callback=callback)
+            mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+            mock_get_port.assert_called_once_with(device="amigo")
+            mock_is_port_working.assert_called_once_with("/mock/path0")
+            mock_process_flash.assert_called_once_with(
+                port="/mock/path0", callback=callback
+            )
+
+    @patch("sys.platform", "win32")
+    @patch("os.path.exists", return_value=True)
+    @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
+    @patch("src.utils.flasher.flasher.Flasher.process_flash")
+    def test_flash_amigo_callback_win32(
+        self, mock_process_flash, mock_is_port_working, mock_exists
+    ):
+        with patch(
+            "src.utils.flasher.flasher.Flasher.get_port",
+            return_value=MockListPortsGrep().devices[0],
+        ) as mock_get_port:
+            callback = MagicMock()
+            f = Flasher(firmware="mock/maixpy_test/kboot.kfpkg")
+            f.flash(device="amigo", callback=callback)
+            mock_exists.assert_called_once_with("mock/maixpy_test/kboot.kfpkg")
+            mock_get_port.assert_called_once_with(device="amigo")
+            mock_is_port_working.assert_called_once_with("MOCK0")
+            mock_process_flash.assert_called_once_with(port="MOCK0", callback=callback)
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.flasher.Flasher.get_port", new_callable=MockListPortsGrep)

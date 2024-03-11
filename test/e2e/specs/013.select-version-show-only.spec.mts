@@ -87,7 +87,7 @@ describe('KruxInstaller SelectVersion page (show only)', () => {
     await expect(instance.selectVersionOdudexButton).toBeDisplayed()
   })
 
-  it('should \'selfcustody/krux/releases/tag/v23.09.1\' button have \'selfcustody/krux/releases/tag/v23.09.1\' text', async () => {
+  it('should \'odudex\/krux_binaries\' button have \'odudex\/krux_binaries\' text', async () => {
     await instance.selectVersionOdudexText.waitForExist()
     await expect(instance.selectVersionOdudexText).toHaveText('odudex/krux_binaries')
   })

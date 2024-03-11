@@ -62,13 +62,13 @@ describe('KruxInstaller SelectVersion page (already downloaded  release signatur
     await instance.warningDownloadPage.waitForExist({ reverse: true })
   })
 
-  it ('should \'v23.09.1/krux-v23.09.1.zip.sig found\' message appears', async () => {
+  it ('should \'v24.03.0/krux-v24.03.0.zip.sig found\' message appears', async () => {
     await instance.checkingReleaseZipSigMsg.waitForExist()
     await expect(instance.foundReleaseZipSigMsg).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expect(instance.foundReleaseZipSigMsg).toHaveText('v23.09.1/krux-v23.09.1.zip.sig found')
+      await expect(instance.foundReleaseZipSigMsg).toHaveText('v24.03.0/krux-v24.03.0.zip.sig found')
     } else if (process.platform === 'win32') {
-      await expect(instance.foundReleaseZipSigMsg).toHaveText('v23.09.1\\krux-v23.09.1.zip.sig found')
+      await expect(instance.foundReleaseZipSigMsg).toHaveText('v24.03.0\\krux-v24.03.0.zip.sig found')
     }
   })
 
@@ -77,13 +77,13 @@ describe('KruxInstaller SelectVersion page (already downloaded  release signatur
     await expect(instance.warningDownloadPage).toBeDisplayed()
   }) 
 
-  it('should \'v23.09.1/krux-v23.09.1.zip.sig already downloaded\' message be displayed', async () => {
+  it('should \'v24.03.0/krux-v24.03.0.zip.sig already downloaded\' message be displayed', async () => {
     await instance.warningAlreadyDownloadedText.waitForExist()
     await expect(instance.warningAlreadyDownloadedText).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expect(instance.warningAlreadyDownloadedText).toHaveText('v23.09.1/krux-v23.09.1.zip.sig already downloaded')
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0/krux-v24.03.0.zip.sig already downloaded')
     } else if (process.platform === 'win32') {
-      await expect(instance.warningAlreadyDownloadedText).toHaveText('v23.09.1\\krux-v23.09.1.zip.sig already downloaded')
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0\\krux-v24.03.0.zip.sig already downloaded')
     }
   })
 

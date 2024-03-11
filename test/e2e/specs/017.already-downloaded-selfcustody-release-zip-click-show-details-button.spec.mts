@@ -72,16 +72,16 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click s
     await expect(instance.warningAlreadyDownloadedOverlayTitle).toHaveText('Resource details')
   })
 
-  it ('should overlay subtitle be \'v23.09.1/krux-v23.09.1.zip\'', async () => {
+  it ('should overlay subtitle be \'v24.03.0/krux-v24.03.0.zip\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTitle.waitForExist()
     await expect(instance.warningAlreadyDownloadedOverlaySubtitle).toBeDisplayed()
-    await expect(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v23.09.1/krux-v23.09.1.zip')
+    await expect(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v24.03.0/krux-v24.03.0.zip')
   })
 
-  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip\'', async () => {
+  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTextRemote.waitForExist()
     await expect(instance.warningAlreadyDownloadedOverlayTextRemote).toBeDisplayed()
-    await expect(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip')
+    await expect(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip')
   })
 
   it ('should a overlay text have properly local resource', async () => {
@@ -109,7 +109,7 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click s
       }
     }
 
-    const resource = join(resources, 'v23.09.1', 'krux-v23.09.1.zip')
+    const resource = join(resources, 'v24.03.0', 'krux-v24.03.0.zip')
     await expect(instance.warningAlreadyDownloadedOverlayTextLocal).toHaveText(`Local:\n${resource}`)
   })
 

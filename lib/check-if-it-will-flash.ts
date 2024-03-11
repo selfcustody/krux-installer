@@ -45,20 +45,23 @@ export default class CheckIfItWillFlashHandler extends Handler {
 
       if (device.match(/maixpy_(m5stickv|amigo|amigo_ips|amigo_tft|bit|dock|yahboom|cube)/g)) {
         if (version.match(/selfcustody\/.*/g)) {
-          const __version__ = version.split('tag/')[1]
-          const destinationResourceZip = join(resources, __version__, `krux-${__version__}.zip`)
-          const destinationResourceSha = join(resources, __version__, `krux-${__version__}.zip.sha256.txt`)
-          const destinationResourceSig = join(resources, __version__, `krux-${__version__}.zip.sig`)
-
-          if (
-            await existsAsync(destinationResourceZip) &&
-            await existsAsync(destinationResourceSha) &&
-            await existsAsync(destinationResourceSig)
-          ) {
-            this.send(`${this.name}:success`, { showFlash: true })
-          } else {
-            
+          if (device === 'maixpy_cube') {
             this.send(`${this.name}:success`, { showFlash: false })
+          } else {
+            const __version__ = version.split('tag/')[1]
+            const destinationResourceZip = join(resources, __version__, `krux-${__version__}.zip`)
+            const destinationResourceSha = join(resources, __version__, `krux-${__version__}.zip.sha256.txt`)
+            const destinationResourceSig = join(resources, __version__, `krux-${__version__}.zip.sig`)
+
+            if (
+              await existsAsync(destinationResourceZip) &&
+              await existsAsync(destinationResourceSha) &&
+              await existsAsync(destinationResourceSig)
+            ) {
+              this.send(`${this.name}:success`, { showFlash: true })
+            } else {
+              this.send(`${this.name}:success`, { showFlash: false })
+            }
           }
         } else if (version.match(/odudex\/krux_binaries/g)) {
           const destinationResourceFirmware = join(resources, version, 'main', device, 'firmware.bin')

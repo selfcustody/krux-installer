@@ -88,6 +88,22 @@ export default class FlashHandler extends Handler {
         } catch (error) {
           this.send(`${this.name}:error`, { done: false, name: error.name, message: error.message, stack: error.stack })
         }
+      } else if (device.match(/maixpy_cube/g)) {
+        try {
+          const ports = await SerialPort.list()
+          ports.forEach(function(port) {
+            if (port.productId == "0403") {
+              flash.args.push("-p")
+              if (os === 'linux') {
+                flash.args.push(port.path)
+              } else if (os === 'win32') {
+                flash.args.push(port.comName)
+              }
+            }
+          })
+        } catch (error) {
+          this.send(`${this.name}:error`, { done: false, name: error.name, message: error.message, stack: error.stack })
+        }
       } else {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
       }

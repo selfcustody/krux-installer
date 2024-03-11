@@ -5,6 +5,7 @@ import { join } from 'path'
 import { SudoerLinux, SudoerDarwin } from '@o/electron-sudo/src/sudoer'
 import ElectronStore from 'electron-store'
 import Handler from './handler'
+import { SerialPort } from 'serialport'
 
 export default class FlashHandler extends Handler {
 
@@ -72,13 +73,20 @@ export default class FlashHandler extends Handler {
         flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000', kboot]
       } else if (device.match(/maixpy_yahboom/g)){
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
-        if (os === 'linux') {
-          flash.args.push('-p'),
-          flash.args.push('/dev/ttyUSB0')
-        }
-        if (os === 'win32') {
-          flash.args.push('-p')
-          flash.args.push('COM0')
+        try {
+          ports = await SerialPort.list()
+          ports.forEach(function(port) {
+            if (product.vendorId == "7523") {
+              flash.args.push("-p")
+              if (os === 'linux') {
+                flash.args.push(port.path)
+              } else if (os === 'win32') {
+                flash.args.push(port.comName)
+              }
+            }
+          })
+        } catch (error) {
+          this.send(`${this.name}:error`, { done: false, name: error.name, message: error.message, stack: error.stack })
         }
       }else {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]

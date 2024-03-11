@@ -83,6 +83,7 @@
     "command-exists": "^1.2.9",
     "debug": "^4.3.4",
     "electron-store": "^8.1.0",
+    "serialport": "^12.0.0",
     "vite-plugin-vuetify": "^2.0.1",
     "vue-asciimorph": "^0.0.3",
     "vuetify": "^3.4.8",

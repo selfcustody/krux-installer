@@ -56,12 +56,12 @@ describe('KruxInstaller SelectVersion page (download release sha256.txt)', () =>
     await instance.warningDownloadPage.waitForExist({ reverse: true })
   })
 
-  it ('should \'checking v23.09.1/krux-v23.09.1.zip.sha256.txt\' message appears', async () => {
+  it ('should \'checking v24.03.0/krux-v24.03.0.zip.sha256.txt\' message appears', async () => {
     await instance.checkingReleaseZipSha256txtMsg.waitForExist()
     await expect(instance.checkingReleaseZipSha256txtMsg).toBeDisplayed()
   })
 
-  it ('should \'v23.09.1/krux-v23.09.1.zip.sha256.txt not found\' message appears', async () => {
+  it ('should \'v24.03.0/krux-v24.03.0.zip.sha256.txt not found\' message appears', async () => {
     await instance.notFoundReleaseZipSha256txtMsg.waitForExist()
     await expect(instance.notFoundReleaseZipSha256txtMsg).toBeDisplayed()
   })
@@ -77,10 +77,10 @@ describe('KruxInstaller SelectVersion page (download release sha256.txt)', () =>
     await expect(instance.downloadOfficialReleaseZipSha256txtPageTitle).toHaveText('Downloading')
   })
 
-  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sha256.txt\' subtitle', async () => {
+  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sha256.txt\' subtitle', async () => {
     await instance.downloadOfficialReleaseZipSha256txtPageSubtitle.waitForExist()
     await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toBeDisplayed()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sha256.txt')
+    await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sha256.txt')
   })
 
   it('should DownloadOfficialReleaseZipSha256 page progress until 100%', async () => {

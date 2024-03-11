@@ -77,10 +77,10 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await expect(instance.downloadOfficialReleaseZipSha256txtPageTitle).toHaveText('Downloading')
   })
 
-  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v24.03.1/krux-v24.03.1.zip.sha256.txt\' subtitle', async () => {
+  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sha256.txt\' subtitle', async () => {
     await instance.downloadOfficialReleaseZipSha256txtPageSubtitle.waitForExist()
     await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toBeDisplayed()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v24.03.1/krux-v24.03.1.zip.sha256.txt')
+    await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sha256.txt')
   })
 
   it('should DownloadOfficialReleaseZipSha256 page progress until 100%', async () => {

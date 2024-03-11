@@ -74,9 +74,9 @@ export default class FlashHandler extends Handler {
       } else if (device.match(/maixpy_yahboom/g)){
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
         try {
-          ports = await SerialPort.list()
+          const ports = await SerialPort.list()
           ports.forEach(function(port) {
-            if (product.vendorId == "7523") {
+            if (port.productId == "7523") {
               flash.args.push("-p")
               if (os === 'linux') {
                 flash.args.push(port.path)
@@ -88,7 +88,7 @@ export default class FlashHandler extends Handler {
         } catch (error) {
           this.send(`${this.name}:error`, { done: false, name: error.name, message: error.message, stack: error.stack })
         }
-      }else {
+      } else {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
       }
 

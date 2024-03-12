@@ -78,11 +78,7 @@ export default class FlashHandler extends Handler {
           ports.forEach(function(port) {
             if (port.productId == "7523") {
               flash.args.push("-p")
-              if (os === 'linux') {
-                flash.args.push(port.path)
-              } else if (os === 'win32') {
-                flash.args.push(port.comName)
-              }
+              flash.args.push(port.path)
             }
           })
         } catch (error) {
@@ -94,11 +90,7 @@ export default class FlashHandler extends Handler {
           ports.forEach(function(port) {
             if (port.productId == "0403") {
               flash.args.push("-p")
-              if (os === 'linux') {
-                flash.args.push(port.path)
-              } else if (os === 'win32') {
-                flash.args.push(port.comName)
-              }
+              flash.args.push(port.path)
             }
           })
         } catch (error) {

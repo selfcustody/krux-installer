@@ -23,14 +23,12 @@ class App {
 
   private __select_device_page__: string;
   private __select_device_page_maixpy_m5stickv_button__: string;
-  private __select_device_page_maixpy_amigo_ips_button__: string;
-  private __select_device_page_maixpy_amigo_tft_button__: string;
+  private __select_device_page_maixpy_amigo_button__: string;
   private __select_device_page_maixpy_bit_button__: string;
   private __select_device_page_maixpy_dock_button__: string;
   private __select_device_page_maixpy_back_button__: string;
   private __select_device_page_maixpy_m5stickv_text__: string;
-  private __select_device_page_maixpy_amigo_ips_text__: string;
-  private __select_device_page_maixpy_amigo_tft_text__: string;
+  private __select_device_page_maixpy_amigo_text__: string;
   private __select_device_page_maixpy_bit_text__: string;
   private __select_device_page_maixpy_dock_text__: string;
   private __select_device_page_maixpy_back_text__: string;
@@ -135,14 +133,12 @@ class App {
 
     this.__select_device_page__ = 'div#select-device-page';
     this.__select_device_page_maixpy_m5stickv_button__ = 'div#select-device-page-maixpy_m5stickv-button'
-    this.__select_device_page_maixpy_amigo_ips_button__ = 'div#select-device-page-maixpy_amigo_ips-button'
-    this.__select_device_page_maixpy_amigo_tft_button__ = 'div#select-device-page-maixpy_amigo_tft-button' 
+    this.__select_device_page_maixpy_amigo_button__ = 'div#select-device-page-maixpy_amigo-button'
     this.__select_device_page_maixpy_bit_button__ = 'div#select-device-page-maixpy_bit-button' 
     this.__select_device_page_maixpy_dock_button__ = 'div#select-device-page-maixpy_dock-button' 
     this.__select_device_page_maixpy_back_button__ = 'div#select-device-page-back-button'
     this.__select_device_page_maixpy_m5stickv_text__ = 'div#select-device-page-maixpy_m5stickv-text' 
-    this.__select_device_page_maixpy_amigo_ips_text__ = 'div#select-device-page-maixpy_amigo_ips-text'  
-    this.__select_device_page_maixpy_amigo_tft_text__ = 'div#select-device-page-maixpy_amigo_tft-text'  
+    this.__select_device_page_maixpy_amigo_text__ = 'div#select-device-page-maixpy_amigo-text'  
     this.__select_device_page_maixpy_bit_text__ = 'div#select-device-page-maixpy_bit-text'  
     this.__select_device_page_maixpy_dock_text__ = 'div#select-device-page-maixpy_dock-text'  
     this.__select_device_page_maixpy_back_text__ = 'div#select-device-page-back-text' 
@@ -300,12 +296,8 @@ class App {
     return $(this.__select_device_page_maixpy_m5stickv_button__)
   }
 
-  get selectMaixpyAmigoIpsButton () {
-    return $(this.__select_device_page_maixpy_amigo_ips_button__)
-  }
-
-  get selectMaixpyAmigoTftButton () {
-    return $(this.__select_device_page_maixpy_amigo_tft_button__)
+  get selectMaixpyAmigoButton () {
+    return $(this.__select_device_page_maixpy_amigo_button__)
   }
 
   get selectMaixpyBitButton () {
@@ -324,12 +316,8 @@ class App {
     return $(this.__select_device_page_maixpy_m5stickv_text__)
   }
 
-  get selectMaixpyAmigoIpsText () {
-    return $(this.__select_device_page_maixpy_amigo_ips_text__)
-  }
-
-  get selectMaixpyAmigoTftText () {
-    return $(this.__select_device_page_maixpy_amigo_tft_text__)
+  get selectMaixpyAmigoText () {
+    return $(this.__select_device_page_maixpy_amigo_text__)
   }
 
   get selectMaixpyBitText () {

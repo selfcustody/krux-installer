@@ -47,8 +47,6 @@ import { Ref, ref } from 'vue'
 const devices: Ref<string[]> = ref([
   'maixpy_m5stickv',
   'maixpy_amigo',
-  'maixpy_amigo_ips',
-  'maixpy_amigo_tft',
   'maixpy_bit',
   'maixpy_dock',
   'maixpy_yahboom',

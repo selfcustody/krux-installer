@@ -48,24 +48,14 @@ describe('KruxInstaller SelectDevice page (show only)', () => {
     await expect(instance.selectMaixpyM5StickVText).toHaveText('maixpy_m5stickv')
   })
 
-  it('should \'maixpy_amigo_ips\' button be displayed', async () => {
-    await instance.selectMaixpyAmigoIpsButton.waitForExist()
-    await expect(instance.selectMaixpyAmigoIpsButton).toBeDisplayed()
+  it('should \'maixpy_amigo\' button be displayed', async () => {
+    await instance.selectMaixpyAmigoButton.waitForExist()
+    await expect(instance.selectMaixpyAmigoButton).toBeDisplayed()
   })
 
-  it('should \'maixpy_amigo_ips\' button have \'maixpy_amigo_ips\' text', async () => { 
-    await instance.selectMaixpyAmigoIpsText.waitForExist()
-    await expect(instance.selectMaixpyAmigoIpsText).toHaveText('maixpy_amigo_ips')
-  })
-
-  it('should \'maixpy_amigo_tft\' button be displayed', async () => {
-    await instance.selectMaixpyAmigoTftButton.waitForExist()
-    await expect(instance.selectMaixpyAmigoTftButton).toBeDisplayed()
-  })
-
-  it('should \'maixpy_amigo_tft\' button have \'maixpy_amigo_tft\' text', async () => { 
-    await instance.selectMaixpyAmigoTftText.waitForExist()
-    await expect(instance.selectMaixpyAmigoTftText).toHaveText('maixpy_amigo_tft')
+  it('should \'maixpy_amigo\' button have \'maixpy_amigo\' text', async () => { 
+    await instance.selectMaixpyAmigoText.waitForExist()
+    await expect(instance.selectMaixpyAmigoText).toHaveText('maixpy_amigo')
   })
 
   it('should \'maixpy_bit\' button be displayed', async () => {

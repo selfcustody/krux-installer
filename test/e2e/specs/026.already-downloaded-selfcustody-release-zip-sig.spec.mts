@@ -4,7 +4,7 @@ import { createRequire } from 'module'
 
 const App = createRequire(import.meta.url)('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded  release signature - click download again button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded  release signature - show only)', () => {
 
   let instance: any;
 
@@ -60,47 +60,63 @@ describe('KruxInstaller SelectVersion page (already downloaded  release signatur
     await instance.warningDownloadProceedButtonText.waitForExist()
     await instance.warningDownloadProceedButton.click()
     await instance.warningDownloadPage.waitForExist({ reverse: true })
+  })
+
+  it ('should \'v24.03.0/krux-v24.03.0.zip.sig found\' message appears', async () => {
     await instance.checkingReleaseZipSigMsg.waitForExist()
-    await instance.foundReleaseZipSigMsg.waitForExist()
+    await expect(instance.foundReleaseZipSigMsg).toBeDisplayed()
+    if (process.platform === 'linux' || process.platform === 'darwin') {
+      await expect(instance.foundReleaseZipSigMsg).toHaveText('v24.03.0/krux-v24.03.0.zip.sig found')
+    } else if (process.platform === 'win32') {
+      await expect(instance.foundReleaseZipSigMsg).toHaveText('v24.03.0\\krux-v24.03.0.zip.sig found')
+    }
+  })
+
+  it('should WarningDownload page should be displayed', async () => {
     await instance.warningDownloadPage.waitForExist()
+    await expect(instance.warningDownloadPage).toBeDisplayed()
+  }) 
+
+  it('should \'v24.03.0/krux-v24.03.0.zip.sig already downloaded\' message be displayed', async () => {
+    await instance.warningAlreadyDownloadedText.waitForExist()
+    await expect(instance.warningAlreadyDownloadedText).toBeDisplayed()
+    if (process.platform === 'linux' || process.platform === 'darwin') {
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0/krux-v24.03.0.zip.sig already downloaded')
+    } else if (process.platform === 'win32') {
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0\\krux-v24.03.0.zip.sig already downloaded')
+    }
+  })
+
+  it('should \'Proceed with current file\' button be displayed', async () => {
+    await instance.warningDownloadProceedButton.waitForExist()
+    await instance.warningDownloadProceedButtonText.waitForExist()
+    await expect(instance.warningDownloadProceedButton).toBeDisplayed()
+    await expect(instance.warningDownloadProceedButtonText).toBeDisplayed()
+    await expect(instance.warningDownloadProceedButtonText).toHaveText('Proceed with current file')
+  })
+
+  it('should \'Download it again\' button be displayed', async () => {
     await instance.warningDownloadAgainButton.waitForExist()
     await instance.warningDownloadAgainButtonText.waitForExist()
+    await expect(instance.warningDownloadAgainButton).toBeDisplayed()
+    await expect(instance.warningDownloadAgainButtonText).toBeDisplayed()
+    await expect(instance.warningDownloadAgainButtonText).toHaveText('Download it again')
   })
 
-  it ('should click \'Download again\' go out of WarningDownload page', async () => {
-    await instance.warningDownloadAgainButton.click()
-    await instance.warningDownloadPage.waitForExist({ reverse: true })
-    await expect(instance.warningDownloadPage).not.toBeDisplayed()
+  it('should \'Show details\' button be displayed', async () => {
+    await instance.warningDownloadShowDetailsButton.waitForExist()
+    await instance.warningDownloadShowDetailsButtonText.waitForExist()
+    await expect(instance.warningDownloadShowDetailsButton).toBeDisplayed()
+    await expect(instance.warningDownloadShowDetailsButtonText).toBeDisplayed()
+    await expect(instance.warningDownloadShowDetailsButtonText).toHaveText('Show details')
   })
 
-  it ('should be in DownloadOfficialReleaseSig page', async () => {
-    await instance.downloadOfficialReleaseZipSigPage.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSigPage).toBeDisplayed()
-  })
-
-  it('should DownloadOfficialReleaseSig page have \'Downloading\' title', async () => {
-    await instance.downloadOfficialReleaseZipSigTitle.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSigTitle).toBeDisplayed()
-    await expect(instance.downloadOfficialReleaseZipSigTitle).toHaveText('Downloading')
-  })
-
-  it('should DownloadOfficialReleaseSig page have \'https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sig\' subtitle', async () => {
-    await instance.downloadOfficialReleaseZipSigSubtitle.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSigSubtitle).toBeDisplayed()
-    await expect(instance.downloadOfficialReleaseZipSigSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sig')
-  })
-
-  it('should DownloadOfficialReleaseSig page progress until 100%', async () => {
-    await instance.downloadOfficialReleaseZipSigProgress.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSigProgress).toBeDisplayed()
-    await instance.downloadOfficialReleaseZipSigProgress.waitUntil(async function () {
-      const percentText = await this.getText()
-      const percent = parseFloat(percentText.split('%')[0])
-      return percent === 100.00
-    }, {
-      timeout: 600000,
-      interval: 50
-    })
+  it('should \'Back\' button be displayed', async () => {
+    await instance.warningDownloadBackButton.waitForExist()
+    await instance.warningDownloadBackButtonText.waitForExist()
+    await expect(instance.warningDownloadBackButton).toBeDisplayed()
+    await expect(instance.warningDownloadBackButtonText).toBeDisplayed()
+    await expect(instance.warningDownloadBackButtonText).toHaveText('Back')
   })
   
 })

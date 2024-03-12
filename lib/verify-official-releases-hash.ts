@@ -60,7 +60,8 @@ export default class VerifyOfficialReleasesHashHandler extends Handler {
         try {
           const exists = await existsAsync(p)
           const sha256buffer = await readFileAsync(shaFilePath, null)
-          const sha256txt = sha256buffer.toString()
+          const sha256txt = sha256buffer.toString().split(" ")[0]
+          
           if (exists && sha256txt !== '') {
             result.push({
               name: shaFileRelPath,
@@ -75,7 +76,7 @@ export default class VerifyOfficialReleasesHashHandler extends Handler {
               name: zipFileRelPath,
               value: hashSum.digest('hex')
             })
-
+                        
             const isMatch = result[0].value === result[1].value
 
             if (isMatch) {

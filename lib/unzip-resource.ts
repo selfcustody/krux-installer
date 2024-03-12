@@ -70,6 +70,17 @@ export default class UnzipResourceHandler extends Handler {
           const isMac10  = this.storage.get('isMac10') as boolean;
           version = version.split('tag/')[1];
           const zipFilePath = join(resources, version, `krux-${version}.zip`)
+
+          if (version.match(/24\.\d+\.\d+/)) {
+            if (device.match(/maixpy_amigo_(tft|ips)/g)) {
+              const error = new Error(`Device '${device}' not used anymore in version ${version}. Use 'maixpy_amigo' instead`)
+              this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack})
+            }
+            if (device.match(/maixpy_cube/g)) {
+              const error = new Error(`Device '${device}' not implemented for version '${version}'`)
+              this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack})
+            }
+          }
           
           this.send(`${this.name}:data`, `Extracting ${zipFilePath}<br/><br/>`)
 

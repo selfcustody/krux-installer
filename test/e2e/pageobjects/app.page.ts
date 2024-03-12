@@ -23,14 +23,12 @@ class App {
 
   private __select_device_page__: string;
   private __select_device_page_maixpy_m5stickv_button__: string;
-  private __select_device_page_maixpy_amigo_ips_button__: string;
-  private __select_device_page_maixpy_amigo_tft_button__: string;
+  private __select_device_page_maixpy_amigo_button__: string;
   private __select_device_page_maixpy_bit_button__: string;
   private __select_device_page_maixpy_dock_button__: string;
   private __select_device_page_maixpy_back_button__: string;
   private __select_device_page_maixpy_m5stickv_text__: string;
-  private __select_device_page_maixpy_amigo_ips_text__: string;
-  private __select_device_page_maixpy_amigo_tft_text__: string;
+  private __select_device_page_maixpy_amigo_text__: string;
   private __select_device_page_maixpy_bit_text__: string;
   private __select_device_page_maixpy_dock_text__: string;
   private __select_device_page_maixpy_back_text__: string;
@@ -135,23 +133,21 @@ class App {
 
     this.__select_device_page__ = 'div#select-device-page';
     this.__select_device_page_maixpy_m5stickv_button__ = 'div#select-device-page-maixpy_m5stickv-button'
-    this.__select_device_page_maixpy_amigo_ips_button__ = 'div#select-device-page-maixpy_amigo_ips-button'
-    this.__select_device_page_maixpy_amigo_tft_button__ = 'div#select-device-page-maixpy_amigo_tft-button' 
+    this.__select_device_page_maixpy_amigo_button__ = 'div#select-device-page-maixpy_amigo-button'
     this.__select_device_page_maixpy_bit_button__ = 'div#select-device-page-maixpy_bit-button' 
     this.__select_device_page_maixpy_dock_button__ = 'div#select-device-page-maixpy_dock-button' 
     this.__select_device_page_maixpy_back_button__ = 'div#select-device-page-back-button'
     this.__select_device_page_maixpy_m5stickv_text__ = 'div#select-device-page-maixpy_m5stickv-text' 
-    this.__select_device_page_maixpy_amigo_ips_text__ = 'div#select-device-page-maixpy_amigo_ips-text'  
-    this.__select_device_page_maixpy_amigo_tft_text__ = 'div#select-device-page-maixpy_amigo_tft-text'  
+    this.__select_device_page_maixpy_amigo_text__ = 'div#select-device-page-maixpy_amigo-text'  
     this.__select_device_page_maixpy_bit_text__ = 'div#select-device-page-maixpy_bit-text'  
     this.__select_device_page_maixpy_dock_text__ = 'div#select-device-page-maixpy_dock-text'  
     this.__select_device_page_maixpy_back_text__ = 'div#select-device-page-back-text' 
 
     this.__select_version_page__ = 'div#select-version-page';
-    this.__select_version_page_selfcustody_button__ = 'div#select-version-page-selfcustody-krux-releases-tag-v23-09-1-button'
+    this.__select_version_page_selfcustody_button__ = 'div#select-version-page-selfcustody-krux-releases-tag-v24-03-0-button'
     this.__select_version_page_back_button__ = 'div#select-version-page-back-button'
     this.__select_version_page_odudex_button__ = 'div#select-version-page-odudex-krux-binaries-button'
-    this.__select_version_page_selfcustody_text__ = 'div#select-version-page-selfcustody-krux-releases-tag-v23-09-1-text'
+    this.__select_version_page_selfcustody_text__ = 'div#select-version-page-selfcustody-krux-releases-tag-v24-03-0-text'
     this.__select_version_page_odudex_text__ = 'div#select-version-page-odudex-krux-binaries-text'
     this.__select_version_page_back_text__ = 'div#select-version-page-back-text'
 
@@ -162,22 +158,22 @@ class App {
     this.__download_official_release_zip_subtitle__ = 'div#download-official-release-zip-page-subtitle'
     this.__download_official_release_zip_progress__ = 'div#download-official-release-zip-page-progress'
 
-    this.__checking_release_zip_msg__ = 'pre#checking-v23-09-1-krux-v23-09-1-zip'
-    this.__not_found_release_zip_msg__ = 'pre#v23-09-1-krux-v23-09-1-zip-not-found'
-    this.__found_release_zip_msg__ = 'pre#v23-09-1-krux-v23-09-1-zip-found'
+    this.__checking_release_zip_msg__ = 'pre#checking-v24-03-0-krux-v24-03-0-zip'
+    this.__not_found_release_zip_msg__ = 'pre#v24-03-0-krux-v24-03-0-zip-not-found'
+    this.__found_release_zip_msg__ = 'pre#v24-03-0-krux-v24-03-0-zip-found'
 
-    this.__checking_release_zip_sha256_txt_msg__ = 'pre#checking-v23-09-1-krux-v23-09-1-zip-sha256-txt'
-    this.__not_found_release_zip_sha256_txt_msg__ = 'pre#v23-09-1-krux-v23-09-1-zip-sha256-txt-not-found'
-    this.__found_release_zip_sha256_txt_msg__ = 'pre#v23-09-1-krux-v23-09-1-zip-sha256-txt-found'
+    this.__checking_release_zip_sha256_txt_msg__ = 'pre#checking-v24-03-0-krux-v24-03-0-zip-sha256-txt'
+    this.__not_found_release_zip_sha256_txt_msg__ = 'pre#v24-03-0-krux-v24-03-0-zip-sha256-txt-not-found'
+    this.__found_release_zip_sha256_txt_msg__ = 'pre#v24-03-0-krux-v24-03-0-zip-sha256-txt-found'
 
     this.__download_official_release_zip_sha256_txt_page__ = 'div#download-official-release-zip-sha256-txt-page'
     this.__download_official_release_zip_sha256_txt_page_title__ = 'div#download-official-release-zip-sha256-txt-page-title'
     this.__download_official_release_zip_sha256_txt_page_subtitle__ = 'div#download-official-release-zip-sha256-txt-page-subtitle'
     this.__download_official_release_zip_sha256_txt_page_progress__ = 'div#download-official-release-zip-sha256-txt-page-progress'
 
-    this.__checking_release_zip_sig_msg__ = 'pre#checking-v23-09-1-krux-v23-09-1-zip-sig'
-    this.__not_found_release_zip_sig_msg__ = 'pre#v23-09-1-krux-v23-09-1-zip-sig-not-found'
-    this.__found_release_zip_sig_msg__ = 'pre#v23-09-1-krux-v23-09-1-zip-sig-found'
+    this.__checking_release_zip_sig_msg__ = 'pre#checking-v24-03-0-krux-v24-03-0-zip-sig'
+    this.__not_found_release_zip_sig_msg__ = 'pre#v24-03-0-krux-v24-03-0-zip-sig-not-found'
+    this.__found_release_zip_sig_msg__ = 'pre#v24-03-0-krux-v24-03-0-zip-sig-found'
 
     this.__download_official_release_zip_sig_page__ = 'div#download-official-release-zip-sig-page'
     this.__download_official_release_zip_sig_title__ = 'div#download-official-release-zip-sig-page-title'
@@ -216,8 +212,8 @@ class App {
     
     this.__verified_official_release_page__ = 'div#verified-official-release-page'
     this.__verified_official_release_page_sha256_integrity_title__ = 'div#verified-official-release-page-sha256-integrity-title'
-    this.__verified_official_release_page_sha256_integrity_txt__ = 'div#verified-official-release-page-sha256-integrity-v23-09-1-krux-v23-09-1-zip-sha256-txt' 
-    this.__verified_official_release_page_sha256_integrity__ = 'div#verified-official-release-page-sha256-integrity-v23-09-1-krux-v23-09-1-zip'
+    this.__verified_official_release_page_sha256_integrity_txt__ = 'div#verified-official-release-page-sha256-integrity-v24-03-0-krux-v24-03-0-zip-sha256-txt' 
+    this.__verified_official_release_page_sha256_integrity__ = 'div#verified-official-release-page-sha256-integrity-v24-03-0-krux-v24-03-0-zip'
     this.__verified_official_release_page_signature_title__ = 'div#verified-official-release-page-signature-title'
     this.__verified_official_release_page_signature_command__ = 'span#verified-official-release-page-signature-command'
     this.__verified_official_release_page_signature_result__ = 'span#verified-official-release-page-signature-result'
@@ -300,12 +296,8 @@ class App {
     return $(this.__select_device_page_maixpy_m5stickv_button__)
   }
 
-  get selectMaixpyAmigoIpsButton () {
-    return $(this.__select_device_page_maixpy_amigo_ips_button__)
-  }
-
-  get selectMaixpyAmigoTftButton () {
-    return $(this.__select_device_page_maixpy_amigo_tft_button__)
+  get selectMaixpyAmigoButton () {
+    return $(this.__select_device_page_maixpy_amigo_button__)
   }
 
   get selectMaixpyBitButton () {
@@ -324,12 +316,8 @@ class App {
     return $(this.__select_device_page_maixpy_m5stickv_text__)
   }
 
-  get selectMaixpyAmigoIpsText () {
-    return $(this.__select_device_page_maixpy_amigo_ips_text__)
-  }
-
-  get selectMaixpyAmigoTftText () {
-    return $(this.__select_device_page_maixpy_amigo_tft_text__)
+  get selectMaixpyAmigoText () {
+    return $(this.__select_device_page_maixpy_amigo_text__)
   }
 
   get selectMaixpyBitText () {

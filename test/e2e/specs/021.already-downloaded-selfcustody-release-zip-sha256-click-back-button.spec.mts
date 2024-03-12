@@ -70,10 +70,10 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await expect(instance.mainPage).toBeDisplayed()
   }) 
 
-  it('should \'Select version\' button changed to \'Version: selfcustody/krux/releases/tag/v23.09.1\'', async () => {
+  it('should \'Select version\' button changed to \'Version: selfcustody/krux/releases/tag/v24.03.0\'', async () => {
     await instance.mainSelectVersionText.waitForExist()
     await expect(instance.mainSelectVersionText).toBeDisplayed()
-    await expect(instance.mainSelectVersionText).toHaveText('Version: selfcustody/krux/releases/tag/v23.09.1')
+    await expect(instance.mainSelectVersionText).toHaveText('Version: selfcustody/krux/releases/tag/v24.03.0')
   })
 
 })

@@ -54,13 +54,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await instance.warningDownloadPage.waitForExist({ reverse: true })
   })
 
-  it ('should \'v23.09.1/krux-v23.09.1.zip.sha256.txt found\' message appears', async () => {
+  it ('should \'v24.03.0/krux-v24.03.0.zip.sha256.txt found\' message appears', async () => {
     await instance.checkingReleaseZipSha256txtMsg.waitForExist()
     await expect(instance.checkingReleaseZipSha256txtMsg).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expect(instance.foundReleaseZipSha256txtMsg).toHaveText('v23.09.1/krux-v23.09.1.zip.sha256.txt found')
+      await expect(instance.foundReleaseZipSha256txtMsg).toHaveText('v24.03.0/krux-v24.03.0.zip.sha256.txt found')
     } else if (process.platform === 'win32') {
-      await expect(instance.foundReleaseZipSha256txtMsg).toHaveText('v23.09.1\\krux-v23.09.1.zip.sha256.txt found')
+      await expect(instance.foundReleaseZipSha256txtMsg).toHaveText('v24.03.0\\krux-v24.03.0.zip.sha256.txt found')
     }
   })
 
@@ -69,13 +69,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await expect(instance.warningDownloadPage).toBeDisplayed()
   }) 
 
-  it('should \'v23.09.1/krux-v23.09.1.zip.sha256.txt already downloaded\' message be displayed', async () => {
+  it('should \'v24.03.0/krux-v24.03.0.zip.sha256.txt already downloaded\' message be displayed', async () => {
     await instance.warningAlreadyDownloadedText.waitForExist()
     await expect(instance.warningAlreadyDownloadedText).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expect(instance.warningAlreadyDownloadedText).toHaveText('v23.09.1/krux-v23.09.1.zip.sha256.txt already downloaded')
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0/krux-v24.03.0.zip.sha256.txt already downloaded')
     } else if (process.platform === 'win32') {
-      await expect(instance.warningAlreadyDownloadedText).toHaveText('v23.09.1\\krux-v23.09.1.zip.sha256.txt already downloaded')
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0\\krux-v24.03.0.zip.sha256.txt already downloaded')
     }
   })
 

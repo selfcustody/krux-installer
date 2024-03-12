@@ -4,8 +4,7 @@ import { createRequire } from 'module'
 
 const App = createRequire(import.meta.url)('../pageobjects/app.page')
 
-
-describe('KruxInstaller SelectDevice page selects \'maixpy_amigo_tft\' device', () => {
+describe('KruxInstaller SelectDevice page selects \'maixpy_amigo\' device', () => {
 
   let instance: any;
 
@@ -33,8 +32,8 @@ describe('KruxInstaller SelectDevice page selects \'maixpy_amigo_tft\' device', 
     await instance.mainSelectDeviceButton.click()
     await instance.mainPage.waitForExist({ reverse: true })
     await instance.selectDevicePage.waitForExist() 
-    await instance.selectMaixpyAmigoTftButton.waitForExist() 
-    await instance.selectMaixpyAmigoTftButton.click()
+    await instance.selectMaixpyAmigoButton.waitForExist() 
+    await instance.selectMaixpyAmigoButton.click()
   })
 
   it('should change to Main page', async () => {
@@ -44,8 +43,8 @@ describe('KruxInstaller SelectDevice page selects \'maixpy_amigo_tft\' device', 
     await expect(instance.mainPage).toBeDisplayed()
   })
 
-  it('should \'Select device\' button changed its text to \'Device: maixpy_amigo_tft\'', async () => {
-    await expect(instance.mainSelectDeviceText).toHaveText('Device: maixpy_amigo_tft')
+  it('should \'Select device\' button changed its text to \'Device: maixpy_amigo\'', async () => {
+    await expect(instance.mainSelectDeviceText).toHaveText('Device: maixpy_amigo')
   })
 
 })

@@ -5,6 +5,7 @@ import { join } from 'path'
 import { SudoerLinux, SudoerDarwin } from '@o/electron-sudo/src/sudoer'
 import ElectronStore from 'electron-store'
 import Handler from './handler'
+import { SerialPort } from 'serialport'
 
 export default class FlashHandler extends Handler {
 
@@ -70,6 +71,32 @@ export default class FlashHandler extends Handler {
       // SEE https://github.com/odudex/krux_binaries#flash-instructions
       if (device.match(/maixpy_dock/g)) {
         flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000', kboot]
+      } else if (device.match(/maixpy_yahboom/g)){
+        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
+        try {
+          const ports = await SerialPort.list()
+          ports.forEach(function(port) {
+            if (port.productId == "7523") {
+              flash.args.push("-p")
+              flash.args.push(port.path)
+            }
+          })
+        } catch (error) {
+          this.send(`${this.name}:error`, { done: false, name: error.name, message: error.message, stack: error.stack })
+        }
+      } else if (device.match(/maixpy_cube/g)) {
+        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
+        try {
+          const ports = await SerialPort.list()
+          ports.forEach(function(port) {
+            if (port.productId == "0403") {
+              flash.args.push("-p")
+              flash.args.push(port.path)
+            }
+          })
+        } catch (error) {
+          this.send(`${this.name}:error`, { done: false, name: error.name, message: error.message, stack: error.stack })
+        }
       } else {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
       }

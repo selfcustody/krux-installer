@@ -1,13 +1,13 @@
 import { expect } from '@wdio/globals'
-import { describe, it } from 'mocha'
 import { join } from 'path'
 import { homedir } from 'os'
 import { osLangSync } from 'os-lang'
+import { describe, it } from 'mocha'
 import { createRequire } from 'module'
 
 const App = createRequire(import.meta.url)('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release signature - click show details button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded release sha256.txt - click show details button)', () => {
 
   let instance: any;
 
@@ -59,13 +59,6 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
     await instance.checkingReleaseZipSha256txtMsg.waitForExist()
     await instance.foundReleaseZipSha256txtMsg.waitForExist()
     await instance.warningDownloadPage.waitForExist()
-    await instance.warningDownloadProceedButton.waitForExist()
-    await instance.warningDownloadProceedButtonText.waitForExist()
-    await instance.warningDownloadProceedButton.click()
-    await instance.warningDownloadPage.waitForExist({ reverse: true })
-    await instance.checkingReleaseZipSigMsg.waitForExist()
-    await instance.foundReleaseZipSigMsg.waitForExist()
-    await instance.warningDownloadPage.waitForExist()
     await instance.warningDownloadShowDetailsButton.waitForExist()
   })
 
@@ -85,16 +78,16 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
     await expect(instance.warningAlreadyDownloadedOverlayTitle).toHaveText('Resource details')
   })
 
-  it ('should overlay subtitle be \'v23.09.1/krux-v23.09.1.zip.sig\'', async () => {
+  it ('should overlay subtitle be \'v24.03.0/krux-v24.03.0.zip.sha256.txt\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTitle.waitForExist()
     await expect(instance.warningAlreadyDownloadedOverlaySubtitle).toBeDisplayed()
-    await expect(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v23.09.1/krux-v23.09.1.zip.sig')
+    await expect(instance.warningAlreadyDownloadedOverlaySubtitle).toHaveText('v24.03.0/krux-v24.03.0.zip.sha256.txt')
   })
 
-  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sig\'', async () => {
+  it ('should a overlay text have \'Remote: https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sha256.txt\'', async () => {
     await instance.warningAlreadyDownloadedOverlayTextRemote.waitForExist()
     await expect(instance.warningAlreadyDownloadedOverlayTextRemote).toBeDisplayed()
-    await expect(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sig')
+    await expect(instance.warningAlreadyDownloadedOverlayTextRemote).toHaveText('Remote:\nhttps://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sha256.txt')
   })
 
   it ('should a overlay text have properly local resource', async () => {
@@ -113,7 +106,7 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
     } else {
       const lang = osLangSync()
       const home = homedir()
-      if (lang.match(/en-*/g)) {
+      if ( lang.match(/en-*/g)) {
         resources = join(home, 'Documents', 'krux-installer')
       } else if ( lang.match(/pt-*/g)) {
         resources = join(home, 'Documentos', 'krux-installer')
@@ -122,14 +115,14 @@ describe('KruxInstaller SelectVersion page (already downloaded release signature
       }
     }
 
-    const resource = join(resources, 'v23.09.1', 'krux-v23.09.1.zip.sig')
+    const resource = join(resources, 'v24.03.0', 'krux-v24.03.0.zip.sha256.txt')
     await expect(instance.warningAlreadyDownloadedOverlayTextLocal).toHaveText(`Local:\n${resource}`)
   })
 
   it('should a overlay text have the properly description', async () => {
     await instance.warningAlreadyDownloadedOverlayTextWhatdo.waitForExist()
     await expect(instance.warningAlreadyDownloadedOverlayTextWhatdo).toBeDisplayed()
-    await expect(instance.warningAlreadyDownloadedOverlayTextWhatdo).toHaveText('Description:\nThis file, with the public key certificate, proves the authenticity of zip file, checking if the zip file was signed by its creator.')
+    await expect(instance.warningAlreadyDownloadedOverlayTextWhatdo).toHaveText('Description:\nThis file proves the integrity of previous file. It uses the sha256 algorithm to check if zip file has not be changed during download.')
   })
 
   it('should \'close\' have \'Close\' text',async () => {

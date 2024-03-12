@@ -7,8 +7,7 @@ import { createRequire } from 'module'
 
 const App = createRequire(import.meta.url)('../pageobjects/app.page')
 
-const SHA256 = "4d 58 39 27 a7 22 06 e0 2a 8e 58 13 48 94 37 7c 94 e2 cc 9b 65 1f 16 11 bd de 1f bf 29 4c 78 26"
-
+const SHA256 = "e9 b1 56 d4 d0 1e 80 17 ed 4f 2f ad ac 01 cb 07 fe b2 7e 8a 01 e3 c9 7e 01 9c f2 f9 03 86 e6 b2"
 describe('KruxInstaller VerifiedOfficialRelease page (show and click back button)', () => {
 
   let instance: any;
@@ -100,13 +99,13 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
     await instance.verifiedOfficialReleasePageSha2256IntegritySha256txt.waitForExist()
     await expect(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toBeDisplayed()
     
-    await expect(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toHaveText(`Expected result from file v23.09.1/krux-v23.09.1.zip.sha256.txt\n${SHA256}`)
+    await expect(instance.verifiedOfficialReleasePageSha2256IntegritySha256txt).toHaveText(`Expected result from file v24.03.0/krux-v24.03.0.zip.sha256.txt\n${SHA256}`)
   })
 
   it('should show sha256sum intergrity sha256 summed result', async () => {
     await instance.verifiedOfficialReleasePageSha2256IntegritySha256.waitForExist()
     await expect(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toBeDisplayed()
-    await expect(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText(`Summed result of file v23.09.1/krux-v23.09.1.zip\n${SHA256}`)
+    await expect(instance.verifiedOfficialReleasePageSha2256IntegritySha256).toHaveText(`Summed result of file v24.03.0/krux-v24.03.0.zip\n${SHA256}`)
   })
   
   it('should show openssl authenticity title', async () => {
@@ -149,9 +148,9 @@ describe('KruxInstaller VerifiedOfficialRelease page (show and click back button
       }
     }
 
-    const resourceZip = join(resources, 'v23.09.1', 'krux-v23.09.1.zip')
+    const resourceZip = join(resources, 'v24.03.0', 'krux-v24.03.0.zip')
     const resourcePem = join(resources, 'main', 'selfcustody.pem')
-    const resourceSig = join(resources, 'v23.09.1', 'krux-v23.09.1.zip.sig')
+    const resourceSig = join(resources, 'v24.03.0', 'krux-v24.03.0.zip.sig')
     const command = [
       '$>',
       `${openssl} sha256 <${resourceZip}`,

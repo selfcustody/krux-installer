@@ -4,7 +4,7 @@ import { createRequire } from 'module'
 
 const App = createRequire(import.meta.url)('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release - click back button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded  release signature - click download again button)', () => {
 
   let instance: any;
 
@@ -51,22 +51,56 @@ describe('KruxInstaller SelectVersion page (already downloaded release - click b
     await instance.warningDownloadShowDetailsButtonText.waitForExist()
     await instance.warningDownloadBackButton.waitForExist()
     await instance.warningDownloadBackButtonText.waitForExist()
+    await instance.warningDownloadProceedButton.click()
+    await instance.warningDownloadPage.waitForExist({ reverse: true })
+    await instance.checkingReleaseZipSha256txtMsg.waitForExist()
+    await instance.foundReleaseZipSha256txtMsg.waitForExist()
+    await instance.warningDownloadPage.waitForExist()
+    await instance.warningDownloadProceedButton.waitForExist()
+    await instance.warningDownloadProceedButtonText.waitForExist()
+    await instance.warningDownloadProceedButton.click()
+    await instance.warningDownloadPage.waitForExist({ reverse: true })
+    await instance.checkingReleaseZipSigMsg.waitForExist()
+    await instance.foundReleaseZipSigMsg.waitForExist()
+    await instance.warningDownloadPage.waitForExist()
+    await instance.warningDownloadAgainButton.waitForExist()
+    await instance.warningDownloadAgainButtonText.waitForExist()
   })
 
-  it ('should click \'Back\' button and go out from WarningDownload page', async () => {
-    await instance.warningDownloadBackButton.click()
+  it ('should click \'Download again\' go out of WarningDownload page', async () => {
+    await instance.warningDownloadAgainButton.click()
     await instance.warningDownloadPage.waitForExist({ reverse: true })
     await expect(instance.warningDownloadPage).not.toBeDisplayed()
   })
 
-  it('should Main Page be displayed', async () => {
-    await instance.mainPage.waitForExist()
-    await expect(instance.mainPage).toBeDisplayed()
+  it ('should be in DownloadOfficialReleaseSig page', async () => {
+    await instance.downloadOfficialReleaseZipSigPage.waitForExist()
+    await expect(instance.downloadOfficialReleaseZipSigPage).toBeDisplayed()
   })
 
-  it('should \'Select version\' button changed to \'Version: selfcustody/krux/releases/tag/v23.09.1\'', async () => {
-    await instance.mainSelectVersionText.waitForExist()
-    await expect(instance.mainSelectVersionText).toBeDisplayed()
-    await expect(instance.mainSelectVersionText).toHaveText('Version: selfcustody/krux/releases/tag/v23.09.1')
+  it('should DownloadOfficialReleaseSig page have \'Downloading\' title', async () => {
+    await instance.downloadOfficialReleaseZipSigTitle.waitForExist()
+    await expect(instance.downloadOfficialReleaseZipSigTitle).toBeDisplayed()
+    await expect(instance.downloadOfficialReleaseZipSigTitle).toHaveText('Downloading')
   })
+
+  it('should DownloadOfficialReleaseSig page have \'https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sig\' subtitle', async () => {
+    await instance.downloadOfficialReleaseZipSigSubtitle.waitForExist()
+    await expect(instance.downloadOfficialReleaseZipSigSubtitle).toBeDisplayed()
+    await expect(instance.downloadOfficialReleaseZipSigSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v24.03.0/krux-v24.03.0.zip.sig')
+  })
+
+  it('should DownloadOfficialReleaseSig page progress until 100%', async () => {
+    await instance.downloadOfficialReleaseZipSigProgress.waitForExist()
+    await expect(instance.downloadOfficialReleaseZipSigProgress).toBeDisplayed()
+    await instance.downloadOfficialReleaseZipSigProgress.waitUntil(async function () {
+      const percentText = await this.getText()
+      const percent = parseFloat(percentText.split('%')[0])
+      return percent === 100.00
+    }, {
+      timeout: 600000,
+      interval: 50
+    })
+  })
+  
 })

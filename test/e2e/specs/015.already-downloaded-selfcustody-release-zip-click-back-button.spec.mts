@@ -4,7 +4,7 @@ import { createRequire } from 'module'
 
 const App = createRequire(import.meta.url)('../pageobjects/app.page')
 
-describe('KruxInstaller SelectVersion page (already downloaded release sha256.txt - click download again button)', () => {
+describe('KruxInstaller SelectVersion page (already downloaded release - click back button)', () => {
 
   let instance: any;
 
@@ -51,49 +51,22 @@ describe('KruxInstaller SelectVersion page (already downloaded release sha256.tx
     await instance.warningDownloadShowDetailsButtonText.waitForExist()
     await instance.warningDownloadBackButton.waitForExist()
     await instance.warningDownloadBackButtonText.waitForExist()
-    await instance.warningDownloadProceedButton.click()
-    await instance.warningDownloadPage.waitForExist({ reverse: true })
-    await instance.checkingReleaseZipSha256txtMsg.waitForExist()
-    await instance.foundReleaseZipSha256txtMsg.waitForExist()
-    await instance.warningDownloadPage.waitForExist()
-    await instance.warningDownloadAgainButton.waitForExist()
-    await instance.warningDownloadAgainButtonText.waitForExist()
   })
 
-  it ('should click \'Download again\' go out of WarningDownload page', async () => {
-    await instance.warningDownloadAgainButton.click()
+  it ('should click \'Back\' button and go out from WarningDownload page', async () => {
+    await instance.warningDownloadBackButton.click()
     await instance.warningDownloadPage.waitForExist({ reverse: true })
     await expect(instance.warningDownloadPage).not.toBeDisplayed()
   })
 
-  it ('should be in DownloadOfficialReleaseZipSha256 page', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPage.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPage).toBeDisplayed()
+  it('should Main Page be displayed', async () => {
+    await instance.mainPage.waitForExist()
+    await expect(instance.mainPage).toBeDisplayed()
   })
 
-  it('should DownloadOfficialReleaseZipSha256 page have \'Downloading\' title', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPageTitle.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPageTitle).toBeDisplayed()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPageTitle).toHaveText('Downloading')
+  it('should \'Select version\' button changed to \'Version: selfcustody/krux/releases/tag/v24.03.0\'', async () => {
+    await instance.mainSelectVersionText.waitForExist()
+    await expect(instance.mainSelectVersionText).toBeDisplayed()
+    await expect(instance.mainSelectVersionText).toHaveText('Version: selfcustody/krux/releases/tag/v24.03.0')
   })
-
-  it('should DownloadOfficialReleaseZipSha256 page have \'https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sha256.txt\' subtitle', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPageSubtitle.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toBeDisplayed()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPageSubtitle).toHaveText('https://github.com/selfcustody/krux/releases/download/v23.09.1/krux-v23.09.1.zip.sha256.txt')
-  })
-
-  it('should DownloadOfficialReleaseZipSha256 page progress until 100%', async () => {
-    await instance.downloadOfficialReleaseZipSha256txtPageProgress.waitForExist()
-    await expect(instance.downloadOfficialReleaseZipSha256txtPageProgress).toBeDisplayed()
-    await instance.downloadOfficialReleaseZipSha256txtPageProgress.waitUntil(async function () {
-      const percentText = await this.getText()
-      const percent = parseFloat(percentText.split('%')[0])
-      return percent === 100.00
-    }, {
-      timeout: 600000,
-      interval: 50
-    })
-  })
-  
 })

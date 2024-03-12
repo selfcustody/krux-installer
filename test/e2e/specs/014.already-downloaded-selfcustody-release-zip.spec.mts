@@ -42,13 +42,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release - show on
     await instance.checkingReleaseZipMsg.waitForExist()
   })
 
-  it('should \'v23.09.1/krux-v23.09.1.zip found\' message appears', async () => {
+  it('should \'v24.03.0/krux-v24.03.0.zip found\' message appears', async () => {
     await instance.foundReleaseZipMsg.waitForExist()
     await expect(instance.foundReleaseZipMsg).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expect(instance.foundReleaseZipMsg).toHaveText('v23.09.1/krux-v23.09.1.zip found')
+      await expect(instance.foundReleaseZipMsg).toHaveText('v24.03.0/krux-v24.03.0.zip found')
     } else if (process.platform === 'win32') {
-      await expect(instance.foundReleaseZipMsg).toHaveText('v23.09.1\\krux-v23.09.1.zip found')
+      await expect(instance.foundReleaseZipMsg).toHaveText('v24.03.0\\krux-v24.03.0.zip found')
     }
   })
 
@@ -57,13 +57,13 @@ describe('KruxInstaller SelectVersion page (already downloaded release - show on
     await expect(instance.warningDownloadPage).toBeDisplayed()
   }) 
 
-  it('should \'v23.09.1/krux-v23.09.1.zip already downloaded\' message be displayed', async () => {
+  it('should \'v24.03.0/krux-v24.03.0.zip already downloaded\' message be displayed', async () => {
     await instance.warningAlreadyDownloadedText.waitForExist()
     await expect(instance.warningAlreadyDownloadedText).toBeDisplayed()
     if (process.platform === 'linux' || process.platform === 'darwin') {
-      await expect(instance.warningAlreadyDownloadedText).toHaveText('v23.09.1/krux-v23.09.1.zip already downloaded')
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0/krux-v24.03.0.zip already downloaded')
     } else if (process.platform === 'win32') {
-      await expect(instance.warningAlreadyDownloadedText).toHaveText('v23.09.1\\krux-v23.09.1.zip already downloaded')
+      await expect(instance.warningAlreadyDownloadedText).toHaveText('v24.03.0\\krux-v24.03.0.zip already downloaded')
     }
   })
 

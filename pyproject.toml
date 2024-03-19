@@ -12,12 +12,12 @@ readme = "README.md"
 python = ">=3.8,<3.13"
 kivy = "^2.2.1"
 kivysome = "^0.2.1"
-pyopenssl = "^24.0.0"
 tomli = { version = "^2.0.1", python = "<3.11" }
 pyserial = "^3.5"
 requests = "^2.31.0"
 pyzbar = "^0.1.9"
 opencv-python = "^4.9.0.80"
+cryptography = "^42.0.5"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"
@@ -26,7 +26,9 @@ pyinstaller = "^6.3.0"
 pytest-cov = "^4.1.0"
 poethepoet = "^0.24.4"
 
-[tool.pytest]
+[tool.pytest.coverage]
+cov = [
+]
 
 [tool.poe.tasks]
 cli = "python src/krux-installer.py"
@@ -37,9 +39,8 @@ format = ["format-src", "format-tests", "format-installer"]
 lint-src = "pylint --ignore-paths=./src/utils/kboot ./src"
 lint-tests = "pylint --disable=C0114,C0115,C0116,R0904 ./tests"
 lint = ["lint-src", "lint-tests"]
-test = "pytest --verbose --cache-clear ./tests "
-coverage-html = "pytest --cache-clear --cov=src/utils/*.py --cov=src/utils/downloader --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/verifyer --cov-report html ./tests"
-coverage-xml = "pytest --cache-clear --cov=src/utils/*.py --cov=src/utils/downloader --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/verifyer  --cov-report xml ./tests"
+test = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov-report html ./tests"
+coverage = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov-report xml ./tests"
 build = "python scripts/build.py"
 
 [build-system]

@@ -45,7 +45,7 @@ def _open_pyproject() -> dict[str, Any]:
     """
     try:
         pyproject_filename = os.path.abspath(
-            os.path.join(ROOT_DIRNAME, "..", "..", "pyproject.toml")
+            os.path.join(ROOT_DIRNAME, "..", "..", "..", "pyproject.toml")
         )
         with open(pyproject_filename, "r", encoding="utf8") as pyproject_file:
             data = pyproject_file.read()

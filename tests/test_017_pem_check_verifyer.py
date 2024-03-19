@@ -14,7 +14,7 @@ class TestPemCheckVerifyerDownloader(TestCase):
     def test_init(self, mock_exists):
         p = PemCheckVerifyer(filename="test.mock.pem")
         self.assertEqual(p.filename, "test.mock.pem")
-        self.assertEqual(p.read_mode, "r")
+        self.assertEqual(p.read_mode, "rb")
         mock_exists.assert_called_once_with("test.mock.pem")
 
     @patch("os.path.exists", return_value=True)
@@ -34,7 +34,7 @@ class TestPemCheckVerifyerDownloader(TestCase):
         p = PemCheckVerifyer(filename="test.mock.pem")
         p.load()
         mock_exists.assert_called_once_with("test.mock.pem")
-        open_mock.assert_called_once_with("test.mock.pem", "r", encoding="utf8")
+        open_mock.assert_called_once_with("test.mock.pem", "rb")
         self.assertEqual(
             p.data,
             """-----BEGIN PUBLIC KEY-----

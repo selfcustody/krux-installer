@@ -28,7 +28,7 @@ Generic selector to select devices or versions
 import typing
 from http.client import HTTPResponse
 import requests
-from .trigger import Trigger
+from ..trigger import Trigger
 
 VALID_DEVICES = (
     None,

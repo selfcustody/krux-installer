@@ -2,7 +2,7 @@ from unittest import TestCase
 from unittest.mock import patch, mock_open
 from src.utils.verifyer.sig_verifyer import SigVerifyer
 
-MOCK_PEM = """-----BEGIN PUBLIC KEY-----
+MOCK_PEM = b"""-----BEGIN PUBLIC KEY-----
 MFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAEax27s943R8m9u/80/soZST64+JGLyckJ
 XiyFGjKuWRkpLJzCGPW40sbXZcMOSvPBvCU2vs8Hkyfyhy4lSbySfA==
 -----END PUBLIC KEY-----

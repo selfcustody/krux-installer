@@ -30,4 +30,4 @@ class PemCheckVerifyer(CheckVerifyer):
     """The checker verifyer for .pem files"""
 
     def __init__(self, filename: str):
-        super().__init__(filename=filename, read_mode="r", regexp=r".*\.pem")
+        super().__init__(filename=filename, read_mode="rb", regexp=r".*\.pem")

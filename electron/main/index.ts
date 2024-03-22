@@ -12,8 +12,10 @@ import StoreSetHandler from '../../lib/store-set'
 import StoreGetHandler from '../../lib/store-get'
 import VerifyOpensslHandler from '../../lib/verify-openssl'
 import CheckIfItWillFlashHandler from '../../lib/check-if-it-will-flash'
+import CheckIfItWillWipeHandler from '../../lib/check-if-it-will-wipe'
 import FlashHandler from '../../lib/flash'
 import QuitHandler from '../../lib/quit'
+import WipeHandler from '../../lib/wipe'
 
 const { version } = createRequire(import.meta.url)('../../package.json')
 const kruxInstaller = new App(`KruxInstaller | v${version}`)
@@ -68,13 +70,21 @@ kruxInstaller.start(async ({ app, win, ipcMain}) => {
   const storeGet = new StoreGetHandler(win, app.store, ipcMain)
   storeGet.build()
 
-  // Create 'check if it will flash' handler
+  // Create 'check if it will flash handler
   const checkIfItWillFlashHandler = new CheckIfItWillFlashHandler(win, app.store, ipcMain)
   checkIfItWillFlashHandler.build()
 
+  // Create 'check if it will wipe handler
+  const checkIfItWillWipeHandler = new CheckIfItWillWipeHandler(win, app.store, ipcMain)
+  checkIfItWillWipeHandler.build()
+  
   // Create 'flash' handler
   const flashHandler = new FlashHandler(win, app.store, ipcMain)
   flashHandler.build()
+
+  // Create 'flash' handler
+  const wipeHandler = new WipeHandler(win, app.store, ipcMain)
+  wipeHandler.build()
 
   // Create 'quit' handler
   const quitHandler = new QuitHandler(win, app.store, ipcMain)

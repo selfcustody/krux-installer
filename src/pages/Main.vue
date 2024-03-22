@@ -44,6 +44,24 @@
           </v-item>
         </v-col>
       </v-row>
+      <v-row v-if="showWipe">
+        <v-col>
+          <v-item v-slot="{ selectedClass }">
+            <v-card
+              variant="outlined"
+              :class="selectedClass"
+              @click.prevent="wipeDevice"
+              id="main-page-wipe-button"
+            >
+              <v-card-title
+                id="main-page-wipe-text"
+              >
+                {{ wipe }}
+              </v-card-title>
+            </v-card>
+          </v-item>
+        </v-col>
+      </v-row>
       <v-row v-if="showFlash">
         <v-col>
           <v-item v-slot="{ selectedClass }">
@@ -75,6 +93,7 @@ const props = defineProps<{
   os: string,
   isMac10: boolean,
   showFlash: boolean,
+  showWipe: boolean,
   clickMessage: string
 }>()
 
@@ -108,11 +127,28 @@ const flash = computed(() => {
   }
 })
 
+const wipe = computed(() => {
+  if (props.os === 'linux') {
+    return 'Wipe with ktool-linux'
+  }
+  else if (props.os === 'win32') {
+    return 'Wipe with ktool-win.exe'
+  }
+  else if (props.os === 'darwin' && !props.isMac10) {
+    return 'Wipe with ktool-mac'
+  }
+  else if (props.os === 'darwin' && props.isMac10) {
+    return 'Wipe with ktool-mac-10'
+  }
+  else {
+    return 'Wipe'
+  }
+})
 
 /**
  *Variables
  */
-const { showFlash } = toRefs(props)
+const { showFlash, showWipe } = toRefs(props)
 
 
 /**
@@ -130,7 +166,12 @@ async function flashDevice () {
   await window.api.invoke('krux:change:page', { page: 'FlashToDevice' })
 }
 
+async function wipeDevice () {
+  await window.api.invoke('krux:change:page', { page: 'WipeDevice' })
+}
+
 onMounted(async function () {
+  await window.api.invoke('krux:check:will:wipe')
   await window.api.invoke('krux:check:will:flash')
 })
 </script>

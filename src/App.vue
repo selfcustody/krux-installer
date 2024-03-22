@@ -32,7 +32,7 @@ import DownloadTestFirmware from './pages/DownloadTestFirmware.vue';
 import DownloadTestKboot from './pages/DownloadTestKboot.vue';
 import DownloadTestKtool from './pages/DownloadTestKtool.vue';
 import FlashToDevice from './pages/FlashToDevice.vue';
-
+import WipeDevice from './pages/WipeDevice.vue';
 /**
  * Methods: These function will
  * manipulate `page` and `data` variables
@@ -53,7 +53,9 @@ import onKruxUnzip from './utils/onKruxUnzip';
 import onKruxFlash from './utils/onKruxFlash';
 import onKruxFlashData from './utils/onKruxFlashData';
 import onKruxUnzipData from './utils/onKruxUnzipData';
-
+import onKruxCheckIfItWillWipeHandler from './utils/onKruxCheckIfItWillWipeHandler';
+import onKruxWipe from './utils/onKruxWipe';
+import onKruxWipeData from './utils/onKruxWipeData';
 /**
  * Reference for which component will be used as showing page
  */
@@ -94,7 +96,8 @@ const pages: Ref<Record<string, any>> = shallowRef({
   'DownloadTestFirmware': DownloadTestFirmware,
   'DownloadTestKboot': DownloadTestKboot,
   'DownloadTestKtool': DownloadTestKtool,
-  'FlashToDevice': FlashToDevice
+  'FlashToDevice': FlashToDevice,
+  'WipeDevice': WipeDevice
 })
 
 /**
@@ -114,14 +117,17 @@ window.api.onSuccess('krux:store:set', onKruxStoreSet(data));
 window.api.onSuccess('krux:verify:releases:fetch', onKruxVerifyReleasesFetch(data));
 window.api.onSuccess('krux:check:resource', onKruxCheckResources(data));
 window.api.onSuccess('krux:check:will:flash', onKruxCheckIfItWillFlashHandler(data));
+window.api.onSuccess('krux:check:will:wipe', onKruxCheckIfItWillWipeHandler(data));
 window.api.onSuccess('krux:download:resources', onKruxDownloadResources(data));
 window.api.onSuccess('krux:verify:releases:hash', onKruxVerifyReleasesHash(data));
 window.api.onSuccess('krux:verify:releases:sign', onKruxVerifyReleaseSign(data));
 window.api.onSuccess('krux:unzip', onKruxUnzip(data));
 window.api.onSuccess('krux:flash', onKruxFlash(data));
+window.api.onSuccess('krux:wipe', onKruxWipe(data));
 window.api.onData('krux:download:resources', onKruxDownloadResourcesData(data));
 window.api.onData('krux:unzip', onKruxUnzipData(data));
 window.api.onData('krux:flash', onKruxFlashData(data));
+window.api.onData('krux:wipe', onKruxWipeData(data));
 window.api.onError('krux:change:page', onError(data));
 window.api.onError('krux:store:get', onError(data));
 window.api.onError('krux:store:set', onError(data));
@@ -130,6 +136,7 @@ window.api.onError('krux:verify:releases:fetch', onError(data));
 window.api.onError('krux:check:resource',onError(data));
 window.api.onError('krux:download:resources', onError(data));
 window.api.onError('krux:flash', onError(data));
+window.api.onError('krux:wipe', onError(data));
 window.api.onError('krux:unzip', onError(data));
 
 /**

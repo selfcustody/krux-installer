@@ -59,7 +59,7 @@ export default class UnzipResourceHandler extends Handler {
    * ```
    */
   build () {
-    super.build(async (_: Event) =>{
+    super.build(async (options: { will?: any }) => {
       try {
         // Only unzip if is a selfcustody version
         let version = this.storage.get('version') as string;
@@ -171,14 +171,14 @@ export default class UnzipResourceHandler extends Handler {
 
           zipfile.on('end', () => {
             zipfile.close()
-            this.send(`${this.name}:success`, null)
+            this.send(`${this.name}:success`, { will: options.will })
           })
 
           zipfile.on('error', (zipErr) => {
             this.send(`${this.name}:error`, { name: zipErr.name, message: zipErr.message, stack: zipErr.stack })
           })
         } else {
-          this.send(`${this.name}:success`, null)
+          this.send(`${this.name}:success`, { will: options.will })
         }
       } catch (error) {
         this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack })

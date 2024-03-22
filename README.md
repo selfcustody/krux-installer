@@ -129,20 +129,23 @@ you will have this terminal output:
 A GUI based application to flash Krux firmware on K210 based devices
 
 options:
-  -h, --help            show this help message and exit
-  -v, --version         Show version
+  -h, --help                show this help message and exit
+  -v, --version             Show version
   -a, --available-firmwares
-                        Show available versions (require internet connection)
+                            Show available versions (require internet connection)
   -A, --available-devices
-                        Show available devices
+                            Show available devices
   -d DEVICE, --device DEVICE
-                        Select a device to be flashed
+                            Select a device to be flashed
   -f FIRMWARE, --firmware FIRMWARE
-                        Select a firmware version to be flashed
+                            Select a firmware version to be flashed
   -D DESTDIR, --destdir DESTDIR
-                        Directory where assets will be stored (default: OS tmpdir)
-  -F, --flash           If set, download the kboot.kfpkg firmware and flash. Otherwise, download firmware.bin and store in destdir
-  -w, --wipe            Erase all device's data and firmware (CAUTION: this will make the device unable to work until you install a new firmware)
+                            Directory where assets will be stored (default: OS tmpdir)
+  -F, --flash               If set, download the kboot.kfpkg firmware and flash. Otherwise, download firmware.bin and store in destdir
+  -w, --wipe                Erase all device's data and firmware (CAUTION: this will make the device unable to work until you install a new firmware)
+  -s SIGN, --sign SIGN      Sign a file with your device
+  -S SAVE_HASH, --save-hash SAVE_HASH
+                            Save a sha256.txt file when signing with your device
 ```
 
 ## TODO

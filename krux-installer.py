@@ -53,6 +53,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
     )
     from src.utils.unzip import KbootUnzip, FirmwareUnzip
     from src.utils.flasher import Flasher, Wiper
+    from src.utils.signer import CliSigner
 
     parser = ArgumentParser(prog=get_name(), description=get_description())
 
@@ -102,6 +103,16 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             ),
             action="store_true",
         )
+        parser.add_argument(
+            "-s", "--sign", help=" ".join(["sign a file with your device"])
+        )
+
+        parser.add_argument(
+            "-S",
+            "--save-hash",
+            help=" ".join(["save a sha256.txt file when signing with your device"]),
+        )
+
     else:
         raise RuntimeError(f"Not implementated for {sys.platform}")
 
@@ -128,6 +139,22 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         )
         w = Wiper()
         w.wipe(device=args.device)
+
+    elif args.sign:
+        signer = CliSigner(filename=args.sign)
+        signer.print_scan_hash_message()
+        signer.make_hash()
+        signer.print_hash()
+        if args.save_hash:
+            signer.save_hash()
+
+        signer.print_scan_signature_message()
+        signer.make_signature()
+        signer.save_signature()
+
+        signer.print_scan_pubkey_message()
+        signer.make_pubkey()
+        signer.save_pubkey()
 
     elif args.device and not args.firmware:
         raise RuntimeError("--device must be paired with --firmware option")

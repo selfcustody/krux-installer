@@ -1,6 +1,6 @@
 # The MIT License (MIT)
 
-# Copyright (c) 2021-2024 Krux contributors
+# Copyright (c) 2021-2023 Krux contributors
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,34 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-cli_scanner.py
+__init__.py
 """
-
-import typing
-from pyzbar.pyzbar import decode
-from .base_scanner import BaseScanner
-
-
-class CliScanner(BaseScanner):
-    """Scanner for krux-installer as CLI"""
-
-    def __init__(self):
-        super().__init__(capture_dev=0)
-
-    def scan(self) -> typing.List:
-        """Open scan window and detect/decode a QRCode"""
-
-        while True:
-            _ret, frame = self.video_capture.read()
-            qrcode = decode(frame)
-
-            if qrcode:
-                break
-
-            CliScanner.show_freeze_image(frame)
-
-            if CliScanner.on_click_quit():
-                break
-
-        self.close_cli_capture()
-        return qrcode[0].data
+from .cli_signer import CliSigner

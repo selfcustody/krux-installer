@@ -17,7 +17,7 @@ jobs:
       - name: Install node
         uses: actions/setup-node@v3
         with:
-          node-version: "20.10.0"
+          node-version: "20.11.1"
 
       - name: Variables helpers 
         id: setup
@@ -29,7 +29,7 @@ jobs:
           $signame = "krux-$firmware_version.zip.sig"
           $pemname = "selfcustody.pem"
           $extraResources = "$loc\extraResources"
-          $opensslVersion = "3.2.0"
+          $opensslVersion = "3.2.1"
           $release_url = "https://github.com/selfcustody/krux/releases/download"
           $raw_url = "https://raw.githubusercontent.com/selfcustody/krux/main"
           $app_version = node -e "console.log(require('./package.json').version)"

@@ -22,7 +22,7 @@ describe('KruxInstaller start up', () => {
     const version = await browser.electron.execute(function (electron) {
       return electron.app.getVersion()
     })
-    expect(version).to.be.equal('0.0.12')
+    expect(version).to.be.equal('0.0.13')
   })
 
 })

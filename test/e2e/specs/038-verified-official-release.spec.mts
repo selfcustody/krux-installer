@@ -7,7 +7,7 @@ import { createRequire } from 'module'
 
 const App = createRequire(import.meta.url)('../pageobjects/app.page')
 
-const SHA256 = "e9 b1 56 d4 d0 1e 80 17 ed 4f 2f ad ac 01 cb 07 fe b2 7e 8a 01 e3 c9 7e 01 9c f2 f9 03 86 e6 b2"
+const SHA256 = "f2 54 69 2f 76 6d c6 b0 09 c8 ca 7f 43 b6 74 d0 88 06 26 85 bb 20 3b 85 0f 8b 70 2f 64 1b 59 35"
 describe('KruxInstaller VerifiedOfficialRelease page (show and click back button)', () => {
 
   let instance: any;

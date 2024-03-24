@@ -4,6 +4,7 @@ import ElectronStore from 'electron-store';
 import Handler from './handler'
 import { join } from 'path';
 import { existsAsync } from './utils';
+import { glob } from 'glob'
 
 export default class CheckIfItWillWipeHandler extends Handler {
 
@@ -38,53 +39,23 @@ export default class CheckIfItWillWipeHandler extends Handler {
   build () {
     super.build(async (options) => {
       const device = this.storage.get('device') as string
-      const version = this.storage.get('version') as string
       const resources = this.storage.get('resources') as string
-      const os = this.storage.get('os') as string
-      const isMac10 = this.storage.get('isMac10') as boolean
 
       if (device.match(/maixpy_(m5stickv|amigo|bit|dock|yahboom|cube)/g)) {
-        if (version.match(/selfcustody\/.*/g)) {
-          const __version__ = version.split('tag/')[1]
-          const destinationResourceZip = join(resources, __version__, `krux-${__version__}.zip`)
-          const destinationResourceSha = join(resources, __version__, `krux-${__version__}.zip.sha256.txt`)
-          const destinationResourceSig = join(resources, __version__, `krux-${__version__}.zip.sig`)
+        const globfiles = await glob(
+          [
+            join(resources, 'odudex', 'krux_binaries', 'main', device, 'kboot.kfpkg'),
+            join(resources, 'v\d+\.\d+\.\d', 'krux-v\d+\.\d+\.\d\.zip')
+          ]
+        )
 
-          if (
-            await existsAsync(destinationResourceZip) &&
-            await existsAsync(destinationResourceSha) &&
-            await existsAsync(destinationResourceSig)
-          ) {
-            this.send(`${this.name}:success`, { showWipe: true })
-          } else {
-            this.send(`${this.name}:success`, { showWipe: false })
-          }
-        } else if (version.match(/odudex\/krux_binaries/g)) {
-          const destinationResourceFirmware = join(resources, version, 'main', device, 'firmware.bin')
-          const destinationResourceKboot = join(resources, version, 'main', device, 'kboot.kfpkg')
-          let destinationResourceKtool = ''
-          if (os === 'linux') {
-            destinationResourceKtool= join(resources, version, 'main', 'ktool-linux')
-          } else if (os === 'win32') {
-            destinationResourceKtool= join(resources, version, 'main', 'ktool-win.exe')
-          } else if (os === 'darwin' && !isMac10) {
-            destinationResourceKtool= join(resources, version, 'main', 'ktool-mac')
-          } else if (os === 'darwin' && isMac10) {
-            destinationResourceKtool= join(resources, version, 'main', 'ktool-mac-10')
-          }
-
-          if (
-            await existsAsync(destinationResourceFirmware) &&
-            await existsAsync(destinationResourceKboot) &&
-            await existsAsync(destinationResourceKtool)
-          ) {
-            this.send(`${this.name}:success`, { showWipe: true })
-          } else {
-            this.send(`${this.name}:success`, { showWipe: false })
-          }
+        if (globfiles.length > 0) {
+          this.send(`${this.name}:success`, { showWipe: true })
         } else {
           this.send(`${this.name}:success`, { showWipe: false })
         }
+      } else {
+        this.send(`${this.name}:success`, { showWipe: false })
       }
     })
   }

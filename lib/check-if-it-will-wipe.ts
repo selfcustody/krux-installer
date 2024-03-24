@@ -42,12 +42,7 @@ export default class CheckIfItWillWipeHandler extends Handler {
       const resources = this.storage.get('resources') as string
 
       if (device.match(/maixpy_(m5stickv|amigo|bit|dock|yahboom|cube)/g)) {
-        const globfiles = await glob(
-          [
-            join(resources, 'odudex', 'krux_binaries', 'main', device, 'kboot.kfpkg'),
-            join(resources, 'v\d+\.\d+\.\d', 'krux-v\d+\.\d+\.\d\.zip')
-          ]
-        )
+        const globfiles = await glob(`${resources}/**/*.{kfpkg,zip}`, { ignore: `${resources}/main/**` })
 
         if (globfiles.length > 0) {
           this.send(`${this.name}:success`, { showWipe: true })

@@ -77,8 +77,11 @@ class BaseSigner(Trigger):
     @property
     def filehash(self) -> str:
         """Getter for filehash"""
-        self.debug(f"filehash::getter={self._filehash}")
-        return self._filehash
+        try:
+            self.debug(f"filehash::getter={self._filehash}")
+            return self._filehash
+        except AttributeError:
+            return None
 
     @filehash.setter
     def filehash(self, value: str):
@@ -92,8 +95,11 @@ class BaseSigner(Trigger):
     @property
     def signature(self) -> typing.SupportsBytes:
         """Getter for signature in byte format"""
-        self.debug(f"signature::getter={self._signature}")
-        return self._signature
+        try:
+            self.debug(f"signature::getter={self._signature}")
+            return self._signature
+        except AttributeError:
+            return None
 
     @signature.setter
     def signature(self, value: str):

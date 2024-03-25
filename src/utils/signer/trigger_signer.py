@@ -22,7 +22,6 @@
 """
 signer.py
 """
-import re
 import hashlib
 from .base_signer import BaseSigner
 
@@ -45,20 +44,17 @@ class TriggerSigner(BaseSigner):
     def save_hash(self):
         """Save file's hash in a sha256.txt file"""
         if self.filehash is None:
-            raise ValueError(f"Empty hash: {self.filehash}")
+            raise ValueError("Empty hash")
 
-        if re.findall(r"^[a-f0-9]{64}$", self.filehash):
-            filehashname = f"{self.filename}.sha256.txt"
-            with open(filehashname, mode="w", encoding="utf-8") as h_file:
-                content = f"{self.filehash} {self.filename}"
-                h_file.write(content)
-                print("")
-                print("=====================")
-                print(f"{filehashname} saved")
-                print("=====================")
-                print("")
-        else:
-            raise ValueError(f"Invalid hash: '{self.filehash}'")
+        filehashname = f"{self.filename}.sha256.txt"
+        with open(filehashname, mode="w", encoding="utf-8") as h_file:
+            content = f"{self.filehash} {self.filename}"
+            h_file.write(content)
+            print("")
+            print("=====================")
+            print(f"{filehashname} saved")
+            print("=====================")
+            print("")
 
     def save_signature(self):
         """Save the signature data into a .sig file"""

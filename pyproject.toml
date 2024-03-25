@@ -40,8 +40,8 @@ format = ["format-src", "format-tests", "format-installer"]
 lint-src = "pylint --ignore-paths=./src/utils/kboot ./src"
 lint-tests = "pylint --disable=C0114,C0115,C0116,R0904 ./tests"
 lint = ["lint-src", "lint-tests"]
-test = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov-report html ./tests"
-coverage = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov-report xml ./tests"
+test = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov-report html ./tests"
+coverage = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov-report xml ./tests"
 build = "python scripts/build.py"
 
 [build-system]

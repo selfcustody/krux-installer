@@ -292,7 +292,7 @@ export default function onKruxStoreGet (data: Ref<Record<string, any>>): Functio
       await setMainData(data, result)
     }
 
-    if (result.from === 'FlashToDevice') {
+    if (result.from === 'FlashToDevice' || result.from === 'WipeDevice') {
       messages.clean(data)
       await window.api.invoke('krux:change:page', { page: 'Main' })
       setMainData(data, result)

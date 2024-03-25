@@ -6,7 +6,7 @@ import { SudoerLinux, SudoerDarwin } from '@o/electron-sudo/src/sudoer'
 import ElectronStore from 'electron-store'
 import Handler from './handler'
 import { SerialPort } from 'serialport'
-import { getPositionOfLineAndCharacter } from 'typescript'
+import { glob } from 'glob'
 
 export default class FlashHandler extends Handler {
 
@@ -51,18 +51,6 @@ export default class FlashHandler extends Handler {
       const flash = { command: '', args: [] }
       const chmod = { commands: [] }
 
-      // dynamic variables
-      let  version = this.storage.get('version') as string
-      let cwd = ''
-
-      if (version.match(/selfcustody/g)) {
-        version = version.split('tag/')[1]
-        cwd = join(resources, `krux-${version}`)
-      } else if (version.match(/odudex/g)) {
-        version = join(version, 'main')
-        cwd = join(resources, version)
-      }
-
       // set correct flash instructions
       // if the device 'maixpy_dock' the board argument (-B) is 'dan', 
       // otherwise, is 'goE'
@@ -75,7 +63,7 @@ export default class FlashHandler extends Handler {
           // m5stickv and amigo has two ports
           // get the first
           let found = false
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             if (port.productId == "0403" && !found) {
               this.send(`${this.name}:data`, `found device at ${port.path}`)
               flash.args.push("-p")
@@ -90,7 +78,7 @@ export default class FlashHandler extends Handler {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000']
         try {
           const ports = await SerialPort.list()
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             if (port.productId == "0403") {
               this.send(`${this.name}:data`, `found device at ${port.path}`)
               flash.args.push("-p")
@@ -104,7 +92,7 @@ export default class FlashHandler extends Handler {
         flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000']
         try {
           const ports = await SerialPort.list()
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             this.send(`${this.name}:data`, `found device at ${port.path}`)
             if (port.productId == "7523") {
               flash.args.push("-p")
@@ -118,7 +106,7 @@ export default class FlashHandler extends Handler {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000']
         try {
           const ports = await SerialPort.list()
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             if (port.productId == "7523") {
               this.send(`${this.name}:data`, `found device at ${port.path}`)
               flash.args.push("-p")
@@ -138,16 +126,21 @@ export default class FlashHandler extends Handler {
       flash.args.push('-E')
 
       // Choose the correct ktool flasher
+      let globfiles: string[]
       if (os === 'linux') {
-        flash.command = join(cwd, 'ktool-linux')
+        globfiles = await glob(`${resources}/**/ktool-linux`)
+        flash.command = globfiles[0]
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
       } else if (os === 'win32') {
-        flash.command = join(cwd, 'ktool-win.exe')
+        globfiles = await glob(`${resources}/**/ktool-win.exe`)
+        flash.command = globfiles[0]
       } else if (os === 'darwin' && !isMac10) {
-        flash.command = join(cwd, 'ktool-mac')
+        globfiles = await glob(`${resources}/**/ktool-mac`)
+        flash.command = globfiles[0]
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
       } else if (os === 'darwin' && isMac10) {
-        flash.command = join(cwd, 'ktool-mac-10')
+        globfiles = await glob(`${resources}/**/ktool-mac-10`)
+        flash.command = globfiles[0]
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
       }
 

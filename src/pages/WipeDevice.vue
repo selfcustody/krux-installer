@@ -9,7 +9,7 @@
             >
               <v-card-title > {{ !done ? 'Wiping...' : 'Do not trust, verify! ' }} </v-card-title>
               <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : 'Before quit:' }} </v-card-subtitle>
-              <v-card-subtitle> {{ !done ? '' : '(1) Scroll down the output to check what happened to your device;' }} </v-card-subtitle>
+              <v-card-subtitle> {{ !done ? 'It may take a while to complete.' : '(1) Scroll down the output to check what happened to your device;' }} </v-card-subtitle>
               <v-card-subtitle> {{ !done ? '' : '(2) shutdown your device and unplug it' }} </v-card-subtitle>
               <v-card-text>
                 <div class="console" v-html="!done ? output : allOutput" />

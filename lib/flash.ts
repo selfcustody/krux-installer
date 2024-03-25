@@ -77,7 +77,7 @@ export default class FlashHandler extends Handler {
           // m5stickv and amigo has two ports
           // get the first
           let found = false
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             if (port.productId == "0403" && !found) {
               this.send(`${this.name}:data`, `found device at ${port.path}`)
               flash.args.push("-p")
@@ -92,7 +92,7 @@ export default class FlashHandler extends Handler {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
         try {
           const ports = await SerialPort.list()
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             if (port.productId == "0403") {
               this.send(`${this.name}:data`, `found device at ${port.path}`)
               flash.args.push("-p")
@@ -106,7 +106,7 @@ export default class FlashHandler extends Handler {
         flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000', kboot]
         try {
           const ports = await SerialPort.list()
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             this.send(`${this.name}:data`, `found device at ${port.path}`)
             if (port.productId == "7523") {
               flash.args.push("-p")
@@ -120,7 +120,7 @@ export default class FlashHandler extends Handler {
         flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
         try {
           const ports = await SerialPort.list()
-          ports.forEach(function(port) {
+          ports.forEach((port) => {
             if (port.productId == "7523") {
               this.send(`${this.name}:data`, `found device at ${port.path}`)
               flash.args.push("-p")

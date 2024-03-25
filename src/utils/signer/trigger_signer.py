@@ -24,28 +24,7 @@ signer.py
 """
 import re
 import hashlib
-
 from .base_signer import BaseSigner
-
-ASN1_STRUCTURE_FOR_PUBKEY = "3036301006072A8648CE3D020106052B8104000A032200"
-"""
-ASN.1 STRUCTURE FOR PUBKEY (uncompressed and compressed):
-   30  <-- declares the start of an ASN.1 sequence
-   56  <-- length of following sequence (dez 86)
-   30  <-- length declaration is following
-   10  <-- length of integer in bytes (dez 16)
-   06  <-- declares the start of an "octet string"
-   07  <-- length of integer in bytes (dez 7)
-   2A 86 48 CE 3D 02 01 <-- Object Identifier: 1.2.840.10045.2.1
-                            = ecPublicKey, ANSI X9.62 public key type
-   06  <-- declares the start of an "octet string"
-   05  <-- length of integer in bytes (dez 5)
-   2B 81 04 00 0A <-- Object Identifier: 1.3.132.0.10
-                      = secp256k1, SECG (Certicom) named eliptic curve
-   03  <-- declares the start of an "octet string"
-   42  <-- length of bit string to follow (66 bytes)
-   00  <-- Start pubkey?? 
-"""
 
 
 class TriggerSigner(BaseSigner):

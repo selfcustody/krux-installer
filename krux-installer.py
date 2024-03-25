@@ -110,6 +110,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         parser.add_argument(
             "-S",
             "--save-hash",
+            action="store_true",
             help=" ".join(["save a sha256.txt file when signing with your device"]),
         )
 

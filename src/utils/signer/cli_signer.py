@@ -23,10 +23,9 @@
 cli_signer.py
 """
 import re
-import base64
 import cv2
 from qrcode import QRCode
-from .trigger_signer import TriggerSigner, ASN1_STRUCTURE_FOR_PUBKEY
+from .trigger_signer import TriggerSigner
 
 
 class CliSigner(TriggerSigner):
@@ -112,19 +111,8 @@ class CliSigner(TriggerSigner):
 
     def make_signature(self):
         """Create a signature data"""
-        data = self.scan()
-        self.signature = base64.b64decode(data.encode())
+        self.signature = self.scan()
 
     def make_pubkey(self):
         """Create a pubkey certificate"""
-        data = self.scan()
-        pubkey_data = f"{ASN1_STRUCTURE_FOR_PUBKEY}{data}"
-
-        # Convert pubkey data to bytes
-        pubkey_data_bytes = bytes.fromhex(pubkey_data)
-
-        # Encoding bytes to base64 format
-        pubkey_data_b64 = base64.b64encode(pubkey_data_bytes)
-
-        # Decode base64 to utf8
-        self.pubkey = pubkey_data_b64.decode("utf8")
+        self.pubkey = self.scan()

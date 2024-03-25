@@ -90,4 +90,4 @@ class TriggerSigner(BaseSigner):
                 print("=====================")
                 print("")
         else:
-            raise ValueError(f"Empty pubkey: {self.pubkey}")
+            raise ValueError("Empty pubkey")

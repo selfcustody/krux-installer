@@ -115,8 +115,11 @@ class BaseSigner(Trigger):
     @property
     def pubkey(self) -> str:
         """Getter for public key certificate"""
-        self.debug(f"pubkey::getter={self._pubkey}")
-        return self._pubkey
+        try:
+            self.debug(f"pubkey::getter={self._pubkey}")
+            return self._pubkey
+        except AttributeError:
+            return None
 
     @pubkey.setter
     def pubkey(self, value: typing.SupportsBytes):

@@ -127,3 +127,41 @@ class TestTriggerSigner(TestCase):
                 call(""),
             ]
         )
+
+    @patch("os.path.exists", return_value=True)
+    def test_fail_save_pubkey(self, mock_exists):
+        with self.assertRaises(ValueError) as exc_info:
+            s = TriggerSigner(filename="mock.txt")
+            s.save_pubkey()
+            mock_exists.assert_called_once_with("mock.txt")
+        self.assertEqual(str(exc_info.exception), "Empty pubkey")
+
+    @patch("os.path.exists", return_value=True)
+    @patch("builtins.open", new_callable=mock_open, read_data=b"Mocked")
+    @patch("builtins.print")
+    def test_save_pubkey(self, mock_print, mocked_open, mock_exists):
+        s = TriggerSigner(filename="mock.txt")
+        s.pubkey = "027fbea3abf78019ff6da48d6c235931b26732faaf74eeeda8f0a7e5eb32477c20"
+        s.save_pubkey()
+        mock_exists.assert_called_once_with("mock.txt")
+        mocked_open.assert_has_calls(
+            [
+                call("mock.txt.pem", mode="w", encoding="utf-8"),
+                # pylint: disable=unnecessary-dunder-call
+                call().__enter__(),
+                # pylint: disable=line-too-long
+                call().write(
+                    "-----BEGIN PUBLIC KEY-----\nMDYwEAYHKoZIzj0CAQYFK4EEAAoDIgACf76jq/eAGf9tpI1sI1kxsmcy+q907u2o8Kfl6zJHfCA=\n-----END PUBLIC KEY-----"
+                ),
+                call().__exit__(None, None, None),
+            ]
+        )
+        mock_print.assert_has_calls(
+            [
+                call(""),
+                call("====================="),
+                call("mock.txt.pem saved"),
+                call("====================="),
+                call(""),
+            ]
+        )

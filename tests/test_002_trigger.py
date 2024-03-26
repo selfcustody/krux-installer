@@ -15,19 +15,19 @@ class TestTrigger(TestCase):
     def test_init_warn(self):
         t = Trigger()
         self.assertEqual(t.loglevel, "warn")
-        
+
     @patch.dict(os.environ, {"LOGLEVEL": "debug"}, clear=True)
     def test_init_error(self):
         t = Trigger()
         self.assertEqual(t.loglevel, "debug")
-        
+
     @patch.dict(os.environ, {"LOGLEVEL": "mock"}, clear=True)
     def test_fail_init(self):
         with self.assertRaises(ValueError) as exc_info:
             Trigger()
-        
+
         self.assertEqual(str(exc_info.exception), "Invalid loglevel: mock")
-        
+
     @patch("src.utils.trigger.mro", return_value="Mock")
     def test_create_msg(self, mock_mro):
         t = Trigger()
@@ -47,7 +47,7 @@ class TestTrigger(TestCase):
         trigger = Trigger()
         trigger.warn("Hello World")
         mock_mro.assert_called_once()
-        
+
     @patch.dict(os.environ, {"LOGLEVEL": "debug"}, clear=True)
     @patch("src.utils.trigger.mro", return_value="Mock")
     def test_debug(self, mock_mro):

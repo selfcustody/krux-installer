@@ -874,9 +874,75 @@ class TestTriggerFlasher(TestCase):
             mock_next.assert_has_calls([call(f.ports), call(f.ports)])
             mock_process_wipe.assert_called_once_with(port="MOCK1", callback=callback)
 
+    @patch("sys.platform", "linux")
+    @patch("builtins.print")
+    def test_process_exception_print_no_callback_linux(self, mock_print):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            exc = Exception("Unknown mocked error")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(
+                oldport="/mock/path0",
+                exc_info=exc,
+            )
+            mock_next.assert_has_calls([call(f.ports)])
+            mock_print.assert_called_once_with(
+                "\033[31;1m[ERROR]\033[0m Unknown mocked error"
+            )
+
+    @patch("sys.platform", "linux")
+    def test_process_exception_print_callback_linux(self):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            callback = MagicMock()
+            exc = Exception("Unknown mocked error")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(oldport="/mock/path0", exc_info=exc, callback=callback)
+            mock_next.assert_has_calls([call(f.ports)])
+            callback.assert_called_once_with("Unknown mocked error")
+
+    @patch("sys.platform", "darwin")
+    @patch("builtins.print")
+    def test_process_exception_print_no_callback_darwin(self, mock_print):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            exc = Exception("Unknown mocked error")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(
+                oldport="/mock/path0",
+                exc_info=exc,
+            )
+            mock_next.assert_has_calls([call(f.ports)])
+            mock_print.assert_called_once_with(
+                "\033[31;1m[ERROR]\033[0m Unknown mocked error"
+            )
+
+    @patch("sys.platform", "darwin")
+    def test_process_exception_print_callback_darwin(self):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            callback = MagicMock()
+            exc = Exception("Unknown mocked error")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(oldport="/mock/path0", exc_info=exc, callback=callback)
+            mock_next.assert_has_calls([call(f.ports)])
+            callback.assert_called_once_with("Unknown mocked error")
+
     @patch("sys.platform", "win32")
     @patch("builtins.print")
-    def test_process_exception_print_no_callback(self, mock_print):
+    def test_process_exception_print_no_callback_win32(self, mock_print):
         with patch(
             "src.utils.flasher.trigger_flasher.next",
             return_value=MockListPortsGrep().devices[1],
@@ -892,3 +958,17 @@ class TestTriggerFlasher(TestCase):
             mock_print.assert_called_once_with(
                 "\033[31;1m[ERROR]\033[0m Unknown mocked error"
             )
+
+    @patch("sys.platform", "win32")
+    def test_process_exception_print_callback_win32(self):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            callback = MagicMock()
+            exc = Exception("Unknown mocked error")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(oldport="MOCK0", exc_info=exc, callback=callback)
+            mock_next.assert_has_calls([call(f.ports)])
+            callback.assert_called_once_with("Unknown mocked error")

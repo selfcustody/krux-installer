@@ -103,11 +103,11 @@ class TriggerFlasher(BaseFlasher):
         Generally, Amigos have two ports. If the first fail
         use this function to process
         """
-        if re.findall(r"Greeting fail",  str(exc_info)):
+        if re.findall(r"Greeting fail", str(exc_info)):
 
             port = next(self.ports)
             msg = f"Port {oldport} didnt work, trying {port}"
-            
+
             if callback:
                 callback(msg)
             else:

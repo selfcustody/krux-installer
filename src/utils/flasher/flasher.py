@@ -22,7 +22,6 @@
 """
 __init__.py
 """
-import sys
 import typing
 from .trigger_flasher import TriggerFlasher
 

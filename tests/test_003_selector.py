@@ -128,8 +128,9 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.device = "m5stickv"
+        print(mock_set.device)
         mock_set.assert_has_calls([call(selector, None), call(selector, "m5stickv")])
-
+            
     @patch("src.utils.selector.requests")
     @patch(
         "src.utils.selector.Selector.device",

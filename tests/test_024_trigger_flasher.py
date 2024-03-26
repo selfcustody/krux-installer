@@ -873,3 +873,22 @@ class TestTriggerFlasher(TestCase):
             )
             mock_next.assert_has_calls([call(f.ports), call(f.ports)])
             mock_process_wipe.assert_called_once_with(port="MOCK1", callback=callback)
+
+    
+    @patch("sys.platform", "win32")
+    @patch("builtins.print")
+    def test_process_exception_print_no_callback(self, mock_print):
+        with patch(
+            "src.utils.flasher.trigger_flasher.next",
+            return_value=MockListPortsGrep().devices[1],
+        ) as mock_next:
+            callback = MagicMock()
+            exc = Exception("Unknown mocked error")
+            f = TriggerFlasher()
+            f.get_port(device="amigo")
+            f.process_exception(
+                oldport="MOCK0",
+                exc_info=exc,
+            )
+            mock_next.assert_has_calls([call(f.ports)])
+            mock_print.assert_called_once_with("\033[31;1m[ERROR]\033[0m Unknown mocked error")

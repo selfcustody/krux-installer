@@ -96,26 +96,30 @@ class TriggerFlasher(BaseFlasher):
         self,
         oldport: str,
         exc_info: Exception,
-        process: typing.Callable,
+        process: typing.Callable = None,
         callback: typing.Callable = None,
     ):
         """
         Generally, Amigos have two ports. If the first fail
         use this function to process
         """
-        print(f"\033[31;1m[ERROR]\033[0m {str(exc_info)}")
-        if re.findall(r"Greeting fail", str(exc_info)):
+        if re.findall(r"Greeting fail",  str(exc_info)):
+
             port = next(self.ports)
             msg = f"Port {oldport} didnt work, trying {port}"
-
+            
             if callback:
                 callback(msg)
             else:
+                print(f"\033[31;1m[ERROR]\033[0m {str(exc_info)}")
                 print(f"\033[33;1m[WARN]\033[0m {msg}")
                 print("*")
-            process(port=port.device, callback=callback)
+
+            if process:
+                process(port=port.device, callback=callback)
         else:
             if callback:
-                callback(str(exc_info))
+                msg = str(exc_info)
+                callback(msg)
             else:
-                print(str(exc_info))
+                print(f"\033[31;1m[ERROR]\033[0m {str(exc_info)}")

@@ -27,18 +27,18 @@ import typing
 from .trigger_flasher import TriggerFlasher
 
 
-# pylint: disable=unused-argument
-def get_progress(file_type_str, iteration, total, suffix):
-    """Default callback for flashing (repeat the one from ktool)"""
-    percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
-    filled_length = int(100 * iteration // total)
-    barascii = "=" * filled_length + "-" * (100 - filled_length)
-    msg = f"\r%|{barascii}| {percent}% {suffix}"
-    if percent == 100:
-        print()
-        print(msg)
-    else:
-        sys.stdout.write(msg)
+# Example of parsing progress
+# def get_progress(file_type_str, iteration, total, suffix):
+#    """Default callback for flashing (repeat the one from ktool)"""
+#    percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
+#    filled_length = int(100 * iteration // total)
+#    barascii = "=" * filled_length + "-" * (100 - filled_length)
+#    msg = f"\r%|{barascii}| {percent}% {suffix}"
+#    if percent == 100:
+#        print()
+#        print(msg)
+#    else:
+#        sys.stdout.write(msg)
 
 
 class Flasher(TriggerFlasher):

@@ -11,6 +11,11 @@
 *.exe
 *.bak
 
+# Assets for test
+#################
+*.pem
+*.sig
+
 # Packages
 ############
 

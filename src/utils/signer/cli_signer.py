@@ -22,7 +22,7 @@
 """
 cli_signer.py
 """
-import re
+import typing
 import cv2
 from qrcode import QRCode
 from .trigger_signer import TriggerSigner
@@ -60,12 +60,12 @@ class CliSigner(TriggerSigner):
         print("=====================================================")
         print("")
 
-    def scan(self):
+    def scan(self, device: typing.Union[int | str] = 0):
         """
         Open a scan window and uses cv2 to detect and
         decode a QRCode, returning its data
         """
-        vid = cv2.VideoCapture(0)
+        vid = cv2.VideoCapture(device)
         detector = cv2.QRCodeDetector()
         qr_data = None
 
@@ -99,20 +99,20 @@ class CliSigner(TriggerSigner):
     def print_hash(self):
         """Print sha256sum in qrcode format"""
         if self.filehash is None:
-            raise ValueError(f"Empty hash: {self.filehash}")
+            raise ValueError("Empty hash")
 
-        if re.findall(r"^[a-f0-9]{64}$", self.filehash):
-            qrcode = QRCode()
-            qrcode.add_data(self.filehash)
-            qrcode.print_ascii(invert=True)
+        qrcode = QRCode()
+        qrcode.add_data(self.filehash)
+        print("=====================================================")
+        qrcode.print_ascii(invert=True)
+        print("=====================================================")
+        print(self.filehash)
+        print()
 
-        else:
-            raise ValueError(f"Invalid hash: '{self.filehash}'")
-
-    def make_signature(self):
+    def make_signature(self, device: typing.Union[int | str] = 0):
         """Create a signature data"""
-        self.signature = self.scan()
+        self.signature = self.scan(device)
 
-    def make_pubkey(self):
+    def make_pubkey(self, device: typing.Union[int | str] = 0):
         """Create a pubkey certificate"""
-        self.pubkey = self.scan()
+        self.pubkey = self.scan(device)

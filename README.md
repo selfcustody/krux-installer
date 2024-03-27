@@ -57,13 +57,6 @@ poetry run poe
 poetry run poe format
 ```
 
-That is similar to:
-
-```bash
-poetry run black ./src
-poetry run black ./tests
-```
-
 ### Lint
 
 After format:
@@ -72,39 +65,13 @@ After format:
 poetry run poe lint
 ```
 
-That is simlar to:
-
-```
-poetry run pylint ./src
-poetry run pylint --disable=C0114,C0115,C0116 ./tests
-```
-
 ### Test
 
-Krux-Installer uses `poe` task manager for tests:
+Krux-Installer uses `poe` task manager for tests. This will generate a
+`htmlcov/index.html` folder with coverage results to navigate in a browser.
 
 ```bash
 poetry run poe test
-```
-
-That is simlar to:
-
-```bash
-poetry run pytest --capture=tee-sys --verbose --cache-clear ./tests
-```
-
-### Coverage
-
-After tests, will be worth to run coverage:
-
-```
-poetry run poe coverage-html
-```
-
-That is simlar to:
-
-```bash
-poetry run pytest --cache-clear --cov src/ --cov-report html ./tests
 ```
 
 ## Build
@@ -117,7 +84,7 @@ poetry run poe build
 
 It will export all project in a binary
 (without extension for linux and macOS and with `.exe` for windows)
-located at `./dist` folder.
+located at `./dist/krux-installer`.
 
 
 ## CLI
@@ -126,26 +93,101 @@ Running `./dist/krux-installer --help` (linux and macOS) or `./dist/krux-install
 you will have this terminal output:
 
 ```bash
+usage: krux-installer [-h] [-v] [-a] [-A] [-d DEVICE] [-f FIRMWARE] [-D DESTDIR] [-F] [-w] [-s SIGN] [-S] [-V VERIFY] [-K FILENAME] [-p PUBKEY]
+
 A GUI based application to flash Krux firmware on K210 based devices
 
 options:
-  -h, --help                show this help message and exit
-  -v, --version             Show version
+  -h, --help            show this help message and exit
+  -v, --version         Show version
   -a, --available-firmwares
-                            Show available versions (require internet connection)
+                        Show available versions (require internet connection)
   -A, --available-devices
-                            Show available devices
+                        Show available devices
   -d DEVICE, --device DEVICE
-                            Select a device to be flashed
+                        Select a device to be flashed
   -f FIRMWARE, --firmware FIRMWARE
-                            Select a firmware version to be flashed
+                        Select a firmware version to be flashed
   -D DESTDIR, --destdir DESTDIR
-                            Directory where assets will be stored (default: OS tmpdir)
-  -F, --flash               If set, download the kboot.kfpkg firmware and flash. Otherwise, download firmware.bin and store in destdir
-  -w, --wipe                Erase all device's data and firmware (CAUTION: this will make the device unable to work until you install a new firmware)
-  -s SIGN, --sign SIGN      Sign a file with your device
-  -S SAVE_HASH, --save-hash SAVE_HASH
-                            Save a sha256.txt file when signing with your device
+                        Directory where assets will be stored (default: OS tmpdir)
+  -F, --flash           If set, download the kboot.kfpkg firmware and flash. Otherwise, download firmware.bin and store in destdir
+  -w, --wipe            Erase all device's data and firmware (CAUTION: this will make the device unable to work until you install a new firmware)
+  -s SIGN, --sign SIGN  sign a file with your device
+  -S, --save-hash       save a sha256.txt file when signing with your device
+  -V VERIFY, --verify VERIFY
+                        verify the authenticity of a signature file (.sig) signed with krux
+  -K FILENAME, --filename FILENAME
+                        the file to be verified with --verify option
+  -p PUBKEY, --pubkey PUBKEY
+                        the public key certificate (.pem) to be verified with --verify option
+```
+
+### Check firmwares with `--available-firmwares`
+
+List which firmware versions are available on github:
+
+```
+$> ./dist/krux-installer --available-firmwares
+```
+
+### Check devices with `--available-devices`
+
+List which devices are supported:
+
+
+```
+$> ./dist/krux-installer --available-devices
+```
+
+### Flash official firmware for some device with `--firmware`, `--device` and `--flash`
+
+```
+$> ./dist/krux-installer --firmware v24.03.0 --device amigo --flash
+```
+
+
+### Flash beta firmware for some device with `--firmware`, `--device` and `--flash`
+
+```
+$> ./dist/krux-installer --firmware odudex/krux_binaries --device amigo --flash
+```
+
+### Only download official firmware binary to do an airgapped update with `--firmware` and `--device`
+
+```
+$> ./dist/krux-installer --firmware v24.03.0 --device amigo
+```
+
+### Only download beta firmware binary to do an airgapped update with `--firmware` and `--device`
+
+```
+$> ./dist/krux-installer --firmware odudex/krux_binaries --device amigo
+```
+
+
+### Wipe (erase firmware for emergencies) for some device with `--device` and `--wipe`
+
+```
+$> ./dist/krux-installer --device amigo --wipe
+```
+
+### Sign any file with your device with `--sign`
+
+```
+$> ./dist/krux-installer --sign myfile.txt
+```
+  
+### Sign any file with your device and save a sha256sum file of iw with `--sign` and `--save-hash`
+
+```
+$> ./dist/krux-installer --sign myfile.txt --save-hash
+```
+
+
+### Verify the authenticity of any file signed with krux with `--verify`, `--filename` and `--pubkey`
+
+```
+$> ./dist/krux-installer --verify myfile.txt.sig --filename myfile.txt --pubkey myfile.txt.pem
 ```
 
 ## TODO

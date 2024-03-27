@@ -48,7 +48,6 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
         Sha256Verifyer,
         Sha256CheckVerifyer,
         SigVerifyer,
-        SigAnyVerifyer,
         SigCheckVerifyer,
         PemCheckVerifyer,
     )
@@ -115,18 +114,28 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
             help=" ".join(["save a sha256.txt file when signing with your device"]),
         )
 
-        
         parser.add_argument(
-            "-V", "--verify", help=" ".join(["verify the authenticity of a signature file (.sig) signed with krux"])
+            "-V",
+            "--verify",
+            help=" ".join(
+                ["verify the authenticity of a signature file (.sig) signed with krux"]
+            ),
         )
 
-        
         parser.add_argument(
-            "-K", "--filename", help=" ".join(["the file to be verified with --verify option"])
+            "-K",
+            "--filename",
+            help=" ".join(["the file to be verified with --verify option"]),
         )
-        
+
         parser.add_argument(
-            "-p", "--pubkey", help=" ".join(["the public key certificate (.pem) to be verified with --verify option"])
+            "-p",
+            "--pubkey",
+            help=" ".join(
+                [
+                    "the public key certificate (.pem) to be verified with --verify option"
+                ]
+            ),
         )
 
     else:
@@ -174,24 +183,27 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
 
     elif args.verify:
         if not args.filename and not args.pubkey:
-            raise RuntimeError("--verify [FILE].sig must be paired with --filename [FILE] and --pubkey [FILE].pem")
-        
+            raise RuntimeError(
+                "--verify [FILE].sig must be paired with --filename [FILE] and --pubkey [FILE].pem"
+            )
+
         sig_check_verifyer = SigCheckVerifyer(filename=args.verify)
         pem_check_verifyer = PemCheckVerifyer(filename=args.pubkey)
         sig_check_verifyer.load()
         pem_check_verifyer.load()
-        sig_verifyer = SigAnyVerifyer(
+        sig_verifyer = SigVerifyer(
             filename=args.filename,
             signature=sig_check_verifyer.data,
             pubkey=pem_check_verifyer.data,
+            regexp=r".*",
         )
         sig_verifyer.load()
-        
+
         result = sig_verifyer.verify()
 
         if not result:
             raise RuntimeError("Invalid signature")
-        
+
         print("✅ Signature Verified Successfully")
 
     elif args.device and not args.firmware:
@@ -256,6 +268,7 @@ if re.findall(REG_CLI, " ".join(sys.argv)):
                 filename=filename,
                 signature=sig_check_verifyer.data,
                 pubkey=pem_check_verifyer.data,
+                regexp=".*\.zip",
             )
             sig_verifyer.load()
             return sig_verifyer.verify()

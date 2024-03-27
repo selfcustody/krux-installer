@@ -28,4 +28,3 @@ from .sig_check_verifyer import SigCheckVerifyer
 from .pem_check_verifyer import PemCheckVerifyer
 from .sha256_verifyer import Sha256Verifyer
 from .sig_verifyer import SigVerifyer
-from .sig_any_verifyer import SigAnyVerifyer

@@ -20,7 +20,9 @@ class TestSigVerifyerDownloader(TestCase):
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=MOCK_ZIP)
     def test_init(self, open_mock, mock_exists):
-        sig = SigVerifyer(filename="test.zip", signature=MOCK_SIG, pubkey=MOCK_PEM)
+        sig = SigVerifyer(
+            filename="test.zip", signature=MOCK_SIG, pubkey=MOCK_PEM, regexp=r".*\.zip"
+        )
         sig.load()
 
         mock_exists.assert_called_once_with("test.zip")
@@ -29,7 +31,9 @@ class TestSigVerifyerDownloader(TestCase):
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=MOCK_ZIP)
     def test_verify(self, open_mock, mock_exists):
-        sig = SigVerifyer(filename="test.zip", signature=MOCK_SIG, pubkey=MOCK_PEM)
+        sig = SigVerifyer(
+            filename="test.zip", signature=MOCK_SIG, pubkey=MOCK_PEM, regexp=r".*\.zip"
+        )
         sig.load()
 
         result = sig.verify()

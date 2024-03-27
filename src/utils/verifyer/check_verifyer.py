@@ -52,3 +52,27 @@ class CheckVerifyer(BaseVerifyer):
             # pylint: disable=unspecified-encoding
             with open(self.filename, self.read_mode) as f_data:
                 self.data = f_data.read()
+
+    @property
+    def certificate(self) -> typing.SupportsBytes:
+        """Getter for certificate"""
+        self.debug(f"certificate::getter={self._certificate}")
+        return self._certificate
+
+    @certificate.setter
+    def certificate(self, value: typing.SupportsBytes):
+        """Setter for certificate"""
+        self.debug(f"certificate::setter={value}")
+        self._certificate = value
+
+    @property
+    def signature(self) -> typing.SupportsBytes:
+        """Getter for signature bytes"""
+        self.debug(f"signature::getter={self._signature}")
+        return self._signature
+
+    @signature.setter
+    def signature(self, value: typing.SupportsBytes):
+        """Set the public key on X509 object"""
+        self.debug(f"signature::setter={value}")
+        self._signature = value

@@ -168,14 +168,13 @@ async function flashDevice () {
 
 async function wipeDevice () {
   const message = [
-    "\t\t\t\tTHE DEVICE WILL BE WIPED, DESTRUCTIVELY,",
-    "\t\t\t\t    AND MUST BE RE-FLASHED AFTERWARDS.",
+    "\t\t\t\t\tWARNING: CRITICAL OPERATION",
     "",
-    "After wiped, device will have no firmware, so even when it's turned on, the screen will remain turned off.",
+    "You are about to initiate a FULL WIPE of this device. This operation will:",
     "",
-    "This is useful in case your device is not working properly, is bricked or if you want to erase any trace of information (such as private keys).",
-    "",
-    "If you choose \"OK\", it's encouraged to quit krux-installer, re-open it, and flash a new firmware.",
+    "- Permanently erase all saved data.",
+    "- Remove the existing firmware.",
+    "- Render the device non-functional until new firmware is re-flashed."
   ].join("\n")
   
   const confirmed = confirm(message)

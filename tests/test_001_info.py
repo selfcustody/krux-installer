@@ -7,11 +7,8 @@ class TestInfo(TestCase):
 
     @patch("src.utils.info.currentframe")
     def test_fail_co_varnames(self, mock_currentframe):
-        mock_co_varnames = MagicMock()
-        mock_co_varnames.side_effect = IndexError
-
         mock_f_code = MagicMock()
-        mock_f_code.co_varnames = mock_co_varnames
+        mock_f_code.co_varnames = []
 
         mock_f_back = MagicMock()
         mock_f_back.f_code = mock_f_code

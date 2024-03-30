@@ -26,9 +26,16 @@ import re
 import sys
 
 REG_CLI = r"^(.*krux-installer)(\.py)?(.*)$"
+REG_APP = r"^(.*krux-installer)(\.py)?$"
 
-if not re.findall(REG_CLI, " ".join(sys.argv)):
-    print("Reserved to run kivy app")
+if re.findall(REG_APP, " ".join(sys.argv)):
+    import os
+    from src.app import KruxInstallerApp
+    from src.app import MainScreen
+
+    app = KruxInstallerApp()
+    app.screens = [MainScreen()]
+    app.run()
 
 if re.findall(REG_CLI, " ".join(sys.argv)):
 

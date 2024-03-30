@@ -37,7 +37,7 @@ format-src= "black ./src"
 format-tests= "black ./tests"
 format-installer = "black ./krux-installer.py"
 format = ["format-src", "format-tests", "format-installer"]
-lint-src = "pylint --ignore-paths=./src/utils/kboot ./src"
+lint-src = "pylint ./src"
 lint-tests = "pylint --disable=C0114,C0115,C0116,R0904 ./tests"
 lint = ["lint-src", "lint-tests"]
 test = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov-report html ./tests"

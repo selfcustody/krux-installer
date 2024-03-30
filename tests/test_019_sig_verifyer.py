@@ -31,20 +31,24 @@ class TestSigVerifyerDownloader(TestCase):
         mock_exists.assert_called_once_with("test.zip")
         open_mock.assert_called_once_with("test.zip", "rb")
 
-    
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=MOCK_ZIP)
     def test_fail_init_zip(self, open_mock, mock_exists):
         with self.assertRaises(ValueError) as exc_info:
-            sig = SigVerifyer(
-                filename="test.zip", signature=MOCK_SIG, pubkey=MOCK_PEM, regexp=r".*\.txt"
+            SigVerifyer(
+                filename="test.zip",
+                signature=MOCK_SIG,
+                pubkey=MOCK_PEM,
+                regexp=r".*\.txt",
             )
             mock_exists.assert_called_once_with("test.zip")
             open_mock.assert_called_once_with("test.zip", "rb")
 
-        self.assertEqual(str(exc_info.exception), "Invalid file: test.zip do not assert with .*\\.txt")
+        self.assertEqual(
+            str(exc_info.exception),
+            "Invalid file: test.zip do not assert with .*\\.txt",
+        )
 
-        
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=MOCK_ZIP)
     def test_init_any(self, open_mock, mock_exists):
@@ -74,7 +78,10 @@ class TestSigVerifyerDownloader(TestCase):
     @patch("builtins.open", new_callable=mock_open, read_data=MOCK_ZIP)
     def test_fail_verify_sig(self, open_mock, mock_exists):
         sig = SigVerifyer(
-            filename="test.zip", signature=MOCK_SIG_FAIL, pubkey=MOCK_PEM, regexp=r".*\.zip"
+            filename="test.zip",
+            signature=MOCK_SIG_FAIL,
+            pubkey=MOCK_PEM,
+            regexp=r".*\.zip",
         )
         sig.load()
 

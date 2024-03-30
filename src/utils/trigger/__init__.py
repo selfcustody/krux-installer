@@ -39,10 +39,9 @@ class Trigger:
 
     def __init__(self, logger: typing.Callable = print):
         self.logger_callback = logger
+        self.loglevel = "info"
         if os.environ.get("LOGLEVEL"):
             self.loglevel = os.environ.get("LOGLEVEL")
-        else:
-            self.loglevel = "info"
 
     @property
     def logger_callback(self):

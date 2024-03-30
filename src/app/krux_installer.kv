@@ -1,0 +1,74 @@
+#:kivy 2.3.0
+
+<MainScreen>:    
+	
+	GridLayout:
+		
+		cols: 1
+		rows: 4
+			
+    	Button:
+			id: main_flash_device
+			text: 'Flash Device'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			#on_press: root.on_press_sign_button()
+    		#on_release: root.on_release_sign_button()
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+		
+		
+    	Button:
+			id: main_wipe_device
+			text: 'Wipe Device'
+			font_size: root.height // 25
+        	#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			#on_press: root.on_press_verify_button()
+			#on_release: root.on_release_verify_button()
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+
+		
+    	Button:
+			id: main_sign_verify_file
+			text: 'Sign / Verify File'
+			font_size: root.height // 25
+        	#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			#on_press: root.on_press_verify_button()
+			#on_release: root.on_release_verify_button()
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+
+    	Button:
+			id: main_settings
+			text: 'Settings'
+			font_size: root.height // 25
+        	#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			#on_press: root.on_press_verify_button()
+			#on_release: root.on_release_verify_button()
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height

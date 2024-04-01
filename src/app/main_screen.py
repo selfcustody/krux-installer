@@ -21,14 +21,12 @@
 """
 main_screen.py
 """
-from kivy.uix.screenmanager import Screen
-from ..utils.trigger import Trigger
+
+from .base_screen import BaseScreen
 
 
-class MainScreen(Screen, Trigger):
+class MainScreen(BaseScreen):
     """Main screen is the 'Home' page"""
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.id = "main_screen"
-        self.name = "MainScreen"
+        super().__init__(wid="main_screen", name="MainScreen", **kwargs)

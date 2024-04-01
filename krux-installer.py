@@ -32,9 +32,11 @@ if re.findall(REG_APP, " ".join(sys.argv)):
     import os
     from src.app import KruxInstallerApp
     from src.app import MainScreen
+    from src.app import FlashScreen
+    from src.app import WipeScreen
 
     app = KruxInstallerApp()
-    app.screens = [MainScreen()]
+    app.screens = [MainScreen(), FlashScreen(), WipeScreen()]
     app.run()
 
 if re.findall(REG_CLI, " ".join(sys.argv)):

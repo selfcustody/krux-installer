@@ -14,8 +14,10 @@
 			#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			#on_press: root.on_press_sign_button()
-    		#on_release: root.on_release_sign_button()
+			on_press: root.on_press(wid="main_flash_device")
+    		on_release:
+                root.on_release(wid="main_flash_device")
+                root.set_screen(name="FlashScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -31,8 +33,10 @@
         	#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			#on_press: root.on_press_verify_button()
-			#on_release: root.on_release_verify_button()
+			on_press: root.on_press(wid="main_wipe_device")
+			on_release:
+                root.on_release(wid="main_wipe_device")
+                root.set_screen(name="WipeScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -48,8 +52,8 @@
         	#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			#on_press: root.on_press_verify_button()
-			#on_release: root.on_release_verify_button()
+			on_press: root.on_press(wid="main_sign_verify_file")
+			on_release: root.on_release(wid="main_sign_verify_file")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -64,8 +68,138 @@
         	#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			#on_press: root.on_press_verify_button()
-			#on_release: root.on_release_verify_button()
+			on_press: root.on_press(wid="main_settings")
+			on_release: root.on_release(wid="main_settings")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+
+<FlashScreen>:    
+
+	GridLayout:
+		
+		cols: 1
+		rows: 4
+			
+    	Button:
+			id: flash_select_device
+			text: 'Select Device'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="flash_select_device")
+    		on_release: root.on_release(wid="flash_select_device")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+
+    	Button:
+			id: flash_select_version
+			text: 'Select Version'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="flash_select_version")
+    		on_release: root.on_release(wid="flash_select_version")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+        
+    	Button:
+			id: flash_execute
+			text: 'Flash!'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="flash_execute")
+    		on_release: root.on_release(wid="flash_execute")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+
+    	Button:
+			id: flash_back
+			text: 'Back'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="flash_back")
+    		on_release: 
+                root.on_release(wid="flash_back")
+                root.set_screen(name="MainScreen", direction="right")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+
+<WipeScreen>:    
+
+	GridLayout:
+		
+		cols: 1
+		rows: 3
+			
+    	Button:
+			id: wipe_select_device
+			text: 'Select Device'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="wipe_select_device")
+    		on_release: root.on_release(wid="wipe_select_device")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+       
+    	Button:
+			id: wipe_execute
+			text: 'Wipe!'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="wipe_execute")
+    		on_release: root.on_release(wid="wipe_execute")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+
+    	Button:
+			id: wipe_back
+			text: 'Back'
+			font_size: root.height // 25
+			#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="wipe_back")
+    		on_release: 
+                root.on_release(wid="wipe_back")
+                root.set_screen(name="MainScreen", direction="right")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1

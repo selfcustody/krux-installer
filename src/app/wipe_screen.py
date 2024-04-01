@@ -19,26 +19,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-krux_installer.py
+main_screen.py
 """
-from kivy.lang.builder import Builder
-from kivy.core.window import Window
-from .base_krux_installer import BaseKruxInstaller, KIVY_FILE
+
+from .base_screen import BaseScreen
 
 
-class KruxInstallerApp(BaseKruxInstaller):
-    """KruxInstallerApp is the Root widget"""
+class WipeScreen(BaseScreen):
+    """Flash screen is where flash occurs"""
 
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        Window.size = (640, 800)
-        Builder.load_file(KIVY_FILE)
-
-    def build(self):
-        """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
-        for screen in self.screens:
-            msg = f"adding screen '{screen.name}'"
-            self.debug(msg)
-            self.screen_manager.add_widget(screen)
-
-        return self.screen_manager
+        super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)

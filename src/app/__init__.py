@@ -24,3 +24,5 @@ __init__.py
 
 from .krux_installer import KruxInstallerApp
 from .main_screen import MainScreen
+from .flash_screen import FlashScreen
+from .wipe_screen import WipeScreen

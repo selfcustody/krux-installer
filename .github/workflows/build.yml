@@ -6,8 +6,6 @@ on:
       - Tests
     types:
       - completed
-    branches:
-      - kivy
   
 jobs:
   build:
@@ -23,7 +21,11 @@ jobs:
       
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.event.workflow_run.head_branch }}
           submodules: recursive
+
+      - name: Adjust branch
+      - run: git branch
       
       - name: Setup Python
         uses: actions/setup-python@v4

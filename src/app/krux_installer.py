@@ -30,6 +30,7 @@ from kivy.core.window import Window
 from ..utils.trigger import Trigger
 
 dirname = os.path.dirname(os.path.realpath(__file__))
+KIVYFILE = os.path.abspath(f"{dirname}/../../krux_installer.kv")
 
 
 class KruxInstallerApp(App, Trigger):
@@ -41,7 +42,7 @@ class KruxInstallerApp(App, Trigger):
         self.screen_manager = ScreenManager()
 
         Window.size = (640, 800)
-        Builder.load_file(f"{dirname}/krux_installer.kv")
+        Builder.load_file(KIVYFILE)
 
     @property
     def screens(self) -> typing.List[Screen]:

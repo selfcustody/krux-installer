@@ -2,13 +2,15 @@ name: Build
 
 on:
   workflow_run:
-    workflows: [Tests]
-    types: [completed]
+    workflows: 
+      - Tests
+    types:
+      - completed
+    branches:
+      - kivy
   
 jobs:
   build:
-
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     strategy:
       matrix:
@@ -34,6 +36,14 @@ jobs:
           python3 -m pip install poetry
           poetry install
 
+      - name: Patch *nix
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: poetry run poe patch-nix
+
+      - name: Patch win
+        if: ${{ runner.os == 'Windows' }}
+        run: poetry run poe patch-win
+        
       - name: Build
         run: poetry run poe build
 

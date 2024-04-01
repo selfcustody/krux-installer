@@ -38,14 +38,14 @@ PYFILE = f"{PYNAME}.py"
 KFILE = str(ROOT_PATH / PYFILE)
 BUILDER_ARGS = [
     PYFILE,
-    "--clean",
-    "--log-level=WARN",
-    "--noconfirm",
+    f"--add-data=pyproject.toml:.",
+    f"--add-data=krux_installer.kv:.",
+    "--windowed",
     "--onefile",
-    f"--add-data={str(ROOT_PATH/'pyproject.toml')}:.",
     f"-n={PYNAME}",
 ]
-print("Running pyinstaller " + " \\\n ".join(BUILDER_ARGS))
+print("RUN " + " \\\n ".join(BUILDER_ARGS))
+print()
 
 # Now build
 PyInstaller.__main__.run(BUILDER_ARGS)

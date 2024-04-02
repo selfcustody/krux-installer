@@ -8,7 +8,8 @@ on:
   pull_request:
 
 jobs:
-  lint-black:
+  
+  black:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +31,7 @@ jobs:
       - name: Check format in tests/
         run: poetry run poe format-tests --check --verbose
           
-  lint-pylint:
+  pylint:
 
     needs: lint-black
     
@@ -58,10 +59,10 @@ jobs:
       - name: Install project and its dependencies
         run: poetry install
         
-      - name: Lint
-        run: poetry run poe lint
+      - name: Lint source
+        run: poetry run poe lint-src
                    
-  run-tests:
+  pytest:
 
     needs: lint-pylint
     
@@ -92,7 +93,9 @@ jobs:
         run: poetry install
       
       - name: Run tests
-        run: poetry run poe test
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: poetry run poe test
 
   coverage:
 
@@ -119,7 +122,68 @@ jobs:
         run: poetry install
       
       - name: Build coverage file
-        run: poetry run poe coverage
+        uses: coactions/setup-xvfb@v1
+        with:
+          run: poetry run poe coverage
       
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3
+
+  build:
+
+    needs: coverage
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-12]
+        version: ["3.10", "3.11", "3.12"]
+      
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_branch }}
+          submodules: recursive
+
+      - name: Adjust branch
+        run: git branch
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.version }}
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+          poetry install
+
+      - name: Patch *nix
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: poetry run poe patch-nix
+
+      - name: Patch win
+        if: ${{ runner.os == 'Windows' }}
+        run: poetry run poe patch-win
+        
+      - name: Build
+        run: poetry run poe build
+
+      - name: Hash
+        uses: qlrd/sha256sum-action@v2
+        id: hash
+        with:
+          working-directory: ./dist
+          file: krux-installer
+          ext: 'sha256.txt'
+
+      - name: Upload
+        uses: actions/upload-artifact@v4         
+        with:
+          name: krux-installer-${{ matrix.os }}-py${{ matrix.version }}
+          path:
+            - dist/krux-installer
+            - ${{ steps.hash.outputs.hash-file }}

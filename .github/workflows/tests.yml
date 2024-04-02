@@ -99,7 +99,7 @@ jobs:
 
   coverage:
 
-    needs: tests
+    needs: pytest
 
     runs-on: ubuntu-latest
     

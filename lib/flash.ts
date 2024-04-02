@@ -79,7 +79,7 @@ export default class FlashHandler extends Handler {
           let found = false
           ports.forEach((port) => {
             if (port.productId == "0403" && !found) {
-              this.send(`${this.name}:data`, `found device at ${port.path}`)
+              this.send(`${this.name}:data`, `found device at ${port.path}\n`)
               flash.args.push("-p")
               flash.args.push(port.path)
               found = true
@@ -94,7 +94,7 @@ export default class FlashHandler extends Handler {
           const ports = await SerialPort.list()
           ports.forEach((port) => {
             if (port.productId == "0403") {
-              this.send(`${this.name}:data`, `found device at ${port.path}`)
+              this.send(`${this.name}:data`, `found device at ${port.path}\n`)
               flash.args.push("-p")
               flash.args.push(port.path)
             }
@@ -107,7 +107,7 @@ export default class FlashHandler extends Handler {
         try {
           const ports = await SerialPort.list()
           ports.forEach((port) => {
-            this.send(`${this.name}:data`, `found device at ${port.path}`)
+            this.send(`${this.name}:data`, `found device at ${port.path}\n`)
             if (port.productId == "7523") {
               flash.args.push("-p")
               flash.args.push(port.path)
@@ -122,7 +122,7 @@ export default class FlashHandler extends Handler {
           const ports = await SerialPort.list()
           ports.forEach((port) => {
             if (port.productId == "7523") {
-              this.send(`${this.name}:data`, `found device at ${port.path}`)
+              this.send(`${this.name}:data`, `found device at ${port.path}\n`)
               flash.args.push("-p")
               flash.args.push(port.path)
             }

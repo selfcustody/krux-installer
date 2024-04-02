@@ -59,7 +59,6 @@ const allOutput: Ref<string> = ref('')
   Methods
  */
 async function backToFn () {
-  output.value = output.value.split(' ').splice(0).join('')
   await window.api.invoke('krux:store:get', { from: 'FlashToDevice', keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
 }
 
@@ -68,7 +67,6 @@ async function exitAppFn () {
 }
 
 onMounted(async function () {
-  allOutput.value = allOutput.value.split(' ').splice(0).join('')
   await window.api.invoke('krux:unzip', { will: 'flash' })
 })
 

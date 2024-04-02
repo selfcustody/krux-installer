@@ -181,9 +181,7 @@ jobs:
           ext: 'sha256.txt'
 
       - name: Upload
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v4
         with:
           name: krux-installer-${{ matrix.os }}-py${{ matrix.version }}
-          path:
-            - dist/krux-installer
-            - ${{ steps.hash.outputs.hash-file }}
+          path: dist/krux-installer*

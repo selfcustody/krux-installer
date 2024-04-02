@@ -5,7 +5,7 @@
 	GridLayout:
 		
 		cols: 1
-		rows: 4
+		rows: 5
 			
     	Button:
 			id: main_flash_device
@@ -70,6 +70,22 @@
 			color: 1, 1, 1, 1
 			on_press: root.on_press(wid="main_settings")
 			on_release: root.on_release(wid="main_settings")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height
+        
+    	Button:
+			id: main_about
+			text: 'About'
+			font_size: root.height // 25
+        	#font_name: 'terminus'
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+			on_press: root.on_press(wid="main_about")
+			on_release: root.on_release(wid="main_about")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1

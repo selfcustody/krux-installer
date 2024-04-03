@@ -152,7 +152,7 @@ jobs:
         uses: Homebrew/actions/setup-homebrew@master
 
       - name: Install OpenGL (macOS)
-        if: ${{ runner.os === 'macOS' }}
+        if: ${{ runner.os == 'macOS' }}
         run: brew install glew glfw
       
       - name: Setup Python

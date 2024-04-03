@@ -147,8 +147,13 @@ jobs:
           ref: ${{ github.event.workflow_run.head_branch }}
           submodules: recursive
 
-      - name: Adjust branch
-        run: git branch
+      - name: Set up Homebrew
+        if: ${{ runner.os == 'macOS' }}
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install OpenGL (macOS)
+        if: ${{ runner.os === 'macOS' }}
+        run: brew install glew glfw
       
       - name: Setup Python
         uses: actions/setup-python@v4

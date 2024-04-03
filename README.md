@@ -61,20 +61,54 @@ poetry run poe format
 
 After format:
 
+**Source code**:
+
 ```
-poetry run poe lint
+poetry run poe lint-src
 ```
+
+**Test code**:
+
+```
+poetry run poe lint-tests
+```
+
 
 ### Test
 
 Krux-Installer uses `poe` task manager for tests. This will generate a
 `htmlcov/index.html` folder with coverage results to navigate in a browser.
 
+**With a system without window manager** (Github-Actions and like):
+
 ```bash
 poetry run poe test
 ```
 
-## Build
+**With a system with window manager**:
+
+```bash
+poetry run poe test --no-xvfb
+```
+
+### Patch pyinstaller
+
+At the moment, you'll need to [patch some code on `kivy`](https://github.com/kivy/kivy/issues/8653#issuecomment-2028509695)
+to build the Graphical User Interface:
+
+**Linux and macOS**:
+
+```
+poetry run poe patch-nix
+```
+
+**Windows**:
+
+```
+poetry run poe patch-win
+```
+
+### Build
 
 To build `krux-installer` as standalone executable, run:
 
@@ -86,6 +120,18 @@ It will export all project in a binary
 (without extension for linux and macOS and with `.exe` for windows)
 located at `./dist/krux-installer`.
 
+## GUI
+
+Simple run the `./dist/krux-installer` command without arguments:
+
+```
+./dist/krux-installer
+```
+
+<p>
+  <img src="./screenshots/main_page.png" alt>
+  <em>Figure 1: Krux-Installer MainPage</em>
+</p>
 
 ## CLI
 

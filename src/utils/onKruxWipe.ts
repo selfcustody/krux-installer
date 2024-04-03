@@ -8,6 +8,6 @@ export default function (
     result:Record<string, any>
   ): void {
     data.value.done = result.done
-    delete data.value.output
+    data.value.output = ""
   }
 }

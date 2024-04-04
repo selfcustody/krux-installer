@@ -2,8 +2,6 @@
 
 import ElectronStore from 'electron-store';
 import Handler from './handler'
-import { join } from 'path';
-import { existsAsync } from './utils';
 import { glob } from 'glob'
 
 export default class CheckIfItWillWipeHandler extends Handler {
@@ -42,11 +40,12 @@ export default class CheckIfItWillWipeHandler extends Handler {
       const resources = this.storage.get('resources') as string
 
       if (device.match(/maixpy_(m5stickv|amigo|bit|dock|yahboom|cube)/g)) {
-        const globfiles = await glob(`${resources}/**/*.{kfpkg,zip}`, { ignore: `${resources}/main/**` })
-
+        const globfiles = await glob(`${resources}/**/@(krux-v*.zip|ktool-*)`)
+        
         if (globfiles.length > 0) {
           this.send(`${this.name}:success`, { showWipe: true })
         } else {
+          console.log('no found')
           this.send(`${this.name}:success`, { showWipe: false })
         }
       } else {

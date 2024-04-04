@@ -3,6 +3,7 @@
 import { join } from 'path'
 import { createWriteStream } from 'fs'
 import { ZipFile, open } from 'yauzl'
+import { glob } from 'glob'
 import { mkdirAsync } from './utils'
 import Handler from './handler'
 import ElectronStore from 'electron-store'
@@ -25,6 +26,102 @@ export default class UnzipResourceHandler extends Handler {
     super('krux:unzip', win, storage, ipcMain)
   }
 
+  async onUnzip (zipFilePath: string, resources: string, device: string, os: string, isMac10: boolean, options: { will?: any }) {
+    this.send(`${this.name}:data`, `Extracting ${zipFilePath}<br/><br/>`)
+
+    const zipfile = await openZipFile(zipFilePath)
+    zipfile.readEntry()
+
+    // Each fileName should be added to entries array
+    // that will be returned to client application
+    // This event should extract each file to
+    // a destination folder defined in store
+    zipfile.on('entry', async (entry) => {
+
+    // Directory file names end with '/'.
+    // Note that entries for directories themselves are optional.
+    // An entry's fileName implicitly requires its parent directories to exist.
+    const destination = join(resources, entry.fileName)
+
+    if (/\/$/.test(entry.fileName)) {
+      const onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
+      const deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
+      if (onlyRootKruxFolder.test(entry.fileName) ||  deviceKruxFolder.test(entry.fileName)) {
+        this.send(`${this.name}:data`, `Creating ${destination}<br/><br/>`)
+        await mkdirAsync(destination)
+      }
+        zipfile.readEntry();
+      } else {
+        let ktoolKrux: RegExp;
+        let deviceKruxFirmwareBin: RegExp;
+        let deviceKruxFirmwareBinSig: RegExp;
+        let deviceKruxKboot: RegExp;
+
+        if (os === 'linux') {
+          ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-linux$/
+        } else if (os === 'darwin' && !isMac10) {
+           ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac$/
+        } else if (os === 'darwin' && isMac10) {
+          ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac-10$/
+        } else if (os === 'win32') {
+          ktoolKrux = /^(.*\\)?krux-v[0-9\.]+\\ktool-win\.exe$/
+        }
+
+        if (os === 'linux' || os === 'darwin') {
+          deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)
+          deviceKruxFirmwareBinSig = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin.sig$`)
+          deviceKruxKboot = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/kboot.kfpkg$`)
+        } else if (os === 'win32') {
+          deviceKruxFirmwareBin = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\firmware.bin$`)
+          deviceKruxFirmwareBinSig = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\firmware.bin.sig$`)
+          deviceKruxKboot = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\kboot.kfpkg$`)
+        }
+
+        // (only extract device related files)
+        if (
+          deviceKruxFirmwareBin.test(destination) ||
+          deviceKruxFirmwareBinSig.test(destination) || 
+          deviceKruxKboot.test(destination) ||
+          ktoolKrux.test(destination)
+        ) {
+          // create the destination file
+          const writeStream = createWriteStream(destination)
+
+          this.send(`${this.name}:data`, `Extracting ${entry.fileName}...<br/><br/>`)
+
+          // extract it
+          zipfile.openReadStream(entry, (entryError, readStream) => {
+            if (entryError) {
+              this.send(`${this.name}:error`, { name: entryError.name, message: entryError.message, stack: entryError.stack })
+            } else {
+              readStream.on('end', () => {
+                this.send(`${this.name}:data`, `Extracted to ${destination}<br/><br/>`)
+                zipfile.readEntry()
+              })
+
+              readStream.on('error', (streamErr) => {
+                this.send(`${this.name}:error`, { name: streamErr.name, message: streamErr.message, stack: streamErr.stack })
+              })
+
+              readStream.pipe(writeStream)
+            }
+          })
+        } else {
+          zipfile.readEntry()
+        }
+      }
+    })
+
+    zipfile.on('end', () => {
+      zipfile.close()
+      this.send(`${this.name}:success`, { will: options.will })
+    })
+
+    zipfile.on('error', (zipErr) => {
+      this.send(`${this.name}:error`, { name: zipErr.name, message: zipErr.message, stack: zipErr.stack })
+    })    
+  }
+  
   /**
    * Builds a `handle` method for `ipcMain` to be called
    * with `invoke` method in `ipcRenderer`.
@@ -63,11 +160,12 @@ export default class UnzipResourceHandler extends Handler {
       try {
         // Only unzip if is a selfcustody version
         let version = this.storage.get('version') as string;
+        const device = this.storage.get('device') as string;
+        const resources  = this.storage.get('resources') as string;
+        const os  = this.storage.get('os') as string;
+        const isMac10  = this.storage.get('isMac10') as boolean;
+        
         if (version.match(/selfcustody.*/g)) {
-          const device = this.storage.get('device') as string;
-          const resources  = this.storage.get('resources') as string;
-          const os  = this.storage.get('os') as string;
-          const isMac10  = this.storage.get('isMac10') as boolean;
           version = version.split('tag/')[1];
           const zipFilePath = join(resources, version, `krux-${version}.zip`)
 
@@ -81,102 +179,20 @@ export default class UnzipResourceHandler extends Handler {
               this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack})
             }
           }
-          
-          this.send(`${this.name}:data`, `Extracting ${zipFilePath}<br/><br/>`)
-
-          const zipfile = await openZipFile(zipFilePath)
-          zipfile.readEntry()
-
-          // Each fileName should be added to entries array
-          // that will be returned to client application
-          // This event should extract each file to
-          // a destination folder defined in store
-          zipfile.on('entry', async (entry) => {
-
-            // Directory file names end with '/'.
-            // Note that entries for directories themselves are optional.
-            // An entry's fileName implicitly requires its parent directories to exist.
-            const destination = join(resources, entry.fileName)
-
-            if (/\/$/.test(entry.fileName)) {
-              const onlyRootKruxFolder = /^(.*\/)?krux-v[0-9\.]+\/$/
-              const deviceKruxFolder = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/$`)
-              if (onlyRootKruxFolder.test(entry.fileName) ||  deviceKruxFolder.test(entry.fileName)) {
-                this.send(`${this.name}:data`, `Creating ${destination}<br/><br/>`)
-                await mkdirAsync(destination)
-              }
-              zipfile.readEntry();
-            } else {
-
-              let ktoolKrux: RegExp;
-              let deviceKruxFirmwareBin: RegExp;
-              let deviceKruxFirmwareBinSig: RegExp;
-              let deviceKruxKboot: RegExp;
-
-              if (os === 'linux') {
-                ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-linux$/
-              } else if (os === 'darwin' && !isMac10) {
-                ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac$/
-              } else if (os === 'darwin' && isMac10) {
-                ktoolKrux = /^(.*\/)?krux-v[0-9\.]+\/ktool-mac-10$/
-              } else if (os === 'win32') {
-                ktoolKrux = /^(.*\\)?krux-v[0-9\.]+\\ktool-win\.exe$/
-              }
-
-              if (os === 'linux' || os === 'darwin') {
-                deviceKruxFirmwareBin = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin$`)
-                deviceKruxFirmwareBinSig = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/firmware.bin.sig$`)
-                deviceKruxKboot = new RegExp(`^(.*\/)?krux-v[0-9\.]+\/${device}\/kboot.kfpkg$`)
-              } else if (os === 'win32') {
-                deviceKruxFirmwareBin = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\firmware.bin$`)
-                deviceKruxFirmwareBinSig = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\firmware.bin.sig$`)
-                deviceKruxKboot = new RegExp(`^(.*\\\\)?krux-v[0-9\.]+\\\\${device}\\\\kboot.kfpkg$`)
-              }
-
-              // (only extract device related files)
-              if (
-                deviceKruxFirmwareBin.test(destination) ||
-                deviceKruxFirmwareBinSig.test(destination) || 
-                deviceKruxKboot.test(destination) ||
-                ktoolKrux.test(destination)
-              ) {
-                
-                // create the destination file
-                const writeStream = createWriteStream(destination)
-
-                this.send(`${this.name}:data`, `Extracting ${entry.fileName}...<br/><br/>`)
-
-                // extract it
-                zipfile.openReadStream(entry, (entryError, readStream) => {
-                  if (entryError) {
-                    this.send(`${this.name}:error`, { name: entryError.name, message: entryError.message, stack: entryError.stack })
-                  } else {
-                    readStream.on('end', () => {
-                      this.send(`${this.name}:data`, `Extracted to ${destination}<br/><br/>`)
-                      zipfile.readEntry()
-                    })
-
-                    readStream.on('error', (streamErr) => {
-                      this.send(`${this.name}:error`, { name: streamErr.name, message: streamErr.message, stack: streamErr.stack })
-                    })
-
-                    readStream.pipe(writeStream)
-                  }
-                })
+          this.onUnzip(zipFilePath, resources, device, os, isMac10, options)
+        } else if (version === 'Select version') {
+           const globfiles = await glob(`${resources}/**/@(krux-v*.zip|ktool-*)`)
+            if (globfiles.length > 0) {
+              if (globfiles[0].includes('.zip')) {
+                const zipFilePath = globfiles[0]
+                this.onUnzip(zipFilePath, resources, device, os, isMac10, options)
               } else {
-                zipfile.readEntry()
+                this.send(`${this.name}:success`, { will: options.will })
               }
+            } else {
+              const error = new Error("No ktool found")
+              this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack})
             }
-          })
-
-          zipfile.on('end', () => {
-            zipfile.close()
-            this.send(`${this.name}:success`, { will: options.will })
-          })
-
-          zipfile.on('error', (zipErr) => {
-            this.send(`${this.name}:error`, { name: zipErr.name, message: zipErr.message, stack: zipErr.stack })
-          })
         } else {
           this.send(`${this.name}:success`, { will: options.will })
         }

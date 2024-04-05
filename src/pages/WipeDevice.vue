@@ -7,9 +7,9 @@
             <v-card
               variant="outlined"
             >
-              <v-card-title > {{ !done ? 'Flashing...' : 'Do not trust, verify! ' }} </v-card-title>
+              <v-card-title > {{ !done ? 'Wiping...' : 'Do not trust, verify! ' }} </v-card-title>
               <v-card-subtitle> {{ !done ? 'Do not unplug device or shutdown computer!' : 'Before quit:' }} </v-card-subtitle>
-              <v-card-subtitle> {{ !done ? '' : '(1) Scroll down the output to check what happened to your device;' }} </v-card-subtitle>
+              <v-card-subtitle> {{ !done ? 'It may take a while to complete.' : '(1) Scroll down the output to check what happened to your device;' }} </v-card-subtitle>
               <v-card-subtitle> {{ !done ? '' : '(2) shutdown your device and unplug it' }} </v-card-subtitle>
               <v-card-text>
                 <div class="console" v-html="!done ? output : allOutput" />
@@ -59,7 +59,7 @@ const allOutput: Ref<string> = ref('')
   Methods
  */
 async function backToFn () {
-  await window.api.invoke('krux:store:get', { from: 'FlashToDevice', keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
+  await window.api.invoke('krux:store:get', { from: 'WipeDevice', keys: ['device', 'version', 'os', 'isMac10', 'showFlash'] })
 }
 
 async function exitAppFn () {
@@ -67,7 +67,7 @@ async function exitAppFn () {
 }
 
 onMounted(async function () {
-  await window.api.invoke('krux:unzip', { will: 'flash' })
+  await window.api.invoke('krux:unzip', { will: 'wipe' })
 })
 
 watch(output, function(newValue) {

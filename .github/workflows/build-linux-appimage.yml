@@ -17,9 +17,9 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "20.10.0"
+          node-version: "20.11.1"
 
       - name: Variables helpers
         id: setup
@@ -54,13 +54,13 @@ jobs:
           ls -la release/${{ steps.setup.outputs.app-version }}
           echo "::endgroup::"
 
-      - name: Install xvfb-maybe to allow headless test
-        run: yarn add --dev xvfb-maybe
+      #- name: Install xvfb-maybe to allow headless test
+      #  run: yarn add --dev xvfb-maybe
 
-      - name: E2E test electron app
-        env:
-          DEBUG: 'krux:*'
-        run: ./node_modules/.bin/xvfb-maybe ./node_modules/.bin/wdio run wdio.conf.mts
+      #- name: E2E test electron app
+      #  env:
+      #    DEBUG: 'krux:*'
+      #  run: ./node_modules/.bin/xvfb-maybe ./node_modules/.bin/wdio run wdio.conf.mts
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3

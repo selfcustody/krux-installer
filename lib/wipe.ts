@@ -6,11 +6,12 @@ import { SudoerLinux, SudoerDarwin } from '@o/electron-sudo/src/sudoer'
 import ElectronStore from 'electron-store'
 import Handler from './handler'
 import { SerialPort } from 'serialport'
+import { glob } from 'glob'
 
 export default class FlashHandler extends Handler {
 
   constructor (win: Electron.BrowserWindow, storage: ElectronStore, ipcMain: Electron.IpcMain) {
-    super('krux:flash', win, storage, ipcMain);
+    super('krux:wipe', win, storage, ipcMain);
   }
 
   /**
@@ -50,27 +51,12 @@ export default class FlashHandler extends Handler {
       const flash = { command: '', args: [] }
       const chmod = { commands: [] }
 
-      // dynamic variables
-      let  version = this.storage.get('version') as string
-      let cwd = ''
-
-      if (version.match(/selfcustody/g)) {
-        version = version.split('tag/')[1]
-        cwd = join(resources, `krux-${version}`)
-      } else if (version.match(/odudex/g)) {
-        version = join(version, 'main')
-        cwd = join(resources, version)
-      }
-
-      // set correct kboot.kfpkg
-      const kboot = join(cwd, device, 'kboot.kfpkg')
-
       // set correct flash instructions
       // if the device 'maixpy_dock' the board argument (-B) is 'dan', 
       // otherwise, is 'goE'
       // SEE https://github.com/odudex/krux_binaries#flash-instructions
       if (device.match(/maixpy_(m5stickv|amigo)/)) {
-        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
+        flash.args = ['--verbose', '-B', 'goE', '-b', '1500000']
         try {
           const ports = await SerialPort.list()
           
@@ -79,75 +65,78 @@ export default class FlashHandler extends Handler {
           let found = false
           ports.forEach((port) => {
             if (port.productId == "0403" && !found) {
-              this.send(`${this.name}:data`, `found device at ${port.path}\n`)
               flash.args.push("-p")
               flash.args.push(port.path)
               found = true
             }
-          })
-        } catch (error) {
-          this.send(`${this.name}:error`, { was: 'flash', done: false, name: error.name, message: error.message, stack: error.stack })
+          })       
+        } catch (err) {
+          this.send(`${this.name}:error`, { was: 'wipe', done: false , name: err.name, message: err.message, stack: err.stack })
         }
       } else if (device.match(/maixpy_(bit|cube)/)) {
-        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
+        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000']
         try {
           const ports = await SerialPort.list()
           ports.forEach((port) => {
             if (port.productId == "0403") {
-              this.send(`${this.name}:data`, `found device at ${port.path}\n`)
               flash.args.push("-p")
               flash.args.push(port.path)
             }
           })
-        } catch (error) {
-          this.send(`${this.name}:error`, { was: 'flash', done: false, name: error.name, message: error.message, stack: error.stack })
+        } catch (err) {
+          this.send(`${this.name}:error`, { was: 'wipe', done: false , name: err.name, message: err.message, stack: err.stack })
         }
       } else if (device.match(/maixpy_dock/g)) {
-        flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000', kboot]
+        flash.args = ['--verbose', '-B', 'dan', '-b',  '1500000']
         try {
           const ports = await SerialPort.list()
           ports.forEach((port) => {
-            this.send(`${this.name}:data`, `found device at ${port.path}\n`)
             if (port.productId == "7523") {
               flash.args.push("-p")
               flash.args.push(port.path)
             }
           })
-        } catch (error) {
-          this.send(`${this.name}:error`, { was: 'flash', done: false, name: error.name, message: error.message, stack: error.stack })
+        } catch (err) {
+          this.send(`${this.name}:error`, { was: 'wipe', done: false , name: err.name, message: err.message, stack: err.stack })
         }
       } else if (device.match(/maixpy_yahboom/g)){
-        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000', kboot]
+        flash.args = ['--verbose', '-B', 'goE', '-b',  '1500000']
         try {
           const ports = await SerialPort.list()
           ports.forEach((port) => {
             if (port.productId == "7523") {
-              this.send(`${this.name}:data`, `found device at ${port.path}\n`)
               flash.args.push("-p")
               flash.args.push(port.path)
             }
           })
         } catch (error) {
-          this.send(`${this.name}:error`, { was: 'flash', done: false, name: error.name, message: error.message, stack: error.stack })
+          this.send(`${this.name}:error`, { was: 'wipe', done: false, name: error.name, message: error.message, stack: error.stack })
         }
       } else {
         const error = new Error()
         error.name = "Not Implemented Error"
         error.message = `${device} isnt valid to flash`
-        this.send(`${this.name}:error`, { was: 'flash', done: false, name: error.name, message: error.message, stack: error.stack })
+        this.send(`${this.name}:error`, { was: 'wipe', done: false, name: error.name, message: error.message, stack: error.stack })
       }
+    
+      flash.args.push('-E')
 
       // Choose the correct ktool flasher
+      let globfiles: string[]
       if (os === 'linux') {
-        flash.command = join(cwd, 'ktool-linux')
+        globfiles = await glob(`${resources}/**/ktool-linux`)
+        flash.command = globfiles[0]
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
       } else if (os === 'win32') {
-        flash.command = join(cwd, 'ktool-win.exe')
+        globfiles = await glob(`${resources}/**/ktool-win.exe`)
+        flash.command = globfiles[0]
       } else if (os === 'darwin' && !isMac10) {
-        flash.command = join(cwd, 'ktool-mac')
+        globfiles = await glob(`${resources}/**/ktool-mac`)
+        flash.command = globfiles[0]
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
       } else if (os === 'darwin' && isMac10) {
-        flash.command = join(cwd, 'ktool-mac-10')
+        globfiles = await glob(`${resources}/**/ktool-mac-10`)
+        flash.command = globfiles[0]
         chmod.commands.push({ command: 'chmod', args: ['+x', flash.command] })
       }
 
@@ -223,9 +212,9 @@ export default class FlashHandler extends Handler {
   
       flasher.on('close', (code: any) => {
         if (err) {
-          this.send(`${this.name}:error`, { was: 'flash', done: false , name: err.name, message: err.message, stack: err.stack })
+          this.send(`${this.name}:error`, { was: 'wipe', done: false , name: err.name, message: err.message, stack: err.stack })
         } else {
-          this.send(`${this.name}:success`, { was: 'flash', done: true })
+          this.send(`${this.name}:success`, { was: 'wipe', done: true })
         }
       })
     })

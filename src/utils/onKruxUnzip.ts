@@ -10,8 +10,16 @@ export default function (
 ): Function {
   return async function (
     _: Event, 
-    result:string
+    result:Record<'will', string>
   ): Promise<void>{
-    await window.api.invoke('krux:flash')
+    console.log("DATA===============")
+    console.log(data)
+    console.log("RESULT===============")
+    console.log(result)
+    if (result.will == 'flash') {
+      await window.api.invoke('krux:flash')
+    } else if (result.will == 'wipe') {
+      await window.api.invoke('krux:wipe')
+    }
   }
 }

@@ -11,6 +11,9 @@ export default function (data: Ref<Record<string, any>>): Function {
       ...result,
       backTo: 'Main'
     }
+    if (data.value.output) {
+      data.value.output = ""
+    }
     await window.api.invoke('krux:change:page', { page: 'ErrorMsg' })
   }
 }

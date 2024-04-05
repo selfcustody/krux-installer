@@ -15,6 +15,8 @@ async function add(
 function clean(data: Ref<Record<string, any>>): void {
   data.value.messages = []
   data.value.indexes = []
+  data.value.output = ""
+  data.value.done = false
 }
 
 async function close(data: Ref<Record<string, any>>): Promise<void> {

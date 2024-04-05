@@ -1,6 +1,6 @@
 {
   "name": "krux-installer",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "main": "dist-electron/main/index.js",
   "description": "Graphical User Interface to download, verify and flash Krux´s firmware on Kendryte K210 hardwares as bitcoin signature devices",
   "author": "qlrd <106913782+qlrd@users.noreply.github.com>",
@@ -61,7 +61,6 @@
     "chai": "^5.1.0",
     "electron": "^29.1.0",
     "electron-builder": "^24.4.0",
-    "glob": "^10.3.3",
     "markdownlint-cli": "^0.39.0",
     "mocha": "^10.2.0",
     "os-lang": "^3.1.1",
@@ -83,6 +82,7 @@
     "command-exists": "^1.2.9",
     "debug": "^4.3.4",
     "electron-store": "^8.1.0",
+    "glob": "^10.3.3",
     "serialport": "^12.0.0",
     "vite-plugin-vuetify": "^2.0.1",
     "vue-asciimorph": "^0.0.3",

@@ -65,6 +65,10 @@ jobs:
   pytest:
 
     needs: pylint
+
+    env:
+      KIVY_GL_BACKEND: 'mock'
+      USE_SDL2: 1
     
     strategy:
       matrix:
@@ -79,15 +83,6 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Setup SDL2 frameworks (macOS)
-        if: ${{ runner.os == 'macOS' }}
-        uses: BrettDong/setup-sdl2-frameworks@main
-        with:
-          sdl2: 2.28.5
-          sdl2-ttf: 2.20.2
-          sdl2-image: 2.8.0
-          sdl2-mixer: 2.6.3
-      
       - name: Setup Python
         uses: actions/setup-python@v4
         with:

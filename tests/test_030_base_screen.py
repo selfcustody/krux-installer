@@ -1,4 +1,5 @@
-from kivy.base import EventLoop
+from unittest.mock import patch
+from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
@@ -7,6 +8,7 @@ from src.app.base_screen import BaseScreen
 
 class TestBaseScreen(GraphicUnitTest):
 
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     def test_render(self):
         screen = BaseScreen(wid="mock", name="Mock")
         self.render(screen)
@@ -19,6 +21,7 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(window.children[0], screen)
         self.assertEqual(window.children[0].height, window.height)
 
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     def test_set_background(self):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.ids = {}
@@ -37,6 +40,7 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(window.children[0].ids["mocked_button"].background_color[2], 0)
         self.assertEqual(window.children[0].ids["mocked_button"].background_color[3], 0)
 
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     def test_on_press(self):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.ids = {}
@@ -63,6 +67,7 @@ class TestBaseScreen(GraphicUnitTest):
             window.children[0].ids["mocked_button"].background_color[3], 0.5
         )
 
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     def test_on_release(self):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.ids = {}

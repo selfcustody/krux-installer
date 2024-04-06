@@ -92,10 +92,16 @@ jobs:
       - name: Install project and its dependencies
         run: poetry install
       
-      - name: Run tests
+      - name: Run tests (Linux)
+        if: ${{ runner.os == 'Linux' }}
         uses: coactions/setup-xvfb@v1
         with:
-          run: poetry run poe test
+          run: |
+            poetry add pytest-xvfb
+            poetry run poe test
+
+      - name: Run tests
+        run: poetry run poe test
 
   coverage:
 

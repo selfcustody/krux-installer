@@ -3,7 +3,7 @@ name: Tests
 on:
   push:
     branches:
-      - kivy
+      - main
       
   pull_request:
 
@@ -68,7 +68,14 @@ jobs:
 
     strategy:
       matrix:
-        os: ["ubuntu-latest", "windows-latest", "macos-12", "macos-13", "macos-13-xlarge", "macos-14", "macos-14-large"]
+        os:
+          - ubuntu-latest
+          - windows-latest
+          - macos-12
+          #- macos-13
+          #- macos-13-xlarge
+          #- macos-14
+          #- macos-14-large
         version: ["3.10", "3.11", "3.12"]
         
     runs-on: ${{ matrix.os }}
@@ -79,6 +86,23 @@ jobs:
         with:
           submodules: recursive
 
+      # https://carette.xyz/posts/opengl_and_cpp_on_m1_mac/
+      - name: Setup OpenGL
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew update
+          brew install glfw3
+      
+      - name: Setup SDL2 frameworks
+        if: ${{ runner.os == 'macOS' }}
+        uses: BrettDong/setup-sdl2-frameworks@main
+        with:
+          sdl2: latest
+          sdl2-ttf: latest
+          sdl2-image: 2.6.3
+          sdl2-mixer: none
+          sdl2-net: 2.2.0
+          
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -100,7 +124,16 @@ jobs:
             poetry add pytest-xvfb
             poetry run poe test
 
-      - name: Run tests
+      - name: Run tests (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        env:
+          KIVY_GL_BACKEND: 'angle_sdl2'
+        run: poetry run poe test
+
+      - name: Run tests (macOS)
+        if: ${{ runner.os == 'macOS' }}
+        env:
+          KIVY_GL_BACKEND: 'gl'
         run: poetry run poe test
 
   coverage:
@@ -130,61 +163,9 @@ jobs:
       - name: Build coverage file
         uses: coactions/setup-xvfb@v1
         with:
-          run: poetry run poe coverage
+          run: |
+            poetry install pytest-xvfb
+            poetry run poe coverage
       
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v3
-
-  build:
-
-    needs: coverage
-    
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-12, apple-silicon-m1]
-        version: ["3.10", "3.11", "3.12"]
-      
-    runs-on: ${{ matrix.os }}
-    
-    steps:
-      
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.workflow_run.head_branch }}
-          submodules: recursive
-
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.version }}
-      
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
-          poetry install
-
-      - name: Patch *nix
-        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
-        run: poetry run poe patch-nix
-
-      - name: Patch win
-        if: ${{ runner.os == 'Windows' }}
-        run: poetry run poe patch-win
-        
-      - name: Build
-        run: poetry run poe build
-
-      - name: Hash
-        uses: qlrd/sha256sum-action@v2
-        id: hash
-        with:
-          working-directory: ./dist
-          file: krux-installer
-          ext: 'sha256.txt'
-
-      - name: Upload
-        uses: actions/upload-artifact@v4
-        with:
-          name: krux-installer-${{ matrix.os }}-py${{ matrix.version }}
-          path: dist/krux-installer*

@@ -10,14 +10,20 @@ on:
 jobs:
   
   black:
+
+    strategy:
+      matrix:
+        version: ["3.10", "3.11", "3.12"]
+    
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '${{ matrix.version }}'
+          cache: 'poetry'
       
       - name: Install dependencies
         run: |
@@ -47,9 +53,10 @@ jobs:
           submodules: recursive
 
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '${{ matrix.version }}'
+          cache: 'poetry'
       
       - name: Install dependencies
         run: |
@@ -62,6 +69,10 @@ jobs:
       - name: Lint source
         run: poetry run poe lint-src
                    
+      # from xPsycHoWasPx in discord chat
+      # running macOS in none gpu accelerated mode, and that means no OpenGL,
+      # no OpenGL no kivy window…. if u need to use vm, you also need a dedicated
+      #seperate supported GPU passed through to the osx VM ..
   pytest:
 
     needs: pylint
@@ -72,10 +83,10 @@ jobs:
           - ubuntu-latest
           - windows-latest
           - macos-12
-          #- macos-13
-          #- macos-13-xlarge
-          #- macos-14
-          #- macos-14-large
+          - macos-13
+          - macos-13-xlarge
+          - macos-14
+          - macos-14-large
         version: ["3.10", "3.11", "3.12"]
         
     runs-on: ${{ matrix.os }}
@@ -85,28 +96,12 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-
-      # https://carette.xyz/posts/opengl_and_cpp_on_m1_mac/
-      - name: Setup OpenGL
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          brew update
-          brew install glfw3
       
-      - name: Setup SDL2 frameworks
-        if: ${{ runner.os == 'macOS' }}
-        uses: BrettDong/setup-sdl2-frameworks@main
-        with:
-          sdl2: latest
-          sdl2-ttf: latest
-          sdl2-image: 2.6.3
-          sdl2-mixer: none
-          sdl2-net: 2.2.0
-          
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: '${{ matrix.version }}'
+          cache: 'poetry'
       
       - name: Install dependencies
         run: |
@@ -115,30 +110,84 @@ jobs:
       
       - name: Install project and its dependencies
         run: poetry install
+
+      - name: Test
+        run: poetry run test
+
+  e2e:
+
+    needs: pytest
+
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+        version: ["3.10", "3.11", "3.12"]
+        
+    runs-on: ${{ matrix.os }}
+    
+    steps:
       
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      
+      # https://carette.xyz/posts/opengl_and_cpp_on_m1_mac/
+      #- name: Setup OpenGL
+      #  if: ${{ runner.os == 'macOS' }}
+      #  run: |
+      #    brew update
+      #    brew install glfw3
+      
+      #- name: Setup SDL2 frameworks
+      #  if: ${{ runner.os == 'macOS' }}
+      #  uses: BrettDong/setup-sdl2-frameworks@main
+      #  with:
+      #    sdl2: latest
+      #    sdl2-ttf: latest
+      #    sdl2-image: latest
+      #    sdl2-mixer: latest
+      #    sdl2-net: latest
+          
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '${{ matrix.version }}'
+          cache: 'poetry'
+      
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install poetry
+      
+      - name: Install project and its dependencies
+        run: poetry install
+
       - name: Run tests (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: coactions/setup-xvfb@v1
         with:
           run: |
             poetry add pytest-xvfb
-            poetry run poe test
+            poetry run poe e2e
 
       - name: Run tests (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
-        run: poetry run poe test
+        run: poetry run poe e2e
 
-      - name: Run tests (macOS)
-        if: ${{ runner.os == 'macOS' }}
-        env:
-          KIVY_GL_BACKEND: 'gl'
-        run: poetry run poe test
-
+      #- name: Run tests (MacOS)
+      #  if: ${{ runner.os == 'macOS' }}
+      #  env:
+      #    KIVY_GL_DEBUG: 1
+      #    KIVY_GL_BACKEND: 'gl'
+      #  run: poetry run poe test
+  
   coverage:
 
-    needs: pytest
+    needs: e2e
 
     runs-on: ubuntu-latest
     
@@ -148,9 +197,10 @@ jobs:
           submodules: recursive
     
       - name: Setup Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: '${{ matrix.version }}'
+          cache: 'poetry'
           
       - name: Install dependencies
         run: |

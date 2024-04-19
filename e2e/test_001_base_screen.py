@@ -5,7 +5,6 @@ from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
 from src.app.base_screen import BaseScreen
 
-
 class TestBaseScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -94,10 +93,6 @@ class TestBaseScreen(GraphicUnitTest):
         screen_manager.add_widget(screen_0)
         screen_manager.add_widget(screen_1)
         self.render(screen_manager)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
 
         self.assertEqual(screen_manager.current, "Mock_0")
 

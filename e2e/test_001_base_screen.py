@@ -5,6 +5,7 @@ from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
 from src.app.base_screen import BaseScreen
 
+
 class TestBaseScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

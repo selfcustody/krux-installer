@@ -29,8 +29,11 @@ jobs:
         run: poetry install
 
       - name: Check format/
-        run: poetry run poe format
-
+        run: |
+          poetry run poe format-src --check --format
+          poetry run poe format-tests --check --format
+          poetry run poe format-e2e --check --format
+          poetry run poe format-installer --check --format
   pylint:
 
     needs: black

@@ -103,7 +103,7 @@ jobs:
         run: poetry install
 
       - name: Test
-        run: poetry run test
+        run: poetry run poe test
 
   e2e:
 

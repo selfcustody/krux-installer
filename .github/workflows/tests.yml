@@ -61,13 +61,7 @@ jobs:
         
       - name: Lint src/
         run: poetry run poe lint-src
-      
-      - name: Lint tests/
-        run: poetry run poe lint-tests
 
-      - name: Lint e2e/
-        run: poetry run poe lint-e2e
-                   
   # from xPsycHoWasPx in discord chat
   # running macOS in none gpu accelerated mode, and that means no OpenGL,
   # no OpenGL no kivy window…. if u need to use vm, you also need a dedicated

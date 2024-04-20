@@ -11,66 +11,64 @@ jobs:
   
   black:
 
-    strategy:
-      matrix:
-        version: ["3.10", "3.11", "3.12"]
-    
     runs-on: ubuntu-latest
     steps:
+      
       - uses: actions/checkout@v4
-      
-      - name: Setup Python
-        uses: actions/setup-python@v5
+
+      - name: Install poetry
+        run: pipx install poetry
+        
+      - uses: actions/setup-python@v5
         with:
-          python-version: '${{ matrix.version }}'
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
       
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
-          poetry install
+      - name: Install poetry dependencies
+        run: poetry install
 
-      - name: Check format in src/
-        run: poetry run poe format-src --check --verbose
+      - name: Check format/
+        run: poetry run poe format
 
-      - name: Check format in tests/
-        run: poetry run poe format-tests --check --verbose
-          
   pylint:
 
     needs: black
     
-    strategy:
-      matrix:
-        version: ["3.10", "3.11", "3.12"]
         
     runs-on: ubuntu-latest
     
     steps:
+      
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+          
+      - name: Install poetry
+        run: pipx install poetry
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '${{ matrix.version }}'
-      
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
 
-      - name: Install project and its dependencies
+      - name: Install poetry dependencies
         run: poetry install
         
-      - name: Lint source
+      - name: Lint src/
         run: poetry run poe lint-src
+      
+      - name: Lint tests/
+        run: poetry run poe lint-tests
+
+      - name: Lint e2e/
+        run: poetry run poe lint-e2e
                    
-      # from xPsycHoWasPx in discord chat
-      # running macOS in none gpu accelerated mode, and that means no OpenGL,
-      # no OpenGL no kivy window…. if u need to use vm, you also need a dedicated
-      #seperate supported GPU passed through to the osx VM ..
+  # from xPsycHoWasPx in discord chat
+  # running macOS in none gpu accelerated mode, and that means no OpenGL,
+  # no OpenGL no kivy window…. if u need to use vm, you also need a dedicated
+  #seperate supported GPU passed through to the osx VM ..
   pytest:
 
     needs: pylint
@@ -94,17 +92,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      
-      - name: Setup Python
-        uses: actions/setup-python@v5
+          
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v5
         with:
-          python-version: '${{ matrix.version }}'
-      
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
-      
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
+
       - name: Install project and its dependencies
         run: poetry install
 
@@ -126,10 +123,6 @@ jobs:
     
     steps:
       
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      
       # https://carette.xyz/posts/opengl_and_cpp_on_m1_mac/
       #- name: Setup OpenGL
       #  if: ${{ runner.os == 'macOS' }}
@@ -147,16 +140,19 @@ jobs:
       #    sdl2-mixer: latest
       #    sdl2-net: latest
           
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
         with:
-          python-version: '${{ matrix.version }}'
-      
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
-      
+          submodules: recursive
+          
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
+
       - name: Install project and its dependencies
         run: poetry install
 
@@ -188,23 +184,23 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+     
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-    
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '${{ matrix.version }}'
           
-      - name: Install dependencies
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install poetry
-      
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
+
       - name: Install project and its dependencies
         run: poetry install
-      
+
       - name: Build coverage file
         uses: coactions/setup-xvfb@v1
         with:

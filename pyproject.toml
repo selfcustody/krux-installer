@@ -32,10 +32,11 @@ verbosity = 1
 
 [tool.poe.tasks]
 cli = "python src/krux-installer.py"
-format-src= "black ./src"
-format-tests= "black ./tests"
-format-installer = "black ./krux-installer.py"
-format = ["format-src", "format-tests", "format-installer"]
+format-src= "black ./src --check --verbose"
+format-tests= "black ./tests --check --verbose"
+format-e2e= "black ./e2e --check --verbose"
+format-installer = "black ./krux-installer.py --check --verbose"
+format = ["format-src", "format-tests", "format-e2e", "format-installer"]
 lint-src = "pylint ./src"
 lint-tests = "pylint --disable=C0114,C0115,C0116,R0904 ./tests"
 lint-e2e = "pylint --disable=C0114,C0115,C0116,R0904 ./e2e"

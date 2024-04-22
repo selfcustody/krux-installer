@@ -101,7 +101,7 @@ jobs:
         
       - name: Run tests (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: coactions/setup-xvfb@v1
+        uses: coactions/setup-xvfb@90473c3ebc69533a1a6e0505c36511b69c8c3135
         with:
           run: |
             poetry add pytest-xvfb
@@ -149,7 +149,7 @@ jobs:
         run: poetry install
 
       - name: Build coverage file
-        uses: coactions/setup-xvfb@v1
+        uses: coactions/setup-xvfb@90473c3ebc69533a1a6e0505c36511b69c8c3135
         with:
           run: |
             poetry add pytest-xvfb

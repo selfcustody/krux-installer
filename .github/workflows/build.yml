@@ -5,6 +5,7 @@ on:
     workflows: 
       - Tests
     types:
+      - success
       - completed
   
 jobs:

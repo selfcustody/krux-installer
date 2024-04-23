@@ -70,7 +70,9 @@
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
 			on_press: root.on_press(wid="main_about")
-			on_release: root.on_release(wid="main_about")
+			on_release:
+                root.on_release(wid="main_about")
+                root.set_screen(name="AboutScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -269,3 +271,25 @@
             		rectangle: self.x, self.y, self.width, self.height
         
     
+<AboutScreen>:
+
+    GridLayout:
+        cols: 1
+        rows: 1
+        
+        Button:
+            id: about_label
+            text: 'KruxInstaller\n      v0.0.2'
+			font_size: root.height // 25
+			background_color: 0, 0, 0, 0
+			color: 1, 1, 1, 1
+            on_press: root.on_press(wid="about_label")
+            on_release:
+                root.on_release(wid="about_label")
+                root.set_screen(name="MainScreen", direction="right")
+			canvas.before:
+        		Color:
+            		rgba: 1, 1, 1, 1
+        		Line:
+            		width: 0.5
+            		rectangle: self.x, self.y, self.width, self.height

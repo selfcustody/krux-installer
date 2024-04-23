@@ -19,12 +19,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-__init__.py
+about_screen.py
 """
 
-from .krux_installer import KruxInstallerApp
-from .main_screen import MainScreen
-from .flash_screen import FlashScreen
-from .wipe_screen import WipeScreen
-from .settings_screen import SettingsScreen
-from .about_screen import AboutScreen
+from .base_screen import BaseScreen
+
+
+class AboutScreen(BaseScreen):
+    """Flash screen is where flash occurs"""
+
+    def __init__(self, **kwargs):
+        super().__init__(wid="about_screen", name="AboutScreen", **kwargs)

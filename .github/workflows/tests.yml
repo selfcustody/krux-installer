@@ -62,10 +62,15 @@ jobs:
       - name: Lint src/
         run: poetry run poe lint-src
 
-  # from xPsycHoWasPx in discord chat
-  # running macOS in none gpu accelerated mode, and that means no OpenGL,
+  # from xPsycHoWasPx in discord chat:
+  # "running macOS in none gpu accelerated mode, and that means no OpenGL,
   # no OpenGL no kivy window…. if u need to use vm, you also need a dedicated
-  #seperate supported GPU passed through to the osx VM ..
+  # seperate supported GPU passed through to the osx VM .."
+  # 
+  # TODO: find how to install properly libs for M1/M2 Macs
+  # they raise exceptions that numpy and others libs
+  # arent compiled for arm64 (macos-14 and macos-xlarge-*)
+  
   pytest:
 
     needs: pylint

@@ -14,10 +14,8 @@
 			#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="main_flash_device")
-    		on_release:
-                root.on_release(wid="main_flash_device")
-                root.set_screen(name="FlashScreen", direction="left")
+			on_press: root.before_goto_screen(name="FlashScreen")
+    		on_release: root.goto_screen(name="FlashScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -33,10 +31,8 @@
         	#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="main_wipe_device")
-			on_release:
-                root.on_release(wid="main_wipe_device")
-                root.set_screen(name="WipeScreen", direction="left")
+			on_press: root.before_goto_screen(name="WipeScreen")
+    		on_release: root.goto_screen(name="WipeScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -51,10 +47,8 @@
         	#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="main_settings")
-			on_release:
-                root.on_release(wid="main_settings")
-                root.set_screen(name="SettingsScreen", direction="left")
+			on_press: root.before_goto_screen(name="SettingsScreen")
+    		on_release: root.goto_screen(name="SettingsScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -69,10 +63,8 @@
         	#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="main_about")
-			on_release:
-                root.on_release(wid="main_about")
-                root.set_screen(name="AboutScreen", direction="left")
+			on_press: root.before_goto_screen(name="AboutScreen")
+    		on_release: root.goto_screen(name="AboutScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -279,7 +271,8 @@
         
         Button:
             id: about_label
-            text: 'KruxInstaller\n      v0.0.2'
+            markup: True
+            text: '[b]Krux Installer[/b]\n      v0.0.2'
 			font_size: root.height // 25
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1

@@ -30,3 +30,40 @@ class MainScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="main_screen", name="MainScreen", **kwargs)
+
+    def before_goto_screen(self, name: str):
+        """Action to be performed :method:`on_press` action"""
+        wid = ""
+
+        if name == "FlashScreen":
+            wid = "main_flash_device"
+
+        elif name == "WipeScreen":
+            wid = "main_wipe_device"
+
+        elif name == "SettingsScreen":
+            wid = "main_settings"
+
+        elif name == "AboutScreen":
+            wid = "main_about"
+
+        self.on_press(wid=wid)
+
+    def goto_screen(self, name: str, direction: str):
+        """Action to be performed :method:`on_release` action"""
+        wid = ""
+
+        if name == "FlashScreen":
+            wid = "main_flash_device"
+
+        elif name == "WipeScreen":
+            wid = "main_wipe_device"
+
+        elif name == "SettingsScreen":
+            wid = "main_settings"
+
+        elif name == "AboutScreen":
+            wid = "main_about"
+
+        self.on_release(wid=wid)
+        self.set_screen(name=name, direction=direction)

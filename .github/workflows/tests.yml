@@ -60,7 +60,7 @@ jobs:
         run: poetry install
         
       - name: Lint src/
-        run: poetry run poe lint-src
+        run: poetry run poe lint
 
   # from xPsycHoWasPx in discord chat:
   # "running macOS in none gpu accelerated mode, and that means no OpenGL,

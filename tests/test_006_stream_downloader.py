@@ -108,7 +108,7 @@ class TestStreamDownloader(TestCase):
             sd = StreamDownloader(url=URL)
             sd.download_file_stream(url="https://any.request/test.zip")
 
-        self.assertEqual(str(exc_info.exception), "Timeout error: None")
+        self.assertEqual(str(exc_info.exception), "Download timeout error: None")
 
     @patch("src.utils.downloader.stream_downloader.requests")
     def test_fail_connection_download_file_stream(self, mock_requests):
@@ -123,7 +123,7 @@ class TestStreamDownloader(TestCase):
             sd = StreamDownloader(url=URL)
             sd.download_file_stream(url="https://any.request/test.zip")
 
-        self.assertEqual(str(exc_info.exception), "Connection error: None")
+        self.assertEqual(str(exc_info.exception), "Download connection error: None")
 
     @patch("src.utils.downloader.stream_downloader.requests")
     def test_on_data_callback(self, mock_requests):

@@ -22,6 +22,7 @@
 about_screen.py
 """
 
+from src.utils.constants import get_name, get_version
 from .base_screen import BaseScreen
 
 
@@ -30,3 +31,18 @@ class AboutScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="about_screen", name="AboutScreen", **kwargs)
+
+    def get_button_text(self):
+        """Get title and version name"""
+        title = f"[b]{get_name()}[/b]"
+        version = f"      v{get_version()}"
+        return "\n".join([title, version])
+
+    def before_back(self):
+        """Action to be performed :method:`on_press` action"""
+        self.on_press(wid="about_screen")
+
+    def back(self):
+        """Action to be performed :method:`on_release` action"""
+        self.on_release(wid="about_screen")
+        self.set_screen(name="MainScreen", direction="right")

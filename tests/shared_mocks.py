@@ -157,3 +157,13 @@ class MockSerial(MagicMock):
 
     def close(self):
         pass
+
+
+MOCKED_SIGNATURE = "".join(
+    [
+        "MEQCIC2VjiRUu/UyjDlfQJCrA8Yy",
+        "PE8gxqZXslsqck3N6t/2AiBj0hvV",
+        "6lpczTW4CoaBGlmQB/0yKice5BUF",
+        "6xwHQRWvow==",
+    ]
+)

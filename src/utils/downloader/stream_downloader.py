@@ -115,10 +115,12 @@ class StreamDownloader(TriggerDownloader):
             res.raise_for_status()
 
         except requests.exceptions.Timeout as t_exc:
-            raise RuntimeError(f"Timeout error: {t_exc.__cause__ }") from t_exc
+            raise RuntimeError(f"Download timeout error: {t_exc.__cause__ }") from t_exc
 
         except requests.exceptions.ConnectionError as c_exc:
-            raise RuntimeError(f"Connection error: {c_exc.__cause__}") from c_exc
+            raise RuntimeError(
+                f"Download connection error: {c_exc.__cause__}"
+            ) from c_exc
 
         except requests.exceptions.HTTPError as h_exc:
             raise RuntimeError(

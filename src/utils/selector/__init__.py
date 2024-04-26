@@ -31,11 +31,8 @@ import requests
 from ..trigger import Trigger
 
 VALID_DEVICES = (
-    None,
     "m5stickv",
     "amigo",
-    "amigo_tft",
-    "amigo_ips",
     "dock",
     "bit",
     "yahboom",
@@ -71,7 +68,7 @@ class Selector(Trigger):
     def device(self, value: str):
         """Setter for the current device"""
         self.debug(f"device::setter={value}")
-        if value in VALID_DEVICES:
+        if value in VALID_DEVICES or value is None:
             self.debug(f"device::setter={value}")
             self._device = value
         else:

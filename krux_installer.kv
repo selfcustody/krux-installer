@@ -1,5 +1,13 @@
 #:kivy 2.3.0
 
+<-VersionButton@Button>
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            width: 0.5
+            rectangle: self.x, self.y, self.width, self.height
+
 <MainScreen>:    
 	
 	GridLayout:
@@ -86,8 +94,8 @@
 			#font_name: 'terminus'
 			background_color: 0, 0, 0, 0
 			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="flash_select_device")
-    		on_release: root.on_release(wid="flash_select_device")
+			on_press: root.before_goto_screen(name="SelectDeviceScreen")
+    		on_release: root.goto_screen(name="SelectDeviceScreen", direction="left")
 			canvas.before:
         		Color:
             		rgba: 1, 1, 1, 1
@@ -144,6 +152,20 @@
         		Line:
             		width: 0.5
             		rectangle: self.x, self.y, self.width, self.height
+
+<-DeviceButton@Button>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Line:
+            width: 0.5
+    		rectangle: self.x, self.y, self.width, self.height
+
+<SelectDeviceScreen>:
+
+    GridLayout:
+        id: select_device_screen_grid
+        cols: 1
 
 <WipeScreen>:    
 

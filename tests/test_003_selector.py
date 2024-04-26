@@ -95,7 +95,7 @@ class TestSelector(TestCase):
         self.assertEqual(str(exc_info.exception), "HTTP error 500: None")
 
     @patch("src.utils.selector.requests")
-    def test_fail_init__timeout(self, mock_requests):
+    def test_fail_init_timeout(self, mock_requests):
         mock_response = MagicMock(status_code=404)
         mock_response.raise_for_status.side_effect = requests.exceptions.Timeout
         mock_requests.exceptions = requests.exceptions
@@ -309,7 +309,7 @@ class TestSelector(TestCase):
 
         selector = Selector()
         selector.firmware = "v0.0.1"
-        mock_set.assert_has_calls([call(selector, None), call(selector, "v0.0.1")])
+        mock_set.assert_has_calls([call(selector, "v0.0.1")])
 
     @patch("src.utils.selector.requests")
     @patch(

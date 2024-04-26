@@ -30,3 +30,22 @@ class FlashScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
+
+    def before_goto_screen(self, name: str):
+        """Action to be performed :method:`on_press` action"""
+        wid = ""
+
+        if name == "SelectDeviceScreen":
+            wid = "flash_select_device"
+
+        self.on_press(wid=wid)
+
+    def goto_screen(self, name: str, direction: str):
+        """Action to be performed :method:`on_release` action"""
+        wid = ""
+
+        if name == "SelectDeviceScreen":
+            wid = "flash_select_device"
+
+        self.on_release(wid=wid)
+        self.set_screen(name=name, direction=direction)

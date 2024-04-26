@@ -28,3 +28,4 @@ from .flash_screen import FlashScreen
 from .wipe_screen import WipeScreen
 from .settings_screen import SettingsScreen
 from .about_screen import AboutScreen
+from .select_device_screen import SelectDeviceScreen

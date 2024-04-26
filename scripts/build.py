@@ -22,7 +22,6 @@
 """
 build.py
 """
-import sys
 from pathlib import Path
 from platform import system
 import PyInstaller.__main__
@@ -38,8 +37,8 @@ PYFILE = f"{PYNAME}.py"
 KFILE = str(ROOT_PATH / PYFILE)
 BUILDER_ARGS = [
     PYFILE,
-    f"--add-data=pyproject.toml:.",
-    f"--add-data=krux_installer.kv:.",
+    "--add-data=pyproject.toml:.",
+    "--add-data=krux_installer.kv:.",
     "--windowed",
     "--onefile",
     f"-n={PYNAME}",

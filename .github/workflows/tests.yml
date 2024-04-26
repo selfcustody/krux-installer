@@ -82,7 +82,6 @@ jobs:
           - windows-latest
           - macos-12
           - macos-13
-        version: ["3.10", "3.11", "3.12"]
         
     runs-on: ${{ matrix.os }}
     
@@ -97,7 +96,7 @@ jobs:
 
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.version }}
+          python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
 
@@ -163,3 +162,93 @@ jobs:
       
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v4
+  
+  build:
+
+    needs: coverage
+    
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-12, macos-13]
+      
+    runs-on: ${{ matrix.os }}
+    
+    steps:
+      
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          
+      - name: Install poetry
+        run: pipx install poetry
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
+
+      - name: Install project and its dependencies
+        run: poetry install
+
+      - name: Patch pyinstaller_hook for kivy in Unix
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: poetry run poe patch-nix
+
+      - name: Patch pyinstaller_hook for kivy in Windows
+        if: ${{ runner.os == 'Windows' }}
+        run: poetry run poe patch-win
+        
+      - name: Build (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        uses: coactions/setup-xvfb@90473c3ebc69533a1a6e0505c36511b69c8c3135
+        with:
+          run: |
+            poetry add pytest-xvfb
+            poetry run poe build
+      
+      - name: Build (macOS)
+        if: ${{ runner.os == 'macOS' }}
+        run: poetry run poe build
+
+      - name: Build (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        env:
+          KIVY_GL_BACKEND: 'angle_sdl2'
+        run: poetry run poe build
+        
+      - name: Hash (Linux and MacOS)
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS'}}
+        uses: qlrd/sha256sum-action@v2
+        id: hash-unix
+        with:
+          working-directory: ./dist
+          file: krux-installer
+          ext: 'sha256.txt'
+
+      - name: Hash (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        uses: qlrd/sha256sum-action@v2
+        id: hash-win
+        with:
+          working-directory: .\dist
+          file: krux-installer.exe
+          ext: 'sha256.txt'
+
+      - name: Upload artifacts (Linux and MacOS)
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS'}}
+        uses: actions/upload-artifact@v4         
+        with:
+          name: ${{ matrix.os }}-KruxInstaller-v0.0.2
+          path: |
+            dist/krux-installer
+            ${{ steps.hash-unix.outputs.hash-file }}
+      
+      - name: Upload artifacts (Windows)
+        if: ${{ runner.os == 'Windows' }}
+        uses: actions/upload-artifact@v4         
+        with:
+          name: ${{ matrix.os }}-KruxInstaller-v0.0.2
+          path: |
+            dist\krux-installer.exe
+            ${{ steps.hash-win.outputs.hash-file }}

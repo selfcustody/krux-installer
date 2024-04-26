@@ -47,6 +47,9 @@ class MainScreen(BaseScreen):
         elif name == "AboutScreen":
             wid = "main_about"
 
+        else:
+            raise ValueError(f"Widget {name} isnt valid")
+
         self.on_press(wid=wid)
 
     def goto_screen(self, name: str, direction: str):

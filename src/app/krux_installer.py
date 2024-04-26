@@ -31,7 +31,10 @@ class KruxInstallerApp(BaseKruxInstaller):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
         Window.size = (640, 800)
+        self.debug(f"Window: {Window.size}")
+
         Builder.load_file(KIVY_FILE)
 
     def build(self):

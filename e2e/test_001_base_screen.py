@@ -3,7 +3,7 @@ from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
-from src.app.base_screen import BaseScreen
+from src.app.screens.base_screen import BaseScreen
 
 
 class TestBaseScreen(GraphicUnitTest):

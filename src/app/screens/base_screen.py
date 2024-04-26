@@ -23,7 +23,7 @@ base_screen.py
 """
 import typing
 from kivy.uix.screenmanager import Screen
-from ..utils.trigger import Trigger
+from src.utils.trigger import Trigger
 
 
 class BaseScreen(Screen, Trigger):

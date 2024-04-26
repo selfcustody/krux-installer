@@ -23,21 +23,7 @@ krux-installer.py
 """
 
 if __name__ == "__main__":
-    from src.app import KruxInstallerApp
-    from src.app import MainScreen
-    from src.app import FlashScreen
-    from src.app import WipeScreen
-    from src.app import SettingsScreen
-    from src.app import AboutScreen
-    from src.app import SelectDeviceScreen
+    from src.app import makeapp
 
-    app = KruxInstallerApp()
-    app.screens = [
-        MainScreen(),
-        FlashScreen(),
-        WipeScreen(),
-        SettingsScreen(),
-        AboutScreen(),
-        SelectDeviceScreen(),
-    ]
+    app = makeapp()
     app.run()

@@ -48,7 +48,7 @@ class MainScreen(BaseScreen):
             wid = "main_about"
 
         else:
-            raise ValueError(f"Widget {name} isnt valid")
+            raise ValueError(f"Invalid {name} screen")
 
         self.on_press(wid=wid)
 
@@ -67,6 +67,9 @@ class MainScreen(BaseScreen):
 
         elif name == "AboutScreen":
             wid = "main_about"
+
+        else:
+            raise ValueError(f"Invalid {name} screen")
 
         self.on_release(wid=wid)
         self.set_screen(name=name, direction=direction)

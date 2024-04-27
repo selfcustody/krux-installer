@@ -38,6 +38,9 @@ class FlashScreen(BaseScreen):
         if name == "SelectDeviceScreen":
             wid = "flash_select_device"
 
+        else:
+            raise ValueError(f"Invalid {name} screen")
+
         self.on_press(wid=wid)
 
     def goto_screen(self, name: str, direction: str):
@@ -46,6 +49,9 @@ class FlashScreen(BaseScreen):
 
         if name == "SelectDeviceScreen":
             wid = "flash_select_device"
+
+        else:
+            raise ValueError(f"Invalid {name} screen")
 
         self.on_release(wid=wid)
         self.set_screen(name=name, direction=direction)

@@ -30,3 +30,28 @@ class WipeScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
+
+    def before_goto_screen(self, name: str):
+        """Action to be performed :method:`on_press` action"""
+        wid = ""
+
+        if name == "SelectDeviceScreen":
+            wid = "flash_select_device"
+
+        else:
+            raise ValueError(f"Invalid {name} screen")
+
+        self.on_press(wid=wid)
+
+    def goto_screen(self, name: str, direction: str):
+        """Action to be performed :method:`on_release` action"""
+        wid = ""
+
+        if name == "SelectDeviceScreen":
+            wid = "flash_select_device"
+
+        else:
+            raise ValueError(f"Invalid {name} screen")
+
+        self.on_release(wid=wid)
+        self.set_screen(name=name, direction=direction)

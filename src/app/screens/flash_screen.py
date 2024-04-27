@@ -38,8 +38,11 @@ class FlashScreen(BaseScreen):
         if name == "SelectDeviceScreen":
             wid = "flash_select_device"
 
+        elif name == "SelectVersionScreen":
+            wid = "flash_select_version"
+
         else:
-            raise ValueError(f"Invalid {name} screen")
+            raise ValueError(f"Invalid '{name}' widget")
 
         self.on_press(wid=wid)
 
@@ -50,8 +53,11 @@ class FlashScreen(BaseScreen):
         if name == "SelectDeviceScreen":
             wid = "flash_select_device"
 
+        elif name == "SelectVersionScreen":
+            wid = "flash_select_version"
+
         else:
-            raise ValueError(f"Invalid {name} screen")
+            raise ValueError(f"Invalid '{name}' widget")
 
         self.on_release(wid=wid)
         self.set_screen(name=name, direction=direction)

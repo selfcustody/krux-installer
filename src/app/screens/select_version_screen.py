@@ -22,6 +22,7 @@
 main_screen.py
 """
 # pylint: disable=no-name-in-module
+import re
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -39,32 +40,40 @@ class SelectVersionScreen(BaseScreen):
         )
 
     def on_fetch_releases(self):
+        """Build a set of buttons to select version"""
         self.selector = Selector()
-        i = 0
+        for count, label in enumerate(
+            [self.selector.releases[0], self.selector.releases[-1], "old versions"]
+        ):
+            self._make_button(text=label, i=count, n=3)
 
-        for version in self.selector.releases:
-            btn = Button(
-                text=version,
-                font_size=Window.size[0] // 25,
-                background_color=(0, 0, 0, 0),
-                color=(1, 1, 1, 1),
-            )
+    def _make_button(self, text: str, i: int, n: int):
+        """Build a general button"""
+        btn = Button(
+            text=text,
+            font_size=Window.size[0] // 25,
+            background_color=(0, 0, 0, 0),
+            color=(1, 1, 1, 1),
+        )
 
-            btn_wid = f"select_version_{version}"
-            btn.id = btn_wid
+        sanitized = text.replace(" ", "_").replace("//", "_")
+        btn_wid = f"select_version_{sanitized}"
 
-            btn.on_press = self._make_on_press(wid=btn_wid)
-            btn.x = 0
-            btn.y = (Window.size[1] / len(self.selector.releases)) * i
-            btn.width = Window.size[0]
-            btn.height = Window.size[1] / len(self.selector.releases)
-            self.ids["select_version_screen_grid"].add_widget(btn)
-            self.ids[btn_wid] = WeakProxy(btn)
+        btn.on_press = self._make_on_press(wid=btn_wid)
+        btn.x = 0
+        btn.y = (Window.size[1] / n) * i
+        btn.width = Window.size[0]
+        btn.height = Window.size[1] / n
 
-            with self.canvas.before:
-                Color(rgba=(1, 1, 1, 1))
-                Line(width=0.5, rectangle=(btn.x, btn.y, btn.width, btn.height))
-                i = i + 1
+        self.ids["select_version_screen_grid"].add_widget(btn)
+        self.ids[btn_wid] = WeakProxy(btn)
+
+        with self.canvas.before:
+            Color(rgba=(1, 1, 1, 1))
+            Line(width=0.5, rectangle=(btn.x, btn.y, btn.width, btn.height))
+            i = i + 1
+
+        return btn
 
     def _make_on_press(self, wid: str):
         """Dynamically define a on_press action"""

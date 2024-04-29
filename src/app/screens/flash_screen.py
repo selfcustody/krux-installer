@@ -31,6 +31,10 @@ class FlashScreen(BaseScreen):
     def __init__(self, **kwargs):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
 
+    def fetch_releases(self):
+        widget = self.manager.get_screen("SelectVersionScreen")
+        widget.on_fetch_releases()
+
     def before_goto_screen(self, name: str):
         """Action to be performed :method:`on_press` action"""
         wid = ""

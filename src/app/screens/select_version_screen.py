@@ -26,36 +26,39 @@ from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.graphics import Color, Line
-from src.utils.selector import VALID_DEVICES
+from src.utils.selector import Selector
 from .base_screen import BaseScreen
 
 
-class SelectDeviceScreen(BaseScreen):
+class SelectVersionScreen(BaseScreen):
     """Flash screen is where flash occurs"""
 
     def __init__(self, **kwargs):
         super().__init__(
-            wid="select_device_screen", name="SelectDeviceScreen", **kwargs
+            wid="select_version_screen", name="SelectVersionScreen", **kwargs
         )
 
+    def on_fetch_releases(self):
+        self.selector = Selector()
         i = 0
-        for device in VALID_DEVICES:
+
+        for version in self.selector.releases:
             btn = Button(
-                text=device,
+                text=version,
                 font_size=Window.size[0] // 25,
                 background_color=(0, 0, 0, 0),
                 color=(1, 1, 1, 1),
             )
 
-            btn_wid = f"select_device_{device}"
+            btn_wid = f"select_version_{version}"
             btn.id = btn_wid
 
             btn.on_press = self._make_on_press(wid=btn_wid)
             btn.x = 0
-            btn.y = (Window.size[1] / len(VALID_DEVICES)) * i
+            btn.y = (Window.size[1] / len(self.selector.releases)) * i
             btn.width = Window.size[0]
-            btn.height = Window.size[1] / len(VALID_DEVICES)
-            self.ids["select_device_screen_grid"].add_widget(btn)
+            btn.height = Window.size[1] / len(self.selector.releases)
+            self.ids["select_version_screen_grid"].add_widget(btn)
             self.ids[btn_wid] = WeakProxy(btn)
 
             with self.canvas.before:

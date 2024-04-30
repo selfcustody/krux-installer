@@ -50,7 +50,8 @@ class SelectDeviceScreen(BaseScreen):
             btn_wid = f"select_device_{device}"
             btn.id = btn_wid
 
-            btn.on_press = self._make_on_press(wid=btn_wid)
+            btn.on_press = self._make_before_goto_screen(wid=btn_wid)
+            btn.on_release = self._make_goto_screen(wid=btn_wid)
             btn.x = 0
             btn.y = (Window.size[1] / len(VALID_DEVICES)) * i
             btn.width = Window.size[0]
@@ -63,10 +64,19 @@ class SelectDeviceScreen(BaseScreen):
                 Line(width=0.5, rectangle=(btn.x, btn.y, btn.width, btn.height))
                 i = i + 1
 
-    def _make_on_press(self, wid: str):
+    def _make_before_goto_screen(self, wid: str):
         """Dynamically define a on_press action"""
 
         def _on_press():
             self.on_press(wid=wid)
 
         return _on_press
+
+    def _make_goto_screen(self, wid: str):
+        """Dynamically define a on_release action"""
+
+        def _on_release():
+            self.on_release(wid=wid)
+            self.set_screen(name="FlashScreen", direction="right")
+
+        return _on_release

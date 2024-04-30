@@ -49,7 +49,8 @@
 			color: 1, 1, 1, 1
 			on_press: root.before_goto_screen(name="SettingsScreen")
     		on_release: root.goto_screen(name="SettingsScreen", direction="left")
-			canvas.before:
+                
+			canvas.before: 
         		Color:
             		rgba: 1, 1, 1, 1
         		Line:
@@ -222,67 +223,6 @@
             		width: 0.5
             		rectangle: self.x, self.y, self.width, self.height
 
-<SettingsScreen>:
-
-    GridLayout:
-        cols: 1
-        rows: 3
-
-        Button:
-			id: destination_dir
-			text: 'Destination directory'
-			font_size: root.height // 25
-			#font_name: 'terminus'
-			background_color: 0, 0, 0, 0
-			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="destination_dir")
-    		on_release: 
-                root.on_release(wid="destination_dir")
-                root.set_screen(name="MainScreen", direction="right")
-			canvas.before:
-        		Color:
-            		rgba: 1, 1, 1, 1
-        		Line:
-            		width: 0.5
-            		rectangle: self.x, self.y, self.width, self.height
-
-        Button:
-			id: baudrate
-			text: 'Baudrate'
-			font_size: root.height // 25
-			#font_name: 'terminus'
-			background_color: 0, 0, 0, 0
-			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="baudrate")
-    		on_release: 
-                root.on_release(wid="baudrate")
-                root.set_screen(name="MainScreen", direction="right")
-			canvas.before:
-        		Color:
-            		rgba: 1, 1, 1, 1
-        		Line:
-            		width: 0.5
-            		rectangle: self.x, self.y, self.width, self.height
-
-        Button:
-			id: settings_back
-			text: 'Back'
-			font_size: root.height // 25
-			#font_name: 'terminus'
-			background_color: 0, 0, 0, 0
-			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="settings_back")
-    		on_release: 
-                root.on_release(wid="settings_back")
-                root.set_screen(name="MainScreen", direction="right")
-			canvas.before:
-        		Color:
-            		rgba: 1, 1, 1, 1
-        		Line:
-            		width: 0.5
-            		rectangle: self.x, self.y, self.width, self.height
-        
-    
 <AboutScreen>:
 
     GridLayout:

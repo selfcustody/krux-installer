@@ -1,4 +1,4 @@
-from unittest.mock import patch
+from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.main_screen import MainScreen
@@ -85,18 +85,24 @@ class TestMainScreen(GraphicUnitTest):
         mock_on_press.assert_called_once_with(wid="main_settings")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
     @patch("src.app.screens.main_screen.MainScreen.on_release")
-    def test_goto_screen_settings(self, mock_on_release, mock_set_screen):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_goto_screen_settings(self, mock_get_running_app, mock_on_release):
+
+        mock_app = MagicMock()
+        mock_app.open_settings = MagicMock()
+        mock_get_running_app.return_value = mock_app
+
         screen = MainScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        screen.goto_screen(name="SettingsScreen", direction="left")
+        screen.goto_screen(name="SettingsScreen")
         mock_on_release.assert_called_once_with(wid="main_settings")
-        mock_set_screen.assert_called_once_with(name="SettingsScreen", direction="left")
+        mock_get_running_app.assert_called_once()
+        mock_app.open_settings.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.on_press")

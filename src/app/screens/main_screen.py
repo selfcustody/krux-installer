@@ -22,6 +22,7 @@
 main_screen.py
 """
 
+from kivy.app import App
 from .base_screen import BaseScreen
 
 
@@ -52,7 +53,7 @@ class MainScreen(BaseScreen):
 
         self.on_press(wid=wid)
 
-    def goto_screen(self, name: str, direction: str):
+    def goto_screen(self, name: str, direction: str = "left"):
         """Action to be performed :method:`on_release` action"""
         wid = ""
 
@@ -72,4 +73,10 @@ class MainScreen(BaseScreen):
             raise ValueError(f"Invalid {name} screen")
 
         self.on_release(wid=wid)
-        self.set_screen(name=name, direction=direction)
+
+        if name == "SettingsScreen":
+            _app = App.get_running_app()
+            _app.open_settings()
+
+        else:
+            self.set_screen(name=name, direction=direction)

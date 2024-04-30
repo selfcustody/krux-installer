@@ -23,6 +23,7 @@ main_screen.py
 """
 # pylint: disable=no-name-in-module
 import re
+from typing import List
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -31,38 +32,23 @@ from src.utils.selector import Selector
 from .base_screen import BaseScreen
 
 
-class SelectVersionScreen(BaseScreen):
+class SelectOldVersionScreen(BaseScreen):
     """Flash screen is where flash occurs"""
 
     def __init__(self, **kwargs):
         super().__init__(
-            wid="select_version_screen", name="SelectVersionScreen", **kwargs
+            wid="select_old_version_screen", name="SelectOldVersionScreen", **kwargs
         )
 
     def clear(self):
         """Clear the list of children widgets buttons"""
-        self.ids["select_version_screen_grid"].clear_widgets()
+        self.ids["select_old_version_screen_grid"].clear_widgets()
 
-    def on_fetch_releases(self):
+    def on_fetch_releases(self, old_versions: List[str]):
         """Build a set of buttons to select version"""
         self.clear()
-        self.selector = Selector()
-
-        # build a list of latest versions plus old_versions and back buttons
-        current_versions = [
-            self.selector.releases[0],
-            self.selector.releases[-1],
-            "old versions",
-            "back",
-        ]
-        for count, label in enumerate(current_versions):
-            self._make_button(text=label, i=count, n=len(current_versions))
-
-        # add some data to old versions plus a back button
-        old_versions = self.selector.releases[1:-2]
-        old_versions.append("back")
-        old_versions_widget = self.manager.get_screen("SelectOldVersionScreen")
-        old_versions_widget.on_fetch_releases(old_versions)
+        for count, label in enumerate(old_versions):
+            self._make_button(text=label, i=count, n=len(old_versions))
 
     def _make_button(self, text: str, i: int, n: int):
         """Build a general button"""
@@ -74,7 +60,7 @@ class SelectVersionScreen(BaseScreen):
         )
 
         sanitized = text.replace(" ", "_").replace("//", "_")
-        btn_wid = f"select_version_{sanitized}"
+        btn_wid = f"select_old_version_{sanitized}"
 
         btn.on_press = self._make_before_goto_screen(wid=btn_wid)
         btn.on_release = self._make_goto_screen(wid=btn_wid)
@@ -83,7 +69,7 @@ class SelectVersionScreen(BaseScreen):
         btn.width = Window.size[0]
         btn.height = Window.size[1] / n
 
-        self.ids["select_version_screen_grid"].add_widget(btn)
+        self.ids["select_old_version_screen_grid"].add_widget(btn)
         self.ids[btn_wid] = WeakProxy(btn)
 
         with self.canvas.before:
@@ -108,14 +94,8 @@ class SelectVersionScreen(BaseScreen):
             if re.findall(r"v\d+\.\d+\.\d", wid):
                 self.on_release(wid=wid)
                 self.set_screen(name="FlashScreen", direction="right")
-            if wid == "select_version_odudex_krux_binaries":
+            elif wid == "select_old_version_back":
                 self.on_release(wid=wid)
-                self.set_screen(name="FlashScreen", direction="right")
-            elif wid == "select_version_old_versions":
-                self.on_release(wid=wid)
-                self.set_screen(name="SelectOldVersionScreen", direction="left")
-            elif wid == "select_version_back":
-                self.on_release(wid=wid)
-                self.set_screen(name="FlashScreen", direction="right")
+                self.set_screen(name="SelectVersionScreen", direction="right")
 
         return _on_release

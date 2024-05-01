@@ -83,7 +83,6 @@ class ConfigKruxInstaller(BaseKruxInstaller):
         else:
             raise OSError(f"Not supported: {sys.platform}")
 
-
         if not os.path.exists(_kruxdata):
             os.makedirs(_kruxdata)
 

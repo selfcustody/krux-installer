@@ -25,7 +25,7 @@ trigger.py
 Base class to be used accross project
 """
 import os
-import typing
+from kivy.logger import Logger
 from ..info import mro
 
 
@@ -37,63 +37,18 @@ class Trigger:
     All actions will be logged.
     """
 
-    def __init__(self, logger: typing.Callable = print):
-        self.logger_callback = logger
-        self.loglevel = "info"
-        if os.environ.get("LOGLEVEL"):
-            self.loglevel = os.environ.get("LOGLEVEL")
+    def info(self, msg: str):
+        """Logger with level 'info'"""
+        Logger.info("%s: %s", mro(), msg)
 
-    @property
-    def logger_callback(self):
-        """Getter for logger callback"""
-        return self._logger_callback
+    def debug(self, msg: str):
+        """Logger with level 'debug'"""
+        Logger.debug("%s: %s", mro(), msg)
 
-    @logger_callback.setter
-    def logger_callback(self, value: typing.Callable):
-        """Setter for logger callback"""
-        self._logger_callback = value
+    def warning(self, msg: str):
+        """Logger with level 'warning'"""
+        Logger.warning("%s: %s", mro(), msg)
 
-    @property
-    def loglevel(self):
-        """Getter for loglevel"""
-        return self._loglevel
-
-    @loglevel.setter
-    def loglevel(self, value):
-        """Setter for loglevel"""
-        if value in ("info", "warn", "debug"):
-            self._loglevel = value
-        else:
-            raise ValueError(f"Invalid loglevel: {value}")
-
-    def create_msg(self, msg):
-        """
-        Create the logged message with current
-        class caller
-        """
-        caller = mro()
-        return f"[{caller}]: {msg}"
-
-    def info(self, msg):
-        """
-        Create the info message with the current
-        class caller
-        """
-        if self.loglevel == "info":
-            self.logger_callback(f"[INFO ] {self.create_msg(msg)}")
-
-    def warn(self, msg):
-        """
-        Create the info message with the current
-        class caller
-        """
-        if self.loglevel == "warn":
-            self.logger_callback(f"[WARN ] {self.create_msg(msg)}")
-
-    def debug(self, msg):
-        """
-        Create the debug message with the current
-        class caller
-        """
-        if self.loglevel == "debug":
-            self.logger_callback(f"[DEBUG] {self.create_msg(msg)}")
+    def critical(self, msg: str):
+        """Logger with level 'critical'"""
+        Logger.critical("%s: %s", mro(), msg)

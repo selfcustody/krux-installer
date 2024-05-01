@@ -22,11 +22,11 @@
 __init__.py
 """
 
+import os
 from src.app.krux_installer import KruxInstallerApp
 from src.app.screens.main_screen import MainScreen
 from src.app.screens.flash_screen import FlashScreen
 from src.app.screens.wipe_screen import WipeScreen
-from src.app.screens.settings_screen import SettingsScreen
 from src.app.screens.about_screen import AboutScreen
 from src.app.screens.select_device_screen import SelectDeviceScreen
 from src.app.screens.select_version_screen import SelectVersionScreen
@@ -36,11 +36,11 @@ from src.app.screens.select_old_version_screen import SelectOldVersionScreen
 def makeapp():
     """Create an instance of KruxInstallerApp"""
     app = KruxInstallerApp()
+
     app.screens = [
         MainScreen(),
         FlashScreen(),
         WipeScreen(),
-        SettingsScreen(),
         AboutScreen(),
         SelectDeviceScreen(),
         SelectVersionScreen(),

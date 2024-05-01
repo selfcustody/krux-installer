@@ -21,78 +21,28 @@
 """
 krux_installer.py
 """
-
-import tempfile
-from kivy.lang.builder import Builder
+import os
 from kivy.core.window import Window
-from .base_krux_installer import BaseKruxInstaller, KIVY_FILE
+from kivy.lang.builder import Builder
+from .config_krux_installer import ConfigKruxInstaller
 
 
-class KruxInstallerApp(BaseKruxInstaller):
+class KruxInstallerApp(ConfigKruxInstaller):
     """KruxInstallerApp is the Root widget"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._initialize_window()
-        self._initialize_kv_file()
-
-    def _initialize_window(self):
         Window.size = (640, 800)
-        self.debug(f"Window: {Window.size}")
+        self.debug(f"Window.size={Window.size}")
 
-    def _initialize_kv_file(self):
-        Builder.load_file(KIVY_FILE)
-
-    def build_config(self, config):
-        """Create default configurations for app"""
-        destdir = tempfile.mkdtemp()
-
-        config.setdefaults("destdir", {"assets": destdir})
-
-        config.setdefaults(
-            "flash",
-            {
-                "baudrate": 1500000,
-            },
-        )
-
-        config.setdefaults(
-            "locale",
-            {
-                "lang": "en-US",
-            },
-        )
-
-    def build_settings(self, settings):
-        """Create settings panel"""
-        jsondata = """[
-            { 
-                "type": "path",
-                "title": "Assets's destination path",
-                "desc": "Destination path of downloaded assets",
-                "section": "destdir",
-                "key": "assets"
-            },            
-            { 
-                "type": "numeric",
-                "title": "Flash baudrate",
-                "desc": "Applied baudrate during the flash process",
-                "section": "krux-installer-config",
-                "key": "baudrate"
-            },            
-            { 
-                "type": "options",
-                "title": "Locale",
-                "desc": "Application locale",
-                "section": "krux-installer-config",
-                "key": "locale",
-                "options": ["en-US", "pt-BR"]
-            }
-        ]"""
-        settings.add_json_panel("Settings", self.config, data=jsondata)
+        dirname = os.path.dirname(os.path.realpath(__file__))
+        kvfile = os.path.abspath(f"{dirname}/../../krux_installer.kv")
+        Builder.load_file(kvfile)
+        self.debug(f"Builder.load_file={kvfile}")
 
     def build(self):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
+
         for screen in self.screens:
             msg = f"adding screen '{screen.name}'"
             self.debug(msg)

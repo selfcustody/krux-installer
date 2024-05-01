@@ -23,12 +23,20 @@ krux_installer.py
 """
 import os
 import typing
+import tempfile
+from kivy.logger import Logger, LOG_LEVELS
 from kivy.app import App
 from kivy.uix.screenmanager import Screen, ScreenManager
 from ..utils.trigger import Trigger
 
-dirname = os.path.dirname(os.path.realpath(__file__))
-KIVY_FILE = os.path.abspath(f"{dirname}/../../krux_installer.kv")
+DEFAULT_DESTDIR = tempfile.mkdtemp()
+DEFAULT_BAUDRATE = 1500000
+DEFAULT_LOCALE = "en-US"
+
+if "LOGLEVEL" in os.environ:
+    Logger.setLevel(LOG_LEVELS[os.environ["LOGLEVEL"]])
+else:
+    Logger.setLevel(LOG_LEVELS["info"])
 
 
 class BaseKruxInstaller(App, Trigger):

@@ -22,6 +22,7 @@
 main_screen.py
 """
 # pylint: disable=no-name-in-module
+from kivy.cache import Cache
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -38,33 +39,18 @@ class SelectDeviceScreen(BaseScreen):
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
 
-        i = 0
-        for device in VALID_DEVICES:
-            btn = Button(
-                text=device,
-                font_size=Window.size[0] // 25,
-                background_color=(0, 0, 0, 0),
-                color=(1, 1, 1, 1),
+        buttons = [
+            {"id": f"select_device_{device}", "text": device, "markup": False, "i": i}
+            for i, device in enumerate(VALID_DEVICES)
+        ]
+        for device in buttons:
+            self.make_button(
+                root_widget="select_device_screen_grid",
+                template=device,
+                total=len(VALID_DEVICES),
             )
 
-            btn_wid = f"select_device_{device}"
-            btn.id = btn_wid
-
-            btn.on_press = self._make_before_goto_screen(wid=btn_wid)
-            btn.on_release = self._make_goto_screen(wid=btn_wid)
-            btn.x = 0
-            btn.y = (Window.size[1] / len(VALID_DEVICES)) * i
-            btn.width = Window.size[0]
-            btn.height = Window.size[1] / len(VALID_DEVICES)
-            self.ids["select_device_screen_grid"].add_widget(btn)
-            self.ids[btn_wid] = WeakProxy(btn)
-
-            with self.canvas.before:
-                Color(rgba=(1, 1, 1, 1))
-                Line(width=0.5, rectangle=(btn.x, btn.y, btn.width, btn.height))
-                i = i + 1
-
-    def _make_before_goto_screen(self, wid: str):
+    def make_on_press(self, wid: str):
         """Dynamically define a on_press action"""
 
         def _on_press():
@@ -72,11 +58,23 @@ class SelectDeviceScreen(BaseScreen):
 
         return _on_press
 
-    def _make_goto_screen(self, wid: str):
+    def make_on_release(self, wid: str):
         """Dynamically define a on_release action"""
 
         def _on_release():
+            self.change_device(wid=wid)
             self.on_release(wid=wid)
-            self.set_screen(name="FlashScreen", direction="right")
+            self.set_screen(name="MainScreen", direction="right")
 
         return _on_release
+
+    def change_device(self, wid: str):
+        """Change device text on MainScreen"""
+        device = self.ids[wid].text
+        self.debug(f"on_release::{wid}={device}")
+
+        main_screen = self.manager.get_screen("MainScreen")
+        main_select_device = main_screen.ids["main_select_device"]
+
+        main_select_device.text = f"Device: [color=#00AABB]{device}[/color]"
+        self.debug(f"{main_select_device}.text = {main_select_device.text}")

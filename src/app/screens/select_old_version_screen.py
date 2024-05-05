@@ -44,42 +44,24 @@ class SelectOldVersionScreen(BaseScreen):
         """Clear the list of children widgets buttons"""
         self.ids["select_old_version_screen_grid"].clear_widgets()
 
-    def on_fetch_releases(self, old_versions: List[str]):
+    def fetch_releases(self, old_versions: List[str]):
         """Build a set of buttons to select version"""
         self.clear()
         for count, label in enumerate(old_versions):
-            self._make_button(text=label, i=count, n=len(old_versions))
+            sanitized = label.replace(".", "_").replace("/", "_").replace(" ", "_")
+            obj = {
+                "id": f"select_version_{sanitized}",
+                "text": label,
+                "markup": False,
+                "i": count,
+            }
+            self.make_button(
+                root_widget="select_old_version_screen_grid",
+                template=obj,
+                total=len(old_versions),
+            )
 
-    def _make_button(self, text: str, i: int, n: int):
-        """Build a general button"""
-        btn = Button(
-            text=text,
-            font_size=Window.size[0] // 25,
-            background_color=(0, 0, 0, 0),
-            color=(1, 1, 1, 1),
-        )
-
-        sanitized = text.replace(" ", "_").replace("//", "_")
-        btn_wid = f"select_old_version_{sanitized}"
-
-        btn.on_press = self._make_before_goto_screen(wid=btn_wid)
-        btn.on_release = self._make_goto_screen(wid=btn_wid)
-        btn.x = 0
-        btn.y = (Window.size[1] / n) * i
-        btn.width = Window.size[0]
-        btn.height = Window.size[1] / n
-
-        self.ids["select_old_version_screen_grid"].add_widget(btn)
-        self.ids[btn_wid] = WeakProxy(btn)
-
-        with self.canvas.before:
-            Color(rgba=(1, 1, 1, 1))
-            Line(width=0.5, rectangle=(btn.x, btn.y, btn.width, btn.height))
-            i = i + 1
-
-        return btn
-
-    def _make_before_goto_screen(self, wid: str):
+    def make_on_press(self, wid: str):
         """Dynamically define a on_press action"""
 
         def _on_press():
@@ -87,15 +69,26 @@ class SelectOldVersionScreen(BaseScreen):
 
         return _on_press
 
-    def _make_goto_screen(self, wid: str):
+    def make_on_release(self, wid: str):
         """Dynamically define a on_release action"""
 
         def _on_release():
-            if re.findall(r"v\d+\.\d+\.\d", wid):
+            if re.findall(r"^select_version_v\d+\_\d+\_\d$", wid):
+                self.change_version(wid=wid)
                 self.on_release(wid=wid)
-                self.set_screen(name="FlashScreen", direction="right")
+                self.set_screen(name="MainScreen", direction="right")
             elif wid == "select_old_version_back":
                 self.on_release(wid=wid)
                 self.set_screen(name="SelectVersionScreen", direction="right")
 
         return _on_release
+
+    def change_version(self, wid: str):
+        """Change version text on MainScreen"""
+        version = self.ids[wid].text
+        self.debug(f"on_release::{wid} = {version}")
+
+        main_screen = self.manager.get_screen("MainScreen")
+        main_select_version = main_screen.ids["main_select_version"]
+        main_select_version.text = f"Version: [color=#00AABB]{version}[/color]"
+        self.debug(f"{main_select_version}.text = {main_select_version.text}")

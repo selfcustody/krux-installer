@@ -22,6 +22,10 @@
 base_screen.py
 """
 import typing
+from kivy.uix.button import Button
+from kivy.core.window import Window
+from kivy.weakproxy import WeakProxy
+from kivy.graphics import Color, Line
 from kivy.uix.screenmanager import Screen
 from src.utils.trigger import Trigger
 
@@ -59,3 +63,31 @@ class BaseScreen(Screen, Trigger):
         self.debug(msg)
         self.manager.transition.direction = direction
         self.manager.current = name
+
+    def make_button(
+        self, root_widget: str, template: typing.Dict[str, str], total: int
+    ):
+        self.debug(f"make_button::{template["id"]} -> {root_widget}")
+        i = template["i"]
+        btn = Button(
+            text=template["text"],
+            markup=template["markup"],
+            font_size=Window.size[0] // 25,
+            background_color=(0, 0, 0, 0),
+            color=(1, 1, 1, 1),
+        )
+
+        btn.id = template["id"]
+        btn.on_press = self.make_on_press(wid=btn.id)
+        btn.on_release = self.make_on_release(wid=btn.id)
+        btn.x = 0
+        btn.y = (Window.size[1] / total) * i
+        btn.width = Window.size[0]
+        btn.height = Window.size[1] / total
+
+        self.ids[root_widget].add_widget(btn)
+        self.ids[btn.id] = WeakProxy(btn)
+
+        with self.canvas.before:
+            Color(rgba=(1, 1, 1, 1))
+            Line(width=0.5, rectangle=(btn.x, btn.y, btn.width, btn.height))

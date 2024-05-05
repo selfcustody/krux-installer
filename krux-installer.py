@@ -23,7 +23,7 @@ krux-installer.py
 """
 
 if __name__ == "__main__":
-    from src.app import makeapp
+    from src.app import KruxInstallerApp
 
-    app = makeapp()
+    app = KruxInstallerApp()
     app.run()

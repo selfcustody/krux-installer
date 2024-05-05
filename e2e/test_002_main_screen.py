@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, call
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.main_screen import MainScreen
@@ -21,111 +21,41 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(screen.id, "main_screen")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.on_press")
-    def test_before_goto_screen_flash(self, mock_on_press):
+    @patch("src.app.screens.main_screen.MainScreen.make_on_press")
+    def test_make_on_press(self, mock_make_on_press):
         screen = MainScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        screen.before_goto_screen(name="FlashScreen")
-        mock_on_press.assert_called_once_with(wid="main_flash_device")
+        mock_make_on_press.assert_has_calls(
+            [
+                call(wid="main_select_device"),
+                call(wid="main_select_version"),
+                call(wid="main_flash"),
+                call(wid="main_wipe"),
+                call(wid="main_settings"),
+                call(wid="main_about"),
+            ]
+        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    @patch("src.app.screens.main_screen.MainScreen.on_release")
-    def test_goto_screen_flash(self, mock_on_release, mock_set_screen):
+    @patch("src.app.screens.main_screen.MainScreen.make_on_release")
+    def test_make_on_release(self, mock_make_on_release):
         screen = MainScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        screen.goto_screen(name="FlashScreen", direction="left")
-        mock_on_release.assert_called_once_with(wid="main_flash_device")
-        mock_set_screen.assert_called_once_with(name="FlashScreen", direction="left")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.on_press")
-    def test_before_goto_screen_wipe(self, mock_on_press):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.before_goto_screen(name="WipeScreen")
-        mock_on_press.assert_called_once_with(wid="main_wipe_device")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    @patch("src.app.screens.main_screen.MainScreen.on_release")
-    def test_goto_screen_wipe(self, mock_on_release, mock_set_screen):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.goto_screen(name="WipeScreen", direction="left")
-        mock_on_release.assert_called_once_with(wid="main_wipe_device")
-        mock_set_screen.assert_called_once_with(name="WipeScreen", direction="left")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.on_press")
-    def test_before_goto_screen_settings(self, mock_on_press):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.before_goto_screen(name="SettingsScreen")
-        mock_on_press.assert_called_once_with(wid="main_settings")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.on_release")
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_goto_screen_settings(self, mock_get_running_app, mock_on_release):
-
-        mock_app = MagicMock()
-        mock_app.open_settings = MagicMock()
-        mock_get_running_app.return_value = mock_app
-
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.goto_screen(name="SettingsScreen")
-        mock_on_release.assert_called_once_with(wid="main_settings")
-        mock_get_running_app.assert_called_once()
-        mock_app.open_settings.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.on_press")
-    def test_before_goto_screen_about(self, mock_on_press):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.before_goto_screen(name="AboutScreen")
-        mock_on_press.assert_called_once_with(wid="main_about")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    @patch("src.app.screens.main_screen.MainScreen.on_release")
-    def test_goto_screen_about(self, mock_on_release, mock_set_screen):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.goto_screen(name="AboutScreen", direction="left")
-        mock_on_release.assert_called_once_with(wid="main_about")
-        mock_set_screen.assert_called_once_with(name="AboutScreen", direction="left")
+        mock_make_on_release.assert_has_calls(
+            [
+                call(wid="main_select_device"),
+                call(wid="main_select_version"),
+                call(wid="main_flash"),
+                call(wid="main_wipe"),
+                call(wid="main_settings"),
+                call(wid="main_about"),
+            ]
+        )

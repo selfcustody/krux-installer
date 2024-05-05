@@ -21,30 +21,45 @@
 """
 __init__.py
 """
-
 import os
-from src.app.krux_installer import KruxInstallerApp
+from kivy.cache import Cache
+from kivy.core.window import Window
+from kivy.lang.builder import Builder
+from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.main_screen import MainScreen
-from src.app.screens.flash_screen import FlashScreen
-from src.app.screens.wipe_screen import WipeScreen
-from src.app.screens.about_screen import AboutScreen
 from src.app.screens.select_device_screen import SelectDeviceScreen
 from src.app.screens.select_version_screen import SelectVersionScreen
 from src.app.screens.select_old_version_screen import SelectOldVersionScreen
+from src.app.screens.about_screen import AboutScreen
 
 
-def makeapp():
-    """Create an instance of KruxInstallerApp"""
-    app = KruxInstallerApp()
+class KruxInstallerApp(ConfigKruxInstaller):
+    """KruxInstallerApp is the Root widget"""
 
-    app.screens = [
-        MainScreen(),
-        FlashScreen(),
-        WipeScreen(),
-        AboutScreen(),
-        SelectDeviceScreen(),
-        SelectVersionScreen(),
-        SelectOldVersionScreen(),
-    ]
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        Window.size = (640, 800)
+        self.debug(f"Window.size={Window.size}")
 
-    return app
+        dirname = os.path.dirname(os.path.realpath(__file__))
+        kvfile = os.path.abspath(f"{dirname}/../../krux_installer.kv")
+        Builder.load_file(kvfile)
+        self.debug(f"Builder.load_file={kvfile}")
+
+    def build(self):
+        """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
+
+        screens = [
+            MainScreen(),
+            SelectDeviceScreen(),
+            SelectVersionScreen(),
+            SelectOldVersionScreen(),
+            AboutScreen(),
+        ]
+
+        for screen in screens:
+            msg = f"adding screen '{screen.name}'"
+            self.debug(msg)
+            self.screen_manager.add_widget(screen)
+
+        return self.screen_manager

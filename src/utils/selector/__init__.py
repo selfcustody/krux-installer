@@ -30,13 +30,7 @@ from http.client import HTTPResponse
 import requests
 from ..trigger import Trigger
 
-VALID_DEVICES = (
-    "m5stickv",
-    "amigo",
-    "dock",
-    "bit",
-    "yahboom",
-)
+VALID_DEVICES = ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube")
 
 
 class Selector(Trigger):

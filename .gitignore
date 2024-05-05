@@ -33,6 +33,7 @@ build/
 build-*/
 dist/
 *.spec
+kivy/
 
 # Test failure outputs
 ######################

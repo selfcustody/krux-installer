@@ -39,34 +39,69 @@ class SelectDeviceScreen(BaseScreen):
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
 
-        buttons = [
-            {"id": f"select_device_{device}", "text": device, "markup": False, "i": i}
-            for i, device in enumerate(VALID_DEVICES)
-        ]
-        for device in buttons:
-            self.make_button(
-                root_widget="select_device_screen_grid",
-                template=device,
-                total=len(VALID_DEVICES),
-            )
+        # Build grid where buttons will be placed
+        self.make_grid(wid="select_device_screen_grid", rows=6)
 
-    def make_on_press(self, wid: str):
-        """Dynamically define a on_press action"""
+        # Build buttons to be placed in GridLayout
+        self.make_button(
+            row=0,
+            id="select_device_m5stickv",
+            root_widget="select_device_screen_grid",
+            text="m5stickv",
+            markup=False,
+            on_press=self.on_press_m5stickv,
+            on_release=self.on_release_m5stickv,
+        )
 
-        def _on_press():
-            self.on_press(wid=wid)
+        self.make_button(
+            row=1,
+            id="select_device_amigo",
+            root_widget="select_device_screen_grid",
+            text="amigo",
+            markup=False,
+            on_press=self.on_press_amigo,
+            on_release=self.on_release_amigo,
+        )
 
-        return _on_press
+        self.make_button(
+            row=2,
+            id="select_device_dock",
+            root_widget="select_device_screen_grid",
+            text="dock",
+            markup=False,
+            on_press=self.on_press_dock,
+            on_release=self.on_release_dock,
+        )
 
-    def make_on_release(self, wid: str):
-        """Dynamically define a on_release action"""
+        self.make_button(
+            row=3,
+            id="select_device_bit",
+            root_widget="select_device_screen_grid",
+            text="bit",
+            markup=False,
+            on_press=self.on_press_bit,
+            on_release=self.on_release_bit,
+        )
 
-        def _on_release():
-            self.change_device(wid=wid)
-            self.on_release(wid=wid)
-            self.set_screen(name="MainScreen", direction="right")
+        self.make_button(
+            row=4,
+            id="select_device_yahboom",
+            root_widget="select_device_screen_grid",
+            text="yahboom",
+            markup=False,
+            on_press=self.on_press_yahboom,
+            on_release=self.on_release_yahboom,
+        )
 
-        return _on_release
+        self.make_button(
+            row=5,
+            id="select_device_cube",
+            root_widget="select_device_screen_grid",
+            text="cube",
+            markup=False,
+            on_press=self.on_press_cube,
+            on_release=self.on_release_cube,
+        )
 
     def change_device(self, wid: str):
         """Change device text on MainScreen"""
@@ -78,3 +113,51 @@ class SelectDeviceScreen(BaseScreen):
 
         main_select_device.text = f"Device: [color=#00AABB]{device}[/color]"
         self.debug(f"{main_select_device}.text = {main_select_device.text}")
+
+    def on_press_m5stickv(self, instance):
+        self.set_background(wid="select_device_m5stickv", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_m5stickv(self, instance):
+        self.set_background(wid="select_device_m5stickv", rgba=(0, 0, 0, 0))
+        self.change_device(wid="select_device_m5stickv")
+        self.set_screen(name="MainScreen", direction="right")
+
+    def on_press_amigo(self, instance):
+        self.set_background(wid="select_device_amigo", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_amigo(self, instance):
+        self.set_background(wid="select_device_amigo", rgba=(0, 0, 0, 0))
+        self.change_device(wid="select_device_amigo")
+        self.set_screen(name="MainScreen", direction="right")
+
+    def on_press_dock(self, instance):
+        self.set_background(wid="select_device_dock", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_dock(self, instance):
+        self.set_background(wid="select_device_dock", rgba=(0, 0, 0, 0))
+        self.change_device(wid="select_device_dock")
+        self.set_screen(name="MainScreen", direction="right")
+
+    def on_press_bit(self, instance):
+        self.set_background(wid="select_device_bit", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_bit(self, instance):
+        self.set_background(wid="select_device_bit", rgba=(0, 0, 0, 0))
+        self.change_device(wid="select_device_bit")
+        self.set_screen(name="MainScreen", direction="right")
+
+    def on_press_yahboom(self, instance):
+        self.set_background(wid="select_device_yahboom", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_yahboom(self, instance):
+        self.set_background(wid="select_device_yahboom", rgba=(0, 0, 0, 0))
+        self.change_device(wid="select_device_yahboom")
+        self.set_screen(name="MainScreen", direction="right")
+
+    def on_press_cube(self, instance):
+        self.set_background(wid="select_device_cube", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_cube(self, instance):
+        self.set_background(wid="select_device_cube", rgba=(0, 0, 0, 0))
+        self.change_device(wid="select_device_cube")
+        self.set_screen(name="MainScreen", direction="right")

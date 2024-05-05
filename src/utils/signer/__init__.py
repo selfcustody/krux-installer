@@ -22,4 +22,4 @@
 """
 __init__.py
 """
-from .cli_signer import CliSigner
+from .trigger_signer import TriggerSigner

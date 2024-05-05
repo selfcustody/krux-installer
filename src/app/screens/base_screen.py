@@ -22,7 +22,9 @@
 base_screen.py
 """
 import typing
+from functools import partial
 from kivy.uix.button import Button
+from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.graphics import Color, Line
@@ -38,18 +40,6 @@ class BaseScreen(Screen, Trigger):
         self.id = wid
         self.name = name
 
-    def on_press(self, wid: str):
-        """General on_press method to change background of buttons"""
-        msg = f"Button::{wid} clicked"
-        self.debug(msg)
-        self.set_background(wid=wid, rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release(self, wid: str):
-        """General on_release method to change background of buttons"""
-        msg = f"Button::{wid} released"
-        self.debug(msg)
-        self.set_background(wid=wid, rgba=(0, 0, 0, 0))
-
     def set_background(self, wid: str, rgba: typing.Tuple[float, float, float, float]):
         """Changes the widget's background by it's id"""
         widget = self.ids[wid]
@@ -64,24 +54,40 @@ class BaseScreen(Screen, Trigger):
         self.manager.transition.direction = direction
         self.manager.current = name
 
+    def make_grid(self, wid: str, rows: int):
+        # Build grid where buttons will be placed
+        grid = GridLayout(cols=1, rows=rows)
+        grid.id = wid
+        self.add_widget(grid)
+        self.ids[wid] = WeakProxy(grid)
+
     def make_button(
-        self, root_widget: str, template: typing.Dict[str, str], total: int
+        self,
+        root_widget: str,
+        id: str,
+        text: str,
+        markup: str,
+        row: str,
+        on_press: typing.Callable,
+        on_release: typing.Callable,
     ):
-        self.debug(f"make_button::{template["id"]} -> {root_widget}")
-        i = template["i"]
+        self.debug(f"{id} -> {root_widget}")
+
+        total = self.ids[root_widget].rows
+
         btn = Button(
-            text=template["text"],
-            markup=template["markup"],
+            text=text,
+            markup=markup,
             font_size=Window.size[0] // 25,
             background_color=(0, 0, 0, 0),
             color=(1, 1, 1, 1),
         )
 
-        btn.id = template["id"]
-        btn.on_press = self.make_on_press(wid=btn.id)
-        btn.on_release = self.make_on_release(wid=btn.id)
+        btn.id = id
+        btn.bind(on_press=on_press)
+        btn.bind(on_release=on_release)
         btn.x = 0
-        btn.y = (Window.size[1] / total) * i
+        btn.y = (Window.size[1] / total) * row
         btn.width = Window.size[0]
         btn.height = Window.size[1] / total
 

@@ -25,8 +25,6 @@ import typing
 from kivy.app import App
 from kivy.cache import Cache
 from .base_screen import BaseScreen
-from kivy.uix.gridlayout import GridLayout
-from kivy.weakproxy import WeakProxy
 
 
 class MainScreen(BaseScreen):
@@ -42,97 +40,110 @@ class MainScreen(BaseScreen):
         self.willWipe = False
 
         # Build grid where buttons will be placed
-        grid = GridLayout(cols=1)
-        grid.id = "main_screen_grid"
-        self.add_widget(grid)
-        self.ids["main_screen_grid"] = WeakProxy(grid)
+        self.make_grid(wid="main_screen_grid", rows=6)
 
         # Build buttons to be placed in GridLayout
-        buttons = [
-            {
-                "id": "main_select_device",
-                "text": f"Device: [color=#00AABB]{self.device}[/color]",
-                "markup": True,
-                "i": 0,
-            },
-            {
-                "id": "main_select_version",
-                "text": f"Version: [color=#00AABB]{self.version}[/color]",
-                "markup": True,
-                "i": 1,
-            },
-            {
-                "id": "main_flash",
-                "text": f"[color={"#FFFFFF" if self.willFlash else "#333333"}]Flash[/color]",
-                "markup": True,
-                "i": 2,
-            },
-            {
-                "id": "main_wipe",
-                "text": "Wipe",
-                "text": f"[color={"#FFFFFF" if self.willWipe else "#333333"}]Wipe[/color]",
-                "markup": True,
-                "i": 3,
-            },
-            {"id": "main_settings", "text": "Settings", "markup": False, "i": 4},
-            {"id": "main_about", "text": "About", "markup": False, "i": 5},
-        ]
+        self.make_button(
+            row=0,
+            id="main_select_device",
+            root_widget="main_screen_grid",
+            text=f"Device: [color=#00AABB]{self.device}[/color]",
+            markup=True,
+            on_press=self.on_press_select_device,
+            on_release=self.on_release_select_device,
+        )
 
-        for btn in buttons:
-            self.make_button(
-                root_widget="main_screen_grid", template=btn, total=len(buttons)
-            )
+        self.make_button(
+            row=1,
+            id="main_select_version",
+            root_widget="main_screen_grid",
+            text=f"Version: [color=#00AABB]{self.version}[/color]",
+            markup=True,
+            on_press=self.on_press_select_version,
+            on_release=self.on_release_select_version,
+        )
 
-    def make_on_press(self, wid: str):
-        """Build an action to be performed :method:`on_press` action"""
+        self.make_button(
+            row=2,
+            id="main_flash",
+            root_widget="main_screen_grid",
+            text=f"[color={"#FFFFFF" if self.willFlash else "#333333"}]Flash[/color]",
+            markup=True,
+            on_press=self.on_press_flash,
+            on_release=self.on_release_flash,
+        )
 
-        def on_press():
-            if wid in (
-                "main_select_device",
-                "main_select_version",
-                "main_flash",
-                "main_wipe",
-                "main_settings",
-                "main_about",
-            ):
-                self.on_press(wid=wid)
-            else:
-                raise ValueError(f"Invalid id screen: '{wid}'")
+        self.make_button(
+            row=3,
+            id="main_wipe",
+            root_widget="main_screen_grid",
+            text=f"[color={"#FFFFFF" if self.willWipe else "#333333"}]Wipe[/color]",
+            markup=True,
+            on_press=self.on_press_wipe,
+            on_release=self.on_release_wipe,
+        )
 
-        return on_press
+        self.make_button(
+            row=4,
+            id="main_settings",
+            root_widget="main_screen_grid",
+            text="Settings",
+            markup=False,
+            on_press=self.on_press_settings,
+            on_release=self.on_release_settings,
+        )
 
-    def make_on_release(self, wid: str, direction: str = "left"):
-        """Action to be performed :method:`on_release` action"""
+        self.make_button(
+            row=5,
+            id="main_about",
+            root_widget="main_screen_grid",
+            text="About",
+            markup=False,
+            on_press=self.on_press_about,
+            on_release=self.on_release_about,
+        )
 
-        def on_release():
-            if wid == "main_select_device":
-                name = "SelectDeviceScreen"
+    def on_press_select_device(self, instance):
+        self.set_background(wid="main_select_device", rgba=(0.5, 0.5, 0.5, 0.5))
 
-            elif wid == "main_select_version":
-                name = "SelectVersionScreen"
-                self.manager.get_screen("SelectVersionScreen").fetch_releases()
+    def on_release_select_device(self, instance):
+        self.set_background(wid="main_select_device", rgba=(0, 0, 0, 0))
+        self.set_screen(name="SelectDeviceScreen", direction="left")
 
-            elif wid == "main_flash":
-                name = "FlashScreen"
+    def on_press_select_version(self, instance):
+        self.set_background(wid="main_select_version", rgba=(0.5, 0.5, 0.5, 0.5))
 
-            elif wid == "main_wipe":
-                name = "WipeScreen"
+    def on_release_select_version(self, instance):
+        select_version = self.manager.get_screen("SelectVersionScreen")
+        select_version.clear()
+        select_version.fetch_releases()
+        self.set_background(wid="main_select_version", rgba=(0, 0, 0, 0))
+        self.set_screen(name="SelectVersionScreen", direction="left")
 
-            elif wid == "main_settings":
-                name = "SettingsScreen"
+    def on_press_flash(self, instance):
+        self.set_background(wid="main_flash", rgba=(0.5, 0.5, 0.5, 0.5))
 
-            elif wid == "main_about":
-                name = "AboutScreen"
+    def on_release_flash(self, instance):
+        self.set_background(wid="main_flash", rgba=(0, 0, 0, 0))
+        self.set_screen(name="FlashScreen", direction="left")
 
-            else:
-                raise ValueError(f"Invalid {name} screen")
+    def on_press_wipe(self, instance):
+        self.set_background(wid="main_wipe", rgba=(0.5, 0.5, 0.5, 0.5))
 
-            self.on_release(wid=wid)
+    def on_release_wipe(self, instance):
+        self.set_background(wid="main_wipe", rgba=(0, 0, 0, 0))
+        self.set_screen(name="WipeScreen", direction="left")
 
-            if name == "SettingsScreen":
-                _app = App.get_running_app()
-                _app.open_settings()
-            else:
-                self.set_screen(name=name, direction=direction)
+    def on_press_settings(self, instance):
+        self.set_background(wid="main_settings", rgba=(0.5, 0.5, 0.5, 0.5))
 
-        return on_release
+    def on_release_settings(self, instance):
+        self.set_background(wid="main_settings", rgba=(0, 0, 0, 0))
+        App.get_running_app().open_settings()
+
+    def on_press_about(self, instance):
+        self.set_background(wid="main_about", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_about(self, instance):
+        self.set_background(wid="main_about", rgba=(0, 0, 0, 0))
+        self.set_screen(name="AboutScreen", direction="left")

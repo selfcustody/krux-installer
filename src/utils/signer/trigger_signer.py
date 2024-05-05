@@ -50,11 +50,7 @@ class TriggerSigner(BaseSigner):
         with open(filehashname, mode="w", encoding="utf-8") as h_file:
             content = f"{self.filehash} {self.filename}"
             h_file.write(content)
-            print("")
-            print("=====================")
-            print(f"{filehashname} saved")
-            print("=====================")
-            print("")
+            self.debug(f"{filehashname} saved")
 
     def save_signature(self):
         """Save the signature data into a .sig file"""
@@ -62,11 +58,7 @@ class TriggerSigner(BaseSigner):
             sigfile = f"{self.filename}.sig"
             with open(sigfile, "wb") as s_file:
                 s_file.write(self.signature)
-                print("")
-                print("=====================")
-                print(f"{sigfile} saved")
-                print("=====================")
-                print("")
+                self.debug(f"{sigfile} saved")
         else:
             raise ValueError("Empty signature")
 
@@ -84,10 +76,6 @@ class TriggerSigner(BaseSigner):
             pubfile = f"{self.filename}.pem"
             with open(pubfile, mode="w", encoding="utf-8") as pb_file:
                 pb_file.write(formated_pubkey)
-                print("")
-                print("=====================")
-                print(f"{pubfile} saved")
-                print("=====================")
-                print("")
+                self.debug(f"{pubfile} saved")
         else:
             raise ValueError("Empty pubkey")

@@ -28,8 +28,7 @@ class TestTriggerSigner(TestCase):
 
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=b"Mocked")
-    @patch("builtins.print")
-    def test_save_hash(self, mock_print, mocked_open, mock_exists):
+    def test_save_hash(self, mocked_open, mock_exists):
         s = TriggerSigner(filename="mock.txt")
         s.make_hash()
         s.save_hash()
@@ -50,15 +49,6 @@ class TestTriggerSigner(TestCase):
                 call().__exit__(None, None, None),
             ]
         )
-        mock_print.assert_has_calls(
-            [
-                call(""),
-                call("====================="),
-                call("mock.txt.sha256.txt saved"),
-                call("====================="),
-                call(""),
-            ]
-        )
 
     @patch("os.path.exists", return_value=True)
     def test_fail_save_signature(self, mock_exists):
@@ -70,8 +60,7 @@ class TestTriggerSigner(TestCase):
 
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=b"Mocked")
-    @patch("builtins.print")
-    def test_save_signature(self, mock_print, mocked_open, mock_exists):
+    def test_save_signature(self, mocked_open, mock_exists):
         s = TriggerSigner(filename="mock.txt")
         s.signature = MOCKED_SIGNATURE
         s.save_signature()
@@ -88,15 +77,6 @@ class TestTriggerSigner(TestCase):
                 call().__exit__(None, None, None),
             ]
         )
-        mock_print.assert_has_calls(
-            [
-                call(""),
-                call("====================="),
-                call("mock.txt.sig saved"),
-                call("====================="),
-                call(""),
-            ]
-        )
 
     @patch("os.path.exists", return_value=True)
     def test_fail_save_pubkey(self, mock_exists):
@@ -108,8 +88,7 @@ class TestTriggerSigner(TestCase):
 
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=b"Mocked")
-    @patch("builtins.print")
-    def test_save_pubkey(self, mock_print, mocked_open, mock_exists):
+    def test_save_pubkey(self, mocked_open, mock_exists):
         s = TriggerSigner(filename="mock.txt")
         s.pubkey = "027fbea3abf78019ff6da48d6c235931b26732faaf74eeeda8f0a7e5eb32477c20"
         s.save_pubkey()
@@ -124,14 +103,5 @@ class TestTriggerSigner(TestCase):
                     "-----BEGIN PUBLIC KEY-----\nMDYwEAYHKoZIzj0CAQYFK4EEAAoDIgACf76jq/eAGf9tpI1sI1kxsmcy+q907u2o8Kfl6zJHfCA=\n-----END PUBLIC KEY-----"
                 ),
                 call().__exit__(None, None, None),
-            ]
-        )
-        mock_print.assert_has_calls(
-            [
-                call(""),
-                call("====================="),
-                call("mock.txt.pem saved"),
-                call("====================="),
-                call(""),
             ]
         )

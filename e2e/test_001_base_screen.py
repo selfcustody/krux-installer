@@ -40,52 +40,6 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(window.children[0].ids["mocked_button"].background_color[2], 0)
         self.assertEqual(window.children[0].ids["mocked_button"].background_color[3], 0)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_on_press(self):
-        screen = BaseScreen(wid="mock", name="Mock")
-        screen.ids = {}
-        screen.ids["mocked_button"] = Button()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-
-        screen.on_press(wid="mocked_button")
-
-        # your asserts
-        self.assertEqual(
-            window.children[0].ids["mocked_button"].background_color[0], 0.5
-        )
-        self.assertEqual(
-            window.children[0].ids["mocked_button"].background_color[1], 0.5
-        )
-        self.assertEqual(
-            window.children[0].ids["mocked_button"].background_color[2], 0.5
-        )
-        self.assertEqual(
-            window.children[0].ids["mocked_button"].background_color[3], 0.5
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_on_release(self):
-        screen = BaseScreen(wid="mock", name="Mock")
-        screen.ids = {}
-        screen.ids["mocked_button"] = Button()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-
-        screen.on_release(wid="mocked_button")
-
-        # your asserts
-        self.assertEqual(window.children[0].ids["mocked_button"].background_color[0], 0)
-        self.assertEqual(window.children[0].ids["mocked_button"].background_color[1], 0)
-        self.assertEqual(window.children[0].ids["mocked_button"].background_color[2], 0)
-        self.assertEqual(window.children[0].ids["mocked_button"].background_color[3], 0)
-
     def test_set_screen(self):
         screen_manager = ScreenManager()
         screen_0 = BaseScreen(wid="mock_0", name="Mock_0")

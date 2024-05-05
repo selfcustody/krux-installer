@@ -61,7 +61,7 @@ class ConfigKruxInstaller(BaseKruxInstaller):
             with open(_kruxconfig, "w", encoding="utf8"):
                 pass
 
-        self.debug(f"defaultpath={_kruxconfig}")
+        self.debug(f"ConfigKruxInstaller.get_application_config = {_kruxconfig}")
         return super(BaseKruxInstaller, self).get_application_config(_kruxconfig)
 
     def build_config(self, config):
@@ -87,13 +87,13 @@ class ConfigKruxInstaller(BaseKruxInstaller):
             os.makedirs(_kruxdata)
 
         config.setdefaults("destdir", {"assets": _kruxdata})
-        self.debug(f"destdir={_kruxdata}")
+        self.debug(f"{config}.destdir={_kruxdata}")
 
         config.setdefaults("flash", {"baudrate": DEFAULT_BAUDRATE})
-        self.debug(f"baudrate={DEFAULT_BAUDRATE}")
+        self.debug(f"{config}.baudrate={DEFAULT_BAUDRATE}")
 
         config.setdefaults("locale", {"lang": "en-US"})
-        self.debug(f"lang={DEFAULT_LOCALE}")
+        self.debug(f"{config}.lang={DEFAULT_LOCALE}")
 
     def build_settings(self, settings):
         """Create settings panel"""
@@ -121,5 +121,5 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                 "options": ["en-US", "pt-BR"]
             }
         ]"""
-        self.debug(f"build_settings::data={jsondata}")
+        self.debug(f"{settings}.data={jsondata}")
         settings.add_json_panel("Settings", self.config, data=jsondata)

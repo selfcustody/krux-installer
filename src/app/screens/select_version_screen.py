@@ -39,71 +39,62 @@ class SelectVersionScreen(BaseScreen):
             wid="select_version_screen", name="SelectVersionScreen", **kwargs
         )
 
+        # Build grid where buttons will be placed
+        self.make_grid(wid="select_version_screen_grid", rows=4)
+
     def clear(self):
         """Clear the list of children widgets buttons"""
         self.ids["select_version_screen_grid"].clear_widgets()
 
     def fetch_releases(self):
         """Build a set of buttons to select version"""
-        self.clear()
-        self.selector = Selector()
+        selector = Selector()
 
-        # build a list of latest versions plus old_versions and back buttons
-        current_versions = [
-            self.selector.releases[0],
-            self.selector.releases[-1],
-            "old versions",
-            "back",
-        ]
+        # Build buttons to be placed in GridLayout
+        self.make_button(
+            row=0,
+            id=f"select_version_latest",
+            root_widget="select_version_screen_grid",
+            text=selector.releases[0],
+            markup=False,
+            on_press=self.on_press_stable,
+            on_release=self.on_release_stable,
+        )
 
-        for count, label in enumerate(current_versions):
-            sanitized = label.replace(".", "_").replace("/", "_").replace(" ", "_")
-            obj = {
-                "id": f"select_version_{sanitized}",
-                "text": label,
-                "markup": False,
-                "i": count,
-            }
-            self.make_button(
-                root_widget="select_version_screen_grid",
-                template=obj,
-                total=len(current_versions),
-            )
+        self.make_button(
+            row=1,
+            id=f"select_version_beta",
+            root_widget="select_version_screen_grid",
+            text=selector.releases[-1],
+            markup=False,
+            on_press=self.on_press_beta,
+            on_release=self.on_release_beta,
+        )
+
+        self.make_button(
+            row=2,
+            id=f"select_version_old",
+            root_widget="select_version_screen_grid",
+            text="Old versions",
+            markup=False,
+            on_press=self.on_press_old,
+            on_release=self.on_release_old,
+        )
+
+        self.make_button(
+            row=3,
+            id=f"select_version_back",
+            root_widget="select_version_screen_grid",
+            text="Back",
+            markup=False,
+            on_press=self.on_press_back,
+            on_release=self.on_release_back,
+        )
 
         # add some data to old versions plus a back button
-        old_versions = self.selector.releases[1:-2]
-        old_versions.append("back")
+        old_versions = selector.releases[1:-2]
         old_versions_widget = self.manager.get_screen("SelectOldVersionScreen")
         old_versions_widget.fetch_releases(old_versions)
-
-    def make_on_press(self, wid: str):
-        """Dynamically define a on_press action"""
-
-        def _on_press():
-            self.on_press(wid=wid)
-
-        return _on_press
-
-    def make_on_release(self, wid: str):
-        """Dynamically define a on_release action"""
-
-        def _on_release():
-            if re.findall(r"^select_version_v\d+\_\d+\_\d$", wid):
-                self.change_version(wid=wid)
-                self.on_release(wid=wid)
-                self.set_screen(name="MainScreen", direction="right")
-            if wid == "select_version_odudex_krux_binaries":
-                self.change_version(wid=wid)
-                self.on_release(wid=wid)
-                self.set_screen(name="MainScreen", direction="right")
-            elif wid == "select_version_old_versions":
-                self.on_release(wid=wid)
-                self.set_screen(name="SelectOldVersionScreen", direction="left")
-            elif wid == "select_version_back":
-                self.on_release(wid=wid)
-                self.set_screen(name="MainScreen", direction="right")
-
-        return _on_release
 
     def change_version(self, wid: str):
         """Change version text on MainScreen"""
@@ -114,3 +105,33 @@ class SelectVersionScreen(BaseScreen):
         main_select_version = main_screen.ids["main_select_version"]
         main_select_version.text = f"Version: [color=#00AABB]{version}[/color]"
         self.debug(f"{main_select_version}.text = {main_select_version.text}")
+
+    def on_press_stable(self, instance):
+        self.set_background(wid="select_version_latest", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_stable(self, instance):
+        self.set_background(wid="select_version_latest", rgba=(0, 0, 0, 0))
+        self.change_version(wid="select_version_latest")
+        self.set_screen(name="MainScreen", direction="right")
+
+    def on_press_beta(self, instance):
+        self.set_background(wid="select_version_beta", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_beta(self, instance):
+        self.set_background(wid="select_version_beta", rgba=(0, 0, 0, 0))
+        self.change_version(wid="select_version_beta")
+        self.set_screen(name="MainScreen", direction="right")
+
+    def on_press_old(self, instance):
+        self.set_background(wid="select_version_old", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_old(self, instance):
+        self.set_background(wid="select_version_old", rgba=(0, 0, 0, 0))
+        self.set_screen(name="SelectOldVersionScreen", direction="left")
+
+    def on_press_back(self, instance):
+        self.set_background(wid="select_version_back", rgba=(0.5, 0.5, 0.5, 0.5))
+
+    def on_release_back(self, instance):
+        self.set_background(wid="select_version_back", rgba=(0, 0, 0, 0))
+        self.set_screen(name="MainScreen", direction="right")

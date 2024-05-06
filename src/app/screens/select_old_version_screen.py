@@ -45,9 +45,27 @@ class SelectOldVersionScreen(BaseScreen):
         """Clear the list of children widgets buttons"""
         self.ids["select_old_version_screen_grid"].clear_widgets()
 
+    def register_button_methods(self, name: str):
+        """Dynamic registering of on_press and on_release methods for a button"""
+
+        def on_press(instance):
+            self.set_background(
+                wid=f"select_old_version_{name}", rgba=(0.5, 0.5, 0.5, 0.5)
+            )
+
+        def on_release(instance):
+            self.set_background(wid=f"select_old_version_{name}", rgba=(0, 0, 0, 0))
+            self.change_version(wid=f"select_old_version_{name}")
+            self.set_screen(name="MainScreen", direction="right")
+
+        on_press.__name__ = "on_press_%s" % name
+        on_release.__name__ = "on_release_%s" % name
+
+        setattr(self, on_press.__name__, on_press)
+        setattr(self, on_release.__name__, on_release)
+
     def fetch_releases(self, old_versions: List[str]):
         """Build a set of buttons to select version"""
-        print(self.ids)
         if not "select_old_version_screen_grid" in self.ids:
             self.make_grid(
                 wid="select_old_version_screen_grid", rows=len(old_versions) + 1
@@ -57,21 +75,7 @@ class SelectOldVersionScreen(BaseScreen):
 
         for row, text in enumerate(old_versions):
             sanitized = text.replace(".", "_").replace("/", "_")
-
-            def on_press(instance):
-                self.set_background(
-                    wid=f"select_old_version_{sanitized}", rgba=(0.5, 0.5, 0.5, 0.5)
-                )
-
-            def on_release(instance):
-                self.set_background(
-                    wid=f"select_old_version_{sanitized}", rgba=(0, 0, 0, 0)
-                )
-                self.change_version(wid=f"select_old_version_{sanitized}")
-                self.set_screen(name="MainScreen", direction="right")
-
-            setattr(self.__class__, f"on_press_{sanitized}", staticmethod(on_press))
-            setattr(self.__class__, f"on_release_{sanitized}", staticmethod(on_release))
+            self.register_button_methods(name=sanitized)
 
             self.make_button(
                 row=row,
@@ -79,8 +83,8 @@ class SelectOldVersionScreen(BaseScreen):
                 root_widget="select_old_version_screen_grid",
                 text=text,
                 markup=False,
-                on_press=getattr(self.__class__, f"on_press_{sanitized}"),
-                on_release=getattr(self.__class__, f"on_release_{sanitized}"),
+                on_press=getattr(self, f"on_press_{sanitized}"),
+                on_release=getattr(self, f"on_release_{sanitized}"),
             )
 
         self.make_button(

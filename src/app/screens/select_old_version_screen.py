@@ -23,8 +23,7 @@ main_screen.py
 """
 # pylint: disable=no-name-in-module
 import re
-from functools import partial
-from typing import List
+import typing
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -40,6 +39,13 @@ class SelectOldVersionScreen(BaseScreen):
         super().__init__(
             wid="select_old_version_screen", name="SelectOldVersionScreen", **kwargs
         )
+
+    def make_grid_if_not_exist(self, old_versions: typing.List[str]):
+        """Build a grid layout if"""
+        if not "select_old_version_screen_grid" in self.ids:
+            self.make_grid(
+                wid="select_old_version_screen_grid", rows=len(old_versions) + 1
+            )
 
     def clear(self):
         """Clear the list of children widgets buttons"""
@@ -64,13 +70,9 @@ class SelectOldVersionScreen(BaseScreen):
         setattr(self, on_press.__name__, on_press)
         setattr(self, on_release.__name__, on_release)
 
-    def fetch_releases(self, old_versions: List[str]):
+    def fetch_releases(self, old_versions: typing.List[str]):
         """Build a set of buttons to select version"""
-        if not "select_old_version_screen_grid" in self.ids:
-            self.make_grid(
-                wid="select_old_version_screen_grid", rows=len(old_versions) + 1
-            )
-
+        self.make_grid_if_not_exist(old_versions=old_versions)
         self.clear()
 
         for row, text in enumerate(old_versions):

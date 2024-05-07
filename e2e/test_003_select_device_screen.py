@@ -72,8 +72,15 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
+    @patch("src.app.screens.select_device_screen.partial")
+    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
     def test_on_release_m5stickv(
-        self, mock_set_screen, mock_manager, mock_set_background
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_set_screen,
+        mock_manager,
+        mock_set_background,
     ):
         mock_manager.get_screen = MagicMock()
 
@@ -92,7 +99,12 @@ class TestSelectDeviceScreen(GraphicUnitTest):
             wid="select_device_m5stickv", rgba=(0, 0, 0, 0)
         )
         mock_manager.get_screen.assert_called_once_with("MainScreen")
+        mock_update = mock_manager.get_screen().update
+        mock_partial.assert_called_once_with(
+            mock_update, name="SelectDeviceScreen", key="device", value="m5stickv"
+        )
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
@@ -116,7 +128,16 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    def test_on_release_amigo(self, mock_set_screen, mock_manager, mock_set_background):
+    @patch("src.app.screens.select_device_screen.partial")
+    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
+    def test_on_release_amigo(
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_set_screen,
+        mock_manager,
+        mock_set_background,
+    ):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectDeviceScreen()
@@ -134,7 +155,12 @@ class TestSelectDeviceScreen(GraphicUnitTest):
             wid="select_device_amigo", rgba=(0, 0, 0, 0)
         )
         mock_manager.get_screen.assert_called_once_with("MainScreen")
+        mock_update = mock_manager.get_screen().update
+        mock_partial.assert_called_once_with(
+            mock_update, name="SelectDeviceScreen", key="device", value="amigo"
+        )
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
@@ -158,7 +184,16 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    def test_on_release_dock(self, mock_set_screen, mock_manager, mock_set_background):
+    @patch("src.app.screens.select_device_screen.partial")
+    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
+    def test_on_release_dock(
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_set_screen,
+        mock_manager,
+        mock_set_background,
+    ):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectDeviceScreen()
@@ -176,7 +211,12 @@ class TestSelectDeviceScreen(GraphicUnitTest):
             wid="select_device_dock", rgba=(0, 0, 0, 0)
         )
         mock_manager.get_screen.assert_called_once_with("MainScreen")
+        mock_update = mock_manager.get_screen().update
+        mock_partial.assert_called_once_with(
+            mock_update, name="SelectDeviceScreen", key="device", value="dock"
+        )
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
@@ -200,7 +240,16 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    def test_on_release_bit(self, mock_set_screen, mock_manager, mock_set_background):
+    @patch("src.app.screens.select_device_screen.partial")
+    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
+    def test_on_release_bit(
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_set_screen,
+        mock_manager,
+        mock_set_background,
+    ):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectDeviceScreen()
@@ -218,7 +267,12 @@ class TestSelectDeviceScreen(GraphicUnitTest):
             wid="select_device_bit", rgba=(0, 0, 0, 0)
         )
         mock_manager.get_screen.assert_called_once_with("MainScreen")
+        mock_update = mock_manager.get_screen().update
+        mock_partial.assert_called_once_with(
+            mock_update, name="SelectDeviceScreen", key="device", value="bit"
+        )
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
@@ -242,8 +296,15 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
+    @patch("src.app.screens.select_device_screen.partial")
+    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
     def test_on_release_yahboom(
-        self, mock_set_screen, mock_manager, mock_set_background
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_set_screen,
+        mock_manager,
+        mock_set_background,
     ):
         mock_manager.get_screen = MagicMock()
 
@@ -262,7 +323,12 @@ class TestSelectDeviceScreen(GraphicUnitTest):
             wid="select_device_yahboom", rgba=(0, 0, 0, 0)
         )
         mock_manager.get_screen.assert_called_once_with("MainScreen")
+        mock_update = mock_manager.get_screen().update
+        mock_partial.assert_called_once_with(
+            mock_update, name="SelectDeviceScreen", key="device", value="yahboom"
+        )
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
@@ -286,7 +352,16 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    def test_on_release_cube(self, mock_set_screen, mock_manager, mock_set_background):
+    @patch("src.app.screens.select_device_screen.partial")
+    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
+    def test_on_release_cube(
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_set_screen,
+        mock_manager,
+        mock_set_background,
+    ):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectDeviceScreen()
@@ -304,4 +379,9 @@ class TestSelectDeviceScreen(GraphicUnitTest):
             wid="select_device_cube", rgba=(0, 0, 0, 0)
         )
         mock_manager.get_screen.assert_called_once_with("MainScreen")
+        mock_update = mock_manager.get_screen().update
+        mock_partial.assert_called_once_with(
+            mock_update, name="SelectDeviceScreen", key="device", value="cube"
+        )
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)

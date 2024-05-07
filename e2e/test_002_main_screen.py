@@ -132,8 +132,24 @@ class TestMainScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
+    def test_fail_on_press_flash(self, mock_set_background):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[2]
+
+        screen.on_press_flash(button)
+        self.assertEqual(len(mock_set_background.call_args_list), 0)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
     def test_on_press_flash(self, mock_set_background):
         screen = MainScreen()
+        screen.will_flash = True
         self.render(screen)
 
         # get your Window instance safely
@@ -150,8 +166,26 @@ class TestMainScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
+    def test_fail_on_release_flash(self, mock_set_screen, mock_set_background):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[2]
+
+        screen.on_release_flash(button)
+        self.assertEqual(len(mock_set_background.call_args_list), 0)
+        self.assertEqual(len(mock_set_screen.call_args_list), 0)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    @patch("src.app.screens.main_screen.MainScreen.set_screen")
     def test_on_release_flash(self, mock_set_screen, mock_set_background):
         screen = MainScreen()
+        screen.will_flash = True
         self.render(screen)
 
         # get your Window instance safely
@@ -166,8 +200,25 @@ class TestMainScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
+    def test_fail_on_press_wipe(self, mock_set_background):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[3]
+
+        screen.on_press_wipe(button)
+        self.assertEqual(len(mock_set_background.call_args_list), 0)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
     def test_on_press_wipe(self, mock_set_background):
         screen = MainScreen()
+        screen.will_wipe = True
         self.render(screen)
 
         # get your Window instance safely
@@ -185,8 +236,26 @@ class TestMainScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
+    def test_fail_on_release_wipe(self, mock_set_screen, mock_set_background):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[3]
+
+        screen.on_release_wipe(button)
+        self.assertEqual(len(mock_set_background.call_args_list), 0)
+        self.assertEqual(len(mock_set_screen.call_args_list), 0)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    @patch("src.app.screens.main_screen.MainScreen.set_screen")
     def test_on_release_wipe(self, mock_set_screen, mock_set_background):
         screen = MainScreen()
+        screen.will_wipe = True
         self.render(screen)
 
         # get your Window instance safely

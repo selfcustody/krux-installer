@@ -23,6 +23,8 @@ main_screen.py
 """
 # pylint: disable=no-name-in-module
 import re
+from functools import partial
+from kivy.clock import Clock
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -102,9 +104,8 @@ class SelectVersionScreen(BaseScreen):
         self.debug(f"on_release::{wid} = {version}")
 
         main_screen = self.manager.get_screen("MainScreen")
-        main_select_version = main_screen.ids["main_select_version"]
-        main_select_version.text = f"Version: [color=#00AABB]{version}[/color]"
-        self.debug(f"{main_select_version}.text = {main_select_version.text}")
+        fn = partial(main_screen.update, name=self.name, key="version", value=version)
+        Clock.schedule_once(fn, 0)
 
     def on_press_stable(self, instance):
         self.set_background(wid="select_version_latest", rgba=(0.5, 0.5, 0.5, 0.5))

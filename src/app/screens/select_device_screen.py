@@ -22,6 +22,8 @@
 main_screen.py
 """
 # pylint: disable=no-name-in-module
+from functools import partial
+from kivy.clock import Clock
 from kivy.cache import Cache
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
@@ -106,13 +108,11 @@ class SelectDeviceScreen(BaseScreen):
     def change_device(self, wid: str):
         """Change device text on MainScreen"""
         device = self.ids[wid].text
-        self.debug(f"on_release::{wid}={device}")
+        self.debug(f"on_release::{wid} = {device}")
 
         main_screen = self.manager.get_screen("MainScreen")
-        main_select_device = main_screen.ids["main_select_device"]
-
-        main_select_device.text = f"Device: [color=#00AABB]{device}[/color]"
-        self.debug(f"{main_select_device}.text = {main_select_device.text}")
+        fn = partial(main_screen.update, name=self.name, key="device", value=device)
+        Clock.schedule_once(fn, 0)
 
     def on_press_m5stickv(self, instance):
         self.set_background(wid="select_device_m5stickv", rgba=(0.5, 0.5, 0.5, 0.5))

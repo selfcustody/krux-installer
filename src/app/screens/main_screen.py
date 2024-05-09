@@ -43,66 +43,102 @@ class MainScreen(BaseScreen):
         # Build grid where buttons will be placed
         self.make_grid(wid="main_screen_grid", rows=6)
 
-        # Build buttons to be placed in GridLayout
-        self.make_button(
-            row=0,
-            id="main_select_device",
-            root_widget="main_screen_grid",
-            text=f"Device: [color=#00AABB]{self.device}[/color]",
-            markup=True,
-            on_press=self.on_press_select_device,
-            on_release=self.on_release_select_device,
-        )
+        buttons = [
+            (
+                "main_select_device",
+                f"Device: [color=#00AABB]{self.device}[/color]",
+                True,
+            ),
+            (
+                "main_select_version",
+                f"Version: [color=#00AABB]{self.version}[/color]",
+                True,
+            ),
+            ("main_flash", f"Flash: [color=#333333]Flash[/color]", True),
+            ("main_wipe", f"Wipe: [color=#333333]Wipe[/color]", True),
+            ("main_settings", "Settings", False),
+            ("main_about", "About", False),
+        ]
 
-        self.make_button(
-            row=1,
-            id="main_select_version",
-            root_widget="main_screen_grid",
-            text=f"Version: [color=#00AABB]{self.version}[/color]",
-            markup=True,
-            on_press=self.on_press_select_version,
-            on_release=self.on_release_select_version,
-        )
+        # START of buttons
+        for row, _tuple in enumerate(buttons):
 
-        self.make_button(
-            row=2,
-            id="main_flash",
-            root_widget="main_screen_grid",
-            text=f"[color={"#FFFFFF" if self.will_flash else "#333333"}]Flash[/color]",
-            markup=True,
-            on_press=self.on_press_flash,
-            on_release=self.on_release_flash,
-        )
+            # START of on_press buttons
+            def _press(instance):
+                self.debug(f"Calling Button::{instance.id}::on_press")
+                if instance.id == "main_flash":
+                    if self.will_flash:
+                        self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                    else:
+                        self.warning(f"Button::{instance.id} disabled")
 
-        self.make_button(
-            row=3,
-            id="main_wipe",
-            root_widget="main_screen_grid",
-            text=f"[color={"#FFFFFF" if self.will_wipe else "#333333"}]Wipe[/color]",
-            markup=True,
-            on_press=self.on_press_wipe,
-            on_release=self.on_release_wipe,
-        )
+                elif instance.id == "main_wipe":
+                    if self.will_wipe:
+                        self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                    else:
+                        self.warning(f"Button::{instance.id} disabled")
 
-        self.make_button(
-            row=4,
-            id="main_settings",
-            root_widget="main_screen_grid",
-            text="Settings",
-            markup=False,
-            on_press=self.on_press_settings,
-            on_release=self.on_release_settings,
-        )
+                elif instance.id in (
+                    "main_select_device",
+                    "main_select_version",
+                    "main_settings",
+                    "main_about",
+                ):
+                    self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
 
-        self.make_button(
-            row=5,
-            id="main_about",
-            root_widget="main_screen_grid",
-            text="About",
-            markup=False,
-            on_press=self.on_press_about,
-            on_release=self.on_release_about,
-        )
+                else:
+                    self.warning(f"Button::{instance.id} not found")
+
+            # END of on_press buttons
+
+            # START of on_release_buttons
+            def _release(instance):
+                self.debug(f"Calling Button::{instance.id}::on_release")
+                if instance.id == "main_select_device":
+                    self.set_background(wid="main_select_device", rgba=(0, 0, 0, 0))
+                    self.set_screen(name="SelectDeviceScreen", direction="left")
+
+                elif instance.id == "main_select_version":
+                    select_version = self.manager.get_screen("SelectVersionScreen")
+                    select_version.clear()
+                    select_version.fetch_releases()
+                    self.set_background(wid="main_select_version", rgba=(0, 0, 0, 0))
+                    self.set_screen(name="SelectVersionScreen", direction="left")
+
+                elif instance.id == "main_flash":
+                    if self.will_flash:
+                        self.set_background(wid="main_flash", rgba=(0, 0, 0, 0))
+                        self.set_screen(name="FlashScreen", direction="left")
+                    else:
+                        self.debug(f"Button::{instance.id} disabled")
+
+                elif instance.id == "main_wipe":
+                    if self.will_wipe:
+                        self.set_background(wid="main_wipe", rgba=(0, 0, 0, 0))
+                        self.set_screen(name="WipeScreen", direction="left")
+                    else:
+                        self.debug(f"Button::{instance.id} disabled")
+
+                elif instance.id == "main_settings":
+                    self.set_background(wid="main_settings", rgba=(0, 0, 0, 0))
+                    App.get_running_app().open_settings()
+
+                elif instance.id == "main_about":
+                    self.set_background(wid="main_about", rgba=(0, 0, 0, 0))
+                    self.set_screen(name="AboutScreen", direction="left")
+
+            # END of on_release buttons
+
+            self.make_button(
+                row=row,
+                id=_tuple[0],
+                root_widget="main_screen_grid",
+                text=_tuple[1],
+                markup=_tuple[2],
+                on_press=_press,
+                on_release=_release,
+            )
+        # END of buttons
 
     def update(self, *args, **kwargs):
         name = kwargs.get("name")
@@ -149,52 +185,3 @@ class MainScreen(BaseScreen):
 
             self.ids["main_wipe"].text = f"[color=#333333]Wipe[/color]"
             self.debug(f"main_wipe.text = {self.ids["main_wipe"].text}")
-
-    def on_press_select_device(self, instance):
-        self.set_background(wid="main_select_device", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_select_device(self, instance):
-        self.set_background(wid="main_select_device", rgba=(0, 0, 0, 0))
-        self.set_screen(name="SelectDeviceScreen", direction="left")
-
-    def on_press_select_version(self, instance):
-        self.set_background(wid="main_select_version", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_select_version(self, instance):
-        select_version = self.manager.get_screen("SelectVersionScreen")
-        select_version.clear()
-        select_version.fetch_releases()
-        self.set_background(wid="main_select_version", rgba=(0, 0, 0, 0))
-        self.set_screen(name="SelectVersionScreen", direction="left")
-
-    def on_press_flash(self, instance):
-        if self.will_flash:
-            self.set_background(wid="main_flash", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_flash(self, instance):
-        if self.will_flash:
-            self.set_background(wid="main_flash", rgba=(0, 0, 0, 0))
-            self.set_screen(name="FlashScreen", direction="left")
-
-    def on_press_wipe(self, instance):
-        if self.will_wipe:
-            self.set_background(wid="main_wipe", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_wipe(self, instance):
-        if self.will_wipe:
-            self.set_background(wid="main_wipe", rgba=(0, 0, 0, 0))
-            self.set_screen(name="WipeScreen", direction="left")
-
-    def on_press_settings(self, instance):
-        self.set_background(wid="main_settings", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_settings(self, instance):
-        self.set_background(wid="main_settings", rgba=(0, 0, 0, 0))
-        App.get_running_app().open_settings()
-
-    def on_press_about(self, instance):
-        self.set_background(wid="main_about", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_about(self, instance):
-        self.set_background(wid="main_about", rgba=(0, 0, 0, 0))
-        self.set_screen(name="AboutScreen", direction="left")

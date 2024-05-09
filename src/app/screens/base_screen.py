@@ -55,11 +55,19 @@ class BaseScreen(Screen, Trigger):
         self.manager.current = name
 
     def make_grid(self, wid: str, rows: int):
-        # Build grid where buttons will be placed
-        grid = GridLayout(cols=1, rows=rows)
-        grid.id = wid
-        self.add_widget(grid)
-        self.ids[wid] = WeakProxy(grid)
+        """Build grid where buttons will be placed"""
+        if not wid in self.ids:
+            self.debug(f"Building GridLayout::{wid}")
+            grid = GridLayout(cols=1, rows=rows)
+            grid.id = wid
+            self.add_widget(grid)
+            self.ids[wid] = WeakProxy(grid)
+        else:
+            self.debug(f"GridLayout::{wid} already exist")
+
+    def clear_grid(self, wid: str):
+        self.debug(f"Clearing widgets from GridLayout::{wid}")
+        self.ids[wid].clear_widgets()
 
     def make_button(
         self,
@@ -74,7 +82,6 @@ class BaseScreen(Screen, Trigger):
         self.debug(f"{id} -> {root_widget}")
 
         total = self.ids[root_widget].rows
-
         btn = Button(
             text=text,
             markup=markup,
@@ -82,8 +89,12 @@ class BaseScreen(Screen, Trigger):
             background_color=(0, 0, 0, 0),
             color=(1, 1, 1, 1),
         )
-
         btn.id = id
+
+        # define button methods to be callable in classes
+        setattr(self, f"on_press_{id}", on_press)
+        setattr(self, f"on_release_{id}", on_release)
+
         btn.bind(on_press=on_press)
         btn.bind(on_release=on_release)
         btn.x = 0

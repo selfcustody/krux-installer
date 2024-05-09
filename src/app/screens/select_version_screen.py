@@ -52,87 +52,69 @@ class SelectVersionScreen(BaseScreen):
         """Build a set of buttons to select version"""
         selector = Selector()
 
-        # Build buttons to be placed in GridLayout
-        self.make_button(
-            row=0,
-            id=f"select_version_latest",
-            root_widget="select_version_screen_grid",
-            text=selector.releases[0],
-            markup=False,
-            on_press=self.on_press_stable,
-            on_release=self.on_release_stable,
-        )
+        buttons = [
+            ("select_version_latest", selector.releases[0], False),
+            ("select_version_beta", selector.releases[-1], False),
+            ("select_version_old", "Old versions", False),
+            ("select_version_back", "Back", False),
+        ]
 
-        self.make_button(
-            row=1,
-            id=f"select_version_beta",
-            root_widget="select_version_screen_grid",
-            text=selector.releases[-1],
-            markup=False,
-            on_press=self.on_press_beta,
-            on_release=self.on_release_beta,
-        )
+        # Push other releases to SelectOldVersionScreen
 
-        self.make_button(
-            row=2,
-            id=f"select_version_old",
-            root_widget="select_version_screen_grid",
-            text="Old versions",
-            markup=False,
-            on_press=self.on_press_old,
-            on_release=self.on_release_old,
-        )
+        select_old_version_screen = self.manager.get_screen("SelectOldVersionScreen")
+        select_old_version_screen.fetch_releases(old_versions=selector.releases[1:-1])
+        # START of buttons
+        for row, _tuple in enumerate(buttons):
 
-        self.make_button(
-            row=3,
-            id=f"select_version_back",
-            root_widget="select_version_screen_grid",
-            text="Back",
-            markup=False,
-            on_press=self.on_press_back,
-            on_release=self.on_release_back,
-        )
+            # START of on_press buttons
+            def _press(instance):
+                self.debug(f"Calling Button::{instance.id}::on_press")
+                if instance.id in (
+                    "select_version_latest",
+                    "select_version_beta",
+                    "select_version_old",
+                    "select_version_back",
+                ):
+                    self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                else:
+                    self.warning(f"Button::{instance.id} not found")
 
-        # add some data to old versions plus a back button
-        old_versions = selector.releases[1:-2]
-        old_versions_widget = self.manager.get_screen("SelectOldVersionScreen")
-        old_versions_widget.fetch_releases(old_versions)
+            # END of on_press buttons
 
-    def change_version(self, wid: str):
-        """Change version text on MainScreen"""
-        version = self.ids[wid].text
-        self.debug(f"on_release::{wid} = {version}")
+            # START of on_release_buttons
+            def _release(instance):
+                self.debug(f"Calling Button::{instance.id}::on_release")
+                if (
+                    instance.id == "select_version_latest"
+                    or instance.id == "select_version_beta"
+                ):
+                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+                    version = self.ids[instance.id].text
+                    self.debug(f"on_release::{instance.id} = {version}")
+                    main_screen = self.manager.get_screen("MainScreen")
+                    fn = partial(
+                        main_screen.update, name=self.name, key="version", value=version
+                    )
+                    Clock.schedule_once(fn, 0)
+                    self.set_screen(name="MainScreen", direction="right")
 
-        main_screen = self.manager.get_screen("MainScreen")
-        fn = partial(main_screen.update, name=self.name, key="version", value=version)
-        Clock.schedule_once(fn, 0)
+                elif instance.id == "select_version_old":
+                    self.set_background(wid="select_version_old", rgba=(0, 0, 0, 0))
+                    self.set_screen(name="SelectOldVersionScreen", direction="left")
+                elif instance.id == "select_version_back":
+                    self.set_background(wid="select_version_back", rgba=(0, 0, 0, 0))
+                    self.set_screen(name="MainScreen", direction="right")
+                else:
+                    self.warning(f"Button::{instance.id} not found")
 
-    def on_press_stable(self, instance):
-        self.set_background(wid="select_version_latest", rgba=(0.5, 0.5, 0.5, 0.5))
+            # END of on_release buttons
 
-    def on_release_stable(self, instance):
-        self.set_background(wid="select_version_latest", rgba=(0, 0, 0, 0))
-        self.change_version(wid="select_version_latest")
-        self.set_screen(name="MainScreen", direction="right")
-
-    def on_press_beta(self, instance):
-        self.set_background(wid="select_version_beta", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_beta(self, instance):
-        self.set_background(wid="select_version_beta", rgba=(0, 0, 0, 0))
-        self.change_version(wid="select_version_beta")
-        self.set_screen(name="MainScreen", direction="right")
-
-    def on_press_old(self, instance):
-        self.set_background(wid="select_version_old", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_old(self, instance):
-        self.set_background(wid="select_version_old", rgba=(0, 0, 0, 0))
-        self.set_screen(name="SelectOldVersionScreen", direction="left")
-
-    def on_press_back(self, instance):
-        self.set_background(wid="select_version_back", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_back(self, instance):
-        self.set_background(wid="select_version_back", rgba=(0, 0, 0, 0))
-        self.set_screen(name="MainScreen", direction="right")
+            self.make_button(
+                row=row,
+                id=_tuple[0],
+                root_widget="select_version_screen_grid",
+                text=_tuple[1],
+                markup=_tuple[2],
+                on_press=_press,
+                on_release=_release,
+            )

@@ -32,7 +32,9 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     def test_render_grid_layout(self):
         screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
+        screen.make_grid(
+            wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
+        )
         self.render(screen)
 
         # get your Window instance safely
@@ -46,8 +48,10 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch("kivy.uix.gridlayout.GridLayout.clear_widgets")
     def test_clear_grid(self, mock_clear_widgets):
         screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
-        screen.clear()
+        screen.make_grid(
+            wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
+        )
+        screen.clear_grid(wid="select_old_version_screen_grid")
         self.render(screen)
 
         # get your Window instance safely
@@ -56,93 +60,15 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_clear_widgets.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_register_button_methods(self):
-        screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
-        screen.clear()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.register_button_methods(name="mock")
-
-        # pylint: disable=no-member
-        self.assertTrue(screen.on_press_mock is not None)
-
-        # pylint: disable=no-member
-        self.assertTrue(screen.on_release_mock is not None)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_fetch_releases_made_on_press_method(self):
-        screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
-        screen.clear()
-        screen.fetch_releases(OLD_VERSIONS)
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-
-        print(screen.ids["select_old_version_screen_grid"].ids)
-        self.assertEqual(len(grid.children), len(OLD_VERSIONS) + 1)
-
-        for tag in OLD_VERSIONS:
-            sanitized = tag.replace(".", "_").replace("/", "_")
-            on_press_method = getattr(screen, f"on_press_{sanitized}")
-            self.assertTrue(on_press_method is not None)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_fetch_releases_made_on_release_method(self):
-        screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
-        screen.clear()
-        screen.fetch_releases(OLD_VERSIONS)
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-
-        print(screen.ids["select_old_version_screen_grid"].ids)
-        self.assertEqual(len(grid.children), len(OLD_VERSIONS) + 1)
-
-        for tag in OLD_VERSIONS:
-            sanitized = tag.replace(".", "_").replace("/", "_")
-            on_release_method = getattr(screen, f"on_release_{sanitized}")
-            self.assertTrue(on_release_method is not None)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_fetch_releases_made_button(self):
-        screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
-        screen.clear()
-        screen.fetch_releases(OLD_VERSIONS)
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-
-        print(screen.ids["select_old_version_screen_grid"].ids)
-        self.assertEqual(len(grid.children), len(OLD_VERSIONS) + 1)
-
-        for tag in OLD_VERSIONS:
-            sanitized = tag.replace(".", "_").replace("/", "_")
-            self.assertTrue(f"select_old_version_{sanitized}" in screen.ids)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.select_old_version_screen.SelectOldVersionScreen.set_background"
     )
     def test_on_press(self, mock_set_background):
         screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
-        screen.clear()
+        screen.make_grid(
+            wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
+        )
+        screen.clear_grid(wid="select_old_version_screen_grid")
         screen.fetch_releases(OLD_VERSIONS)
         self.render(screen)
 
@@ -154,18 +80,10 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(len(grid.children), len(OLD_VERSIONS) + 1)
 
         calls = []
-        for tag in OLD_VERSIONS:
-            sanitized = tag.replace(".", "_").replace("/", "_")
-            button = screen.ids[f"select_old_version_{sanitized}"]
-            on_press = getattr(screen, f"on_press_{sanitized}")
+        for button in grid.children:
+            on_press = getattr(screen, f"on_press_{button.id}")
             on_press(button)
-            calls.append(
-                call(wid=f"select_old_version_{sanitized}", rgba=(0.5, 0.5, 0.5, 0.5))
-            )
-
-        back_button = screen.ids["select_old_version_back"]
-        screen.on_press_back(back_button)
-        calls.append(call(wid="select_old_version_back", rgba=(0.5, 0.5, 0.5, 0.5)))
+            calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
 
         mock_set_background.assert_has_calls(calls)
 
@@ -181,8 +99,10 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectOldVersionScreen()
-        screen.make_grid_if_not_exist(OLD_VERSIONS)
-        screen.clear()
+        screen.make_grid(
+            wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
+        )
+        screen.clear_grid(wid="select_old_version_screen_grid")
         screen.fetch_releases(OLD_VERSIONS)
         self.render(screen)
 
@@ -195,22 +115,18 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
         set_background_calls = []
         set_screen_calls = []
-        for tag in OLD_VERSIONS:
-            sanitized = tag.replace(".", "_").replace("/", "_")
-            button = screen.ids[f"select_old_version_{sanitized}"]
-            on_release = getattr(screen, f"on_release_{sanitized}")
-            on_release(button)
-            set_background_calls.append(
-                call(wid=f"select_old_version_{sanitized}", rgba=(0, 0, 0, 0))
-            )
-            set_screen_calls.append(call(name="MainScreen", direction="right"))
 
-        back_button = screen.ids["select_old_version_back"]
-        screen.on_release_back(back_button)
-        set_background_calls.append(
-            call(wid="select_old_version_back", rgba=(0, 0, 0, 0))
-        )
-        set_screen_calls.append(call(name="SelectVersionScreen", direction="right"))
+        for button in grid.children:
+            on_release = getattr(screen, f"on_release_{button.id}")
+            on_release(button)
+            set_background_calls.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+
+            if button.id == "select_old_version_back":
+                set_screen_calls.append(
+                    call(name="SelectVersionScreen", direction="right")
+                )
+            else:
+                set_screen_calls.append(call(name="MainScreen", direction="right"))
 
         mock_set_background.assert_has_calls(set_background_calls)
         mock_set_screen.assert_has_calls(set_screen_calls)

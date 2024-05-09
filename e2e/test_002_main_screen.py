@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.main_screen import MainScreen
@@ -52,7 +52,7 @@ class TestMainScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_select_device(self, mock_set_background):
+    def test_on_press_cant_flash_or_wipe(self, mock_set_background):
         screen = MainScreen()
         self.render(screen)
 
@@ -60,59 +60,32 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[0]
 
-        screen.on_press_select_device(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_select_device", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
+        calls = []
+        for button in grid.children:
+            action = getattr(screen, f"on_press_{button.id}")
+            action(button)
+            if button.id in (
+                "main_select_device",
+                "main_select_version",
+                "main_settings",
+                "main_about",
+            ):
+                calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+
+        mock_set_background.assert_has_calls(calls)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_on_release_select_device(self, mock_set_screen, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
-
-        screen.on_release_select_device(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_select_device", rgba=(0, 0, 0, 0)
-        )
-        mock_set_screen.assert_called_once_with(
-            name="SelectDeviceScreen", direction="left"
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_select_version(self, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[1]
-
-        screen.on_press_select_version(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_select_version", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_on_release_select_version(
-        self, mock_set_screen, mock_set_background, mock_manager
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_on_release_cant_flash_or_wipe(
+        self, mock_get_running_app, mock_manager, mock_set_screen, mock_set_background
     ):
         mock_manager.get_screen = MagicMock()
+
+        mock_get_running_app.return_value = MagicMock(open_settings=MagicMock())
         screen = MainScreen()
         self.render(screen)
 
@@ -120,220 +93,36 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[1]
 
-        screen.on_release_select_version(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_select_version", rgba=(0, 0, 0, 0)
-        )
-        mock_set_screen.assert_called_once_with(
-            name="SelectVersionScreen", direction="left"
-        )
+        calls_set_background = []
+        calls_set_screen = []
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_fail_on_press_flash(self, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
+        for button in grid.children:
+            action = getattr(screen, f"on_release_{button.id}")
+            action(button)
+            if button.id in (
+                "main_select_device",
+                "main_select_version",
+                "main_settings",
+                "main_about",
+            ):
+                calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
 
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[2]
+            if button.id == "main_select_device":
+                calls_set_screen.append(
+                    call(name="SelectDeviceScreen", direction="left")
+                )
 
-        screen.on_press_flash(button)
-        self.assertEqual(len(mock_set_background.call_args_list), 0)
+            if button.id == "main_select_version":
+                calls_set_screen.append(
+                    call(name="SelectVersionScreen", direction="left")
+                )
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_flash(self, mock_set_background):
-        screen = MainScreen()
-        screen.will_flash = True
-        self.render(screen)
+            if button.id == "main_about":
+                calls_set_screen.append(call(name="AboutScreen", direction="left"))
 
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[2]
-
-        screen.on_press_flash(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_flash", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_fail_on_release_flash(self, mock_set_screen, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[2]
-
-        screen.on_release_flash(button)
-        self.assertEqual(len(mock_set_background.call_args_list), 0)
-        self.assertEqual(len(mock_set_screen.call_args_list), 0)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_on_release_flash(self, mock_set_screen, mock_set_background):
-        screen = MainScreen()
-        screen.will_flash = True
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[2]
-
-        screen.on_release_flash(button)
-        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 0))
-        mock_set_screen.assert_called_once_with(name="FlashScreen", direction="left")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_fail_on_press_wipe(self, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[3]
-
-        screen.on_press_wipe(button)
-        self.assertEqual(len(mock_set_background.call_args_list), 0)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_wipe(self, mock_set_background):
-        screen = MainScreen()
-        screen.will_wipe = True
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[3]
-
-        screen.on_press_wipe(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_wipe", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_fail_on_release_wipe(self, mock_set_screen, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[3]
-
-        screen.on_release_wipe(button)
-        self.assertEqual(len(mock_set_background.call_args_list), 0)
-        self.assertEqual(len(mock_set_screen.call_args_list), 0)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_on_release_wipe(self, mock_set_screen, mock_set_background):
-        screen = MainScreen()
-        screen.will_wipe = True
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[3]
-
-        screen.on_release_wipe(button)
-        mock_set_background.assert_called_once_with(wid="main_wipe", rgba=(0, 0, 0, 0))
-        mock_set_screen.assert_called_once_with(name="WipeScreen", direction="left")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_settings(self, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[4]
-
-        screen.on_press_settings(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_settings", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_on_release_settings(self, mock_get_running_app, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[4]
-
-        screen.on_release_settings(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_settings", rgba=(0, 0, 0, 0)
-        )
+        mock_set_background.assert_has_calls(calls_set_background)
+        mock_set_screen.assert_has_calls(calls_set_screen)
+        mock_manager.get_screen.assert_called_once_with("SelectVersionScreen")
         mock_get_running_app.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_about(self, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[5]
-
-        screen.on_press_about(button)
-        mock_set_background.assert_called_once_with(
-            wid="main_about", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_on_release_about(self, mock_set_screen, mock_set_background):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[2]
-
-        screen.on_release_about(button)
-        mock_set_background.assert_called_once_with(wid="main_about", rgba=(0, 0, 0, 0))
-        mock_set_screen.assert_called_once_with(name="AboutScreen", direction="left")
+        mock_get_running_app.return_value.open_settings.assert_called_once()

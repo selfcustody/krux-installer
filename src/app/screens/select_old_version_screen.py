@@ -24,6 +24,8 @@ main_screen.py
 # pylint: disable=no-name-in-module
 import re
 import typing
+from functools import partial
+from kivy.clock import Clock
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
@@ -40,54 +42,53 @@ class SelectOldVersionScreen(BaseScreen):
             wid="select_old_version_screen", name="SelectOldVersionScreen", **kwargs
         )
 
-    def make_grid_if_not_exist(self, old_versions: typing.List[str]):
-        """Build a grid layout if"""
-        if not "select_old_version_screen_grid" in self.ids:
-            self.make_grid(
-                wid="select_old_version_screen_grid", rows=len(old_versions) + 1
-            )
-
-    def clear(self):
-        """Clear the list of children widgets buttons"""
-        self.ids["select_old_version_screen_grid"].clear_widgets()
-
-    def register_button_methods(self, name: str):
-        """Dynamic registering of on_press and on_release methods for a button"""
-
-        def on_press(instance):
-            self.set_background(
-                wid=f"select_old_version_{name}", rgba=(0.5, 0.5, 0.5, 0.5)
-            )
-
-        def on_release(instance):
-            self.set_background(wid=f"select_old_version_{name}", rgba=(0, 0, 0, 0))
-            self.change_version(wid=f"select_old_version_{name}")
-            self.set_screen(name="MainScreen", direction="right")
-
-        on_press.__name__ = "on_press_%s" % name
-        on_release.__name__ = "on_release_%s" % name
-
-        setattr(self, on_press.__name__, on_press)
-        setattr(self, on_release.__name__, on_release)
-
     def fetch_releases(self, old_versions: typing.List[str]):
         """Build a set of buttons to select version"""
-        self.make_grid_if_not_exist(old_versions=old_versions)
-        self.clear()
+        self.make_grid(wid="select_old_version_screen_grid", rows=len(old_versions) + 1)
+        self.clear_grid(wid="select_old_version_screen_grid")
 
         for row, text in enumerate(old_versions):
             sanitized = text.replace(".", "_").replace("/", "_")
-            self.register_button_methods(name=sanitized)
+
+            wid = f"select_old_version_{sanitized}"
+
+            def _press(instance):
+                self.debug(f"Calling {instance}::on_press")
+                self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+
+            def _release(instance):
+                self.debug(f"Calling {instance.id}::on_release")
+                self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+                version = self.ids[instance.id].text
+                self.debug(f"on_release::{instance.id} = {version}")
+                main_screen = self.manager.get_screen("MainScreen")
+                fn = partial(
+                    main_screen.update, name=self.name, key="version", value=version
+                )
+                Clock.schedule_once(fn, 0)
+                self.set_screen(name="MainScreen", direction="right")
 
             self.make_button(
                 row=row,
-                id=f"select_old_version_{sanitized}",
+                id=wid,
                 root_widget="select_old_version_screen_grid",
                 text=text,
                 markup=False,
-                on_press=getattr(self, f"on_press_{sanitized}"),
-                on_release=getattr(self, f"on_release_{sanitized}"),
+                on_press=_press,
+                on_release=_release,
             )
+
+        # Back Button
+        def _press_back(instance):
+            self.debug(f"Calling {instance}::on_press")
+            self.set_background(
+                wid="select_old_version_back", rgba=(0.5, 0.5, 0.5, 0.5)
+            )
+
+        def _release_back(instance):
+            self.debug(f"Calling {instance}::on_release")
+            self.set_background(wid="select_old_version_back", rgba=(0, 0, 0, 0))
+            self.set_screen(name="SelectVersionScreen", direction="right")
 
         self.make_button(
             row=len(old_versions) + 1,
@@ -95,23 +96,6 @@ class SelectOldVersionScreen(BaseScreen):
             root_widget="select_old_version_screen_grid",
             text="Back",
             markup=False,
-            on_press=self.on_press_back,
-            on_release=self.on_release_back,
+            on_press=_press_back,
+            on_release=_release_back,
         )
-
-    def change_version(self, wid: str):
-        """Change version text on MainScreen"""
-        version = self.ids[wid].text
-        self.debug(f"on_release::{wid} = {version}")
-
-        main_screen = self.manager.get_screen("MainScreen")
-        main_select_version = main_screen.ids["main_select_version"]
-        main_select_version.text = f"Version: [color=#00AABB]{version}[/color]"
-        self.debug(f"{main_select_version}.text = {main_select_version.text}")
-
-    def on_press_back(self, instance):
-        self.set_background(wid="select_old_version_back", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_back(self, instance):
-        self.set_background(wid="select_old_version_back", rgba=(0, 0, 0, 0))
-        self.set_screen(name="SelectVersionScreen", direction="right")

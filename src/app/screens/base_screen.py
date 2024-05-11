@@ -66,6 +66,7 @@ class BaseScreen(Screen, Trigger):
             self.debug(f"GridLayout::{wid} already exist")
 
     def clear_grid(self, wid: str):
+        """Clear GridLayout widget"""
         self.debug(f"Clearing widgets from GridLayout::{wid}")
         self.ids[wid].clear_widgets()
 
@@ -79,6 +80,7 @@ class BaseScreen(Screen, Trigger):
         on_press: typing.Callable,
         on_release: typing.Callable,
     ):
+        """Create buttons in a dynamic way"""
         self.debug(f"{id} -> {root_widget}")
 
         total = self.ids[root_widget].rows

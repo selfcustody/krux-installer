@@ -27,6 +27,9 @@ from functools import partial
 from kivy.clock import Clock
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
+from kivy.uix.modalview import ModalView
 from kivy.uix.button import Button
 from kivy.graphics import Color, Line
 from src.utils.selector import Selector
@@ -84,10 +87,7 @@ class SelectVersionScreen(BaseScreen):
             # START of on_release_buttons
             def _release(instance):
                 self.debug(f"Calling Button::{instance.id}::on_release")
-                if (
-                    instance.id == "select_version_latest"
-                    or instance.id == "select_version_beta"
-                ):
+                if instance.id == "select_version_latest":
                     self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
                     version = self.ids[instance.id].text
                     self.debug(f"on_release::{instance.id} = {version}")
@@ -97,7 +97,24 @@ class SelectVersionScreen(BaseScreen):
                     )
                     Clock.schedule_once(fn, 0)
                     self.set_screen(name="MainScreen", direction="right")
+                if instance.id == "select_version_beta":
+                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+                    version = self.ids[instance.id].text
+                    self.debug(f"on_release::{instance.id} = {version}")
 
+                    title = "[size=28sp][color=#efcc00][b]WARNING[/b][/color][/size]"
+                    subtitle = "[size=18sp][color=#efcc00]This is our test (beta) repository[/color][/size]"
+                    message = [
+                        "These are unsigned binaries for the latest and most experimental features",
+                        "and it's just for trying new things and providing feedback.",
+                    ]
+
+                    self.show_warning_beta(
+                        title=title,
+                        subtitle=subtitle,
+                        message="\n".join(message),
+                        version=version,
+                    )
                 elif instance.id == "select_version_old":
                     self.set_background(wid="select_version_old", rgba=(0, 0, 0, 0))
                     self.set_screen(name="SelectOldVersionScreen", direction="left")
@@ -118,3 +135,38 @@ class SelectVersionScreen(BaseScreen):
                 on_press=_press,
                 on_release=_release,
             )
+
+    def show_warning_beta(self, title: str, subtitle: str, message: str, version: str):
+        # Create widgets
+        view = ModalView(size_hint=(1, 1), background_color=(0, 0, 0))
+        _title = Label(text=title, markup=True, halign="center")
+        _subtitle = Label(text=subtitle, markup=True, halign="center")
+        _message = Label(text=message, halign="center")
+        ok = Button(text="I understand")
+        box = BoxLayout(orientation="vertical", spacing=2)
+
+        ok.id = "select_version_warning_ok"
+
+        # Structure them
+        box.add_widget(_title)
+        box.add_widget(_subtitle)
+        box.add_widget(_message)
+        box.add_widget(ok)
+        view.add_widget(box)
+
+        # define events
+        def on_ok(instance):
+            self.debug(f"Button 'I understand' pressed")
+            main_screen = self.manager.get_screen("MainScreen")
+            fn = partial(
+                main_screen.update, name=self.name, key="version", value=version
+            )
+            Clock.schedule_once(fn, 0)
+            self.set_screen(name="MainScreen", direction="right")
+            return False
+
+        ok.bind(on_press=view.dismiss)
+        view.bind(on_dismiss=on_ok)
+
+        # show it
+        view.open()

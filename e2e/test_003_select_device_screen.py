@@ -1,4 +1,4 @@
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.select_device_screen import SelectDeviceScreen
@@ -52,32 +52,116 @@ class TestSelectDeviceScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_m5stickv(self, mock_set_background):
+    def test_on_press_with_latest_version(self, mock_set_background):
         screen = SelectDeviceScreen()
         self.render(screen)
+        screen.update(key="version", value="v24.03.0")
 
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[5]
 
-        self.assertEqual(button.text, "m5stickv")
-        screen.on_press_m5stickv(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_m5stickv", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
+        calls = []
+
+        for button in grid.children:
+            action = getattr(screen, f"on_press_{button.id}")
+            action(button)
+            if button.id in (
+                "select_device_m5stickv",
+                "select_device_amigo",
+                "select_device_dock",
+                "select_device_bit",
+                "select_device_yahboom",
+            ):
+                calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+
+        mock_set_background.assert_has_calls(calls)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
+    def test_on_press_with_v23_08_1_version(self, mock_set_background):
+        screen = SelectDeviceScreen()
+        self.render(screen)
+        screen.update(key="version", value="v23.09.1")
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+
+        calls = []
+
+        for button in grid.children:
+            action = getattr(screen, f"on_press_{button.id}")
+            action(button)
+            if button.id in (
+                "select_device_m5stickv",
+                "select_device_amigo",
+                "select_device_dock",
+                "select_device_bit",
+            ):
+                calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+
+        mock_set_background.assert_has_calls(calls)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
+    def test_on_press_with_v22_03_0_version(self, mock_set_background):
+        screen = SelectDeviceScreen()
+        self.render(screen)
+        screen.update(key="version", value="v22.03.0")
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+
+        calls = []
+
+        for button in grid.children:
+            action = getattr(screen, f"on_press_{button.id}")
+            action(button)
+            if button.id in ("select_device_m5stickv"):
+                calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+
+        mock_set_background.assert_has_calls(calls)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
+    def test_on_press_with_beta_version(self, mock_set_background):
+        screen = SelectDeviceScreen()
+        self.render(screen)
+        screen.update(key="version", value="odudex/krux_binaries")
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+
+        calls = []
+
+        for button in grid.children:
+            action = getattr(screen, f"on_press_{button.id}")
+            action(button)
+            if button.id in (
+                "select_device_m5stickv",
+                "select_device_amigo",
+                "select_device_dock",
+                "select_device_bit",
+                "select_device_yahboom",
+                "select_device_cube",
+            ):
+                calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+
+        mock_set_background.assert_has_calls(calls)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    @patch("src.app.screens.select_device_screen.partial")
-    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
-    def test_on_release_m5stickv(
+    def test_on_release_with_latest_version(
         self,
-        mock_schedule_once,
-        mock_partial,
         mock_set_screen,
         mock_manager,
         mock_set_background,
@@ -85,55 +169,43 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectDeviceScreen()
+        screen.update(key="version", value="v24.03.0")
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[5]
 
-        self.assertEqual(button.text, "m5stickv")
-        screen.on_release_m5stickv(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_m5stickv", rgba=(0, 0, 0, 0)
-        )
-        mock_manager.get_screen.assert_called_once_with("MainScreen")
-        mock_update = mock_manager.get_screen().update
-        mock_partial.assert_called_once_with(
-            mock_update, name="SelectDeviceScreen", key="device", value="m5stickv"
-        )
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
-        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
+        calls_set_background = []
+        calls_manager = []
+        calls_set_screen = []
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_amigo(self, mock_set_background):
-        screen = SelectDeviceScreen()
-        self.render(screen)
+        for button in grid.children:
+            action = getattr(screen, f"on_release_{button.id}")
+            action(button)
 
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[4]
+            if button.id in (
+                "select_device_m5stickv",
+                "select_device_amigo",
+                "select_device_dock",
+                "select_device_bit",
+                "select_device_yahboom",
+            ):
+                calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+                calls_manager.append(call("MainScreen"))
+                calls_set_screen.append(call(name="MainScreen", direction="right"))
 
-        self.assertEqual(button.text, "amigo")
-        screen.on_press_amigo(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_amigo", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
+        mock_set_background.assert_has_calls(calls_set_background)
+        mock_manager.get_screen.assert_has_calls(calls_manager)
+        mock_set_screen.assert_has_calls(calls_set_screen)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    @patch("src.app.screens.select_device_screen.partial")
-    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
-    def test_on_release_amigo(
+    def test_on_release_with_beta_version(
         self,
-        mock_schedule_once,
-        mock_partial,
         mock_set_screen,
         mock_manager,
         mock_set_background,
@@ -141,55 +213,44 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectDeviceScreen()
+        screen.update(key="version", value="odudex/krux_binaries")
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[4]
 
-        self.assertEqual(button.text, "amigo")
-        screen.on_release_amigo(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_amigo", rgba=(0, 0, 0, 0)
-        )
-        mock_manager.get_screen.assert_called_once_with("MainScreen")
-        mock_update = mock_manager.get_screen().update
-        mock_partial.assert_called_once_with(
-            mock_update, name="SelectDeviceScreen", key="device", value="amigo"
-        )
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
-        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
+        calls_set_background = []
+        calls_manager = []
+        calls_set_screen = []
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_dock(self, mock_set_background):
-        screen = SelectDeviceScreen()
-        self.render(screen)
+        for button in grid.children:
+            action = getattr(screen, f"on_release_{button.id}")
+            action(button)
 
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[3]
+            if button.id in (
+                "select_device_m5stickv",
+                "select_device_amigo",
+                "select_device_dock",
+                "select_device_bit",
+                "select_device_yahboom",
+                "select_device_cube",
+            ):
+                calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+                calls_manager.append(call("MainScreen"))
+                calls_set_screen.append(call(name="MainScreen", direction="right"))
 
-        self.assertEqual(button.text, "dock")
-        screen.on_press_dock(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_dock", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
+        mock_set_background.assert_has_calls(calls_set_background)
+        mock_manager.get_screen.assert_has_calls(calls_manager)
+        mock_set_screen.assert_has_calls(calls_set_screen)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    @patch("src.app.screens.select_device_screen.partial")
-    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
-    def test_on_release_dock(
+    def test_on_release_with_v22_03_0_version(
         self,
-        mock_schedule_once,
-        mock_partial,
         mock_set_screen,
         mock_manager,
         mock_set_background,
@@ -197,191 +258,27 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         mock_manager.get_screen = MagicMock()
 
         screen = SelectDeviceScreen()
+        screen.update(key="version", value="v22.03.0")
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[3]
 
-        self.assertEqual(button.text, "dock")
-        screen.on_release_dock(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_dock", rgba=(0, 0, 0, 0)
-        )
-        mock_manager.get_screen.assert_called_once_with("MainScreen")
-        mock_update = mock_manager.get_screen().update
-        mock_partial.assert_called_once_with(
-            mock_update, name="SelectDeviceScreen", key="device", value="dock"
-        )
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
-        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
+        calls_set_background = []
+        calls_manager = []
+        calls_set_screen = []
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_bit(self, mock_set_background):
-        screen = SelectDeviceScreen()
-        self.render(screen)
+        for button in grid.children:
+            action = getattr(screen, f"on_release_{button.id}")
+            action(button)
 
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[2]
+            if button.id in ("select_device_m5stickv"):
+                calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+                calls_manager.append(call("MainScreen"))
+                calls_set_screen.append(call(name="MainScreen", direction="right"))
 
-        self.assertEqual(button.text, "bit")
-        screen.on_press_bit(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_bit", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    @patch("src.app.screens.select_device_screen.partial")
-    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
-    def test_on_release_bit(
-        self,
-        mock_schedule_once,
-        mock_partial,
-        mock_set_screen,
-        mock_manager,
-        mock_set_background,
-    ):
-        mock_manager.get_screen = MagicMock()
-
-        screen = SelectDeviceScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[2]
-
-        self.assertEqual(button.text, "bit")
-        screen.on_release_bit(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_bit", rgba=(0, 0, 0, 0)
-        )
-        mock_manager.get_screen.assert_called_once_with("MainScreen")
-        mock_update = mock_manager.get_screen().update
-        mock_partial.assert_called_once_with(
-            mock_update, name="SelectDeviceScreen", key="device", value="bit"
-        )
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
-        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_yahboom(self, mock_set_background):
-        screen = SelectDeviceScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[1]
-
-        self.assertEqual(button.text, "yahboom")
-        screen.on_press_yahboom(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_yahboom", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    @patch("src.app.screens.select_device_screen.partial")
-    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
-    def test_on_release_yahboom(
-        self,
-        mock_schedule_once,
-        mock_partial,
-        mock_set_screen,
-        mock_manager,
-        mock_set_background,
-    ):
-        mock_manager.get_screen = MagicMock()
-
-        screen = SelectDeviceScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[1]
-
-        self.assertEqual(button.text, "yahboom")
-        screen.on_release_yahboom(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_yahboom", rgba=(0, 0, 0, 0)
-        )
-        mock_manager.get_screen.assert_called_once_with("MainScreen")
-        mock_update = mock_manager.get_screen().update
-        mock_partial.assert_called_once_with(
-            mock_update, name="SelectDeviceScreen", key="device", value="yahboom"
-        )
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
-        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_cube(self, mock_set_background):
-        screen = SelectDeviceScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
-
-        self.assertEqual(button.text, "cube")
-        screen.on_press_cube(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_cube", rgba=(0.5, 0.5, 0.5, 0.5)
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
-    @patch("src.app.screens.select_device_screen.partial")
-    @patch("src.app.screens.select_device_screen.Clock.schedule_once")
-    def test_on_release_cube(
-        self,
-        mock_schedule_once,
-        mock_partial,
-        mock_set_screen,
-        mock_manager,
-        mock_set_background,
-    ):
-        mock_manager.get_screen = MagicMock()
-
-        screen = SelectDeviceScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
-
-        self.assertEqual(button.text, "cube")
-        screen.on_release_cube(button)
-        mock_set_background.assert_called_once_with(
-            wid="select_device_cube", rgba=(0, 0, 0, 0)
-        )
-        mock_manager.get_screen.assert_called_once_with("MainScreen")
-        mock_update = mock_manager.get_screen().update
-        mock_partial.assert_called_once_with(
-            mock_update, name="SelectDeviceScreen", key="device", value="cube"
-        )
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
-        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
+        mock_set_background.assert_has_calls(calls_set_background)
+        mock_manager.get_screen.assert_has_calls(calls_manager)
+        mock_set_screen.assert_has_calls(calls_set_screen)

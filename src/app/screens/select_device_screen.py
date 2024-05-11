@@ -22,6 +22,7 @@
 main_screen.py
 """
 # pylint: disable=no-name-in-module
+import re
 from functools import partial
 from kivy.clock import Clock
 from kivy.cache import Cache
@@ -29,7 +30,7 @@ from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.graphics import Color, Line
-from src.utils.selector import VALID_DEVICES
+from src.utils.constants import VALID_DEVICES_VERSIONS
 from .base_screen import BaseScreen
 
 
@@ -40,124 +41,60 @@ class SelectDeviceScreen(BaseScreen):
         super().__init__(
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
-
-        # Build grid where buttons will be placed
+        self.enabled_devices = []
         self.make_grid(wid="select_device_screen_grid", rows=6)
 
-        # Build buttons to be placed in GridLayout
-        self.make_button(
-            row=0,
-            id="select_device_m5stickv",
-            root_widget="select_device_screen_grid",
-            text="m5stickv",
-            markup=False,
-            on_press=self.on_press_m5stickv,
-            on_release=self.on_release_m5stickv,
-        )
+        for row, device in enumerate(
+            ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube"]
+        ):
 
-        self.make_button(
-            row=1,
-            id="select_device_amigo",
-            root_widget="select_device_screen_grid",
-            text="amigo",
-            markup=False,
-            on_press=self.on_press_amigo,
-            on_release=self.on_release_amigo,
-        )
+            def _on_press(instance):
+                if instance.id in self.enabled_devices:
+                    self.debug(f"Calling Button::{instance.id}::on_press")
+                    self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
 
-        self.make_button(
-            row=2,
-            id="select_device_dock",
-            root_widget="select_device_screen_grid",
-            text="dock",
-            markup=False,
-            on_press=self.on_press_dock,
-            on_release=self.on_release_dock,
-        )
+            def _on_release(instance):
+                if instance.id in self.enabled_devices:
+                    self.debug(f"Calling Button::{instance.id}::on_release")
+                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+                    device = self.ids[instance.id].text
+                    self.debug(f"on_release::{instance.id} = {device}")
+                    main_screen = self.manager.get_screen("MainScreen")
+                    fn = partial(
+                        main_screen.update, name=self.name, key="device", value=device
+                    )
+                    Clock.schedule_once(fn, 0)
+                    self.set_screen(name="MainScreen", direction="right")
 
-        self.make_button(
-            row=3,
-            id="select_device_bit",
-            root_widget="select_device_screen_grid",
-            text="bit",
-            markup=False,
-            on_press=self.on_press_bit,
-            on_release=self.on_release_bit,
-        )
+            self.make_button(
+                row=row,
+                id=f"select_device_{device}",
+                root_widget="select_device_screen_grid",
+                text=device,
+                markup=True,
+                on_press=_on_press,
+                on_release=_on_release,
+            )
 
-        self.make_button(
-            row=4,
-            id="select_device_yahboom",
-            root_widget="select_device_screen_grid",
-            text="yahboom",
-            markup=False,
-            on_press=self.on_press_yahboom,
-            on_release=self.on_release_yahboom,
-        )
+    def update(self, *args, **kwargs):
+        """Update buttons according the valid devices for each version"""
+        if kwargs.get("key") == "version":
+            self.debug(
+                f"Updating buttons to fit {kwargs.get("key")} = {kwargs.get("version")}"
+            )
+            version = kwargs.get("value")
+            self.enabled_devices = []
+            enabled_devices = VALID_DEVICES_VERSIONS[version]
 
-        self.make_button(
-            row=5,
-            id="select_device_cube",
-            root_widget="select_device_screen_grid",
-            text="cube",
-            markup=False,
-            on_press=self.on_press_cube,
-            on_release=self.on_release_cube,
-        )
-
-    def change_device(self, wid: str):
-        """Change device text on MainScreen"""
-        device = self.ids[wid].text
-        self.debug(f"on_release::{wid} = {device}")
-
-        main_screen = self.manager.get_screen("MainScreen")
-        fn = partial(main_screen.update, name=self.name, key="device", value=device)
-        Clock.schedule_once(fn, 0)
-
-    def on_press_m5stickv(self, instance):
-        self.set_background(wid="select_device_m5stickv", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_m5stickv(self, instance):
-        self.set_background(wid="select_device_m5stickv", rgba=(0, 0, 0, 0))
-        self.change_device(wid="select_device_m5stickv")
-        self.set_screen(name="MainScreen", direction="right")
-
-    def on_press_amigo(self, instance):
-        self.set_background(wid="select_device_amigo", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_amigo(self, instance):
-        self.set_background(wid="select_device_amigo", rgba=(0, 0, 0, 0))
-        self.change_device(wid="select_device_amigo")
-        self.set_screen(name="MainScreen", direction="right")
-
-    def on_press_dock(self, instance):
-        self.set_background(wid="select_device_dock", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_dock(self, instance):
-        self.set_background(wid="select_device_dock", rgba=(0, 0, 0, 0))
-        self.change_device(wid="select_device_dock")
-        self.set_screen(name="MainScreen", direction="right")
-
-    def on_press_bit(self, instance):
-        self.set_background(wid="select_device_bit", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_bit(self, instance):
-        self.set_background(wid="select_device_bit", rgba=(0, 0, 0, 0))
-        self.change_device(wid="select_device_bit")
-        self.set_screen(name="MainScreen", direction="right")
-
-    def on_press_yahboom(self, instance):
-        self.set_background(wid="select_device_yahboom", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_yahboom(self, instance):
-        self.set_background(wid="select_device_yahboom", rgba=(0, 0, 0, 0))
-        self.change_device(wid="select_device_yahboom")
-        self.set_screen(name="MainScreen", direction="right")
-
-    def on_press_cube(self, instance):
-        self.set_background(wid="select_device_cube", rgba=(0.5, 0.5, 0.5, 0.5))
-
-    def on_release_cube(self, instance):
-        self.set_background(wid="select_device_cube", rgba=(0, 0, 0, 0))
-        self.change_device(wid="select_device_cube")
-        self.set_screen(name="MainScreen", direction="right")
+            for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
+                if not device in enabled_devices:
+                    self.ids[f"select_device_{device}"].markup = True
+                    self.ids[f"select_device_{device}"].text = (
+                        f"[color=#333333]{device}[/color]"
+                    )
+                else:
+                    self.enabled_devices.append(f"select_device_{device}")
+                    self.ids[f"select_device_{device}"].markup = False
+                    self.ids[f"select_device_{device}"].text = device
+        else:
+            self.warning(f"Skiping update for {kwargs.get("key")}")

@@ -22,6 +22,8 @@
 main_screen.py
 """
 import typing
+from functools import partial
+from kivy.clock import Clock
 from kivy.app import App
 from kivy.cache import Cache
 from .base_screen import BaseScreen
@@ -54,8 +56,8 @@ class MainScreen(BaseScreen):
                 f"Version: [color=#00AABB]{self.version}[/color]",
                 True,
             ),
-            ("main_flash", f"Flash: [color=#333333]Flash[/color]", True),
-            ("main_wipe", f"Wipe: [color=#333333]Wipe[/color]", True),
+            ("main_flash", f"[color=#333333]Flash[/color]", True),
+            ("main_wipe", f"[color=#333333]Wipe[/color]", True),
             ("main_settings", "Settings", False),
             ("main_about", "About", False),
         ]
@@ -95,6 +97,11 @@ class MainScreen(BaseScreen):
             def _release(instance):
                 self.debug(f"Calling Button::{instance.id}::on_release")
                 if instance.id == "main_select_device":
+                    select_device = self.manager.get_screen("SelectDeviceScreen")
+                    fn = partial(
+                        select_device.update, key="version", value=self.version
+                    )
+                    Clock.schedule_once(fn, 0)
                     self.set_background(wid="main_select_device", rgba=(0, 0, 0, 0))
                     self.set_screen(name="SelectDeviceScreen", direction="left")
 
@@ -141,6 +148,7 @@ class MainScreen(BaseScreen):
         # END of buttons
 
     def update(self, *args, **kwargs):
+        """Update buttons from selected device/versions on related screens"""
         name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")

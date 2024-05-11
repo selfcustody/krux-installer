@@ -37,6 +37,25 @@ if sys.version_info.minor > 10:
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
+VALID_DEVICES_VERSIONS = {
+    "v24.03.0": ["m5stickv", "amigo", "dock", "bit", "yahboom"],
+    "odudex/krux_binaries": [
+        "m5stickv",
+        "amigo",
+        "dock",
+        "bit",
+        "yahboom",
+        "dock",
+        "cube",
+    ],
+    "v23.09.1": ["m5stickv", "amigo", "dock", "bit"],
+    "v23.09.0": ["m5stickv", "amigo", "dock", "bit"],
+    "v22.08.2": ["m5stickv", "amigo", "dock", "bit"],
+    "v22.08.1": ["m5stickv", "amigo", "dock", "bit"],
+    "v22.08.0": ["m5stickv", "amigo", "dock", "bit"],
+    "v22.03.0": ["m5stickv"],
+}
+
 
 def _open_pyproject() -> dict[str, Any]:
     """

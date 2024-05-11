@@ -96,10 +96,12 @@ class TestMainScreen(GraphicUnitTest):
 
         calls_set_background = []
         calls_set_screen = []
+        calls_manager = []
 
         for button in grid.children:
             action = getattr(screen, f"on_release_{button.id}")
             action(button)
+
             if button.id in (
                 "main_select_device",
                 "main_select_version",
@@ -112,17 +114,20 @@ class TestMainScreen(GraphicUnitTest):
                 calls_set_screen.append(
                     call(name="SelectDeviceScreen", direction="left")
                 )
+                calls_manager.append(call("SelectDeviceScreen"))
 
             if button.id == "main_select_version":
                 calls_set_screen.append(
                     call(name="SelectVersionScreen", direction="left")
                 )
-
+                calls_manager.append(call("SelectVersionScreen"))
+                calls_manager.append(call().clear())
+                calls_manager.append(call().fetch_releases())
             if button.id == "main_about":
                 calls_set_screen.append(call(name="AboutScreen", direction="left"))
 
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)
-        mock_manager.get_screen.assert_called_once_with("SelectVersionScreen")
+        mock_manager.get_screen.assert_has_calls(calls_manager)
         mock_get_running_app.assert_called_once()
         mock_get_running_app.return_value.open_settings.assert_called_once()

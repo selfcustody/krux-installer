@@ -27,6 +27,7 @@ from kivy.clock import Clock
 from kivy.app import App
 from kivy.cache import Cache
 from .base_screen import BaseScreen
+from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.utils.selector import VALID_DEVICES
 
 
@@ -47,13 +48,13 @@ class MainScreen(BaseScreen):
 
         buttons = [
             (
-                "main_select_device",
-                f"Device: [color=#00AABB]{self.device}[/color]",
+                "main_select_version",
+                f"Version: [color=#00AABB]{self.version}[/color]",
                 True,
             ),
             (
-                "main_select_version",
-                f"Version: [color=#00AABB]{self.version}[/color]",
+                "main_select_device",
+                f"Device: [color=#00AABB]{self.device}[/color]",
                 True,
             ),
             ("main_flash", f"[color=#333333]Flash[/color]", True),
@@ -147,21 +148,73 @@ class MainScreen(BaseScreen):
             )
         # END of buttons
 
+    @property
+    def device(self) -> str:
+        """Getter for device property"""
+        return self._device
+
+    @device.setter
+    def device(self, value: str):
+        """Setter for version property"""
+        if value in VALID_DEVICES or value == "select a new one":
+            self.debug(f"device = {value}")
+            self._device = value
+        else:
+            raise ValueError(f"Invalid device: {value}")
+
+    @property
+    def version(self) -> str:
+        """Getter for version property"""
+        return self._version
+
+    @version.setter
+    def version(self, value: str):
+        """Setter for version property"""
+        if value in VALID_DEVICES_VERSIONS.keys():
+            self.debug(f"version = {value}")
+            self._version = value
+        else:
+            raise ValueError(f"Invalid version: {value}")
+
+    @property
+    def will_flash(self) -> bool:
+        """Getter for will_flash property"""
+        return self._will_flash
+
+    @will_flash.setter
+    def will_flash(self, value: bool):
+        """Setter for will_flash property"""
+        self.debug(f"will_flash = {value}")
+        self._will_flash = value
+
+    @property
+    def will_wipe(self) -> bool:
+        """Getter for will_wipe property"""
+        return self._will_wipe
+
+    @will_wipe.setter
+    def will_wipe(self, value: bool):
+        """Setter for will_wipe property"""
+        self.debug(f"will_wipe = {value}")
+        self._will_wipe = value
+
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
         name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        self.debug(f"Updating MainScreen from {name}...")
+        # Check if update to screen
+        if name in (
+            "SelectDeviceScreen",
+            "SelectVersionScreen",
+            "SelectOldVersionScreen",
+        ):
+            self.debug(f"Updating MainScreen from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
 
-        if key == "device":
-            self.device = value
-            self.debug(f"device = {value}")
-            self.ids["main_select_device"].text = (
-                f"Device: [color=#00AABB]{value}[/color]"
-            )
-
+        # Check if update to given key
         if key == "version":
             self.version = value
             self.debug(f"version = {value}")
@@ -169,27 +222,28 @@ class MainScreen(BaseScreen):
                 f"Version: [color=#00AABB]{value}[/color]"
             )
 
-        if self.device in VALID_DEVICES:
-            self.will_flash = True
-            self.debug(f"will_flash = {self.will_flash}")
+        elif key == "device":
 
-            self.will_wipe = True
-            self.debug(f"will_wipe = {self.will_wipe}")
+            # check if update to given values
+            if value in VALID_DEVICES:
+                self.device = value
+                self.will_flash = True
+                self.will_wipe = True
+                self.ids["main_flash"].markup = False
+                self.ids["main_wipe"].markup = False
+                self.ids["main_flash"].text = "Flash"
+                self.ids["main_wipe"].text = "Wipe"
+            else:
+                self.will_flash = False
+                self.will_wipe = False
+                self.ids["main_flash"].markup = True
+                self.ids["main_wipe"].markup = True
+                self.ids["main_flash"].text = "[color=#333333]Flash[/color]"
+                self.ids["main_flash"].text = "[color=#333333]Wipe[/color]"
 
-            self.ids["main_flash"].text = "[color=#00FF00]Flash[/color]"
-            self.debug(f"main_flash.text = {self.ids["main_flash"].text}")
+            self.ids["main_select_device"].text = (
+                f"Device: [color=#00AABB]{value}[/color]"
+            )
 
-            self.ids["main_wipe"].text = "[color=#00FF00]Wipe[/color]"
-            self.debug(f"main_wipe.text = {self.ids["main_wipe"].text}")
         else:
-            self.will_flash = False
-            self.debug(f"will_flash = {self.will_flash}")
-
-            self.will_wipe = False
-            self.debug(f"will_wipe = {self.will_wipe}")
-
-            self.ids["main_flash"].text = f"[color=#333333]Flash[/color]"
-            self.debug(f"main_flash.text = {self.ids["main_flash"].text}")
-
-            self.ids["main_wipe"].text = f"[color=#333333]Wipe[/color]"
-            self.debug(f"main_wipe.text = {self.ids["main_wipe"].text}")
+            raise ValueError(f'Invalid key: "{key}"')

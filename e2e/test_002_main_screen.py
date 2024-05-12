@@ -43,8 +43,8 @@ class TestMainScreen(GraphicUnitTest):
         buttons = grid.children
 
         self.assertEqual(len(buttons), 6)
-        self.assertEqual(buttons[5].id, "main_select_device")
-        self.assertEqual(buttons[4].id, "main_select_version")
+        self.assertEqual(buttons[5].id, "main_select_version")
+        self.assertEqual(buttons[4].id, "main_select_device")
         self.assertEqual(buttons[3].id, "main_flash")
         self.assertEqual(buttons[2].id, "main_wipe")
         self.assertEqual(buttons[1].id, "main_settings")
@@ -131,3 +131,71 @@ class TestMainScreen(GraphicUnitTest):
         mock_manager.get_screen.assert_has_calls(calls_manager)
         mock_get_running_app.assert_called_once()
         mock_get_running_app.return_value.open_settings.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    def test_update_version(self):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        device_button = grid.children[5]
+        flash_button = grid.children[3]
+        wipe_button = grid.children[2]
+
+        self.assertEqual(device_button.text, "Version: [color=#00AABB]v24.03.0[/color]")
+        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertTrue(flash_button.markup)
+        self.assertTrue(wipe_button.markup)
+
+        for version in (
+            "odudex/krux_binaries",
+            "v23.09.1",
+            "v23.09.0",
+            "v22.08.2",
+            "v22.08.1",
+            "v22.08.0",
+            "v22.03.0",
+        ):
+            screen.update(name="SelectVersionScreen", key="version", value=version)
+            self.assertEqual(
+                device_button.text, f"Version: [color=#00AABB]{version}[/color]"
+            )
+            self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
+            self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+            self.assertTrue(flash_button.markup)
+            self.assertTrue(wipe_button.markup)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    def test_update_device(self):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        device_button = grid.children[4]
+        flash_button = grid.children[3]
+        wipe_button = grid.children[2]
+
+        self.assertEqual(
+            device_button.text, "Device: [color=#00AABB]select a new one[/color]"
+        )
+        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertTrue(flash_button.markup)
+        self.assertTrue(wipe_button.markup)
+
+        for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
+            screen.update(name="SelectVersionScreen", key="device", value=device)
+            self.assertEqual(
+                device_button.text, f"Device: [color=#00AABB]{device}[/color]"
+            )
+            self.assertEqual(flash_button.text, "Flash")
+            self.assertEqual(wipe_button.text, "Wipe")
+            self.assertFalse(flash_button.markup)
+            self.assertFalse(wipe_button.markup)

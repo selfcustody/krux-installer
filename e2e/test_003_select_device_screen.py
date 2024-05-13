@@ -51,6 +51,18 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         self.assertEqual(buttons[0].id, "select_device_cube")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    def test_fail_update(self):
+        screen = SelectDeviceScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(key="mock", value="mock")
+
+        self.assertEqual(str(exc_info.exception), "Invalid key: mock")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     def test_on_press_with_latest_version(self, mock_set_background):
         screen = SelectDeviceScreen()

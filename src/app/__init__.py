@@ -30,6 +30,7 @@ from src.app.screens.main_screen import MainScreen
 from src.app.screens.select_device_screen import SelectDeviceScreen
 from src.app.screens.select_version_screen import SelectVersionScreen
 from src.app.screens.select_old_version_screen import SelectOldVersionScreen
+from src.app.screens.warning_beta_screen import WarningBetaScreen
 from src.app.screens.about_screen import AboutScreen
 
 
@@ -54,6 +55,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             SelectDeviceScreen(),
             SelectVersionScreen(),
             SelectOldVersionScreen(),
+            WarningBetaScreen(),
             AboutScreen(),
         ]
 

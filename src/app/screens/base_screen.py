@@ -87,6 +87,7 @@ class BaseScreen(Screen, Trigger):
         btn = Button(
             text=text,
             markup=markup,
+            halign="center",
             font_size=Window.size[0] // 25,
             background_color=(0, 0, 0, 0),
             color=(1, 1, 1, 1),

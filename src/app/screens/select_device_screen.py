@@ -78,7 +78,8 @@ class SelectDeviceScreen(BaseScreen):
 
     def update(self, *args, **kwargs):
         """Update buttons according the valid devices for each version"""
-        if kwargs.get("key") == "version":
+        key = kwargs.get("key")
+        if key == "version":
             self.debug(
                 f"Updating buttons to fit {kwargs.get("key")} = {kwargs.get("version")}"
             )
@@ -97,4 +98,4 @@ class SelectDeviceScreen(BaseScreen):
                     self.ids[f"select_device_{device}"].markup = False
                     self.ids[f"select_device_{device}"].text = device
         else:
-            self.warning(f"Skiping update for {kwargs.get("key")}")
+            raise ValueError(f"Invalid key: {key}")

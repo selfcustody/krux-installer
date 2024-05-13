@@ -145,24 +145,24 @@ class TestSelectVersionScreen(GraphicUnitTest):
         for button in grid.children:
             action = getattr(screen, f"on_release_{button.id}")
             action(button)
-            if button.id in (
-                "select_version_stable",
-                "select_version_beta",
-                "select_version_old",
-                "select_version_back",
-            ):
-                calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+            calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
 
-            if button.id in ("select_version_stable", "select_version_beta"):
+            if button.id == "select_version_stable":
                 calls_get_screen.append(call("MainScreen"))
                 calls_set_screen.append(call(name="MainScreen", direction="right"))
 
-            if button.id == "select_version_old":
+            elif button.id == "select_version_beta":
+                calls_get_screen.append(call("MainScreen"))
+                calls_set_screen.append(
+                    call(name="WarningBetaScreen", direction="left")
+                )
+
+            elif button.id == "select_version_old":
                 calls_set_screen.append(
                     call(name="SelectOldVersionScreen", direction="left")
                 )
 
-            if button.id == "select_version_back":
+            elif button.id == "select_version_back":
                 calls_set_screen.append(call(name="MainScreen", direction="right"))
 
         mock_set_background.assert_has_calls(calls_set_background)

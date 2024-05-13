@@ -199,3 +199,118 @@ class TestMainScreen(GraphicUnitTest):
             self.assertEqual(wipe_button.text, "Wipe")
             self.assertFalse(flash_button.markup)
             self.assertFalse(wipe_button.markup)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    def test_fail_update_invalid_screen(self):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name="MockedScreen", key="device", value="v24.03.0")
+
+        self.assertEqual(str(exc_info.exception), "Invalid screen name: MockedScreen")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    def test_fail_update_invalid_key(self):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name="SelectDeviceScreen", key="mock", value="mock")
+
+        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    def test_update_no_valid_device_but_valid_situation(self):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        device_button = grid.children[4]
+        flash_button = grid.children[3]
+        wipe_button = grid.children[2]
+
+        self.assertEqual(
+            device_button.text, "Device: [color=#00AABB]select a new one[/color]"
+        )
+        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertTrue(flash_button.markup)
+        self.assertTrue(wipe_button.markup)
+
+        screen.update(name="SelectDeviceScreen", key="device", value="Mocked device")
+
+        self.assertEqual(
+            device_button.text, "Device: [color=#00AABB]Mocked device[/color]"
+        )
+        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertTrue(flash_button.markup)
+        self.assertTrue(wipe_button.markup)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    def test_on_press_can_flash_or_wipe(self, mock_set_background):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        flash_button = grid.children[3]
+        wipe_button = grid.children[2]
+
+        calls = []
+
+        for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
+            screen.update(name="SelectVersionScreen", key="device", value=device)
+            flash_action = getattr(screen, "on_press_main_flash")
+            wipe_action = getattr(screen, "on_press_main_wipe")
+            flash_action(flash_button)
+            wipe_action(wipe_button)
+            calls.append(call(wid="main_flash", rgba=(0.5, 0.5, 0.5, 0.5)))
+            calls.append(call(wid="main_wipe", rgba=(0.5, 0.5, 0.5, 0.5)))
+
+        mock_set_background.assert_has_calls(calls)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    @patch("src.app.screens.main_screen.MainScreen.set_screen")
+    def test_on_release_can_flash_or_wipe(self, mock_set_screen, mock_set_background):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        flash_button = grid.children[3]
+        wipe_button = grid.children[2]
+
+        calls_set_background = []
+        calls_set_screen = []
+
+        for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
+            screen.update(name="SelectVersionScreen", key="device", value=device)
+            flash_action = getattr(screen, "on_release_main_flash")
+            wipe_action = getattr(screen, "on_release_main_wipe")
+            flash_action(flash_button)
+            wipe_action(wipe_button)
+
+            calls_set_background.append(call(wid="main_flash", rgba=(0, 0, 0, 0)))
+            calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 0)))
+            calls_set_screen.append(call(name="FlashScreen", direction="left"))
+            calls_set_screen.append(call(name="WipeScreen", direction="left"))
+
+        mock_set_background.assert_has_calls(calls_set_background)
+        mock_set_screen.assert_has_calls(calls_set_screen)

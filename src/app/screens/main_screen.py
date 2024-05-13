@@ -75,22 +75,19 @@ class MainScreen(BaseScreen):
                     else:
                         self.warning(f"Button::{instance.id} disabled")
 
-                elif instance.id == "main_wipe":
+                if instance.id == "main_wipe":
                     if self.will_wipe:
                         self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
                     else:
                         self.warning(f"Button::{instance.id} disabled")
 
-                elif instance.id in (
+                if instance.id in (
                     "main_select_device",
                     "main_select_version",
                     "main_settings",
                     "main_about",
                 ):
                     self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
-
-                else:
-                    self.warning(f"Button::{instance.id} not found")
 
             # END of on_press buttons
 
@@ -155,12 +152,8 @@ class MainScreen(BaseScreen):
 
     @device.setter
     def device(self, value: str):
-        """Setter for version property"""
-        if value in VALID_DEVICES or value == "select a new one":
-            self.debug(f"device = {value}")
-            self._device = value
-        else:
-            raise ValueError(f"Invalid device: {value}")
+        self.debug(f"device = {value}")
+        self._device = value
 
     @property
     def version(self) -> str:
@@ -170,11 +163,8 @@ class MainScreen(BaseScreen):
     @version.setter
     def version(self, value: str):
         """Setter for version property"""
-        if value in VALID_DEVICES_VERSIONS.keys():
-            self.debug(f"version = {value}")
-            self._version = value
-        else:
-            raise ValueError(f"Invalid version: {value}")
+        self.debug(f"version = {value}")
+        self._version = value
 
     @property
     def will_flash(self) -> bool:
@@ -239,7 +229,7 @@ class MainScreen(BaseScreen):
                 self.ids["main_flash"].markup = True
                 self.ids["main_wipe"].markup = True
                 self.ids["main_flash"].text = "[color=#333333]Flash[/color]"
-                self.ids["main_flash"].text = "[color=#333333]Wipe[/color]"
+                self.ids["main_wipe"].text = "[color=#333333]Wipe[/color]"
 
             self.ids["main_select_device"].text = (
                 f"Device: [color=#00AABB]{value}[/color]"

@@ -91,10 +91,10 @@ class ConfigKruxInstaller(BaseKruxInstaller):
             _kruxdata = os.path.join(localdata, ".local", "krux-installer")
         elif _system == "win32":
             localdata = os.getenv("LOCALAPPDATA")
-            _kruxappdata = os.path.join(localdata, "krux-installer")
+            _kruxdata = os.path.join(localdata, "krux-installer")
         elif _system == "darwin":
             localdata = os.path.expanduser("~")
-            _kruxadata = os.path.join(
+            _kruxdata = os.path.join(
                 localdata, "Library", "Application Support", "krux-installer"
             )
         else:

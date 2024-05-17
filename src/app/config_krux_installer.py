@@ -23,10 +23,27 @@ krux_installer.py
 """
 import os
 import sys
-from .base_krux_installer import BaseKruxInstaller
+from functools import partial
+from kivy.clock import Clock
+from src.app.base_krux_installer import BaseKruxInstaller
+
+if os.name == "posix":
+    LANG = os.getenv("LANG")
+else:
+    import platform
+
+    if platform.system() == "Windows":
+        import ctypes
+        import locale
+
+        windll = ctypes.windll.kernel32
+        windll.GetUserDefaultUILanguage()
+        LANG = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+    else:
+        raise OSError(f"OS '{platform.system()}' not recognized")
+
 
 DEFAULT_BAUDRATE = 1500000
-DEFAULT_LOCALE = "en-US"
 
 
 class ConfigKruxInstaller(BaseKruxInstaller):
@@ -92,8 +109,8 @@ class ConfigKruxInstaller(BaseKruxInstaller):
         config.setdefaults("flash", {"baudrate": DEFAULT_BAUDRATE})
         self.debug(f"{config}.baudrate={DEFAULT_BAUDRATE}")
 
-        config.setdefaults("locale", {"lang": "en-US"})
-        self.debug(f"{config}.lang={DEFAULT_LOCALE}")
+        config.setdefaults("locale", {"lang": LANG})
+        self.debug(f"{config}.lang={LANG}")
 
     def build_settings(self, settings):
         """Create settings panel"""
@@ -118,8 +135,32 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                 "desc": "Application locale",
                 "section": "locale",
                 "key": "lang",
-                "options": ["en-US", "pt-BR"]
+                "options": [
+                    "en_US.UTF-8",
+                    "pt_BR.UTF-8",
+                    "es_ES.UTF-8",
+                    "ru_RU.UTF-8"
+                ]
             }
         ]"""
         self.debug(f"{settings}.data={jsondata}")
         settings.add_json_panel("Settings", self.config, data=jsondata)
+
+    def on_config_change(self, config, section, key, value):
+        if section == "locale" and key == "lang":
+            main = self.screen_manager.get_screen("MainScreen")
+            fn_l = partial(
+                main.update, name="ConfigKruxInstaller", key="locale", value=value
+            )
+            fn_v = partial(
+                main.update,
+                name="ConfigKruxInstaller",
+                key="version",
+                value=main.version,
+            )
+            fn_d = partial(
+                main.update, name="ConfigKruxInstaller", key="device", value=main.device
+            )
+            Clock.schedule_once(fn_l, 0)
+            Clock.schedule_once(fn_v, 0)
+            Clock.schedule_once(fn_d, 0)

@@ -29,6 +29,7 @@ from kivy.cache import Cache
 from .base_screen import BaseScreen
 from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.utils.selector import VALID_DEVICES
+from src.i18n import T
 
 
 class MainScreen(BaseScreen):
@@ -38,6 +39,10 @@ class MainScreen(BaseScreen):
         super().__init__(wid="main_screen", name="MainScreen", **kwargs)
 
         # Prepare some variables
+        locale = App.get_running_app().config.get("locale", "lang")
+        locale = locale.split(".")
+        locale = f"{locale[0].replace("-", "_")}.{locale[1]}"
+        self.locale = locale
         self.device = "select a new one"
         self.version = "v24.03.0"
         self.will_flash = False
@@ -46,15 +51,19 @@ class MainScreen(BaseScreen):
         # Build grid where buttons will be placed
         self.make_grid(wid="main_screen_grid", rows=6)
 
+        version_text = T("Version", locale=self.locale, module=self.id)
+        device_text = T("Device", locale=self.locale, module=self.id)
+        device_dev_text = T("select a new one", locale=self.locale, module=self.id)
+
         buttons = [
             (
                 "main_select_version",
-                f"Version: [color=#00AABB]{self.version}[/color]",
+                f"{version_text}: [color=#00AABB]{self.version}[/color]",
                 True,
             ),
             (
                 "main_select_device",
-                f"Device: [color=#00AABB]{self.device}[/color]",
+                f"{device_text}: [color=#00AABB]{device_dev_text}[/color]",
                 True,
             ),
             ("main_flash", f"[color=#333333]Flash[/color]", True),
@@ -117,9 +126,7 @@ class MainScreen(BaseScreen):
                     select_version.fetch_releases()
                     self.set_background(wid="main_select_version", rgba=(0, 0, 0, 0))
                     self.set_screen(name="SelectVersionScreen", direction="left")
-                    self.ids[instance.id].text = (
-                        f"Version: [color=#00AABB]{self.version}[/color]"
-                    )
+                    self.update(name=self.name, key="version", value=self.version)
 
                 elif instance.id == "main_flash":
                     if self.will_flash:
@@ -199,6 +206,17 @@ class MainScreen(BaseScreen):
         self.debug(f"will_wipe = {value}")
         self._will_wipe = value
 
+    @property
+    def locale(self) -> str:
+        """Getter for locale property"""
+        return self._locale
+
+    @locale.setter
+    def locale(self, value: bool):
+        """Setter for locale property"""
+        self.debug(f"locale = {value}")
+        self._locale = value
+
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
         name = kwargs.get("name")
@@ -207,6 +225,8 @@ class MainScreen(BaseScreen):
 
         # Check if update to screen
         if name in (
+            "ConfigKruxInstaller",
+            "MainScreen",
             "SelectDeviceScreen",
             "SelectVersionScreen",
             "SelectOldVersionScreen",
@@ -215,12 +235,16 @@ class MainScreen(BaseScreen):
         else:
             raise ValueError(f"Invalid screen name: {name}")
 
+        # Check locale
+        if key == "locale":
+            self.locale = value
+
         # Check if update to given key
-        if key == "version":
+        elif key == "version":
             self.version = value
-            self.debug(f"version = {value}")
+            version_text = T("Version", locale=self.locale, module=self.id)
             self.ids["main_select_version"].text = (
-                f"Version: [color=#00AABB]{value}[/color]"
+                f"{version_text}: [color=#00AABB]{value}[/color]"
             )
 
         elif key == "device":
@@ -242,8 +266,12 @@ class MainScreen(BaseScreen):
                 self.ids["main_flash"].text = "[color=#333333]Flash[/color]"
                 self.ids["main_wipe"].text = "[color=#333333]Wipe[/color]"
 
+            if value == "select a new one":
+                value = T("select a new one", locale=self.locale, module=self.id)
+
+            device_text = T("Device", locale=self.locale, module=self.id)
             self.ids["main_select_device"].text = (
-                f"Device: [color=#00AABB]{value}[/color]"
+                f"{device_text}: [color=#00AABB]{value}[/color]"
             )
 
         else:

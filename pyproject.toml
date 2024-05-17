@@ -19,6 +19,7 @@ pyzbar = "^0.1.9"
 opencv-python = "^4.9.0.80"
 cryptography = "^42.0.5"
 qrcode = "^7.4.2"
+easy-i18n = "^1.2.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"
@@ -34,10 +35,10 @@ format-tests= "black ./tests"
 format-e2e= "black ./e2e"
 format-installer = "black ./krux-installer.py"
 format = ["format-src", "format-tests", "format-e2e", "format-installer"]
-test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov-report html ./tests"
+test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-report html ./tests"
 test-e2e = "pytest --cov-append --cov=src/app --cov-report html ./e2e"
 test = ["test-unit", "test-e2e"]
-coverage-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov-report xml ./tests"
+coverage-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-report xml ./tests"
 coverage-e2e = "pytest --cov-append --cov=src/app --cov-report xml ./e2e"
 coverage = ["coverage-unit", "coverage-e2e"]
 patch-nix = "sh .ci/patch-pyinstaller-kivy-hook.sh"

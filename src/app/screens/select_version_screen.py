@@ -30,7 +30,7 @@ from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.graphics import Color, Line
 from src.utils.selector import Selector
-from .base_screen import BaseScreen
+from src.app.screens.base_screen import BaseScreen
 
 
 class SelectVersionScreen(BaseScreen):
@@ -87,10 +87,17 @@ class SelectVersionScreen(BaseScreen):
                     version = self.ids[instance.id].text
                     self.debug(f"on_release::{instance.id} = {version}")
                     main_screen = self.manager.get_screen("MainScreen")
-                    fn = partial(
+                    fn_version = partial(
                         main_screen.update, name=self.name, key="version", value=version
                     )
-                    Clock.schedule_once(fn, 0)
+                    fn_device = partial(
+                        main_screen.update,
+                        name=self.name,
+                        key="device",
+                        value="select a new one",
+                    )
+                    Clock.schedule_once(fn_version, 0)
+                    Clock.schedule_once(fn_device, 0)
                     self.set_screen(name="MainScreen", direction="right")
 
                 if instance.id == "select_version_beta":
@@ -107,9 +114,10 @@ class SelectVersionScreen(BaseScreen):
                         main_screen.update,
                         name=self.name,
                         key="device",
-                        value="Device: select a new one",
+                        value="select a new one",
                     )
                     Clock.schedule_once(fn_version, 0)
+                    Clock.schedule_once(fn_device, 0)
                     self.debug(f"on_release::{instance.id} = {version}")
                     self.set_screen(name="WarningBetaScreen", direction="left")
 

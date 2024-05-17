@@ -7,7 +7,11 @@ from src.app.screens.main_screen import MainScreen
 class TestMainScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_render_main_screen(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_render_main_screen(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -18,9 +22,13 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "MainScreen")
         self.assertEqual(screen.id, "main_screen")
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_render_grid_layout(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_render_grid_layout(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
         screen = MainScreen()
         self.render(screen)
 
@@ -30,9 +38,14 @@ class TestMainScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
 
         self.assertEqual(grid.id, "main_screen_grid")
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_render_buttons(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_render_buttons(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -52,7 +65,13 @@ class TestMainScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_cant_flash_or_wipe(self, mock_set_background):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_on_press_cant_flash_or_wipe(
+        self, mock_get_running_app, mock_set_background
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -74,6 +93,7 @@ class TestMainScreen(GraphicUnitTest):
                 calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
 
         mock_set_background.assert_has_calls(calls)
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -86,6 +106,9 @@ class TestMainScreen(GraphicUnitTest):
         mock_manager.get_screen = MagicMock()
 
         mock_get_running_app.return_value = MagicMock(open_settings=MagicMock())
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -129,11 +152,22 @@ class TestMainScreen(GraphicUnitTest):
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_manager.get_screen.assert_has_calls(calls_manager)
-        mock_get_running_app.assert_called_once()
+        mock_get_running_app.assert_has_calls(
+            [
+                call().config.get("locale", "lang"),
+                call().open_settings(),
+            ],
+            any_order=True,
+        )
+
         mock_get_running_app.return_value.open_settings.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_update_version(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_version(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -169,8 +203,13 @@ class TestMainScreen(GraphicUnitTest):
             self.assertTrue(flash_button.markup)
             self.assertTrue(wipe_button.markup)
 
+        mock_get_running_app.assert_called_once()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_update_device(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_device(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
         screen = MainScreen()
         self.render(screen)
 
@@ -201,7 +240,11 @@ class TestMainScreen(GraphicUnitTest):
             self.assertFalse(wipe_button.markup)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_fail_update_invalid_screen(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_fail_update_invalid_screen(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -212,9 +255,14 @@ class TestMainScreen(GraphicUnitTest):
             screen.update(name="MockedScreen", key="device", value="v24.03.0")
 
         self.assertEqual(str(exc_info.exception), "Invalid screen name: MockedScreen")
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_fail_update_invalid_key(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_fail_update_invalid_key(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -225,9 +273,14 @@ class TestMainScreen(GraphicUnitTest):
             screen.update(name="SelectDeviceScreen", key="mock", value="mock")
 
         self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_update_no_valid_device_but_valid_situation(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_no_valid_device_but_valid_situation(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -256,10 +309,17 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
         self.assertTrue(flash_button.markup)
         self.assertTrue(wipe_button.markup)
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
-    def test_on_press_can_flash_or_wipe(self, mock_set_background):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_on_press_can_flash_or_wipe(
+        self, mock_get_running_app, mock_set_background
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -282,11 +342,18 @@ class TestMainScreen(GraphicUnitTest):
             calls.append(call(wid="main_wipe", rgba=(0.5, 0.5, 0.5, 0.5)))
 
         mock_set_background.assert_has_calls(calls)
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    def test_on_release_can_flash_or_wipe(self, mock_set_screen, mock_set_background):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_on_release_can_flash_or_wipe(
+        self, mock_get_running_app, mock_set_screen, mock_set_background
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = MainScreen()
         self.render(screen)
 
@@ -314,3 +381,4 @@ class TestMainScreen(GraphicUnitTest):
 
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)
+        mock_get_running_app.assert_called_once()

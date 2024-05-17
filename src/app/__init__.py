@@ -22,6 +22,7 @@
 __init__.py
 """
 import os
+from kivy.app import App
 from kivy.cache import Cache
 from kivy.core.window import Window
 from kivy.lang.builder import Builder

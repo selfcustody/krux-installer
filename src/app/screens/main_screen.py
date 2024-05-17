@@ -81,6 +81,14 @@ class MainScreen(BaseScreen):
                     else:
                         self.warning(f"Button::{instance.id} disabled")
 
+                if instance.id == "main_select_version":
+                    self.ids[instance.id].text = "\n".join(
+                        [
+                            "[size=18sp][color=#efcc00][b]Fetching data from[/b][/color][/size]",
+                            "[size=16sp][color=#efcc00]https://api.github.com/repos/selfcustody/krux/releases[/color][/size]",
+                        ]
+                    )
+
                 if instance.id in (
                     "main_select_device",
                     "main_select_version",
@@ -109,6 +117,9 @@ class MainScreen(BaseScreen):
                     select_version.fetch_releases()
                     self.set_background(wid="main_select_version", rgba=(0, 0, 0, 0))
                     self.set_screen(name="SelectVersionScreen", direction="left")
+                    self.ids[instance.id].text = (
+                        f"Version: [color=#00AABB]{self.version}[/color]"
+                    )
 
                 elif instance.id == "main_flash":
                     if self.will_flash:

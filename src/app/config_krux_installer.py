@@ -149,18 +149,32 @@ class ConfigKruxInstaller(BaseKruxInstaller):
     def on_config_change(self, config, section, key, value):
         if section == "locale" and key == "lang":
             main = self.screen_manager.get_screen("MainScreen")
-            fn_l = partial(
-                main.update, name="ConfigKruxInstaller", key="locale", value=value
-            )
-            fn_v = partial(
-                main.update,
-                name="ConfigKruxInstaller",
-                key="version",
-                value=main.version,
-            )
-            fn_d = partial(
-                main.update, name="ConfigKruxInstaller", key="device", value=main.device
-            )
-            Clock.schedule_once(fn_l, 0)
-            Clock.schedule_once(fn_v, 0)
-            Clock.schedule_once(fn_d, 0)
+            partials = [
+                partial(
+                    main.update, name="ConfigKruxInstaller", key="locale", value=value
+                ),
+                partial(
+                    main.update,
+                    name="ConfigKruxInstaller",
+                    key="version",
+                    value=main.version,
+                ),
+                partial(
+                    main.update,
+                    name="ConfigKruxInstaller",
+                    key="device",
+                    value=main.device,
+                ),
+                partial(
+                    main.update, name="ConfigKruxInstaller", key="wipe", value=None
+                ),
+                partial(
+                    main.update, name="ConfigKruxInstaller", key="settings", value=None
+                ),
+                partial(
+                    main.update, name="ConfigKruxInstaller", key="about", value=None
+                ),
+            ]
+
+            for fn in partials:
+                Clock.schedule_once(fn, 0)

@@ -68,3 +68,27 @@ a_i18n.add(
     module="main_screen",
     locale="ru_RU.UTF-8",
 )
+
+# Wipe
+a_i18n.add(k="Wipe", message="Wipe", module="main_screen", locale="en_US.UTF-8")
+a_i18n.add(k="Wipe", message="Limpar", module="main_screen", locale="pt_BR.UTF-8")
+a_i18n.add(k="Wipe", message="Limpiar", module="main_screen", locale="es_ES.UTF-8")
+a_i18n.add(k="Wipe", message="Вытирать", module="main_screen", locale="ru_RU.UTF-8")
+
+# Settings
+a_i18n.add(k="Settings", message="Settings", module="main_screen", locale="en_US.UTF-8")
+a_i18n.add(
+    k="Settings", message="Configurações", module="main_screen", locale="pt_BR.UTF-8"
+)
+a_i18n.add(k="Settings", message="Ajustes", module="main_screen", locale="es_ES.UTF-8")
+a_i18n.add(
+    k="Settings", message="Настройки", module="main_screen", locale="ru_RU.UTF-8"
+)
+
+# About
+a_i18n.add(k="About", message="About", module="main_screen", locale="en_US.UTF-8")
+a_i18n.add(k="About", message="Sobre", module="main_screen", locale="pt_BR.UTF-8")
+a_i18n.add(k="About", message="Acerca de", module="main_screen", locale="es_ES.UTF-8")
+a_i18n.add(
+    k="About", message="Об установщике", module="main_screen", locale="ru_RU.UTF-8"
+)

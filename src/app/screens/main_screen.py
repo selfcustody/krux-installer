@@ -54,6 +54,9 @@ class MainScreen(BaseScreen):
         version_text = T("Version", locale=self.locale, module=self.id)
         device_text = T("Device", locale=self.locale, module=self.id)
         device_dev_text = T("select a new one", locale=self.locale, module=self.id)
+        wipe_text = T("Wipe", locale=self.locale, module=self.id)
+        settings_text = T("Settings", locale=self.locale, module=self.id)
+        about_text = T("About", locale=self.locale, module=self.id)
 
         buttons = [
             (
@@ -67,9 +70,9 @@ class MainScreen(BaseScreen):
                 True,
             ),
             ("main_flash", f"[color=#333333]Flash[/color]", True),
-            ("main_wipe", f"[color=#333333]Wipe[/color]", True),
-            ("main_settings", "Settings", False),
-            ("main_about", "About", False),
+            ("main_wipe", f"[color=#333333]{wipe_text}[/color]", True),
+            ("main_settings", settings_text, False),
+            ("main_about", about_text, False),
         ]
 
         # START of buttons
@@ -273,6 +276,21 @@ class MainScreen(BaseScreen):
             self.ids["main_select_device"].text = (
                 f"{device_text}: [color=#00AABB]{value}[/color]"
             )
+
+        elif key == "wipe":
+            wipe_text = T("Wipe", locale=self.locale, module=self.id)
+            self.ids["main_wipe"].markup = False
+            self.ids["main_wipe"].text = wipe_text
+
+        elif key == "settings":
+            settings_text = T("Settings", locale=self.locale, module=self.id)
+            self.ids["main_settings"].markup = False
+            self.ids["main_settings"].text = settings_text
+
+        elif key == "about":
+            about_text = T("About", locale=self.locale, module=self.id)
+            self.ids["main_about"].markup = False
+            self.ids["main_about"].text = about_text
 
         else:
             raise ValueError(f'Invalid key: "{key}"')

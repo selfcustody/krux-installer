@@ -1,0 +1,11 @@
+{
+  "main_screen": {
+    "Version": "Версия",
+    "Device": "Устройство",
+    "select a new one": "выберите новый",
+    "Flash": "Flash",
+    "Wipe": "Стереть",
+    "Settings": "Настройки",
+    "About": "Об установщике"
+  }
+}

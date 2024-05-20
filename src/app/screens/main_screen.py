@@ -277,10 +277,23 @@ class MainScreen(BaseScreen):
                 f"{device_text}: [color=#00AABB]{value}[/color]"
             )
 
+        elif key == "flash":
+            flash_text = T("Flash", locale=self.locale, module=self.id)
+            if not self.will_flash:
+                self.ids["main_flash"].markup = True
+                self.ids["main_flash"].text = f"[color=#333333]{flash_text}[/color]"
+            else:
+                self.ids["main_flash"].markup = False
+                self.ids["main_flash"].text = flash_text
+
         elif key == "wipe":
             wipe_text = T("Wipe", locale=self.locale, module=self.id)
-            self.ids["main_wipe"].markup = False
-            self.ids["main_wipe"].text = wipe_text
+            if not self.will_wipe:
+                self.ids["main_wipe"].markup = True
+                self.ids["main_wipe"].text = f"[color=#333333]{wipe_text}[/color]"
+            else:
+                self.ids["main_wipe"].markup = False
+                self.ids["main_wipe"].text = wipe_text
 
         elif key == "settings":
             settings_text = T("Settings", locale=self.locale, module=self.id)

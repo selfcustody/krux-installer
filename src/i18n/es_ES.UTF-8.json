@@ -1,0 +1,11 @@
+{
+  "main_screen": {
+    "Version": "Versión",
+    "Device": "Dispositivo",
+    "select a new one": "seleccione uno nuevo",
+    "Flash": "Flash",
+    "Wipe": "Limpiar",
+    "Settings": "Ajustes",
+    "About": "Acerca de"
+  }
+}

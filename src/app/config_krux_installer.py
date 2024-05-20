@@ -166,6 +166,9 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                     value=main.device,
                 ),
                 partial(
+                    main.update, name="ConfigKruxInstaller", key="flash", value=None
+                ),
+                partial(
                     main.update, name="ConfigKruxInstaller", key="wipe", value=None
                 ),
                 partial(

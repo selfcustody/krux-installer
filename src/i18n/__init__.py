@@ -60,7 +60,7 @@ a_i18n.add(
     k="select a new one",
     message="seleccione uno nuevo",
     module="main_screen",
-    locale="_s-.UTF-8",
+    locale="es_ES.UTF-8",
 )
 a_i18n.add(
     k="select a new one",

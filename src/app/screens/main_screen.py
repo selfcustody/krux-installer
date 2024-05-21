@@ -39,10 +39,6 @@ class MainScreen(BaseScreen):
         super().__init__(wid="main_screen", name="MainScreen", **kwargs)
 
         # Prepare some variables
-        locale = App.get_running_app().config.get("locale", "lang")
-        locale = locale.split(".")
-        locale = f"{locale[0].replace("-", "_")}.{locale[1]}"
-        self.locale = locale
         self.device = "select a new one"
         self.version = "v24.03.0"
         self.will_flash = False
@@ -51,28 +47,21 @@ class MainScreen(BaseScreen):
         # Build grid where buttons will be placed
         self.make_grid(wid="main_screen_grid", rows=6)
 
-        version_text = T("Version", locale=self.locale, module=self.id)
-        device_text = T("Device", locale=self.locale, module=self.id)
-        device_dev_text = T("select a new one", locale=self.locale, module=self.id)
-        wipe_text = T("Wipe", locale=self.locale, module=self.id)
-        settings_text = T("Settings", locale=self.locale, module=self.id)
-        about_text = T("About", locale=self.locale, module=self.id)
-
         buttons = [
             (
                 "main_select_version",
-                f"{version_text}: [color=#00AABB]{self.version}[/color]",
+                f"{self.translate("Version")}: [color=#00AABB]{self.version}[/color]",
                 True,
             ),
             (
                 "main_select_device",
-                f"{device_text}: [color=#00AABB]{device_dev_text}[/color]",
+                f"{self.translate("Device")}: [color=#00AABB]{self.translate("select a new one")}[/color]",
                 True,
             ),
             ("main_flash", f"[color=#333333]Flash[/color]", True),
-            ("main_wipe", f"[color=#333333]{wipe_text}[/color]", True),
-            ("main_settings", settings_text, False),
-            ("main_about", about_text, False),
+            ("main_wipe", f"[color=#333333]{self.translate("Wipe")}[/color]", True),
+            ("main_settings", self.translate("Settings"), False),
+            ("main_about", self.translate("About"), False),
         ]
 
         # START of buttons
@@ -208,18 +197,7 @@ class MainScreen(BaseScreen):
         """Setter for will_wipe property"""
         self.debug(f"will_wipe = {value}")
         self._will_wipe = value
-
-    @property
-    def locale(self) -> str:
-        """Getter for locale property"""
-        return self._locale
-
-    @locale.setter
-    def locale(self, value: bool):
-        """Setter for locale property"""
-        self.debug(f"locale = {value}")
-        self._locale = value
-
+    
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
         name = kwargs.get("name")
@@ -234,7 +212,7 @@ class MainScreen(BaseScreen):
             "SelectVersionScreen",
             "SelectOldVersionScreen",
         ):
-            self.debug(f"Updating MainScreen from {name}...")
+            self.debug(f"Updating {self.name} from {name}...")
         else:
             raise ValueError(f"Invalid screen name: {name}")
 
@@ -245,9 +223,8 @@ class MainScreen(BaseScreen):
         # Check if update to given key
         elif key == "version":
             self.version = value
-            version_text = T("Version", locale=self.locale, module=self.id)
             self.ids["main_select_version"].text = (
-                f"{version_text}: [color=#00AABB]{value}[/color]"
+                f"{self.translate("Version")}: [color=#00AABB]{value}[/color]"
             )
 
         elif key == "device":
@@ -259,51 +236,46 @@ class MainScreen(BaseScreen):
                 self.will_wipe = True
                 self.ids["main_flash"].markup = False
                 self.ids["main_wipe"].markup = False
-                self.ids["main_flash"].text = "Flash"
-                self.ids["main_wipe"].text = "Wipe"
+                self.ids["main_flash"].text = self.translate("Flash")
+                self.ids["main_wipe"].text = self.translate("Wipe")
             else:
                 self.will_flash = False
                 self.will_wipe = False
                 self.ids["main_flash"].markup = True
                 self.ids["main_wipe"].markup = True
-                self.ids["main_flash"].text = "[color=#333333]Flash[/color]"
-                self.ids["main_wipe"].text = "[color=#333333]Wipe[/color]"
+                self.ids["main_flash"].text = f"[color=#333333]{self.translate("Flash")}[/color]"
+                self.ids["main_wipe"].text = f"[color=#333333]{self.translate("Wipe")}[/color]"
 
             if value == "select a new one":
-                value = T("select a new one", locale=self.locale, module=self.id)
+                value = self.translate("select a new one")
 
-            device_text = T("Device", locale=self.locale, module=self.id)
             self.ids["main_select_device"].text = (
-                f"{device_text}: [color=#00AABB]{value}[/color]"
+                f"{self.translate("Device")}: [color=#00AABB]{value}[/color]"
             )
 
         elif key == "flash":
-            flash_text = T("Flash", locale=self.locale, module=self.id)
             if not self.will_flash:
                 self.ids["main_flash"].markup = True
-                self.ids["main_flash"].text = f"[color=#333333]{flash_text}[/color]"
+                self.ids["main_flash"].text = f"[color=#333333]{self.translate("Flash")}[/color]"
             else:
                 self.ids["main_flash"].markup = False
-                self.ids["main_flash"].text = flash_text
+                self.ids["main_flash"].text = self.translate("Flash")
 
         elif key == "wipe":
-            wipe_text = T("Wipe", locale=self.locale, module=self.id)
             if not self.will_wipe:
                 self.ids["main_wipe"].markup = True
-                self.ids["main_wipe"].text = f"[color=#333333]{wipe_text}[/color]"
+                self.ids["main_wipe"].text = f"[color=#333333]{self.translate("Wipe")}[/color]"
             else:
                 self.ids["main_wipe"].markup = False
-                self.ids["main_wipe"].text = wipe_text
+                self.ids["main_wipe"].text = self.translate("Wipe")
 
         elif key == "settings":
-            settings_text = T("Settings", locale=self.locale, module=self.id)
             self.ids["main_settings"].markup = False
-            self.ids["main_settings"].text = settings_text
+            self.ids["main_settings"].text = self.translate("Settings")
 
         elif key == "about":
-            about_text = T("About", locale=self.locale, module=self.id)
             self.ids["main_about"].markup = False
-            self.ids["main_about"].text = about_text
+            self.ids["main_about"].text = self.translate("About")
 
         else:
             raise ValueError(f'Invalid key: "{key}"')

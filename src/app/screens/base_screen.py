@@ -23,6 +23,7 @@ base_screen.py
 """
 import typing
 from functools import partial
+from kivy.app import App
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
@@ -30,7 +31,8 @@ from kivy.weakproxy import WeakProxy
 from kivy.graphics import Color, Line
 from kivy.uix.screenmanager import Screen
 from src.utils.trigger import Trigger
-
+from src.i18n import T
+from src.utils.selector import VALID_DEVICES
 
 class BaseScreen(Screen, Trigger):
     """Main screen is the 'Home' page"""
@@ -39,7 +41,28 @@ class BaseScreen(Screen, Trigger):
         super().__init__(**kwargs)
         self.id = wid
         self.name = name
+ 
+        locale = App.get_running_app().config.get("locale", "lang")
+        locale = locale.split(".")
+        locale = f"{locale[0].replace("-", "_")}.{locale[1]}"
+        self.locale = locale
 
+    @property
+    def locale(self) -> str:
+        """Getter for locale property"""
+        return self._locale
+
+    @locale.setter
+    def locale(self, value: bool):
+        """Setter for locale property"""
+        self.debug(f"locale = {value}")
+        self._locale = value
+
+    def translate(self, key: str) -> str:
+        msg = T(key, locale=self.locale, module=self.id)
+        self.debug(f"Translated '{key}' to '{msg}'")
+        return msg
+    
     def set_background(self, wid: str, rgba: typing.Tuple[float, float, float, float]):
         """Changes the widget's background by it's id"""
         widget = self.ids[wid]

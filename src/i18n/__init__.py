@@ -45,7 +45,7 @@ for locale in I18N_LOCALES:
     file = locale["file"]
     with open(file, mode="r", encoding="utf-8") as f:
         data = json.loads(f.read())
-        for screen in ["main_screen"]:
+        for screen in ["main_screen", "warning_beta_screen"]:
             for word, translation in data[screen].items():
                 a_i18n.add(k=word, message=translation, module=screen, locale=name)
 

@@ -7,5 +7,11 @@
     "Wipe": "Limpiar",
     "Settings": "Ajustes",
     "About": "Acerca de"
+  },
+  "warning_beta_screen": {
+    "WARNING": "ADVERTENCIA",
+    "This is our test repository": "Este es nuestro repositorio de pruebas",
+    "These are unsigned binaries for the latest and most experimental features": "Estos son binarios sin firmar para las funciones más recientes y experimentales",
+    "and it's just for trying new things and providing feedback.": "y es sólo para probar cosas nuevas y dar opinión."
   }
 }

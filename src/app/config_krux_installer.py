@@ -151,6 +151,7 @@ class ConfigKruxInstaller(BaseKruxInstaller):
         if section == "locale" and key == "lang":
             main = self.screen_manager.get_screen("MainScreen")
             vers = self.screen_manager.get_screen("SelectVersionScreen")
+            oldv = self.screen_manager.get_screen("SelectOldVersionScreen")
             warn = self.screen_manager.get_screen("WarningBetaScreen")
 
             partials = [
@@ -183,6 +184,9 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                 ),
                 partial(
                     vers.update, name="ConfigKruxInstaller", key="locale", value=value
+                ),
+                partial(
+                    oldv.update, name="ConfigKruxInstaller", key="locale", value=value
                 ),
                 partial(
                     warn.update, name="ConfigKruxInstaller", key="locale", value=value

@@ -13,6 +13,9 @@
     "Old versions": "Versiones antiguas",
     "Back": "Volver"
   },
+  "select_old_version_screen": {
+    "Back": "Volver"
+  },
   "warning_beta_screen": {
     "WARNING": "ADVERTENCIA",
     "This is our test repository": "Este es nuestro repositorio de pruebas",

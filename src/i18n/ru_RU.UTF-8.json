@@ -13,6 +13,9 @@
     "Old versions": "Старые версии",
     "Back": "Вернуться"
   },
+  "select_old_version_screen": {
+    "Back": "Вернуться"
+  },
   "warning_beta_screen": {
     "WARNING": "ПРЕДУПРЕЖДЕНИЕ",
     "This is our test repository": "Это наш тестовый репозиторий",

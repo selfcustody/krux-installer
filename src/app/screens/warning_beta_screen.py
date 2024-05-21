@@ -26,6 +26,7 @@ from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
 from src.i18n import T
 
+
 class WarningBetaScreen(BaseScreen):
     """WarningBetaScreen warns user about krux beta versions"""
 
@@ -35,9 +36,13 @@ class WarningBetaScreen(BaseScreen):
 
         warning = self.translate("WARNING")
         test_repo = self.translate("This is our test repository")
-        unsg_bin = self.translate("These are unsigned binaries for the latest and most experimental features")        
-        just_try = self.translate("and it's just for trying new things and providing feedback.")
-        
+        unsg_bin = self.translate(
+            "These are unsigned binaries for the latest and most experimental features"
+        )
+        just_try = self.translate(
+            "and it's just for trying new things and providing feedback."
+        )
+
         text = [
             f"[size=32sp][color=#efcc00][b]{warning}[/b][/color][/size]",
             "",
@@ -60,7 +65,6 @@ class WarningBetaScreen(BaseScreen):
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
             self.set_screen(name="MainScreen", direction="right")
 
-
         self.make_button(
             row=0,
             id="warning_beta_screen_warn",
@@ -70,7 +74,7 @@ class WarningBetaScreen(BaseScreen):
             on_press=_press,
             on_release=_release,
         )
-    
+
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
         name = kwargs.get("name")
@@ -78,9 +82,7 @@ class WarningBetaScreen(BaseScreen):
         value = kwargs.get("value")
 
         # Check if update to screen
-        if name in (
-            "ConfigKruxInstaller",
-        ):
+        if name in ("ConfigKruxInstaller",):
             self.debug(f"Updating {self.name} from {name}...")
         else:
             raise ValueError(f"Invalid screen name: {name}")
@@ -90,9 +92,13 @@ class WarningBetaScreen(BaseScreen):
             self.locale = value
             warning = self.translate("WARNING")
             test_repo = self.translate("This is our test repository")
-            unsg_bin = self.translate("These are unsigned binaries for the latest and most experimental features")
-            just_try = self.translate("and it's just for trying new things and providing feedback.")
-        
+            unsg_bin = self.translate(
+                "These are unsigned binaries for the latest and most experimental features"
+            )
+            just_try = self.translate(
+                "and it's just for trying new things and providing feedback."
+            )
+
             text = [
                 f"[size=32sp][color=#efcc00][b]{warning}[/b][/color][/size]",
                 "",
@@ -103,4 +109,3 @@ class WarningBetaScreen(BaseScreen):
             ]
 
             self.ids["warning_beta_screen_warn"].text = "\n".join(text)
-

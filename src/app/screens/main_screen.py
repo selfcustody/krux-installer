@@ -197,7 +197,7 @@ class MainScreen(BaseScreen):
         """Setter for will_wipe property"""
         self.debug(f"will_wipe = {value}")
         self._will_wipe = value
-    
+
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
         name = kwargs.get("name")
@@ -243,8 +243,12 @@ class MainScreen(BaseScreen):
                 self.will_wipe = False
                 self.ids["main_flash"].markup = True
                 self.ids["main_wipe"].markup = True
-                self.ids["main_flash"].text = f"[color=#333333]{self.translate("Flash")}[/color]"
-                self.ids["main_wipe"].text = f"[color=#333333]{self.translate("Wipe")}[/color]"
+                self.ids["main_flash"].text = (
+                    f"[color=#333333]{self.translate("Flash")}[/color]"
+                )
+                self.ids["main_wipe"].text = (
+                    f"[color=#333333]{self.translate("Wipe")}[/color]"
+                )
 
             if value == "select a new one":
                 value = self.translate("select a new one")
@@ -256,7 +260,9 @@ class MainScreen(BaseScreen):
         elif key == "flash":
             if not self.will_flash:
                 self.ids["main_flash"].markup = True
-                self.ids["main_flash"].text = f"[color=#333333]{self.translate("Flash")}[/color]"
+                self.ids["main_flash"].text = (
+                    f"[color=#333333]{self.translate("Flash")}[/color]"
+                )
             else:
                 self.ids["main_flash"].markup = False
                 self.ids["main_flash"].text = self.translate("Flash")
@@ -264,7 +270,9 @@ class MainScreen(BaseScreen):
         elif key == "wipe":
             if not self.will_wipe:
                 self.ids["main_wipe"].markup = True
-                self.ids["main_wipe"].text = f"[color=#333333]{self.translate("Wipe")}[/color]"
+                self.ids["main_wipe"].text = (
+                    f"[color=#333333]{self.translate("Wipe")}[/color]"
+                )
             else:
                 self.ids["main_wipe"].markup = False
                 self.ids["main_wipe"].text = self.translate("Wipe")

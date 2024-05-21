@@ -34,6 +34,7 @@ from src.utils.trigger import Trigger
 from src.i18n import T
 from src.utils.selector import VALID_DEVICES
 
+
 class BaseScreen(Screen, Trigger):
     """Main screen is the 'Home' page"""
 
@@ -41,7 +42,7 @@ class BaseScreen(Screen, Trigger):
         super().__init__(**kwargs)
         self.id = wid
         self.name = name
- 
+
         locale = App.get_running_app().config.get("locale", "lang")
         locale = locale.split(".")
         locale = f"{locale[0].replace("-", "_")}.{locale[1]}"
@@ -62,7 +63,7 @@ class BaseScreen(Screen, Trigger):
         msg = T(key, locale=self.locale, module=self.id)
         self.debug(f"Translated '{key}' to '{msg}'")
         return msg
-    
+
     def set_background(self, wid: str, rgba: typing.Tuple[float, float, float, float]):
         """Changes the widget's background by it's id"""
         widget = self.ids[wid]

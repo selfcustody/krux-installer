@@ -55,8 +55,8 @@ class SelectVersionScreen(BaseScreen):
         buttons = [
             ("select_version_latest", selector.releases[0], False),
             ("select_version_beta", selector.releases[-1], False),
-            ("select_version_old", "Old versions", False),
-            ("select_version_back", "Back", False),
+            ("select_version_old", self.translate("Old versions"), False),
+            ("select_version_back", self.translate("Back"), False),
         ]
 
         # Push other releases to SelectOldVersionScreen
@@ -140,3 +140,24 @@ class SelectVersionScreen(BaseScreen):
                 on_press=_press,
                 on_release=_release,
             )
+
+    def update(self, *args, **kwargs):
+        """Update buttons on related screen"""
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        # Check if update to screen
+        if name in ("ConfigKruxInstaller"):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
+
+        # Check locale
+        if key == "locale":
+            self.locale = value
+            if "select_version_old" in self.ids:
+                self.ids["select_version_old"].text = self.translate("Old versions")
+
+            if "select_version_back" in self.ids:
+                self.ids["select_version_back"].text = self.translate("Back")

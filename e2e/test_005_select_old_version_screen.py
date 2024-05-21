@@ -17,7 +17,11 @@ OLD_VERSIONS = [d["tag_name"] for d in MOCKED_FOUND_API]
 class TestSelectVersionScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_render_main_screen(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_render_main_screen(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = SelectOldVersionScreen()
         self.render(screen)
 
@@ -28,9 +32,14 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "SelectOldVersionScreen")
         self.assertEqual(screen.id, "select_old_version_screen")
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    def test_render_grid_layout(self):
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_render_grid_layout(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = SelectOldVersionScreen()
         screen.make_grid(
             wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
@@ -43,10 +52,15 @@ class TestSelectVersionScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
 
         self.assertEqual(grid.id, "select_old_version_screen_grid")
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
     @patch("kivy.uix.gridlayout.GridLayout.clear_widgets")
-    def test_clear_grid(self, mock_clear_widgets):
+    def test_clear_grid(self, mock_clear_widgets, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = SelectOldVersionScreen()
         screen.make_grid(
             wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
@@ -58,12 +72,17 @@ class TestSelectVersionScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         mock_clear_widgets.assert_called_once()
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
     @patch(
         "src.app.screens.select_old_version_screen.SelectOldVersionScreen.set_background"
     )
-    def test_on_press(self, mock_set_background):
+    def test_on_press(self, mock_set_background, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         screen = SelectOldVersionScreen()
         screen.make_grid(
             wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
@@ -86,8 +105,10 @@ class TestSelectVersionScreen(GraphicUnitTest):
             calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
 
         mock_set_background.assert_has_calls(calls)
+        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
     @patch("src.app.screens.select_old_version_screen.SelectOldVersionScreen.manager")
     @patch(
         "src.app.screens.select_old_version_screen.SelectOldVersionScreen.set_background"
@@ -95,7 +116,12 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.select_old_version_screen.SelectOldVersionScreen.set_screen"
     )
-    def test_on_release(self, mock_set_screen, mock_set_background, mock_manager):
+    def test_on_release(
+        self, mock_set_screen, mock_set_background, mock_manager, mock_get_running_app
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
         mock_manager.get_screen = MagicMock()
 
         screen = SelectOldVersionScreen()
@@ -130,3 +156,4 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
         mock_set_background.assert_has_calls(set_background_calls)
         mock_set_screen.assert_has_calls(set_screen_calls)
+        mock_get_running_app.assert_called_once()

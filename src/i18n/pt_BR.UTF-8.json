@@ -3,10 +3,15 @@
     "Version": "Versão",
     "Device": "Dispositivo",
     "select a new one": "selecione um novo",
-    "Flash": "Flash",
-    "Wipe": "Apagar",
+    "Flash": "Atualizar o firmware",
+    "Wipe": "Limpar dispositivo",
     "Settings": "Configurações",
-    "About": "Sobre"
+    "About": "Sobre",     
+    "Fetching data from": "Buscando dados de"
+  },
+  "select_version_screen": {
+    "Old versions": "Versões antigas",
+    "Back": "Voltar"
   },
   "warning_beta_screen": {
     "WARNING": "ADVERTÊNCIA",

@@ -76,7 +76,7 @@ class WarningBetaScreen(BaseScreen):
         )
 
     def update(self, *args, **kwargs):
-        """Update buttons from selected device/versions on related screens"""
+        """Update buttons on related screen"""
         name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")

@@ -25,6 +25,7 @@ import re
 import os
 import json
 from easy_i18n.t import Ai18n
+from src.utils.trigger import Trigger
 
 I18N_DIRNAME = os.path.dirname(os.path.realpath(__file__))
 I18N_LOCALES = []
@@ -45,8 +46,8 @@ for locale in I18N_LOCALES:
     file = locale["file"]
     with open(file, mode="r", encoding="utf-8") as f:
         data = json.loads(f.read())
-        for screen in ["main_screen", "warning_beta_screen"]:
-            for word, translation in data[screen].items():
+        for screen, value in data.items():
+            for word, translation in value.items():
                 a_i18n.add(k=word, message=translation, module=screen, locale=name)
 
 

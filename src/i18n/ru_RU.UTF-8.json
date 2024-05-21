@@ -3,10 +3,15 @@
     "Version": "Версия",
     "Device": "Устройство",
     "select a new one": "выберите новый",
-    "Flash": "Flash",
-    "Wipe": "Стереть",
+    "Flash": "обновить прошивку",
+    "Wipe": "Стереть устройство",
     "Settings": "Настройки",
-    "About": "Об установщике"
+    "About": "Об установщике",    
+    "Fetching data from": "Получение данных из"
+  },
+  "select_version_screen": {
+    "Old versions": "Старые версии",
+    "Back": "Вернуться"
   },
   "warning_beta_screen": {
     "WARNING": "ПРЕДУПРЕЖДЕНИЕ",

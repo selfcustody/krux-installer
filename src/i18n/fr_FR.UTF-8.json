@@ -1,0 +1,22 @@
+{
+  "main_screen": {
+    "Version": "Version",
+    "Device": "Appareil",
+    "select a new one": "sélectionnez-en un nouveau",
+    "Flash": "Mise à jour du firmware",
+    "Wipe": "Effacer l'appareil",
+    "Settings": "Paramètres",
+    "About": "À propos",     
+    "Fetching data from": "Récupérer des données depuis"
+  },
+  "select_version_screen": {
+    "Old versions": "Anciennes versions",
+    "Back": "Retour"
+  },
+  "warning_beta_screen": {
+    "WARNING": "AVERTISSEMENT",
+    "This is our test repository": "Ceci est notre référentiel de tests",
+    "These are unsigned binaries for the latest and most experimental features": "Ce sont des binaires non signés pour les fonctionnalités\nles plus récentes et les plus expérimentales",
+    "and it's just for trying new things and providing feedback.": "et c'est juste pour essayer de nouvelles choses et fournir des commentaires."
+  }
+}

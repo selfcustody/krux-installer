@@ -22,6 +22,9 @@
 """
 build.py
 """
+from re import findall
+from os import listdir
+from os.path import join, isfile
 from pathlib import Path
 from platform import system
 import PyInstaller.__main__
@@ -35,14 +38,28 @@ ROOT_PATH = Path(__file__).parent.parent.absolute()
 PYNAME = "krux-installer"
 PYFILE = f"{PYNAME}.py"
 KFILE = str(ROOT_PATH / PYFILE)
+I18NS = str(ROOT_PATH / "src" / "i18n")
+
 BUILDER_ARGS = [
     PYFILE,
     "--add-data=pyproject.toml:.",
     "--add-data=krux_installer.kv:.",
-    "--windowed",
-    "--onefile",
-    f"-n={PYNAME}",
 ]
+
+# Add i18n translations
+
+for f in listdir(I18NS):
+    i18n_abs = join(I18NS, f)
+    i18n_rel = join("src", "i18n")
+    if isfile(i18n_abs):
+        if findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
+            BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
+
+
+BUILDER_ARGS.append("--windowed")
+BUILDER_ARGS.append("--onefile")
+BUILDER_ARGS.append(f"-n={PYNAME}")
+
 print("RUN " + " \\\n ".join(BUILDER_ARGS))
 print()
 

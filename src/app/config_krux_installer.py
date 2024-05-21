@@ -139,7 +139,8 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                     "en_US.UTF-8",
                     "pt_BR.UTF-8",
                     "es_ES.UTF-8",
-                    "ru_RU.UTF-8"
+                    "ru_RU.UTF-8", 
+                    "fr_FR.UTF-8"
                 ]
             }
         ]"""
@@ -149,6 +150,7 @@ class ConfigKruxInstaller(BaseKruxInstaller):
     def on_config_change(self, config, section, key, value):
         if section == "locale" and key == "lang":
             main = self.screen_manager.get_screen("MainScreen")
+            vers = self.screen_manager.get_screen("SelectVersionScreen")
             warn = self.screen_manager.get_screen("WarningBetaScreen")
 
             partials = [
@@ -178,6 +180,9 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                 ),
                 partial(
                     main.update, name="ConfigKruxInstaller", key="about", value=None
+                ),
+                partial(
+                    vers.update, name="ConfigKruxInstaller", key="locale", value=value
                 ),
                 partial(
                     warn.update, name="ConfigKruxInstaller", key="locale", value=value

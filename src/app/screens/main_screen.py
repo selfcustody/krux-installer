@@ -58,7 +58,7 @@ class MainScreen(BaseScreen):
                 f"{self.translate("Device")}: [color=#00AABB]{self.translate("select a new one")}[/color]",
                 True,
             ),
-            ("main_flash", f"[color=#333333]Flash[/color]", True),
+            ("main_flash", f"[color=#333333]{self.translate("Flash")}[/color]", True),
             ("main_wipe", f"[color=#333333]{self.translate("Wipe")}[/color]", True),
             ("main_settings", self.translate("Settings"), False),
             ("main_about", self.translate("About"), False),
@@ -83,9 +83,10 @@ class MainScreen(BaseScreen):
                         self.warning(f"Button::{instance.id} disabled")
 
                 if instance.id == "main_select_version":
+
                     self.ids[instance.id].text = "\n".join(
                         [
-                            "[size=18sp][color=#efcc00][b]Fetching data from[/b][/color][/size]",
+                            f"[size=18sp][color=#efcc00][b]{self.translate("Fetching data from")}[/b][/color][/size]",
                             "[size=16sp][color=#efcc00]https://api.github.com/repos/selfcustody/krux/releases[/color][/size]",
                         ]
                     )

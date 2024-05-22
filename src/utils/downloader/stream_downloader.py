@@ -37,17 +37,17 @@ class StreamDownloader(TriggerDownloader):
     def __init__(self, url: str):
         super().__init__(url=url)
         self.progress_bar_size = 64
-        self.on_data = self.progress_bar_cli
+        self.on_data = self.progress_bar
 
     @property
     def progress_bar_size(self) -> int:
-        """Getter for the size of progress_bar_cli"""
+        """Getter for the size of progress_bar"""
         self.debug(f"progress_bar_size::getter={self._progress_bar_size}")
         return self._progress_bar_size
 
     @progress_bar_size.setter
     def progress_bar_size(self, value: int):
-        """Setter for the size of progress_bar_cli"""
+        """Setter for the size of progress_bar"""
         self._progress_bar_size = value
         self.debug(f"progress_bar_size::setter={self._progress_bar_size}")
 
@@ -63,7 +63,7 @@ class StreamDownloader(TriggerDownloader):
         self._on_data = value
         self.debug(f"on_data::setter={value}")
 
-    def progress_bar_cli(
+    def progress_bar(
         self,
         data: bytes,  # pylint: disable=unused-argument
     ):
@@ -82,7 +82,7 @@ class StreamDownloader(TriggerDownloader):
         tot_mb = f"{self.content_len / 1000000:.2f}"
         sys.stdout.write(f"{cli_bar} {dld_mb} of {tot_mb} Mb ({percent}%)")
         if bar_amount == self.progress_bar_size:
-            print()
+            sys.stdout.write("")
 
     def download_file_stream(self, url: str) -> str:
         """

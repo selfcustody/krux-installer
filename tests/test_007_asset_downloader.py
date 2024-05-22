@@ -67,7 +67,7 @@ class TestAssetDownloader(TestCase):
             write_mode="w",
         )
 
-        calls = [call(a, a.progress_bar_cli), call(a, a.write_to_buffer)]
+        calls = [call(a, a.progress_bar), call(a, a.write_to_buffer)]
         mock_on_data.assert_has_calls(calls)
 
     @patch(
@@ -84,7 +84,7 @@ class TestAssetDownloader(TestCase):
             write_mode="w",
         )
 
-        mock_on_write.assert_called_once_with(a, a.progress_bar_cli)
+        mock_on_write.assert_called_once_with(a, a.progress_bar)
 
     @patch("builtins.open", new_callable=mock_open)
     @patch("tempfile.gettempdir")

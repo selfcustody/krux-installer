@@ -30,12 +30,12 @@ class TestStreamDownloader(TestCase):
     )
     def test_init_on_data(self, mock_on_data):
         s = StreamDownloader(url=URL)
-        mock_on_data.assert_called_once_with(s, s.progress_bar_cli)
+        mock_on_data.assert_called_once_with(s, s.progress_bar)
 
     @patch(
         "src.utils.downloader.stream_downloader.sys.stdout", new_callable=io.StringIO
     )
-    def test_progress_bar_cli(self, mock_stdout):
+    def test_progress_bar(self, mock_stdout):
         # mock sys.stdout.write function
         mock_stdout.write = MagicMock()
 
@@ -57,7 +57,7 @@ class TestStreamDownloader(TestCase):
 
         for chunk in stream:
             sd.downloaded_len += len(chunk)
-            sd.progress_bar_cli(data=chunk)
+            sd.progress_bar(data=chunk)
 
         mock_stdout.write.assert_called()
 

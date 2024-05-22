@@ -36,7 +36,7 @@ class AssetDownloader(StreamDownloader):
         super().__init__(url=url)
         self.destdir = destdir
         self.on_data = self.write_to_buffer
-        self.on_write_to_buffer = self.progress_bar_cli
+        self.on_write_to_buffer = self.progress_bar
         self.write_mode = write_mode
 
     @property

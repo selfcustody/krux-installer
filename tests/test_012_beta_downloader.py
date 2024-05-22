@@ -19,12 +19,8 @@ class TestBetaDownloader(TestCase):
     @patch("tempfile.gettempdir")
     def test_calls_init(self, mock_gettempdir, mock_binary_type, mock_device):
         mock_gettempdir.return_value = "/tmp/dir"
-
-        devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware.bin", "kboot.kfpkg")
-
-        for device in devices:
-            for _bin in binary_types:
+        for device in BetaDownloader.VALID_DEVICES:
+            for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
                 )
@@ -33,12 +29,9 @@ class TestBetaDownloader(TestCase):
 
     @patch("tempfile.gettempdir")
     def test_init_url(self, mock_gettempdir):
-        devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware.bin", "kboot.kfpkg")
-
         mock_gettempdir.return_value = "/tmp/dir"
-        for device in devices:
-            for _bin in binary_types:
+        for device in BetaDownloader.VALID_DEVICES:
+            for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 mock_url = f"{BASE_URL}/maixpy_{device}/{_bin}"
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
@@ -62,19 +55,16 @@ class TestBetaDownloader(TestCase):
 
         with self.assertRaises(ValueError) as exc_info:
             BetaDownloader(
-                device="amigo_tft", binary_type="esp32", destdir=mock_gettempdir()
+                device="amigo", binary_type="esp32", destdir=mock_gettempdir()
             )
 
         self.assertEqual(str(exc_info.exception), "Invalid binary_type esp32")
 
     @patch("tempfile.gettempdir")
     def test_init_destdir(self, mock_gettempdir):
-        devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware.bin", "kboot.kfpkg")
-
         mock_gettempdir.return_value = "/tmp/dir"
-        for device in devices:
-            for _bin in binary_types:
+        for device in BetaDownloader.VALID_DEVICES:
+            for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
                 )
@@ -82,13 +72,19 @@ class TestBetaDownloader(TestCase):
 
     @patch("tempfile.gettempdir")
     def test_init_write_mode(self, mock_gettempdir):
-        devices = ("amigo_tft", "amigo_ips", "bit", "dock", "yahboom")
-        binary_types = ("firmware.bin", "kboot.kfpkg")
-
         mock_gettempdir.return_value = "/tmp/dir"
-        for device in devices:
-            for _bin in binary_types:
+        for device in BetaDownloader.VALID_DEVICES:
+            for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
                 )
                 self.assertEqual(b.write_mode, "wb")
+
+    @patch("tempfile.gettempdir")
+    def test_set_properties(self, mock_gettempdir):
+        mock_gettempdir.return_value = "/tmp/dir"
+        b = BetaDownloader(
+            device="m5stickv", binary_type="kboot.kfpkg", destdir=mock_gettempdir()
+        )
+        self.assertEqual(b.device, "m5stickv")
+        self.assertEqual(b.binary_type, "kboot.kfpkg")

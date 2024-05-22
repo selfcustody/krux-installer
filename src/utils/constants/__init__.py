@@ -29,11 +29,6 @@ from typing import Any
 import sys
 import os
 
-if sys.version_info.minor <= 10:
-    from tomli import loads as load_toml
-if sys.version_info.minor > 10:
-    # pylint: disable=import-error
-    from tomllib import loads as load_toml
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
@@ -62,6 +57,12 @@ def _open_pyproject() -> dict[str, Any]:
     Open root pyprojet.toml file to get some constant datas
     like name, version and description
     """
+    if sys.version_info.minor <= 10:
+        from tomli import loads as load_toml
+    if sys.version_info.minor > 10:
+        # pylint: disable=import-error
+        from tomllib import loads as load_toml
+    
     try:
         pyproject_filename = os.path.abspath(
             os.path.join(ROOT_DIRNAME, "..", "..", "..", "pyproject.toml")

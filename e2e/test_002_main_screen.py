@@ -312,6 +312,173 @@ class TestMainScreen(GraphicUnitTest):
         mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_locale(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        screen.update(name="ConfigKruxInstaller", key="locale", value="en_US.UTF-8")
+
+        self.assertEqual(screen.locale, "en_US.UTF-8")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_device_select_a_new_one(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        device_button = grid.children[4]
+
+        screen.update(
+            name="ConfigKruxInstaller", key="device", value="select a new one"
+        )
+        self.assertEqual(screen.device, "select a new one")
+        self.assertEqual(
+            device_button.text, "Device: [color=#00AABB]select a new one[/color]"
+        )
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_flash_not_will_flash(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        flash_button = grid.children[3]
+
+        screen.update(name="ConfigKruxInstaller", key="flash", value=None)
+
+        self.assertTrue(flash_button.markup)
+        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_flash_will_flash(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        screen.will_flash = True
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        flash_button = grid.children[3]
+
+        screen.update(name="ConfigKruxInstaller", key="flash", value=None)
+
+        self.assertFalse(flash_button.markup)
+        self.assertEqual(flash_button.text, "Flash")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_flash_not_will_wipe(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        wipe_button = grid.children[2]
+
+        screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
+
+        self.assertTrue(wipe_button.markup)
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_flash_will_wipe(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        screen.will_wipe = True
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        wipe_button = grid.children[2]
+
+        screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
+
+        self.assertFalse(wipe_button.markup)
+        self.assertEqual(wipe_button.text, "Wipe")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_settings(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        s_button = grid.children[1]
+
+        screen.update(name="ConfigKruxInstaller", key="settings", value=None)
+
+        self.assertEqual(s_button.text, "Settings")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_about(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        a_button = grid.children[0]
+
+        screen.update(name="ConfigKruxInstaller", key="about", value=None)
+
+        self.assertEqual(a_button.text, "About")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.App.get_running_app")
     def test_on_press_can_flash_or_wipe(

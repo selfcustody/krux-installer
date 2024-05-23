@@ -87,3 +87,49 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 0))
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
         mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_update_locale(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = WarningBetaScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[0]
+
+        screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
+        text = [
+            "[size=32sp][color=#efcc00][b]ADVERTÊNCIA[/b][/color][/size]",
+            "",
+            "[size=20sp][color=#efcc00]Este é nosso repositório de testes[/color][/size]",
+            "",
+            "[size=16sp]Estes são binários não assinados das últimas e mais experimentais características[/size]",
+            "[size=16sp]e serve apenas para experimentar coisas novas e fornecer opiniões.[/size]",
+        ]
+
+        self.assertEqual(button.text, "\n".join(text))
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_update_locale(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = WarningBetaScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
+
+        self.assertEqual(str(exc_info.exception), "Invalid screen name: Mock")
+        mock_get_running_app.assert_called_once()

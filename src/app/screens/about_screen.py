@@ -21,7 +21,7 @@
 """
 about_screen.py
 """
-
+import webbrowser
 from src.utils.constants import get_name, get_version
 from .base_screen import BaseScreen
 
@@ -31,18 +31,42 @@ class AboutScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="about_screen", name="AboutScreen", **kwargs)
+        self.make_grid(wid="about_screen_grid", rows=1)
+        self.src_code = "https://github.com/selfcustody/krux-installer"
 
-    def get_button_text(self):
-        """Get title and version name"""
+        def _on_press(instance):
+            self.debug(f"Calling Button::{instance.id}::on_press")
+            self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+
+        def _on_release(instance):
+            self.debug(f"Calling Button::{instance.id}::on_release")
+            self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+            self.set_screen(name="MainScreen", direction="right")
+
         title = f"[b]{get_name()}[/b]"
-        version = f"      v{get_version()}"
-        return "\n".join([title, version])
+        version = f"v{get_version()}"
+        source = f"[color=#00AABB][ref={self.src_code}]Check source code[/ref][/color]"
+        issues = (
+            f"[color=#00AABB][ref={self.src_code}/issues]I found a bug![/ref][/color]"
+        )
 
-    def before_back(self):
-        """Action to be performed :method:`on_press` action"""
-        self.on_press(wid="about_screen")
+        self.make_button(
+            row=0,
+            id=f"about_screen_button",
+            root_widget="about_screen_grid",
+            text="\n".join([title, version, "", source, "", issues]),
+            markup=True,
+            on_press=_on_press,
+            on_release=_on_release,
+        )
 
-    def back(self):
-        """Action to be performed :method:`on_release` action"""
-        self.on_release(wid="about_screen")
-        self.set_screen(name="MainScreen", direction="right")
+        def _on_ref_press(*args):
+            self.debug(f"Calling Button::{args[0]}::on_ref_press")
+            self.debug(f"Opening {args[1]}")
+            webbrowser.open(args[1])
+
+        self.ids["about_screen_button"].halign = "center"
+        self.ids["about_screen_button"].valign = "center"
+
+        setattr(self, f"on_ref_press_about_screen_button", _on_ref_press)
+        self.ids["about_screen_button"].bind(on_ref_press=_on_ref_press)

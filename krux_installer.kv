@@ -7,6 +7,7 @@
 <SelectVersionScreen>
 
 <SelectOldVersionScreen>
+
 <FlashScreen>:    
 
 	GridLayout:
@@ -106,25 +107,5 @@
         		Line:
             		width: 0.5
             		rectangle: self.x, self.y, self.width, self.height
-
-<AboutScreen>:
-
-    GridLayout:
-        cols: 1
-        rows: 1
-        
-        Button:
-            id: about_screen
-            markup: True
-            text: root.get_button_text()
-            font_size: root.height // 25
-            background_color: 0, 0, 0, 0
-			color: 1, 1, 1, 1
-            on_press: root.before_back()
-            on_release: root.back()
-			canvas.before:
-        		Color:
-            		rgba: 1, 1, 1, 1
-        		Line:
-            		width: 0.5
-            		rectangle: self.x, self.y, self.width, self.height
+                    
+<AboutScreen>

@@ -58,11 +58,12 @@ def _open_pyproject() -> dict[str, Any]:
     like name, version and description
     """
     if sys.version_info.minor <= 10:
+        # pylint: disable=import-outside-toplevel
         from tomli import loads as load_toml
     if sys.version_info.minor > 10:
-        # pylint: disable=import-error
+        # pylint: disable=import-outside-toplevel,import-error
         from tomllib import loads as load_toml
-    
+
     try:
         pyproject_filename = os.path.abspath(
             os.path.join(ROOT_DIRNAME, "..", "..", "..", "pyproject.toml")

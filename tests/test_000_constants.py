@@ -1,7 +1,6 @@
 import os
-import sys
 from unittest import TestCase
-from unittest.mock import mock_open, patch, PropertyMock
+from unittest.mock import mock_open, patch
 from src.utils.constants import _open_pyproject, get_name, get_version, get_description
 
 PYPROJECT_STR = """
@@ -11,13 +10,16 @@ version = "0.0.1"
 description = "Hello World!"
 """
 
+
 class TestConstants(TestCase):
 
-    @patch("sys.version_info") 
+    @patch("sys.version_info")
     @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_STR)
-    def test_open_pyproject_with_py_minor_version_10(self, open_mock, mock_version_info):
+    def test_open_pyproject_with_py_minor_version_10(
+        self, open_mock, mock_version_info
+    ):
         mock_version_info.minor = 9
-        
+
         rootdirname = os.path.abspath(os.path.dirname(__file__))
         pyproject_filename = os.path.abspath(
             os.path.join(rootdirname, "..", "pyproject.toml")
@@ -37,8 +39,7 @@ class TestConstants(TestCase):
                 }
             },
         )
-    
-    
+
     @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_STR)
     def test_open_pyproject(self, open_mock):
         rootdirname = os.path.abspath(os.path.dirname(__file__))

@@ -70,6 +70,7 @@ def _open_pyproject() -> dict[str, Any]:
         )
         with open(pyproject_filename, "r", encoding="utf8") as pyproject_file:
             data = pyproject_file.read()
+            # pylint: disable=possibly-used-before-assignment
             return load_toml(data)
     except FileNotFoundError as exc:
         raise FileNotFoundError(f"{pyproject_filename} isnt found") from exc

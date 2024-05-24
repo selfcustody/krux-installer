@@ -35,6 +35,7 @@ from src.app.screens.warning_beta_screen import WarningBetaScreen
 from src.app.screens.about_screen import AboutScreen
 from src.app.screens.flash_screen import FlashScreen
 
+
 class KruxInstallerApp(ConfigKruxInstaller):
     """KruxInstallerApp is the Root widget"""
 
@@ -58,7 +59,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             SelectOldVersionScreen(),
             WarningBetaScreen(),
             AboutScreen(),
-            FlashScreen()
+            FlashScreen(),
         ]
 
         for screen in screens:

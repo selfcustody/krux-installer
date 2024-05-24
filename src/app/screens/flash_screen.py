@@ -27,6 +27,7 @@ from kivy.weakproxy import WeakProxy
 from src.app.screens.base_screen import BaseScreen
 from kivy_circular_progress_bar import CircularProgressBar
 
+
 class FlashScreen(BaseScreen):
     """Flash screen is where flash occurs"""
 
@@ -34,18 +35,15 @@ class FlashScreen(BaseScreen):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
         self.make_grid(wid="flash_screen_grid", rows=1)
 
-        #progress_bar_label = Label(text="0.0%", valign="center", halign="center")        
+        # progress_bar_label = Label(text="0.0%", valign="center", halign="center")
         progress_bar = CircularProgressBar(
-            pos=(
-                Window.width / 2 - 100,
-                Window.height / 2
-            )
+            pos=(Window.width / 2 - 100, Window.height / 2)
         )
-        
+
         progress_bar.progress_colour = (0, 1, 0.5, 0)
-        progress_bar.thickness=15
-        progress_bar.cap_style="square"
-        
+        progress_bar.thickness = 15
+        progress_bar.cap_style = "square"
+
         progress_bar.id = "flash_screen_progress_bar"
         self.ids["flash_screen_grid"].add_widget(progress_bar)
         self.ids[progress_bar.id] = WeakProxy(progress_bar)
@@ -54,5 +52,3 @@ class FlashScreen(BaseScreen):
         key = kwargs.get("key")
         if key == "progress":
             self.ids["flash_screen_progress_bar"].value = kwargs.get("value")
-                        
-        

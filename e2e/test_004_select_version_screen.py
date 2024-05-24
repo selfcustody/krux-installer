@@ -206,3 +206,57 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_manager.get_screen.assert_has_calls(calls_get_screen)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.utils.selector.requests")
+    @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_update_locale(self, mock_get_running_app, mock_manager, mock_requests):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = MOCKED_FOUND_API
+        mock_requests.get.return_value = mock_response
+
+        mock_manager.get_screen = MagicMock()
+
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = SelectVersionScreen()
+        screen.fetch_releases()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+
+        print(window.children[0].children[0].children)
+        button_old_versions = grid.children[1]
+        button_back = grid.children[0]
+
+        screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
+
+        self.assertEqual(button_old_versions.text, "Versões antigas")
+        self.assertEqual(button_back.text, "Voltar")
+
+        mock_manager.get_screen.assert_called_once()
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_update_locale(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = SelectVersionScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
+
+        self.assertEqual(str(exc_info.exception), "Invalid screen name: Mock")
+        mock_get_running_app.assert_called_once()

@@ -231,7 +231,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
 
-        print(window.children[0].children[0].children)
         button_old_versions = grid.children[1]
         button_back = grid.children[0]
 

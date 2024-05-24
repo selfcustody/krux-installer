@@ -9,7 +9,7 @@ license = "LICENSE"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.8,<3.13"
+python = ">=3.9,<3.13"
 kivy = "2.3.0"
 kivysome = "^0.2.1"
 tomli = { version = "^2.0.1", python = "<3.11" }
@@ -20,6 +20,7 @@ opencv-python = "^4.9.0.80"
 cryptography = "^42.0.5"
 qrcode = "^7.4.2"
 easy-i18n = "^1.2.0"
+kivy-circular-progress-bar = {git = "https://github.com/qlrd/kivy-circular-progress-bar.git"}
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"

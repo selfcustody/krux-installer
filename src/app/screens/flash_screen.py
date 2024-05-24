@@ -22,46 +22,37 @@
 main_screen.py
 """
 
-from .base_screen import BaseScreen
-
+from kivy.core.window import Window
+from kivy.weakproxy import WeakProxy
+from src.app.screens.base_screen import BaseScreen
+from kivy_circular_progress_bar import CircularProgressBar
 
 class FlashScreen(BaseScreen):
     """Flash screen is where flash occurs"""
 
     def __init__(self, **kwargs):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
+        self.make_grid(wid="flash_screen_grid", rows=1)
 
-    def fetch_releases(self):
-        widget = self.manager.get_screen("SelectVersionScreen")
-        widget.on_fetch_releases()
+        #progress_bar_label = Label(text="0.0%", valign="center", halign="center")        
+        progress_bar = CircularProgressBar(
+            pos=(
+                Window.width / 2 - 100,
+                Window.height / 2
+            )
+        )
+        
+        progress_bar.progress_colour = (0, 1, 0.5, 0)
+        progress_bar.thickness=15
+        progress_bar.cap_style="square"
+        
+        progress_bar.id = "flash_screen_progress_bar"
+        self.ids["flash_screen_grid"].add_widget(progress_bar)
+        self.ids[progress_bar.id] = WeakProxy(progress_bar)
 
-    def before_goto_screen(self, name: str):
-        """Action to be performed :method:`on_press` action"""
-        wid = ""
-
-        if name == "SelectDeviceScreen":
-            wid = "flash_select_device"
-
-        elif name == "SelectVersionScreen":
-            wid = "flash_select_version"
-
-        else:
-            raise ValueError(f"Invalid '{name}' widget")
-
-        self.on_press(wid=wid)
-
-    def goto_screen(self, name: str, direction: str):
-        """Action to be performed :method:`on_release` action"""
-        wid = ""
-
-        if name == "SelectDeviceScreen":
-            wid = "flash_select_device"
-
-        elif name == "SelectVersionScreen":
-            wid = "flash_select_version"
-
-        else:
-            raise ValueError(f"Invalid '{name}' widget")
-
-        self.on_release(wid=wid)
-        self.set_screen(name=name, direction=direction)
+    def update(self, *args, **kwargs):
+        key = kwargs.get("key")
+        if key == "progress":
+            self.ids["flash_screen_progress_bar"].value = kwargs.get("value")
+                        
+        

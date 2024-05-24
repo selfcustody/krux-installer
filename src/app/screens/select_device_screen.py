@@ -31,11 +31,11 @@ from kivy.core.window import Window
 from kivy.uix.button import Button
 from kivy.graphics import Color, Line
 from src.utils.constants import VALID_DEVICES_VERSIONS
-from .base_screen import BaseScreen
+from src.app.screens.base_screen import BaseScreen
 
 
 class SelectDeviceScreen(BaseScreen):
-    """Flash screen is where flash occurs"""
+    """SelectDeviceScreen is where versions can be selected"""
 
     def __init__(self, **kwargs):
         super().__init__(

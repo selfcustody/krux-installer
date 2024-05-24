@@ -8,48 +8,7 @@
 
 <SelectOldVersionScreen>
 
-<FlashScreen>:    
-
-	GridLayout:
-		
-		cols: 1
-		rows: 4
-			
-    	Button:
-			id: flash_execute
-			text: 'Flash!'
-			font_size: root.height // 25
-			#font_name: 'terminus'
-			background_color: 0, 0, 0, 0
-			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="flash_execute")
-    		on_release: root.on_release(wid="flash_execute")
-			canvas.before:
-        		Color:
-            		rgba: 1, 1, 1, 1
-        		Line:
-            		width: 0.5
-            		rectangle: self.x, self.y, self.width, self.height
-
-    	Button:
-			id: flash_back
-			text: 'Back'
-			font_size: root.height // 25
-			#font_name: 'terminus'
-			background_color: 0, 0, 0, 0
-			color: 1, 1, 1, 1
-			on_press: root.on_press(wid="flash_back")
-    		on_release: 
-                root.on_release(wid="flash_back")
-                root.set_screen(name="MainScreen", direction="right")
-			canvas.before:
-        		Color:
-            		rgba: 1, 1, 1, 1
-        		Line:
-            		width: 0.5
-            		rectangle: self.x, self.y, self.width, self.height
-
-
+<FlashScreen>  
 
 <WipeScreen>:    
 

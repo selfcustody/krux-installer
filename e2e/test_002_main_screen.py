@@ -514,10 +514,13 @@ class TestMainScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
+    @patch("src.app.screens.main_screen.MainScreen.manager")
     @patch("src.app.screens.main_screen.App.get_running_app")
     def test_on_release_can_flash_or_wipe(
-        self, mock_get_running_app, mock_set_screen, mock_set_background
+        self, mock_get_running_app, mock_manager, mock_set_screen, mock_set_background
     ):
+
+        mock_manager.get_screen = MagicMock()
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
@@ -543,7 +546,7 @@ class TestMainScreen(GraphicUnitTest):
 
             calls_set_background.append(call(wid="main_flash", rgba=(0, 0, 0, 0)))
             calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 0)))
-            calls_set_screen.append(call(name="FlashScreen", direction="left"))
+            calls_set_screen.append(call(name="DownloadScreen", direction="left"))
             calls_set_screen.append(call(name="WipeScreen", direction="left"))
 
         mock_set_background.assert_has_calls(calls_set_background)

@@ -123,8 +123,15 @@ class MainScreen(BaseScreen):
 
                 elif instance.id == "main_flash":
                     if self.will_flash:
+                        download = self.manager.get_screen("DownloadScreen")
+                        partials = [
+                            partial(download.update, key="version", value=self.version),
+                            partial(download.update, key="device", value=self.device),
+                        ]
+                        for fn in partials:
+                            Clock.schedule_once(fn, 0)
                         self.set_background(wid="main_flash", rgba=(0, 0, 0, 0))
-                        self.set_screen(name="FlashScreen", direction="left")
+                        self.set_screen(name="DownloadScreen", direction="left")
                     else:
                         self.debug(f"Button::{instance.id} disabled")
 

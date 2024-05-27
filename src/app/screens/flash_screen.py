@@ -39,7 +39,7 @@ class FlashScreen(BaseScreen):
         progress_bar = CircularProgressBar(
             pos=(Window.width / 2 - 100, Window.height / 2)
         )
-
+        progress_bar.widget_size = Window.width * 0.50
         progress_bar.progress_colour = (0, 1, 0.5, 0)
         progress_bar.thickness = 15
         progress_bar.cap_style = "square"

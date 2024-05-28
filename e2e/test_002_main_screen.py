@@ -546,9 +546,10 @@ class TestMainScreen(GraphicUnitTest):
 
             calls_set_background.append(call(wid="main_flash", rgba=(0, 0, 0, 0)))
             calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 0)))
-            calls_set_screen.append(call(name="DownloadScreen", direction="left"))
+            calls_set_screen.append(
+                call(name="DownloadStableZipScreen", direction="left")
+            )
             calls_set_screen.append(call(name="WipeScreen", direction="left"))
 
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)
-        mock_get_running_app.assert_called_once()

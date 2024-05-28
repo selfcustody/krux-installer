@@ -33,12 +33,14 @@ from src.app.screens.base_screen import BaseScreen
 from src.utils.downloader.zip_downloader import ZipDownloader
 
 
-class DownloadScreen(BaseScreen):
+class DownloadStableZipScreen(BaseScreen):
     """Flash screen is where flash occurs"""
 
     def __init__(self, **kwargs):
-        super().__init__(wid="download_screen", name="DownloadScreen", **kwargs)
-        self.make_grid(wid="download_screen_grid", rows=2)
+        super().__init__(
+            wid="download_stable_zip_screen", name="DownloadStableZipScreen", **kwargs
+        )
+        self.make_grid(wid="download_stable_zip_screen_grid", rows=2)
         self.downloader = None
         self.downloader_thread = None
 
@@ -47,27 +49,22 @@ class DownloadScreen(BaseScreen):
             text="", markup=True, font_size="80sp", valign="center", halign="center"
         )
         progress.id = "download_progress"
-        self.ids["download_screen_grid"].add_widget(progress)
+        self.ids["download_stable_zip_screen_grid"].add_widget(progress)
         self.ids[progress.id] = WeakProxy(progress)
 
         # build label
         asset_label = Label(markup=True, valign="center", halign="center")
         asset_label.id = "asset_label"
-        self.ids["download_screen_grid"].add_widget(asset_label)
+        self.ids["download_stable_zip_screen_grid"].add_widget(asset_label)
         self.ids[asset_label.id] = WeakProxy(asset_label)
 
     def update(self, *args, **kwargs):
-        """Update screen with device and version keys"""
-        if kwargs.get("key") == "device":
-            pass
-
+        """Update screen with version key"""
         if kwargs.get("key") == "version":
-
-            if re.findall(r"^v\d+\.\d+\.\d", kwargs.get("value")):
-                self.downloader = ZipDownloader(
-                    version=kwargs.get("value"),
-                    destdir=App.get_running_app().config.get("destdir", "assets"),
-                )
+            self.downloader = ZipDownloader(
+                version=kwargs.get("value"),
+                destdir=App.get_running_app().config.get("destdir", "assets"),
+            )
 
             def on_progress(data: bytes):
                 l1 = self.downloader.downloaded_len

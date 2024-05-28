@@ -21,6 +21,8 @@
 """
 main_screen.py
 """
+import os
+import re
 import typing
 from functools import partial
 from kivy.clock import Clock
@@ -123,15 +125,47 @@ class MainScreen(BaseScreen):
 
                 elif instance.id == "main_flash":
                     if self.will_flash:
-                        download = self.manager.get_screen("DownloadScreen")
-                        partials = [
-                            partial(download.update, key="version", value=self.version),
-                            partial(download.update, key="device", value=self.device),
-                        ]
+                        # do a click effect
+                        self.set_background(wid="main_flash", rgba=(0, 0, 0, 0))
+
+                        # partials are functions that call `update`
+                        # method in screen before go to them
+                        partials = []
+
+                        # Check if any release file exists
+                        if re.findall(r"^v\d+\.\d+\.\d$", self.version):
+                            resources = App.get_running_app().config.get(
+                                "destdir", "assets"
+                            )
+                            zipfile = os.path.join(
+                                resources, f"krux-{self.version}.zip"
+                            )
+                            if os.path.isfile(zipfile):
+                                to_screen = "AlreadyDownloadedScreen"
+                            else:
+                                to_screen = "DownloadStableZipScreen"
+
+                            screen = self.manager.get_screen(to_screen)
+                            partials.append(
+                                partial(
+                                    screen.update, key="version", value=self.version
+                                )
+                            )
+
+                        # check if release is beta
+                        elif re.findall("^odudex/krux_binaries", self.version):
+                            to_screen = "DownloadBetaScreen"
+                            screen = self.manager.get_screen(to_screen)
+                            partials.append(
+                                partial(screen.update, key="device", value=self.device)
+                            )
+
+                        # Execute the partials
                         for fn in partials:
                             Clock.schedule_once(fn, 0)
-                        self.set_background(wid="main_flash", rgba=(0, 0, 0, 0))
-                        self.set_screen(name="DownloadScreen", direction="left")
+
+                        # Goto the selected screen
+                        self.set_screen(name=to_screen, direction="left")
                     else:
                         self.debug(f"Button::{instance.id} disabled")
 

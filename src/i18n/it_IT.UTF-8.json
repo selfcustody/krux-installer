@@ -1,0 +1,25 @@
+{
+  "main_screen": {
+    "Version": "Versione",
+    "Device": "Dispositivo",
+    "select a new one": "selezionane uno nuovo",
+    "Flash": "Programmare il firmware",
+    "Wipe": "Spegnere il dispositivo",
+    "Settings": "Configurazioni",
+    "About": "Informazioni",     
+    "Fetching data from": "Recupero dati da"
+  },
+  "select_version_screen": {
+    "Old versions": "Vecchie versioni",
+    "Back": "Indietro"
+  },
+  "select_old_version_screen": {
+    "Back": "Indietro"
+  },
+  "warning_beta_screen": {
+    "WARNING": "AVVERTIMENTO",
+    "This is our test repository": "Questo è il nostro repository di testare",
+    "These are unsigned binaries for the latest and most experimental features": "Questi sono file binari non firmati per le funzionalità più recenti e sperimentali",
+    "and it's just for trying new things and providing feedback.": "ed è solo per provare cose nuove e fornire feedback."
+  }
+}

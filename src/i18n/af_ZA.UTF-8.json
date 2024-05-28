@@ -1,0 +1,25 @@
+{
+  "main_screen": {
+    "Version": "Weergawe",
+    "Device": "Toestel",
+    "select a new one": "kies 'n nuwe een",
+    "Flash": "Programmeer die firmware",
+    "Wipe": "Skakel toestel af",
+    "Settings": "Instellings",
+    "About": "Oor",     
+    "Fetching data from": "Haal tans data van"
+  },
+  "select_version_screen": {
+    "Old versions": "Ou weergawes",
+    "Back": "Terug"
+  },
+  "select_old_version_screen": {
+    "Back": "Terug"
+  },
+  "warning_beta_screen": {
+    "WARNING": "WAARSKUWING",
+    "This is our test repository": "Dit is ons toetsbewaarplek",
+    "These are unsigned binaries for the latest and most experimental features": "Dit is ongetekende binaries vir die nuutste en mees eksperimentele kenmerke",
+    "and it's just for trying new things and providing feedback.": "en dit is net om nuwe dinge te probeer en terugvoer te gee."
+  }
+}

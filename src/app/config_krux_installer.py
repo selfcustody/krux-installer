@@ -136,11 +136,13 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                 "section": "locale",
                 "key": "lang",
                 "options": [
+                    "af_ZA.UTF-8",
                     "en_US.UTF-8",
-                    "pt_BR.UTF-8",
                     "es_ES.UTF-8",
-                    "ru_RU.UTF-8", 
-                    "fr_FR.UTF-8"
+                    "fr_FR.UTF-8",
+                    "it_IT.UTF-8",
+                    "pt_BR.UTF-8",
+                    "ru_RU.UTF-8"
                 ]
             }
         ]"""

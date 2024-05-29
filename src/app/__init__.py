@@ -35,6 +35,9 @@ from src.app.screens.warning_beta_screen import WarningBetaScreen
 from src.app.screens.about_screen import AboutScreen
 from src.app.screens.download_stable_zip_screen import DownloadStableZipScreen
 from src.app.screens.download_beta_screen import DownloadBetaScreen
+from src.app.screens.warning_already_downloaded_screen import (
+    WarningAlreadyDownloadedScreen,
+)
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -62,6 +65,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             AboutScreen(),
             DownloadStableZipScreen(),
             DownloadBetaScreen(),
+            WarningAlreadyDownloadedScreen(),
         ]
 
         for screen in screens:

@@ -141,7 +141,7 @@ class MainScreen(BaseScreen):
                                 resources, f"krux-{self.version}.zip"
                             )
                             if os.path.isfile(zipfile):
-                                to_screen = "AlreadyDownloadedScreen"
+                                to_screen = "WarningAlreadyDownloadedScreen"
                             else:
                                 to_screen = "DownloadStableZipScreen"
 

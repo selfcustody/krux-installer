@@ -49,6 +49,10 @@ class MainScreen(BaseScreen):
         # Build grid where buttons will be placed
         self.make_grid(wid="main_screen_grid", rows=6)
 
+        # Buttons will be defined in dynamic way
+        # so you will need to keep in mind that
+        # some binded methods need a special
+        # treatment in loops
         buttons = [
             (
                 "main_select_version",
@@ -74,13 +78,13 @@ class MainScreen(BaseScreen):
                 self.debug(f"Calling Button::{instance.id}::on_press")
                 if instance.id == "main_flash":
                     if self.will_flash:
-                        self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                        self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
                     else:
                         self.warning(f"Button::{instance.id} disabled")
 
                 if instance.id == "main_wipe":
                     if self.will_wipe:
-                        self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                        self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
                     else:
                         self.warning(f"Button::{instance.id} disabled")
 
@@ -99,7 +103,7 @@ class MainScreen(BaseScreen):
                     "main_settings",
                     "main_about",
                 ):
-                    self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                    self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
             # END of on_press buttons
 
@@ -112,21 +116,21 @@ class MainScreen(BaseScreen):
                         select_device.update, key="version", value=self.version
                     )
                     Clock.schedule_once(fn, 0)
-                    self.set_background(wid="main_select_device", rgba=(0, 0, 0, 0))
+                    self.set_background(wid="main_select_device", rgba=(0, 0, 0, 1))
                     self.set_screen(name="SelectDeviceScreen", direction="left")
 
                 elif instance.id == "main_select_version":
                     select_version = self.manager.get_screen("SelectVersionScreen")
                     select_version.clear()
                     select_version.fetch_releases()
-                    self.set_background(wid="main_select_version", rgba=(0, 0, 0, 0))
+                    self.set_background(wid="main_select_version", rgba=(0, 0, 0, 1))
                     self.set_screen(name="SelectVersionScreen", direction="left")
                     self.update(name=self.name, key="version", value=self.version)
 
                 elif instance.id == "main_flash":
                     if self.will_flash:
                         # do a click effect
-                        self.set_background(wid="main_flash", rgba=(0, 0, 0, 0))
+                        self.set_background(wid="main_flash", rgba=(0, 0, 0, 1))
 
                         # partials are functions that call `update`
                         # method in screen before go to them
@@ -171,17 +175,17 @@ class MainScreen(BaseScreen):
 
                 elif instance.id == "main_wipe":
                     if self.will_wipe:
-                        self.set_background(wid="main_wipe", rgba=(0, 0, 0, 0))
+                        self.set_background(wid="main_wipe", rgba=(0, 0, 0, 1))
                         self.set_screen(name="WipeScreen", direction="left")
                     else:
                         self.debug(f"Button::{instance.id} disabled")
 
                 elif instance.id == "main_settings":
-                    self.set_background(wid="main_settings", rgba=(0, 0, 0, 0))
+                    self.set_background(wid="main_settings", rgba=(0, 0, 0, 1))
                     App.get_running_app().open_settings()
 
                 elif instance.id == "main_about":
-                    self.set_background(wid="main_about", rgba=(0, 0, 0, 0))
+                    self.set_background(wid="main_about", rgba=(0, 0, 0, 1))
                     self.set_screen(name="AboutScreen", direction="left")
 
             # END of on_release buttons

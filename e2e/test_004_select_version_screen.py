@@ -137,7 +137,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "main_settings",
                 "main_about",
             ):
-                calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+                calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
         mock_get_running_app.assert_called_once()
@@ -182,7 +182,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         for button in grid.children:
             action = getattr(screen, f"on_release_{button.id}")
             action(button)
-            calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+            calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
 
             if button.id == "select_version_stable":
                 calls_get_screen.append(call("MainScreen"))

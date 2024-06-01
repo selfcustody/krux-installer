@@ -113,7 +113,7 @@ class BaseScreen(Screen, Trigger):
             markup=markup,
             halign="center",
             font_size=Window.size[0] // 25,
-            background_color=(0, 0, 0, 0),
+            background_color=(0, 0, 0, 1),
             color=(1, 1, 1, 1),
         )
         btn.id = id
@@ -128,10 +128,9 @@ class BaseScreen(Screen, Trigger):
         btn.y = (Window.size[1] / total) * row
         btn.width = Window.size[0]
         btn.height = Window.size[1] / total
-
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
 
-        with self.canvas.before:
-            Color(rgba=(1, 1, 1, 1))
-            Line(width=0.5, rectangle=(btn.x, btn.y, btn.width, btn.height))
+        self.debug(
+            f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
+        )

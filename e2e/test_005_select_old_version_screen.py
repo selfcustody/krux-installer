@@ -102,7 +102,7 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         for button in grid.children:
             on_press = getattr(screen, f"on_press_{button.id}")
             on_press(button)
-            calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+            calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
         mock_get_running_app.assert_called_once()
@@ -145,7 +145,7 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         for button in grid.children:
             on_release = getattr(screen, f"on_release_{button.id}")
             on_release(button)
-            set_background_calls.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+            set_background_calls.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
 
             if button.id == "select_old_version_back":
                 set_screen_calls.append(

@@ -19,10 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-main_screen.py
+select_device_screen.py
 """
-# pylint: disable=no-name-in-module
-import re
 from functools import partial
 from kivy.clock import Clock
 from kivy.cache import Cache
@@ -51,12 +49,12 @@ class SelectDeviceScreen(BaseScreen):
             def _on_press(instance):
                 if instance.id in self.enabled_devices:
                     self.debug(f"Calling Button::{instance.id}::on_press")
-                    self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                    self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
             def _on_release(instance):
                 if instance.id in self.enabled_devices:
                     self.debug(f"Calling Button::{instance.id}::on_release")
-                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
                     device = self.ids[instance.id].text
                     self.debug(f"on_release::{instance.id} = {device}")
                     main_screen = self.manager.get_screen("MainScreen")

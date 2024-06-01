@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-main_screen.py
+select_version_screen.py
 """
 # pylint: disable=no-name-in-module
 import re
@@ -75,15 +75,16 @@ class SelectVersionScreen(BaseScreen):
                     "select_version_old",
                     "select_version_back",
                 ):
-                    self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                    self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
             # END of on_press buttons
 
             # START of on_release_buttons
             def _release(instance):
                 self.debug(f"Calling Button::{instance.id}::on_release")
+                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+
                 if instance.id == "select_version_latest":
-                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
                     version = self.ids[instance.id].text
                     self.debug(f"on_release::{instance.id} = {version}")
                     main_screen = self.manager.get_screen("MainScreen")
@@ -101,7 +102,6 @@ class SelectVersionScreen(BaseScreen):
                     self.set_screen(name="MainScreen", direction="right")
 
                 if instance.id == "select_version_beta":
-                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
                     version = self.ids[instance.id].text
                     main_screen = self.manager.get_screen("MainScreen")
                     fn_version = partial(
@@ -122,11 +122,9 @@ class SelectVersionScreen(BaseScreen):
                     self.set_screen(name="WarningBetaScreen", direction="left")
 
                 if instance.id == "select_version_old":
-                    self.set_background(wid="select_version_old", rgba=(0, 0, 0, 0))
                     self.set_screen(name="SelectOldVersionScreen", direction="left")
 
                 if instance.id == "select_version_back":
-                    self.set_background(wid="select_version_back", rgba=(0, 0, 0, 0))
                     self.set_screen(name="MainScreen", direction="right")
 
             # END of on_release buttons

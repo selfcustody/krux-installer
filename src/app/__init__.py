@@ -47,11 +47,12 @@ class KruxInstallerApp(ConfigKruxInstaller):
         super().__init__(**kwargs)
         Window.size = (640, 800)
         self.debug(f"Window.size={Window.size}")
+        Window.clearcolor = (0.9, 0.9, 0.9, 1)
 
-        dirname = os.path.dirname(os.path.realpath(__file__))
-        kvfile = os.path.abspath(f"{dirname}/../../krux_installer.kv")
-        Builder.load_file(kvfile)
-        self.debug(f"Builder.load_file={kvfile}")
+        # dirname = os.path.dirname(os.path.realpath(__file__))
+        # kvfile = os.path.abspath(f"{dirname}/../../krux_installer.kv")
+        # Builder.load_file(kvfile)
+        # self.debug(f"Builder.load_file={kvfile}")
 
     def build(self):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""

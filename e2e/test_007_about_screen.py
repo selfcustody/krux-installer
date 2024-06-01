@@ -57,7 +57,7 @@ class TestAboutScreen(GraphicUnitTest):
         action(button)
 
         mock_set_background.assert_called_once_with(
-            wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)
+            wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
         )
         mock_get_running_app.assert_called_once()
 
@@ -84,7 +84,7 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_release_about_screen_button")
         action(button)
 
-        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 0))
+        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
         mock_get_running_app.assert_called_once()
 

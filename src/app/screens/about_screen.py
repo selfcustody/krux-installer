@@ -36,11 +36,11 @@ class AboutScreen(BaseScreen):
 
         def _on_press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
         def _on_release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
             self.set_screen(name="MainScreen", direction="right")
 
         title = f"[b]{get_name()}[/b]"

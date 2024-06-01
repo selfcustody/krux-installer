@@ -55,14 +55,14 @@ class WarningBetaScreen(BaseScreen):
         # START of on_press buttons
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
         # END of on_press buttons
 
         # START of on_release_buttons
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
             self.set_screen(name="MainScreen", direction="right")
 
         self.make_button(

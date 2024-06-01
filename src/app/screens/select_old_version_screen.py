@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-main_screen.py
+select_old_version_screen.py
 """
 # pylint: disable=no-name-in-module
 import re
@@ -35,7 +35,7 @@ from .base_screen import BaseScreen
 
 
 class SelectOldVersionScreen(BaseScreen):
-    """Flash screen is where flash occurs"""
+    """SelectOldVersionScreen is where old versions can be selected"""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -54,11 +54,11 @@ class SelectOldVersionScreen(BaseScreen):
 
             def _press(instance):
                 self.debug(f"Calling {instance}::on_press")
-                self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
             def _release(instance):
                 self.debug(f"Calling {instance.id}::on_release")
-                self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
                 version = self.ids[instance.id].text
                 self.debug(f"on_release::{instance.id} = {version}")
                 main_screen = self.manager.get_screen("MainScreen")
@@ -82,12 +82,12 @@ class SelectOldVersionScreen(BaseScreen):
         def _press_back(instance):
             self.debug(f"Calling {instance}::on_press")
             self.set_background(
-                wid="select_old_version_back", rgba=(0.5, 0.5, 0.5, 0.5)
+                wid="select_old_version_back", rgba=(0.25, 0.25, 0.25, 1)
             )
 
         def _release_back(instance):
             self.debug(f"Calling {instance}::on_release")
-            self.set_background(wid="select_old_version_back", rgba=(0, 0, 0, 0))
+            self.set_background(wid="select_old_version_back", rgba=(0, 0, 0, 1))
             self.set_screen(name="SelectVersionScreen", direction="right")
 
         self.make_button(

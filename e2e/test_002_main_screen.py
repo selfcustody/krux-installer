@@ -90,7 +90,7 @@ class TestMainScreen(GraphicUnitTest):
                 "main_settings",
                 "main_about",
             ):
-                calls.append(call(wid=button.id, rgba=(0.5, 0.5, 0.5, 0.5)))
+                calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
         mock_get_running_app.assert_called_once()
@@ -131,7 +131,7 @@ class TestMainScreen(GraphicUnitTest):
                 "main_settings",
                 "main_about",
             ):
-                calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 0)))
+                calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
 
             if button.id == "main_select_device":
                 calls_set_screen.append(
@@ -505,8 +505,8 @@ class TestMainScreen(GraphicUnitTest):
             wipe_action = getattr(screen, "on_press_main_wipe")
             flash_action(flash_button)
             wipe_action(wipe_button)
-            calls.append(call(wid="main_flash", rgba=(0.5, 0.5, 0.5, 0.5)))
-            calls.append(call(wid="main_wipe", rgba=(0.5, 0.5, 0.5, 0.5)))
+            calls.append(call(wid="main_flash", rgba=(0.25, 0.25, 0.25, 1)))
+            calls.append(call(wid="main_wipe", rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
         mock_get_running_app.assert_called_once()
@@ -544,8 +544,8 @@ class TestMainScreen(GraphicUnitTest):
             flash_action(flash_button)
             wipe_action(wipe_button)
 
-            calls_set_background.append(call(wid="main_flash", rgba=(0, 0, 0, 0)))
-            calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 0)))
+            calls_set_background.append(call(wid="main_flash", rgba=(0, 0, 0, 1)))
+            calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 1)))
             calls_set_screen.append(
                 call(name="DownloadStableZipScreen", direction="left")
             )

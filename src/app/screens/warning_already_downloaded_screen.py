@@ -23,6 +23,9 @@ about_screen.py
 """
 from functools import partial
 from kivy.clock import Clock
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
+from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.uix.label import Label
 from kivy.uix.stacklayout import StackLayout
@@ -41,10 +44,18 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             name="WarningAlreadyDownloadedScreen",
             **kwargs,
         )
-        self.make_grid(wid="warning_already_downloaded_screen_grid", rows=2)
-        self.asset = None
 
-        warning = Label(text="", markup=True, valign="center", halign="center")
+        self.make_grid(wid="warning_already_downloaded_screen_grid", rows=2)
+        with self.canvas.before:
+            Color(0, 0, 0, 1)
+            Rectangle(size=(Window.width, Window.height))
+
+        warning = Label(
+            text="",
+            markup=True,
+            valign="center",
+            halign="center",
+        )
         warning.id = "warning_label"
         self.ids["warning_already_downloaded_screen_grid"].add_widget(warning)
         self.ids[warning.id] = WeakProxy(warning)
@@ -63,11 +74,11 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
 
             def _press(instance):
                 self.debug(f"Calling Button::{instance.id}::on_press")
-                self.set_background(wid=instance.id, rgba=(0.5, 0.5, 0.5, 0.5))
+                self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
             def _release(instance):
                 self.debug(f"Calling Button::{instance.id}::on_release")
-                self.set_background(wid=instance.id, rgba=(0, 0, 0, 0))
+                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
 
                 if instance.id == "warning_download_again_button":
                     main_screen = self.manager.get_screen("MainScreen")
@@ -91,7 +102,14 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                         name="DownloadStableZipShaScreen", direction="right"
                     )
 
-            btn = Button(text=_tuple[1], markup=_tuple[2], size_hint=(0.5, None))
+            btn = Button(
+                text=_tuple[1],
+                markup=_tuple[2],
+                font_size=Window.size[0] // 30,
+                background_color=(0, 0, 0, 1),
+                color=(0 if row == 0 else 1, 1 if row == 0 else 0, 0, 1),
+                size_hint=(0.5, None),
+            )
             btn.id = _tuple[0]
             self.ids["stack_layout_buttons"].add_widget(btn)
             self.ids[btn.id] = WeakProxy(stack)
@@ -109,7 +127,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         if key == "version":
             warning = self.translate("Asset already downloaded")
             proceed = self.translate(
-                "You wan't to proceed with same file or want't to download it again?"
+                "Do you want to proceed with the same file or do you want to download it again?"
             )
             self.ids["warning_label"].text = "\n".join(
                 [

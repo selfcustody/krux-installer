@@ -34,6 +34,9 @@ from src.app.screens.select_old_version_screen import SelectOldVersionScreen
 from src.app.screens.warning_beta_screen import WarningBetaScreen
 from src.app.screens.about_screen import AboutScreen
 from src.app.screens.download_stable_zip_screen import DownloadStableZipScreen
+from src.app.screens.download_stable_zip_sha256_screen import (
+    DownloadStableZipSha256Screen,
+)
 from src.app.screens.download_beta_screen import DownloadBetaScreen
 from src.app.screens.warning_already_downloaded_screen import (
     WarningAlreadyDownloadedScreen,
@@ -65,6 +68,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             WarningBetaScreen(),
             AboutScreen(),
             DownloadStableZipScreen(),
+            DownloadStableZipSha256Screen(),
             DownloadBetaScreen(),
             WarningAlreadyDownloadedScreen(),
         ]

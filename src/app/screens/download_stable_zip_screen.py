@@ -24,6 +24,8 @@ main_screen.py
 import math
 import re
 from threading import Thread
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -41,6 +43,10 @@ class DownloadStableZipScreen(BaseScreen):
             wid="download_stable_zip_screen", name="DownloadStableZipScreen", **kwargs
         )
         self.make_grid(wid="download_stable_zip_screen_grid", rows=2)
+        with self.canvas.before:
+            Color(0, 0, 0, 1)
+            Rectangle(size=(Window.width, Window.height))
+
         self.downloader = None
         self.downloader_thread = None
 
@@ -67,13 +73,22 @@ class DownloadStableZipScreen(BaseScreen):
             )
 
             def on_progress(data: bytes):
-                l1 = self.downloader.downloaded_len
-                l2 = self.downloader.content_len
-                p = l1 / l2
+                # calculate downloaded percentage
+                len1 = self.downloader.downloaded_len
+                len2 = self.downloader.content_len
+                p = len1 / len2
+
+                # Format bytes (one liner)
+                # https://stackoverflow.com/questions/
+                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+                down1 = f"{len1/(1<<20):,.2f}"
+                down2 = f"{len2/(1<<20):,.2f}"
+
+                # Put all in Label widget
                 self.ids["download_progress"].text = "\n".join(
                     [
                         f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
-                        f"[size=16sp]{l1} of {l2} B[/size]",
+                        f"[size=16sp]{down1} of {down2} MB[/size]",
                     ]
                 )
 
@@ -88,5 +103,5 @@ class DownloadStableZipScreen(BaseScreen):
             )
 
     def on_enter(self):
-        """Event fired when the screen is displayed: the entering animation is complete"""
+        """Event fired when the screen is displayed and the entering animation is complete"""
         Thread(target=self.downloader.download).start()

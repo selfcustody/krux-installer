@@ -46,6 +46,7 @@ class DownloadStableZipSha256Screen(BaseScreen, BaseDownloadScreen):
     def update(self, *args, **kwargs):
         """Update screen with version key"""
         if kwargs.get("key") == "version":
+            self.version = kwargs.get("value")
             self.downloader = Sha256Downloader(
                 version=kwargs.get("value"),
                 destdir=App.get_running_app().config.get("destdir", "assets"),
@@ -67,7 +68,7 @@ class DownloadStableZipSha256Screen(BaseScreen, BaseDownloadScreen):
                 if p == 1.00:
                     self.ids[f"{self.id}_label_info"].text = "\n".join(
                         [
-                            f"{self.downloader.destdir} downloaded",
+                            f"{self.downloader.destdir}/krux-{self.version}.zip.sha256.txt downloaded",
                         ]
                     )
                     time.sleep(2.1)  # 2.1 remember 21000000

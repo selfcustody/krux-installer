@@ -19,9 +19,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-download_stable_zip_screen.py
+download_stable_zip_sig_screen.py
 """
-import math
 import time
 from threading import Thread
 from functools import partial
@@ -29,45 +28,38 @@ from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
 from src.app.screens.base_download_screen import BaseDownloadScreen
-from src.utils.downloader.zip_downloader import ZipDownloader
+from src.utils.downloader.sig_downloader import SigDownloader
 
 
-class DownloadStableZipScreen(BaseScreen, BaseDownloadScreen):
-    """DownloadStableZipScreen download a official krux zip release"""
+class DownloadStableZipSigScreen(BaseScreen, BaseDownloadScreen):
+    """DownloadStableZipSigScreen download the sig file for official krux zip release"""
 
     def __init__(self, **kwargs):
         super().__init__(
-            wid="download_stable_zip_screen", name="DownloadStableZipScreen", **kwargs
+            wid="download_stable_zip_sig_screen",
+            name="DownloadStableZipSigScreen",
+            **kwargs,
         )
-        self.make_grid(wid="download_stable_zip_screen_grid", rows=2)
-        self.setup(wid=self.id, to_screen="DownloadStableZipSha256Screen")
+        self.make_grid(wid="download_stable_zip_sig_screen_grid", rows=2)
+        self.setup(wid=self.id, to_screen="VerifyStableZipScreen")
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""
         if kwargs.get("key") == "version":
             self.version = kwargs.get("value")
-            self.downloader = ZipDownloader(
-                version=self.version,
+            self.downloader = SigDownloader(
+                version=kwargs.get("value"),
                 destdir=App.get_running_app().config.get("destdir", "assets"),
             )
 
             def on_progress(data: bytes):
-                # calculate downloaded percentage
                 len1 = self.downloader.downloaded_len
                 len2 = self.downloader.content_len
                 p = len1 / len2
-
-                # Format bytes (one liner)
-                # https://stackoverflow.com/questions/
-                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-                down1 = f"{len1/(1<<20):,.2f}"
-                down2 = f"{len2/(1<<20):,.2f}"
-
-                # Put all in Label widget
                 self.ids[f"{self.id}_label_progress"].text = "\n".join(
                     [
                         f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
-                        f"[size=16sp]{down1} of {down2} MB[/size]",
+                        f"[size=16sp]{len1} of {len2} B[/size]",
                     ]
                 )
 
@@ -76,7 +68,7 @@ class DownloadStableZipScreen(BaseScreen, BaseDownloadScreen):
                 if p == 1.00:
                     self.ids[f"{self.id}_label_info"].text = "\n".join(
                         [
-                            f"{self.downloader.destdir}/krux-{self.version}.zip downloaded",
+                            f"{self.downloader.destdir}/krux-{self.version}.zip.sig downloaded",
                         ]
                     )
                     time.sleep(2.1)  # 2.1 remember 21000000

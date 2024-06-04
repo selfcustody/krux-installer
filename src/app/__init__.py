@@ -37,6 +37,7 @@ from src.app.screens.download_stable_zip_screen import DownloadStableZipScreen
 from src.app.screens.download_stable_zip_sha256_screen import (
     DownloadStableZipSha256Screen,
 )
+from src.app.screens.download_stable_zip_sig_screen import DownloadStableZipSigScreen
 from src.app.screens.download_beta_screen import DownloadBetaScreen
 from src.app.screens.warning_already_downloaded_screen import (
     WarningAlreadyDownloadedScreen,
@@ -69,6 +70,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             AboutScreen(),
             DownloadStableZipScreen(),
             DownloadStableZipSha256Screen(),
+            DownloadStableZipSigScreen(),
             DownloadBetaScreen(),
             WarningAlreadyDownloadedScreen(),
         ]

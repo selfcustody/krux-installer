@@ -91,16 +91,12 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
 
                 if instance.id == "warning_proceed_button":
                     main_screen = self.manager.get_screen("MainScreen")
-                    download_screen = self.manager.get_screen(
-                        "DownloadStableZipShaScreen"
-                    )
+                    verify_screen = self.manager.get_screen("VerifyStableZipScreen")
                     fn = partial(
-                        download_screen.update, key="version", value=main_screen.version
+                        verify_screen.update, key="sha256sum", value=main_screen.version
                     )
                     Clock.schedule_once(fn, 0)
-                    self.set_screen(
-                        name="DownloadStableZipShaScreen", direction="right"
-                    )
+                    self.set_screen(name="VerifyStableZipScreen", direction="right")
 
             btn = Button(
                 text=_tuple[1],
@@ -116,7 +112,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             btn.bind(on_press=_press)
             btn.bind(on_release=_release)
             setattr(self, f"on_press_{_tuple[0]}", _press)
-            setattr(self, f"on_press_{_tuple[1]}", _release)
+            setattr(self, f"on_release_{_tuple[1]}", _release)
 
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""

@@ -51,6 +51,7 @@ class DownloadSelfcustodyPemScreen(BaseScreen, BaseDownloadScreen):
             len1 = self.downloader.downloaded_len
             len2 = self.downloader.content_len
             p = len1 / len2
+            p = p if p <= 1.00 else 1.00
             self.ids[f"{self.id}_label_progress"].text = "\n".join(
                 [
                     f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
@@ -83,8 +84,9 @@ class DownloadSelfcustodyPemScreen(BaseScreen, BaseDownloadScreen):
         if not self.downloader is None:
 
             def callback(dt):
+                main_screen = self.manager.get_screen("MainScreen")
                 screen = self.manager.get_screen(self.to_screen)
-                fn = partial(screen.update, key="version", value=self.version)
+                fn = partial(screen.update, key="sha256sum", value=main_screen.version)
                 Clock.schedule_once(fn, 0)
                 self.set_screen(name=self.to_screen, direction="left")
 

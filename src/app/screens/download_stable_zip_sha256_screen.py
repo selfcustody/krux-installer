@@ -22,21 +22,17 @@
 download_stable_zip_sha256_screen.py
 """
 import time
-from functools import partial
 from threading import Thread
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
+from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
 from src.app.screens.base_screen import BaseScreen
+from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.sha256_downloader import Sha256Downloader
 
 
-class DownloadStableZipSha256Screen(BaseScreen):
-    """Flash screen is where flash occurs"""
+class DownloadStableZipSha256Screen(BaseScreen, BaseDownloadScreen):
+    """DownloadStableZipSha256Screen download the sha256sum file for official krux zip release"""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -45,26 +41,7 @@ class DownloadStableZipSha256Screen(BaseScreen):
             **kwargs,
         )
         self.make_grid(wid="download_stable_zip_sha256_screen_grid", rows=2)
-        with self.canvas.before:
-            Color(0, 0, 0, 1)
-            Rectangle(size=(Window.width, Window.height))
-
-        self.downloader = None
-        self.downloader_thread = None
-
-        # progress label
-        progress = Label(
-            text="", markup=True, font_size="80sp", valign="center", halign="center"
-        )
-        progress.id = "download_progress"
-        self.ids["download_stable_zip_sha256_screen_grid"].add_widget(progress)
-        self.ids[progress.id] = WeakProxy(progress)
-
-        # build label
-        asset_label = Label(markup=True, valign="center", halign="center")
-        asset_label.id = "asset_label"
-        self.ids["download_stable_zip_sha256_screen_grid"].add_widget(asset_label)
-        self.ids[asset_label.id] = WeakProxy(asset_label)
+        self.setup(wid=self.id, to_screen="DownloadStableZipSigScreen")
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""
@@ -78,16 +55,27 @@ class DownloadStableZipSha256Screen(BaseScreen):
                 len1 = self.downloader.downloaded_len
                 len2 = self.downloader.content_len
                 p = len1 / len2
-                self.ids["download_progress"].text = "\n".join(
+                self.ids[f"{self.id}_label_progress"].text = "\n".join(
                     [
                         f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
                         f"[size=16sp]{len1} of {len2} B[/size]",
                     ]
                 )
 
+                # When finish, change the label, wait some seconds
+                # and then change screen
+                if p == 1.00:
+                    self.ids[f"{self.id}_label_info"].text = "\n".join(
+                        [
+                            f"{self.downloader.destdir} downloaded",
+                        ]
+                    )
+                    time.sleep(2.1)  # 2.1 remember 21000000
+                    self.trigger()
+
             self.downloader.on_write_to_buffer = on_progress
 
-            self.ids["asset_label"].text = "\n".join(
+            self.ids[f"{self.id}_label_info"].text = "\n".join(
                 [
                     "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
@@ -96,5 +84,16 @@ class DownloadStableZipSha256Screen(BaseScreen):
             )
 
     def on_enter(self):
-        """Event fired when the screen is displayed: the entering animation is complete"""
-        Thread(target=self.downloader.download).start()
+        """Event fired when the screen is displayed and the entering animation is complete"""
+        if not self.downloader is None:
+
+            def callback(dt):
+                screen = self.manager.get_screen(self.to_screen)
+                fn = partial(screen.update, key="version", value=self.version)
+                Clock.schedule_once(fn, 0)
+                self.set_screen(name=self.to_screen, direction="left")
+
+            self.build_thread(callback)
+            self.thread.start()
+        else:
+            raise ValueError("Downloader isnt configured. Use `update` method first")

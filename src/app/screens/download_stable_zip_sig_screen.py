@@ -41,7 +41,7 @@ class DownloadStableZipSigScreen(BaseScreen, BaseDownloadScreen):
             **kwargs,
         )
         self.make_grid(wid="download_stable_zip_sig_screen_grid", rows=2)
-        self.setup(wid=self.id, to_screen="VerifyStableZipScreen")
+        self.setup(wid=self.id, to_screen="DownloadSelfcustodyPemScreen")
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""
@@ -80,7 +80,7 @@ class DownloadStableZipSigScreen(BaseScreen, BaseDownloadScreen):
                 [
                     "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    "" f"to {self.downloader.destdir}",
+                    "" f"to {self.downloader.destdir}/krux-{self.version}.zip.sig",
                 ]
             )
 
@@ -89,9 +89,6 @@ class DownloadStableZipSigScreen(BaseScreen, BaseDownloadScreen):
         if not self.downloader is None:
 
             def callback(dt):
-                screen = self.manager.get_screen(self.to_screen)
-                fn = partial(screen.update, key="version", value=self.version)
-                Clock.schedule_once(fn, 0)
                 self.set_screen(name=self.to_screen, direction="left")
 
             self.build_thread(callback)

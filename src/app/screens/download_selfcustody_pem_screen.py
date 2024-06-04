@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-download_stable_zip_sha256_screen.py
+download_selfcustody_pem_screen.py
 """
 import time
 from threading import Thread
@@ -28,62 +28,55 @@ from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
 from src.app.screens.base_download_screen import BaseDownloadScreen
-from src.utils.downloader.sha256_downloader import Sha256Downloader
+from src.utils.downloader.pem_downloader import PemDownloader
 
 
-class DownloadStableZipSha256Screen(BaseScreen, BaseDownloadScreen):
-    """DownloadStableZipSha256Screen download the sha256sum file for official krux zip release"""
+class DownloadSelfcustodyPemScreen(BaseScreen, BaseDownloadScreen):
+    """DownloadSelfcustodyPemScreen download the selfcustody's public key certificate"""
 
     def __init__(self, **kwargs):
         super().__init__(
-            wid="download_stable_zip_sha256_screen",
-            name="DownloadStableZipSha256Screen",
+            wid="download_selfcustody_pem_screen",
+            name="DownloadSelfcustodyPemScreen",
             **kwargs,
         )
-        self.make_grid(wid="download_stable_zip_sha256_screen_grid", rows=2)
-        self.setup(wid=self.id, to_screen="DownloadStableZipSigScreen")
+        self.make_grid(wid=f"{self.id}_grid", rows=2)
+        self.setup(wid=self.id, to_screen="VerifyStableZipScreen")
 
-    def update(self, *args, **kwargs):
-        """Update screen with version key"""
-        if kwargs.get("key") == "version":
-            self.version = kwargs.get("value")
-            self.downloader = Sha256Downloader(
-                version=kwargs.get("value"),
-                destdir=App.get_running_app().config.get("destdir", "assets"),
-            )
+        self.downloader = PemDownloader(
+            destdir=App.get_running_app().config.get("destdir", "assets"),
+        )
 
-            def on_progress(data: bytes):
-                len1 = self.downloader.downloaded_len
-                len2 = self.downloader.content_len
-                p = len1 / len2
-                self.ids[f"{self.id}_label_progress"].text = "\n".join(
-                    [
-                        f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
-                        f"[size=16sp]{len1} of {len2} B[/size]",
-                    ]
-                )
-
-                # When finish, change the label, wait some seconds
-                # and then change screen
-                if p == 1.00:
-                    self.ids[f"{self.id}_label_info"].text = "\n".join(
-                        [
-                            f"{self.downloader.destdir}/krux-{self.version}.zip.sha256.txt downloaded",
-                        ]
-                    )
-                    time.sleep(2.1)  # 2.1 remember 21000000
-                    self.trigger()
-
-            self.downloader.on_write_to_buffer = on_progress
-
-            self.ids[f"{self.id}_label_info"].text = "\n".join(
+        def on_progress(data: bytes):
+            len1 = self.downloader.downloaded_len
+            len2 = self.downloader.content_len
+            p = len1 / len2
+            self.ids[f"{self.id}_label_progress"].text = "\n".join(
                 [
-                    "Downloading",
-                    f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    ""
-                    f"to {self.downloader.destdir}/krux-{self.version}.zip.sha256.txt",
+                    f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
+                    f"[size=16sp]{len1} of {len2} B[/size]",
                 ]
             )
+
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            if p == 1.00:
+                self.ids[f"{self.id}_label_info"].text = "\n".join(
+                    [
+                        f"{self.downloader.destdir}/selfcustody.pem downloaded",
+                    ]
+                )
+                time.sleep(2.1)  # 2.1 remember 21000000
+                self.trigger()
+
+        self.downloader.on_write_to_buffer = on_progress
+        self.ids[f"{self.id}_label_info"].text = "\n".join(
+            [
+                "Downloading",
+                f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
+                "" f"to {self.downloader.destdir}/selfcustody.pem",
+            ]
+        )
 
     def on_enter(self):
         """Event fired when the screen is displayed and the entering animation is complete"""

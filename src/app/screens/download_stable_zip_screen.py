@@ -88,7 +88,7 @@ class DownloadStableZipScreen(BaseScreen, BaseDownloadScreen):
                 [
                     "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    "" f"to {self.downloader.destdir}",
+                    "" f"to {self.downloader.destdir}/krux-{self.version}.zip",
                 ]
             )
 

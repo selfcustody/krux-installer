@@ -41,6 +41,7 @@ class DownloadStableZipScreen(BaseScreen, BaseDownloadScreen):
         )
         self.make_grid(wid="download_stable_zip_screen_grid", rows=2)
         self.setup(wid=self.id, to_screen="DownloadStableZipSha256Screen")
+        Clock.max_iteration = 20
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""

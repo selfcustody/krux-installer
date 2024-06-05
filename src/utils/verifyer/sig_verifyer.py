@@ -35,7 +35,6 @@ class SigVerifyer(CheckVerifyer):
     def __init__(self, filename: str, signature: str, pubkey: str, regexp: typing.re):
         super().__init__(filename=filename, read_mode="rb", regexp=regexp)
         self.certificate = serialization.load_pem_public_key(pubkey)
-        self.debug("cerit")
         self.signature = signature
 
     def verify(self) -> bool:

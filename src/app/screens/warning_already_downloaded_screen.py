@@ -90,12 +90,6 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                     self.set_screen(name="DownloadStableZipScreen", direction="right")
 
                 if instance.id == "warning_proceed_button":
-                    main_screen = self.manager.get_screen("MainScreen")
-                    verify_screen = self.manager.get_screen("VerifyStableZipScreen")
-                    fn = partial(
-                        verify_screen.update, key="sha256sum", value=main_screen.version
-                    )
-                    Clock.schedule_once(fn, 0)
                     self.set_screen(name="VerifyStableZipScreen", direction="right")
 
             btn = Button(

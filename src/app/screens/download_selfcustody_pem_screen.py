@@ -84,10 +84,6 @@ class DownloadSelfcustodyPemScreen(BaseScreen, BaseDownloadScreen):
         if not self.downloader is None:
 
             def callback(dt):
-                main_screen = self.manager.get_screen("MainScreen")
-                screen = self.manager.get_screen(self.to_screen)
-                fn = partial(screen.update, key="sha256sum", value=main_screen.version)
-                Clock.schedule_once(fn, 0)
                 self.set_screen(name=self.to_screen, direction="left")
 
             self.build_thread(callback)

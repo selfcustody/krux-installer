@@ -33,6 +33,11 @@ jobs:
           echo "app-name=$KRUX_NAME"
           echo "::endgroup::"
 
+      - name: Install node-gyp deps
+        run: |
+          pip3 install --upgrade pip
+          pip3 install setuptools
+
       - name: Install dependencies 
         run: yarn install
 

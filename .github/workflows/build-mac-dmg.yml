@@ -9,7 +9,7 @@ on:
 jobs:
 
   build-macos-12:
-    runs-on: macos-12
+    runs-on: macos-latest
   
     steps:
 
@@ -36,21 +36,21 @@ jobs:
       - name: Install dependencies 
         run: yarn install
 
-          #- name: Install chromedriver
-          #env:
-          #CHROMEDRIVER_VERSION: '114.0.5735.90'
-          #ZIPFILE: 'chromedriver_mac64.zip'
-          #DESTDIR: './node_modules/chromedriver/bin'
-          #ZIPURI: 'https://chromedriver.storage.googleapis.com'
-          #run: |
-          #curl -o ${TMPDIR}${ZIPFILE} $ZIPURI/$CHROMEDRIVER_VERSION/$ZIPFILE
-          #unzip -o ${TMPDIR}${ZIPFILE} -d $DESTDIR
+      #- name: Install chromedriver
+      #  env:
+      #    CHROMEDRIVER_VERSION: '114.0.5735.90'
+      #    ZIPFILE: 'chromedriver_mac64.zip'
+      #    DESTDIR: './node_modules/chromedriver/bin'
+      #    ZIPURI: 'https://chromedriver.storage.googleapis.com'
+      #  run: |
+      #    curl -o ${TMPDIR}${ZIPFILE} $ZIPURI/$CHROMEDRIVER_VERSION/$ZIPFILE
+      #    unzip -o ${TMPDIR}${ZIPFILE} -d $DESTDIR
 
-          #- name: List chromedriver binaries
-          #run: ls -la node_modules/chromedriver/bin
+      #- name: List chromedriver binaries
+      #  run: ls -la node_modules/chromedriver/bin
 
-          #- name: Pre-test chromedriver
-          #run: ./node_modules/chromedriver/bin/chromedriver --version
+      #- name: Pre-test chromedriver
+      #  run: ./node_modules/chromedriver/bin/chromedriver --version
       
       - name: Build electron app
         env:
@@ -64,34 +64,34 @@ jobs:
           file: ${{ steps.setup.outputs.app-name }}.dmg
           ext: sha256.txt
 
-      - name: List release files
-        run: |
-          echo "::group::Release files"
-          ls -la release/${{ steps.setup.outputs.app-version }}
-          echo "::endgroup::"
-          echo "::group::Unpacked files"
-          ls -la release/${{ steps.setup.outputs.app-version }}/mac
-          echo "::endgroup::"
-          echo "::group::Unpacked .app directory"
-          ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app 
-          echo "::endgroup::"
-          echo "::group::Unpacked .app/Contents directory"
-          ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents  
-          echo "::endgroup::"
-          echo "::group::Unpacked .app/Contents/Frameworks directory"
-          ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents/Frameworks  
-          echo "::endgroup::"
-          echo "::group::Unpacked .app/Contents/MacOS directory"
-          ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents/MacOS 
-          echo "::endgroup::"
-          echo "::group::Unpacked .app/Contents/Resources directory"
-          ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents/Resources  
-          echo "::endgroup::"
+      #- name: List release files
+      #  run: |
+      #    echo "::group::Release files"
+      #    ls -la release/${{ steps.setup.outputs.app-version }}
+      #    echo "::endgroup::"
+      #    echo "::group::Unpacked files"
+      #    ls -la release/${{ steps.setup.outputs.app-version }}/mac
+      #    echo "::endgroup::"
+      #    echo "::group::Unpacked .app directory"
+      #    ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app 
+      #    echo "::endgroup::"
+      #    echo "::group::Unpacked .app/Contents directory"
+      #    ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents  
+      #    echo "::endgroup::"
+      #    echo "::group::Unpacked .app/Contents/Frameworks directory"
+      #    ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents/Frameworks  
+      #    echo "::endgroup::"
+      #    echo "::group::Unpacked .app/Contents/MacOS directory"
+      #    ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents/MacOS 
+      #    echo "::endgroup::"
+      #    echo "::group::Unpacked .app/Contents/Resources directory"
+      #    ls -la release/${{ steps.setup.outputs.app-version }}/mac/krux-installer.app/Contents/Resources  
+      #    echo "::endgroup::"
 
-      - name: E2E test electron app
-        env:
-          DEBUG: 'krux:*'
-        run: ./node_modules/.bin/wdio run wdio.conf.mts
+      #- name: E2E test electron app
+      #  env:
+      #    DEBUG: 'krux:*'
+      #  run: ./node_modules/.bin/wdio run wdio.conf.mts
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3 

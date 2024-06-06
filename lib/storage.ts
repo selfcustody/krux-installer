@@ -1,8 +1,8 @@
 /// <reference path="../typings/index.d.ts"/>
+/// <reference path="../node_modules/electron-store/index.d.ts"/>
 
 import { join } from 'path'
 import { spawn } from 'child_process'
-import Store from 'electron-store'
 import Base from './base'
 import pkg from '../package.json'
 import ElectronStore from 'electron-store'
@@ -110,6 +110,7 @@ export default class Storage extends Base {
   async build (): Promise<ElectronStore> {
     try {
       this.log('Starting storage')
+      const { default: Store } = await import('electron-store')
       const store = new Store(this.config)
       /*
        * Variables to set store

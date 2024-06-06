@@ -81,7 +81,7 @@
     "axios": "^1.4.0",
     "command-exists": "^1.2.9",
     "debug": "^4.3.4",
-    "electron-store": "^8.1.0",
+    "electron-store": "^9.0.0",
     "glob": "^10.3.3",
     "serialport": "^12.0.0",
     "vite-plugin-vuetify": "^2.0.1",

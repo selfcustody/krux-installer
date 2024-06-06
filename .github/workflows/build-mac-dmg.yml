@@ -35,7 +35,7 @@ jobs:
 
       - name: Install node-gyp deps
         run: |
-          python3 -m pip install --upgrade setuptools
+          pipx install setuptools
 
       - name: Install dependencies 
         run: yarn install

@@ -35,9 +35,11 @@ jobs:
 
       - name: Install node-gyp deps
         run: |
+          python3 --version
           mkdir .krux-installer-node-gyp
           python3 -m venv .krux-installer-node-gyp
           source .krux-installer-node-gyp/bin/activate
+          python3 -m pip install distutils
           python3 -m pip install setuptools
 
       - name: Install dependencies 

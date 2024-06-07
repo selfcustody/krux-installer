@@ -65,12 +65,9 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         self.ids["warning_already_downloaded_screen_grid"].add_widget(stack)
         self.ids[stack.id] = WeakProxy(stack)
 
-        buttons = [
-            ("warning_download_again_button", "Download again", False),
-            ("warning_proceed_button", "Proceed with current file", False),
-        ]
+        buttons = ["warning_download_again_button", "warning_proceed_button"]
 
-        for row, _tuple in enumerate(buttons):
+        for wid in buttons:
 
             def _press(instance):
                 self.debug(f"Calling Button::{instance.id}::on_press")
@@ -93,38 +90,54 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                     self.set_screen(name="VerifyStableZipScreen", direction="right")
 
             btn = Button(
-                text=_tuple[1],
-                markup=_tuple[2],
+                markup=True,
                 font_size=Window.size[0] // 30,
                 background_color=(0, 0, 0, 1),
-                color=(0 if row == 0 else 1, 1 if row == 0 else 0, 0, 1),
                 size_hint=(0.5, None),
             )
-            btn.id = _tuple[0]
+            btn.id = wid
             self.ids["stack_layout_buttons"].add_widget(btn)
-            self.ids[btn.id] = WeakProxy(stack)
+            self.ids[btn.id] = WeakProxy(btn)
             btn.bind(on_press=_press)
             btn.bind(on_release=_release)
-            setattr(self, f"on_press_{_tuple[0]}", _press)
-            setattr(self, f"on_release_{_tuple[1]}", _release)
+            setattr(self, f"on_press_{wid}", _press)
+            setattr(self, f"on_release_{wid}", _release)
 
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
+        name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
 
+        if name in ("ConfigKruxInstaller", "MainScreen"):
+            self.debug(f"Updating {self.name} from {name}")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
+
         # Check locale
+        if key == "locale":
+            self.locale = value
+
         if key == "version":
-            warning = self.translate("Asset already downloaded")
-            proceed = self.translate(
+            warning_msg = self.translate("Assets already downloaded")
+            ask_proceed = self.translate(
                 "Do you want to proceed with the same file or do you want to download it again?"
+            )
+            download_msg = self.translate("Download again")
+            proceed_msg = self.translate("Proceed with current file")
+
+            self.ids["warning_download_again_button"].text = (
+                f"[color=#00ff00]{download_msg}[/color]"
+            )
+            self.ids["warning_proceed_button"].text = (
+                f"[color=#00ccef]{proceed_msg}[/color]"
             )
             self.ids["warning_label"].text = "\n".join(
                 [
-                    f"[size=32sp][color=#efcc00][b]{warning}[/b][/color][/size]",
+                    f"[size=32sp][color=#efcc00][b]{warning_msg}[/b][/color][/size]",
                     "",
-                    f"[size=20sp][color=#efcc00]krux-{value}[/color][/size]",
+                    f"[size=20sp][color=#efcc00]krux-{value}.zip[/color][/size]",
                     "",
-                    f"[size=16sp]{proceed}[/size]",
+                    f"[size=16sp]{ask_proceed}[/size]",
                 ]
             )

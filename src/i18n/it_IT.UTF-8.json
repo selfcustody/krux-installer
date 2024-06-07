@@ -23,6 +23,21 @@
     "and it's just for trying new things and providing feedback.": "ed è solo per provare cose nuove e fornire feedback."
   },
   "warning_already_downloaded_screen": {
-    "Do you want to proceed with the same file or do you want to download it again?": "Vuoi procedere con l'ultimo file o come scaricare il nuovo file?"
+    "Assets already downloaded": "Risorse già scaricate",
+    "Do you want to proceed with the same file or do you want to download it again?": "Vuoi procedere con l'ultimo file o come scaricare il nuovo file?",
+    "Download again": "Scarica di nuovo",
+    "Proceed with current file": "Procedi con il file corrente"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Verifica dell'integrità e dell'autenticità",
+    "Integrity verification": "Verifica dell'integrità",
+    "SUCCESS": "SUCCESSO",
+    "FAILED": "FALLITO",
+    "Authenticity verification": "Verifica dell'autenticità",
+    "GOOD": "BUONA",
+    "BAD": "CATTIVA",
+    "SIGNATURE": "FIRMA",
+    "If you have openssl installed on your system": "Se hai openssl installato sul tuo sistema",
+    "you can check manually with the following command": "è possibile controllare manualmente con il seguente comando"
   }
 }

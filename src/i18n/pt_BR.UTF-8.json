@@ -21,8 +21,23 @@
     "This is our test repository": "Este é nosso repositório de testes",
     "These are unsigned binaries for the latest and most experimental features": "Estes são binários não assinados das últimas e mais experimentais características",
     "and it's just for trying new things and providing feedback.": "e serve apenas para experimentar coisas novas e fornecer opiniões."
-  }, 
+  },
   "warning_already_downloaded_screen": {
-    "Do you want to proceed with the same file or do you want to download it again?": "Você quer proceder com o mesmo arquivo ou quer fazer o download dele novamente?"
+    "Assets already downloaded": "Arquivos já baixados",
+    "Do you want to proceed with the same file or do you want to download it again?": "Você quer proceder com o mesmo arquivo ou quer fazer o download dele novamente?",
+    "Download again": "Baixe novamente",
+    "Proceed with current file": "Proceda com o arquivo atual"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Verificando integridade e autenticidade",
+    "Integrity verification": "Verificação de integridade",
+    "SUCCESS": "SUCCESSO",
+    "FAILED": "FALHOU",
+    "Authenticity verification": "Verificação de autenticidade",
+    "GOOD": "BOA",
+    "BAD": "MÁ",
+    "SIGNATURE": "ASSINATURA",
+    "If you have openssl installed on your system": "Se você tiver o openssl instalado no seu sistema,",
+    "you can check manually with the following command": "você pode checar manualmente a com o seguinte commando"
   }
 }

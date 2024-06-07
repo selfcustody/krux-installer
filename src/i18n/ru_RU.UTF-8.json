@@ -23,6 +23,21 @@
     "and it's just for trying new things and providing feedback.": "и это просто для того, чтобы попробовать\nчто-то новое и оставить отзыв"
   },
   "warning_already_downloaded_screen": {
-    "Do you want to proceed with the same file or do you want to download it again?": "Хотите продолжить с последним файлом или как загрузить новый файл?"
+    "Assets already downloaded": "Ресурсы уже загружены",
+    "Do you want to proceed with the same file or do you want to download it again?": "Хотите продолжить с последним файлом или как загрузить новый файл?",    
+    "Download again": "Скачать еще раз",
+    "Proceed with current file": "Продолжить работу\nс текущим файлом"
+  },  
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Проверка целостности и подлинности",
+    "Integrity verification": "Проверка целостности",
+    "SUCCESS": "УСПЕХ",
+    "FAILED": "НЕУДАВШИЙСЯ",
+    "Authenticity verification": "Проверка подлинности",
+    "GOOD": "ХОРОШАЯ",
+    "BAD": "НЕПРАВИЛЬНАЯ",
+    "SIGNATURE": "ПОДПИСЬ",
+    "If you have openssl installed on your system": "Если в вашей системе установлен openssl",
+    "you can check mannualy with the following command": "Вы можете проверить вручную с помощью следующей команды"
   }
 }

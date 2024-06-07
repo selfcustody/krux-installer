@@ -154,7 +154,11 @@ class ConfigKruxInstaller(BaseKruxInstaller):
             main = self.screen_manager.get_screen("MainScreen")
             vers = self.screen_manager.get_screen("SelectVersionScreen")
             oldv = self.screen_manager.get_screen("SelectOldVersionScreen")
-            warn = self.screen_manager.get_screen("WarningBetaScreen")
+            warn_stable = self.screen_manager.get_screen(
+                "WarningAlreadyDownloadedScreen"
+            )
+            warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
+            verify = self.screen_manager.get_screen("VerifyStableZipScreen")
 
             partials = [
                 partial(
@@ -191,7 +195,19 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                     oldv.update, name="ConfigKruxInstaller", key="locale", value=value
                 ),
                 partial(
-                    warn.update, name="ConfigKruxInstaller", key="locale", value=value
+                    warn_stable.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    warn_beta.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    verify.update, name="ConfigKruxInstaller", key="locale", value=value
                 ),
             ]
 

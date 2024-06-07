@@ -30,7 +30,6 @@ from kivy.app import App
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.uix.stacklayout import StackLayout
-from kivy.uix.label import Label
 from kivy.uix.button import Button
 from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
@@ -48,97 +47,32 @@ class VerifyStableZipScreen(BaseScreen):
         super().__init__(
             wid="verify_stable_zip_screen", name="VerifyStableZipScreen", **kwargs
         )
-
-        self.version = None
-
-        self.make_grid(wid=f"{self.id}_grid", rows=3)
+        self.make_grid(wid=f"{self.id}_grid", rows=1)
         with self.canvas.before:
             Color(0, 0, 0, 1)
             Rectangle(size=(Window.width, Window.height))
 
-        # Sha256sum verification
-        sha256_label = Label(
-            text="[size=32sp][color=#efcc00]Verifying integrity...[/color][/size]",
-            markup=True,
-            valign="center",
-            halign="center",
-        )
-        sha256_label.id = f"{self.id}_sha256_label"
-        self.ids[f"{self.id}_grid"].add_widget(sha256_label)
-        self.ids[sha256_label.id] = WeakProxy(sha256_label)
+    def update(self, *args, **kwargs):
+        """Update widget from other screens"""
 
-        # Signature verification
-        sig_label = Label(
-            text="[size=32sp][color=#efcc00]Verifying authenticity...[/color][/size]",
-            markup=True,
-            valign="center",
-            halign="center",
-        )
-        sig_label.id = f"{self.id}_sig_label"
-        self.ids[f"{self.id}_grid"].add_widget(sig_label)
-        self.ids[sig_label.id] = WeakProxy(sig_label)
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
 
-    def on_enter(self):
-        assets_dir = App.get_running_app().config.get("destdir", "assets")
-        main_screen = self.manager.get_screen("MainScreen")
+        # Check if update to screen
+        if name in ("ConfigKruxInstaller"):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
 
-        # verify integrity
-        sha256_data_0 = Sha256Verifyer(
-            filename=f"{assets_dir}/krux-{main_screen.version}.zip"
-        )
-        sha256_data_1 = Sha256CheckVerifyer(
-            filename=f"{assets_dir}/krux-{main_screen.version}.zip.sha256.txt"
-        )
+        # Check locale
+        if key == "locale":
+            self.locale = value
 
-        sha256_data_0.load()
-        sha256_data_1.load()
-        checksum = sha256_data_0.verify(sha256_data_1.data)
+    def on_pre_enter(self):
+        self.ids[f"{self.id}_grid"].clear_widgets()
+        verifying_msg = self.translate("Verifying integrity and authenticity")
 
-        self.ids[f"{self.id}_sha256_label"].text = "\n".join(
-            [
-                f"[size=18sp][color=#efcc00]Integrify verification:[/size][/color]",
-                "",
-                f"[b]{assets_dir}/krux-{main_screen.version}.zip[/b]:",
-                f"[color={"#00FF00" if checksum else "#FF0000"}]{sha256_data_0.data}[/color]",
-                "",
-                f"[b]{assets_dir}/krux-{main_screen.version}.zip.sha256.txt[/b]:",
-                f"[color={"#00FF00" if checksum else "#FF0000"}]{sha256_data_1.data}[/color]",
-                "",
-                f"Result: [b]{"SUCCESS" if checksum else "FAILED"}[/b]",
-            ]
-        )
-
-        # verify signature
-        signature = SigCheckVerifyer(
-            filename=f"{assets_dir}/krux-{main_screen.version}.zip.sig"
-        )
-        publickey = PemCheckVerifyer(filename=f"{assets_dir}/selfcustody.pem")
-        signature.load()
-        publickey.load()
-        sig_verifyer = SigVerifyer(
-            filename=f"{assets_dir}/krux-{main_screen.version}.zip",
-            regexp=r"^.*\.zip$",
-            signature=signature.data,
-            pubkey=publickey.data,
-        )
-        sig_verifyer.load()
-        checksig = sig_verifyer.verify()
-
-        self.ids[f"{self.id}_sig_label"].text = "\n".join(
-            [
-                "[size=18sp][color=#efcc00]Authenticiy verification:[/color][/size]",
-                "",
-                f"Binary: [b]{assets_dir}/krux-{main_screen.version}.zip[/b]:",
-                "",
-                f"Signature: [b]{assets_dir}/krux-{main_screen.version}.zip.sig[/b]:",
-                "",
-                f"Public key: [b]{assets_dir}/selfcustody.pem[/b]:",
-                "",
-                f"Result: [b]{"GOOD" if checksig else "BAD"} SIGNATURE[/b]",
-            ]
-        )
-
-        # Create OK or Back button
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
@@ -146,20 +80,93 @@ class VerifyStableZipScreen(BaseScreen):
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-            self.set_screen(name="MainScreen", direction="right")
 
-        # Build OK button
-        btn = Button(
-            text=f"[size=32sp][b]{"Proceed" if checksum and checksig else "Re-download"}[/b][/size]",
+        self.make_button(
+            id=f"{self.id}_button",
+            root_widget=f"{self.id}_grid",
+            text=f"[size=32sp][color=#efcc00]{verifying_msg}[/color][/size]",
             markup=True,
-            font_size=Window.size[0] // 30,
-            background_color=(0, 0, 0, 1),
-            size_hint=(1, None),
+            row=0,
+            on_press=_press,
+            on_release=_release,
         )
-        btn.id = f"{self.id}_{"proceed" if checksum and checksig else "redownload"}"
-        self.ids[f"{self.id}_grid"].add_widget(btn)
-        self.ids[btn.id] = WeakProxy(btn)
-        btn.bind(on_press=_press)
-        btn.bind(on_release=_release)
-        setattr(self, f"on_press_{btn.id}", _press)
-        setattr(self, f"on_release_{btn.id}", _release)
+
+    def on_enter(self):
+        assets_dir = App.get_running_app().config.get("destdir", "assets")
+        main_screen = self.manager.get_screen("MainScreen")
+
+        result_sha256 = self.verify_sha256(
+            assets_dir=assets_dir, version=main_screen.version
+        )
+        self.ids[f"{self.id}_button"].text = result_sha256
+
+        result_sign = self.verify_signature(
+            assets_dir=assets_dir, version=main_screen.version
+        )
+        self.ids[f"{self.id}_button"].text += result_sign
+
+    def verify_sha256(self, assets_dir: str, version: str) -> str:
+        """Do the verification when entering on screen"""
+        # verify integrity
+        sha256_data_0 = Sha256Verifyer(filename=f"{assets_dir}/krux-{version}.zip")
+        sha256_data_1 = Sha256CheckVerifyer(
+            filename=f"{assets_dir}/krux-{version}.zip.sha256.txt"
+        )
+
+        sha256_data_0.load()
+        sha256_data_1.load()
+        checksum = sha256_data_0.verify(sha256_data_1.data)
+
+        integrity_msg = self.translate("Integrity verification")
+        success_msg = self.translate("SUCCESS")
+        failed_msg = self.translate("FAILED")
+        return "\n".join(
+            [
+                f"[size=20sp][color=#efcc00]{integrity_msg}:[/color][/size]",
+                "",
+                f"[size=16sp][b]{assets_dir}/krux-{version}.zip[/b][/size]",
+                f"[size=14sp][color={"#00FF00" if checksum else "#FF0000"}]{sha256_data_0.data}[/color][/size]",
+                "",
+                f"[size=16sp][b]{assets_dir}/krux-{version}.zip.sha256.txt[/b][/size]",
+                f"[size=14sp][color={"#00FF00" if checksum else "#FF0000"}]{sha256_data_1.data}[/color][/size]",
+                f"[size=14sp]Result: [b]{success_msg if checksum else failed_msg}[/b][/size]",
+                "",
+                "",
+            ]
+        )
+
+    def verify_signature(self, assets_dir: str, version: str) -> bool:
+        # verify signature
+        signature = SigCheckVerifyer(filename=f"{assets_dir}/krux-{version}.zip.sig")
+        publickey = PemCheckVerifyer(filename=f"{assets_dir}/selfcustody.pem")
+        signature.load()
+        publickey.load()
+        sig_verifyer = SigVerifyer(
+            filename=f"{assets_dir}/krux-{version}.zip",
+            regexp=r"^.*\.zip$",
+            signature=signature.data,
+            pubkey=publickey.data,
+        )
+        sig_verifyer.load()
+        checksig = sig_verifyer.verify()
+
+        authenticity_msg = self.translate("Authenticity verification")
+        good_msg = self.translate("GOOD")
+        bad_msg = self.translate("BAD")
+        sig_msg = self.translate("SIGNATURE")
+        installed_msg = self.translate("If you have openssl installed on your system")
+        check_msg = self.translate("you can check manually with the following command")
+        return "\n".join(
+            [
+                f"[size=20sp][color=#efcc00]{authenticity_msg}:[/color][/size]",
+                "",
+                f"[size=16sp]Result: [b]{good_msg if checksig else bad_msg} {sig_msg}[/b][/size]",
+                "",
+                f"[size=16sp]{installed_msg}[/size]",
+                f"[size=16sp]{check_msg}:[/size]",
+                "",
+                f"[color=#00ff00][size=14sp]openssl sha256< {assets_dir}/krux-{version}.zip -binary | \\",
+                f"openssl pkeyutl -verify -pubin -inkey {assets_dir}/selfcustody.pem \\",
+                f"-sigfile {assets_dir}/krux-{version}.zip.sig[/size][/color]",
+            ]
+        )

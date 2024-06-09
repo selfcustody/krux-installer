@@ -39,5 +39,11 @@
     "SIGNATURE": "HANDTEKENING",
     "If you have openssl installed on your system": "As u openssl op u stelsel geïnstalleer het",
     "you can check manually with the following command": "U kan handmatig met die volgende opdrag kyk"
+  },  
+  "unzip_stable_screen": {
+    "Flash update with": "Flits opdatering met",
+    "Airgap update with": "Airgap-opdatering",
+    "Unziping": "Uitpak",
+    "Unziped": "Uitgepak"
   }
 }

@@ -159,6 +159,7 @@ class ConfigKruxInstaller(BaseKruxInstaller):
             )
             warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
             verify = self.screen_manager.get_screen("VerifyStableZipScreen")
+            unzip = self.screen_manager.get_screen("UnzipStableScreen")
 
             partials = [
                 partial(
@@ -208,6 +209,9 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                 ),
                 partial(
                     verify.update, name="ConfigKruxInstaller", key="locale", value=value
+                ),
+                partial(
+                    unzip.update, name="ConfigKruxInstaller", key="locale", value=value
                 ),
             ]
 

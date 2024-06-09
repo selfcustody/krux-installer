@@ -39,5 +39,11 @@
     "SIGNATURE": "SIGNATURE",
     "If you have openssl installed on your system": "Si openssl est installé sur votre système",
     "you can check mannualy with the following command": "vous pouvez vérifier manuellement avec la commande suivante"
+  },
+  "unzip_stable_screen": {
+    "Flash update with": "Programmer par flash avec",
+    "Airgap update with": "Programmer de manière airgap avec",
+    "Unziping": "Décompression de",
+    "Unziped": "Décompressé"
   }
 }

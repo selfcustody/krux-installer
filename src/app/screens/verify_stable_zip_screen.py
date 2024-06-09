@@ -47,6 +47,7 @@ class VerifyStableZipScreen(BaseScreen):
         super().__init__(
             wid="verify_stable_zip_screen", name="VerifyStableZipScreen", **kwargs
         )
+        self.success = False
         self.make_grid(wid=f"{self.id}_grid", rows=1)
         with self.canvas.before:
             Color(0, 0, 0, 1)
@@ -80,6 +81,11 @@ class VerifyStableZipScreen(BaseScreen):
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+
+            if self.success:
+                self.set_screen(name="UnzipStableScreen", direction="left")
+            else:
+                self.set_screen(name="MainScreen", direction="right")
 
         self.make_button(
             id=f"{self.id}_button",
@@ -117,6 +123,9 @@ class VerifyStableZipScreen(BaseScreen):
         sha256_data_1.load()
         checksum = sha256_data_0.verify(sha256_data_1.data)
 
+        # memorize result
+        self.success = checksum
+
         integrity_msg = self.translate("Integrity verification")
         success_msg = self.translate("SUCCESS")
         failed_msg = self.translate("FAILED")
@@ -149,6 +158,9 @@ class VerifyStableZipScreen(BaseScreen):
         )
         sig_verifyer.load()
         checksig = sig_verifyer.verify()
+
+        # memorize result
+        self.success = self.success and checksig
 
         authenticity_msg = self.translate("Authenticity verification")
         good_msg = self.translate("GOOD")

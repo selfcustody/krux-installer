@@ -24,14 +24,22 @@ main_screen.py
 import os
 import re
 import typing
+import sys
+import pwd
+import grp
+import distro
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.cache import Cache
+from kivy.uix.popup import Popup
+from kivy.uix.label import Label
+from kivy.uix.button import Button
 from .base_screen import BaseScreen
 from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.utils.selector import VALID_DEVICES
 from src.i18n import T
+from pysudoer import SudoerLinux
 
 
 class MainScreen(BaseScreen):
@@ -336,3 +344,26 @@ class MainScreen(BaseScreen):
 
         else:
             raise ValueError(f'Invalid key: "{key}"')
+
+    def on_enter(self):
+        """
+        check if user belongs to dialout|uucp group
+        (groups that manage /tty/USB files)
+        if belongs, add user to it
+        """
+        if sys.platform == "linux":
+            is_in_dialout_group = False
+            user = os.environ.get("USER")
+            self.debug(f"Checking if user has permission to flash")
+
+            for p in pwd.getpwall():
+                if p[0] == "dialout" or p[0] == "uucp":
+                    if user in grp.getgrgid(p[3]):
+                        is_in_dialout_group = False
+
+            if is_in_dialout_group:
+                self.debug(f"{user} permissioned")
+
+            else:
+                self.debug(f"Creating permission for {user}")
+                self.set_screen(name="AddUserToDialoutGroupScreen", direction="left")

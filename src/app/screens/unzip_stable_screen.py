@@ -109,6 +109,14 @@ class UnzipStableScreen(BaseScreen):
                 )
                 to_screen = "AirgapScreen"
 
+            screen = self.manager.get_screen(to_screen)
+            fns = [
+                partial(screen.update, key="firmware", value=file_path),
+                partial(screen.update, key="device", value=main_screen.device),
+            ]
+            for fn in fns:
+                Clock.schedule_once(fn, 0)
+
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
             unziper.load()
 

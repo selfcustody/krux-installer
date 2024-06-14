@@ -45,6 +45,8 @@ from src.app.screens.download_beta_screen import DownloadBetaScreen
 from src.app.screens.warning_already_downloaded_screen import (
     WarningAlreadyDownloadedScreen,
 )
+from src.app.screens.flash_screen import FlashScreen
+from src.app.screens.add_user_to_dialout_group_screen import AddUserToDialoutGroupScreen
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -56,15 +58,11 @@ class KruxInstallerApp(ConfigKruxInstaller):
         self.debug(f"Window.size={Window.size}")
         Window.clearcolor = (0.9, 0.9, 0.9, 1)
 
-        # dirname = os.path.dirname(os.path.realpath(__file__))
-        # kvfile = os.path.abspath(f"{dirname}/../../krux_installer.kv")
-        # Builder.load_file(kvfile)
-        # self.debug(f"Builder.load_file={kvfile}")
-
     def build(self):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
 
         screens = [
+            AddUserToDialoutGroupScreen(),
             MainScreen(),
             SelectDeviceScreen(),
             SelectVersionScreen(),
@@ -79,6 +77,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             UnzipStableScreen(),
             DownloadBetaScreen(),
             WarningAlreadyDownloadedScreen(),
+            FlashScreen(),
         ]
 
         for screen in screens:

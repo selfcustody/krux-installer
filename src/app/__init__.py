@@ -46,7 +46,7 @@ from src.app.screens.warning_already_downloaded_screen import (
     WarningAlreadyDownloadedScreen,
 )
 from src.app.screens.flash_screen import FlashScreen
-from src.app.screens.add_user_to_dialout_group_screen import AddUserToDialoutGroupScreen
+from src.app.screens.greetings_screen import GreetingsScreen
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -62,7 +62,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
 
         screens = [
-            AddUserToDialoutGroupScreen(),
+            GreetingsScreen(),
             MainScreen(),
             SelectDeviceScreen(),
             SelectVersionScreen(),

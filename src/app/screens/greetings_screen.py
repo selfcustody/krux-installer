@@ -26,9 +26,6 @@ import re
 import typing
 import sys
 import time
-import pwd
-import grp
-import distro
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
@@ -128,6 +125,11 @@ class GreetingsScreen(BaseScreen):
         )
 
     def update(self, *args, **kwargs):
+        """
+        In linux, will check for user permission on group
+        dialout (debian-like) and uucp (archlinux-like) and
+        add user to that group to allow sudoless flash
+        """
         name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
@@ -138,6 +140,8 @@ class GreetingsScreen(BaseScreen):
             raise ValueError(f"Invalid screen: {name}")
 
         if key == "check_user":
+            import distro
+
             self.user = os.environ.get("USER")
             self.debug(f"Checking permissions for {self.user}")
             self.ids[f"{self.id}_button"].text = (
@@ -161,10 +165,13 @@ class GreetingsScreen(BaseScreen):
             Clock.schedule_once(fn, 2)
 
         elif key == "check_group":
-            self.debug(f"Checking {self.group} permissions for {self.user}")
+            import grp
+
+            self.debug(f"Checking%s {self.group} permissions for {self.user}")
             self.ids[f"{self.id}_button"].text = (
                 f"[size=32sp][color=#efcc00]Checking {self.group} permissions for {self.user}[/color][/size]"
             )
+
             for group in grp.getgrall():
                 if self.group == group.gr_name:
                     self.debug(f"Found {group.gr_name}")
@@ -173,7 +180,7 @@ class GreetingsScreen(BaseScreen):
                             self.debug(f"'{self.user}' already in group '{self.group}'")
                             self.in_dialout = True
 
-            self.debug(f"in_dialout: {self.in_dialout}")
+            self.debug(f"in_dialout={self.in_dialout}")
             if not self.in_dialout:
                 fn = partial(self.update, name=self.name, key="show_permission_message")
             else:
@@ -182,6 +189,8 @@ class GreetingsScreen(BaseScreen):
             Clock.schedule_once(fn, 2)
 
         elif key == "show_permission_message":
+            import distro
+
             if not self.in_dialout:
                 self.debug(f"Creating permission for {self.user}")
                 self.ids[f"{self.id}_button"].text = "\n".join(

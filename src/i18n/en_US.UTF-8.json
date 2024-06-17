@@ -1,4 +1,18 @@
 {
+  "greetings_screen": {
+    "Setup": "Setup",
+    "for": "for",
+    "Checking": "Checking",
+    "permissions for": "permissions for",
+    "WARNING": "WARNING",
+    "This is first run of KruxInstaller in": "This is first run of KruxInstaller in",
+    "and it appears that you do not have privileged access to make flash procedures": "and it appears that you do not have privileged access to make flash procedures",
+    "To proceed, click in the screen and a prompt will ask for your password": "To proceed, click in the screen and a prompt will ask for your password",
+    "to execute the following command": "to execute the following command",
+    "You may need to logout (or even reboot)": "You may need to logout (or even reboot)",
+    "and back in for the new group to take effect": "and back in for the new group to take effect",
+    "Do not worry, this message won't appear again": "Do not worry, this message won't appear again"
+  }, 
   "main_screen": {
     "Version": "Version",
     "Device": "Device",

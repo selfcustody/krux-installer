@@ -1,4 +1,18 @@
 {
+  "greetings_screen": {
+    "Setup": "Configurando",
+    "for": "para",
+    "Checking": "Checando",
+    "permissions for": "permissiões para",
+    "WARNING": "AVISO",
+    "This is first run of KruxInstaller in": "Esta é a primeira execução do KruxInstaller no",
+    "and it appears that you do not have privileged access to make flash procedures": "e parece que você não tem acesso privilegiado para realizar procedimentos de flash",
+    "To proceed, click in the screen and a prompt will ask for your password": "para proceder, clique na tela e um prompt irá solicitar sua senha",
+    "to execute the following command": "para executar o seguinte comando",
+    "You may need to logout (or even reboot)": "Talvez você precise deslogar (ou até mesmo reiniciar)",
+    "and back in for the new group to take effect": "e re-logar para que o novo grupo tenha efeito",
+    "Do not worry, this message won't appear again": "Não se preocupe, essa mensagem não irá aparecer novamente"
+  }, 
   "main_screen": {
     "Version": "Versão",
     "Device": "Dispositivo",

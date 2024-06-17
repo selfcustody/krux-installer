@@ -1,4 +1,18 @@
-{
+{   
+  "greetings_screen": {
+    "Setup": "Stel",
+    "for": "vir",
+    "Checking": "Kontroleer",
+    "permissions for": "groeptoestemmings vir",
+    "WARNING": "WAARSKUWING",
+    "This is first run of KruxInstaller in": "Dit is die eerste lopie van KruxInstaller in",
+    "and it appears that you do not have privileged access to make flash procedures": "en dit blyk dat u nie bevoorregte toegang het om flitsprosedures te maak nie",
+    "To proceed, click in the screen and a prompt will ask for your password": "Om voort te gaan, klik op die skerm en 'n aanwysing vra u wagwoord",
+    "to execute the following command": "om die volgende opdrag uit te voer",
+    "You may need to logout (or even reboot)": "Miskien moet u afmeld (of selfs weer begin)",
+    "and back in for the new group to take effect": "en terug vir die nuwe groep om in werking te tree",
+    "Do not worry, this message won't appear again": "Moenie bekommerd wees nie, hierdie boodskap sal nie weer verskyn nie"
+  }, 
   "main_screen": {
     "Version": "Weergawe",
     "Device": "Toestel",

@@ -1,4 +1,18 @@
 {
+  "greetings_screen": {
+    "Setup": "Настройка",
+    "for": "для",
+    "Checking": "Проверка",
+    "permissions for": "Разрешения для",
+    "WARNING": "ПРЕДУПРЕЖДЕНИЕ",
+    "This is first run of KruxInstaller in": "Это первый запуск KruxInstaller в",
+    "and it appears that you do not have privileged access to make flash procedures": "и оказывается, что у вас нет привилегированного доступа для выполнения процедур прошивки",
+    "To proceed, click in the screen and a prompt will ask for your password": "Чтобы продолжить, нажмите на экране, и появится запрос на ввод пароля",
+    "to execute the following command": ", чтобы выполнить следующую команду",
+    "You may need to logout (or even reboot)": "Возможно, потребуется перезагрузка (или даже перезагрузка)",
+    "and back in for the new group to take effect": "и возвращайтесь снова, чтобы новая группа вступила в силу",
+    "Do not worry, this message won't appear again": "Не волнуйтесь, это сообщение больше не появится"
+  }, 
   "main_screen": {
     "Version": "Версия",
     "Device": "Устройство",

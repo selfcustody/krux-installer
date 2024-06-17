@@ -60,13 +60,15 @@ class GreetingsScreen(BaseScreen):
 
         def on_permission_created(output: str):
             self.debug(f"output={output}")
+
             self.ids[f"{self.id}_button"].text = "\n".join(
                 [
                     f"[size=32sp][color=#efcc00]{output}[/color][/size]",
                     "",
-                    f"[size=16sp]You may need to logout (or even reboot)",
-                    "and back in for the new group to take effect." "",
-                    "Do not worry, this message won't appear again.",
+                    f"[size=16sp]{self.translate("You may need to logout (or even reboot)")}",
+                    f"{self.translate("and back in for the new group to take effect")}.",
+                    "",
+                    f"{self.translate("Do not worry, this message won't appear again")}.[/size]",
                 ]
             )
             self.bin = None
@@ -144,8 +146,12 @@ class GreetingsScreen(BaseScreen):
 
             self.user = os.environ.get("USER")
             self.debug(f"Checking permissions for {self.user}")
+
+            setup_msg = self.translate("Setup")
+            for_msg = self.translate("for")
+
             self.ids[f"{self.id}_button"].text = (
-                f"[size=32sp][color=#efcc00]Setup {self.user} for {distro.name()}[/color][/size]"
+                f"[size=32sp][color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color][/size]"
             )
 
             if distro.id() == "debian" or distro.like() == "debian":
@@ -167,9 +173,12 @@ class GreetingsScreen(BaseScreen):
         elif key == "check_group":
             import grp
 
-            self.debug(f"Checking%s {self.group} permissions for {self.user}")
+            self.debug(f"Checking {self.group} permissions for {self.user}")
+            check_msg = self.translate("Checking")
+            perm_msg = self.translate("permissions for")
+
             self.ids[f"{self.id}_button"].text = (
-                f"[size=32sp][color=#efcc00]Checking {self.group} permissions for {self.user}[/color][/size]"
+                f"[size=32sp][color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]"
             )
 
             for group in grp.getgrall():
@@ -193,17 +202,24 @@ class GreetingsScreen(BaseScreen):
 
             if not self.in_dialout:
                 self.debug(f"Creating permission for {self.user}")
+                warn_msg = self.translate("WARNING")
+                first_msg = self.translate("This is first run of KruxInstaller in")
+                access_msg = self.translate(
+                    "and it appears that you do not have privileged access to make flash procedures"
+                )
+                proceed_msg = self.translate(
+                    "To proceed, click in the screen and a prompt will ask for your password"
+                )
+                exec_msg = self.translate("to execute the following command")
+
                 self.ids[f"{self.id}_button"].text = "\n".join(
                     [
                         "[size=32sp][color=#efcc00]WARNING[/color][/size]",
                         "",
-                        f'[size=16sp]This is first run of KruxInstaller in "{distro.name(pretty=True)}"',
-                        f'and and it appears that you, the user "{self.user}",',
-                        f'isn\'t within the "{self.group}" group, which enables the execution of',
-                        "privileged procedures on USB devices (in this case, the firmware flash)",
-                        "",
-                        "To proceed, click in the screen and a prompt will ask for your password",
-                        "to execute the following command:" "",
+                        f'[size=16sp]{first_msg} "{distro.name(pretty=True)}"',
+                        f"{access_msg}.",
+                        proceed_msg,
+                        f"{exec_msg}:",
                         ""
                         f"[color=#00ff00]{self.bin} {" ".join(self.bin_args)} {self.group} {self.user}[/color][/size]",
                     ]

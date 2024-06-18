@@ -360,3 +360,272 @@ class TestI18nMainScreen(TestCase):
         self.assertEqual(
             msg, "Чтобы продолжить, нажмите на экране, и появится запрос на ввод пароля"
         )
+
+    #  to execute the following command
+    def test_translate_to_execute_af_za(self):
+        msg = T(
+            "to execute the following command",
+            locale="af_ZA.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "om die volgende opdrag uit te voer",
+        )
+
+    def test_translate_to_execute_en_us(self):
+        msg = T(
+            "to execute the following command",
+            locale="en_US.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "to execute the following command",
+        )
+
+    def test_translate_to_execute_es_es(self):
+        msg = T(
+            "to execute the following command",
+            locale="es_ES.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "para ejecutar el siguiente comando",
+        )
+
+    def test_translate_to_execute_fr_fr(self):
+        msg = T(
+            "to execute the following command",
+            locale="fr_FR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "pour exécuter la commande suivante")
+
+    def test_translate_to_execute_it_it(self):
+        msg = T(
+            "to execute the following command",
+            locale="it_IT.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "per eseguire il seguente comando")
+
+    def test_translate_to_execute_pt_br(self):
+        msg = T(
+            "to execute the following command",
+            locale="pt_BR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "para executar o seguinte comando")
+
+    def test_translate_to_execute_ru_ru(self):
+        msg = T(
+            "to execute the following command",
+            locale="ru_RU.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, ", чтобы выполнить следующую команду")
+
+    # You may need to logout (or even reboot)
+    def test_translate_logout_af_za(self):
+        msg = T(
+            "You may need to logout (or even reboot)",
+            locale="af_ZA.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "Miskien moet u afmeld (of selfs weer begin)",
+        )
+
+    def test_translate_logout_en_us(self):
+        msg = T(
+            "You may need to logout (or even reboot)",
+            locale="en_US.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "You may need to logout (or even reboot)",
+        )
+
+    def test_translate_logout_es_es(self):
+        msg = T(
+            "You may need to logout (or even reboot)",
+            locale="es_ES.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg, "Es posible que deba cerrar la sesión (o incluso reiniciar)"
+        )
+
+    def test_translate_logout_fr_fr(self):
+        msg = T(
+            "You may need to logout (or even reboot)",
+            locale="fr_FR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "Vous devrez peut-être vous déconnecter (ou même redémarrer)",
+        )
+
+    def test_translate_logout_it_it(self):
+        msg = T(
+            "You may need to logout (or even reboot)",
+            locale="it_IT.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "Potrebbe essere necessario disconnettersi (o addirittura riavviare)",
+        )
+
+    def test_translate_logout_pt_br(self):
+        msg = T(
+            "You may need to logout (or even reboot)",
+            locale="pt_BR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "Talvez você precise deslogar (ou até mesmo reiniciar)")
+
+    def test_translate_logout_ru_ru(self):
+        msg = T(
+            "You may need to logout (or even reboot)",
+            locale="ru_RU.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg, "Возможно, потребуется перезагрузка (или даже перезагрузка)"
+        )
+
+    # You may need to logout (or even reboot)
+    def test_translate_backin_af_za(self):
+        msg = T(
+            "and back in for the new group to take effect",
+            locale="af_ZA.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "en terug vir die nuwe groep om in werking te tree")
+
+    def test_translate_backin_en_us(self):
+        msg = T(
+            "and back in for the new group to take effect",
+            locale="en_US.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "and back in for the new group to take effect",
+        )
+
+    def test_translate_backin_es_es(self):
+        msg = T(
+            "and back in for the new group to take effect",
+            locale="es_ES.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg, "y volver de nuevo para que el nuevo grupo entre en vigor"
+        )
+
+    def test_translate_backin_fr_fr(self):
+        msg = T(
+            "and back in for the new group to take effect",
+            locale="fr_FR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "et de retour pour que le nouveau groupe prenne effet")
+
+    def test_translate_backin_it_it(self):
+        msg = T(
+            "and back in for the new group to take effect",
+            locale="it_IT.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg, "e tornare di nuovo per l'entrata in vigore del nuovo gruppo"
+        )
+
+    def test_translate_backin_pt_br(self):
+        msg = T(
+            "and back in for the new group to take effect",
+            locale="pt_BR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "e re-logar para que o novo grupo tenha efeito")
+
+    def test_translate_backin_ru_ru(self):
+        msg = T(
+            "and back in for the new group to take effect",
+            locale="ru_RU.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg, "и возвращайтесь снова, чтобы новая группа вступила в силу"
+        )
+
+    # Do not worry, this message won't appear again
+    def test_translate_worry_af_za(self):
+        msg = T(
+            "Do not worry, this message won't appear again",
+            locale="af_ZA.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg, "Moenie bekommerd wees nie, hierdie boodskap sal nie weer verskyn nie"
+        )
+
+    def test_translate_worry_en_us(self):
+        msg = T(
+            "Do not worry, this message won't appear again",
+            locale="en_US.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg,
+            "Do not worry, this message won't appear again",
+        )
+
+    def test_translate_worry_es_es(self):
+        msg = T(
+            "Do not worry, this message won't appear again",
+            locale="es_ES.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "No te preocupes, este mensaje no volverá a aparecer")
+
+    def test_translate_worry_fr_fr(self):
+        msg = T(
+            "Do not worry, this message won't appear again",
+            locale="fr_FR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "Ne vous inquiétez pas, ce message n'apparaîtra plus")
+
+    def test_translate_worry_it_it(self):
+        msg = T(
+            "Do not worry, this message won't appear again",
+            locale="it_IT.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "Non preoccuparti, questo messaggio non apparirà più")
+
+    def test_translate_worry_pt_br(self):
+        msg = T(
+            "Do not worry, this message won't appear again",
+            locale="pt_BR.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(
+            msg, "Não se preocupe, essa mensagem não irá aparecer novamente"
+        )
+
+    def test_translate_worry_ru_ru(self):
+        msg = T(
+            "Do not worry, this message won't appear again",
+            locale="ru_RU.UTF-8",
+            module="greetings_screen",
+        )
+        self.assertEqual(msg, "Не волнуйтесь, это сообщение больше не появится")

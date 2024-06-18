@@ -52,7 +52,7 @@
     "BAD": "НЕПРАВИЛЬНАЯ",
     "SIGNATURE": "ПОДПИСЬ",
     "If you have openssl installed on your system": "Если в вашей системе установлен openssl",
-    "you can check mannualy with the following command": "Вы можете проверить вручную с помощью следующей команды"
+    "you can check manually with the following command": "Вы можете проверить вручную с помощью следующей команды"
   },  
   "unzip_stable_screen": {
     "Flash update with": "Программирование \nфлэш-памяти с помощью",

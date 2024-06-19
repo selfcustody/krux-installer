@@ -1,3 +1,4 @@
+import re
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -516,13 +517,161 @@ class TestMainScreen(GraphicUnitTest):
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
     @patch("src.app.screens.main_screen.MainScreen.manager")
     @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_on_release_can_flash_or_wipe(
+    @patch("src.app.screens.main_screen.re.findall", side_effect=[True])
+    @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[False])
+    def test_on_release_flash_to_download_stable_zip_screen(
+        self,
+        mock_isfile,
+        mock_findall,
+        mock_get_running_app,
+        mock_manager,
+        mock_set_screen,
+        mock_set_background,
+    ):
+        mock_manager.get_screen = MagicMock()
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock()
+
+        screen = MainScreen()
+        screen.version = "v24.03.0"
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        flash_button = grid.children[3]
+
+        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
+        flash_action = getattr(screen, "on_release_main_flash")
+        flash_action(flash_button)
+
+        mock_get_running_app.assert_has_calls(
+            [
+                call().config.get("locale", "lang"),
+                call().config.get("destdir", "assets"),
+            ],
+            any_order=True,
+        )
+        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
+        mock_set_screen.assert_called_once_with(
+            name="DownloadStableZipScreen", direction="left"
+        )
+        mock_findall.assert_called_once_with(r"^v\d+\.\d+\.\d$", "v24.03.0")
+        pattern = re.compile(r".*v24\.03\.0\.zip")
+        self.assertTrue(pattern.match(mock_isfile.call_args[0][0]))
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    @patch("src.app.screens.main_screen.MainScreen.set_screen")
+    @patch("src.app.screens.main_screen.MainScreen.manager")
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch("src.app.screens.main_screen.re.findall", side_effect=[True])
+    @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[True])
+    def test_on_release_flash_to_warning_already_downloaded_zip_screen(
+        self,
+        mock_isfile,
+        mock_findall,
+        mock_get_running_app,
+        mock_manager,
+        mock_set_screen,
+        mock_set_background,
+    ):
+        mock_manager.get_screen = MagicMock()
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock()
+
+        screen = MainScreen()
+        screen.version = "v24.03.0"
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        flash_button = grid.children[3]
+
+        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
+        flash_action = getattr(screen, "on_release_main_flash")
+        flash_action(flash_button)
+
+        mock_get_running_app.assert_has_calls(
+            [
+                call().config.get("locale", "lang"),
+                call().config.get("destdir", "assets"),
+            ],
+            any_order=True,
+        )
+        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
+        mock_set_screen.assert_called_once_with(
+            name="WarningAlreadyDownloadedScreen", direction="left"
+        )
+        mock_findall.assert_called_once_with(r"^v\d+\.\d+\.\d$", "v24.03.0")
+        pattern = re.compile(r".*v24\.03\.0\.zip")
+        self.assertTrue(pattern.match(mock_isfile.call_args[0][0]))
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    @patch("src.app.screens.main_screen.MainScreen.set_screen")
+    @patch("src.app.screens.main_screen.MainScreen.manager")
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch("src.app.screens.main_screen.re.findall", side_effect=[False, True])
+    def test_on_release_flash_to_download_beta_screen(
+        self,
+        mock_findall,
+        mock_get_running_app,
+        mock_manager,
+        mock_set_screen,
+        mock_set_background,
+    ):
+        mock_manager.get_screen = MagicMock()
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock()
+
+        screen = MainScreen()
+        screen.version = "odudex/krux_binaries"
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        flash_button = grid.children[3]
+
+        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
+        flash_action = getattr(screen, "on_release_main_flash")
+        flash_action(flash_button)
+
+        mock_get_running_app.assert_has_calls(
+            [
+                call().config.get("locale", "lang"),
+            ]
+        )
+        mock_findall.assert_has_calls(
+            [
+                call("^v\\d+\\.\\d+\\.\\d$", "odudex/krux_binaries"),
+                call(r"^odudex/krux_binaries", "odudex/krux_binaries"),
+            ]
+        )
+        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
+        mock_set_screen.assert_called_once_with(
+            name="DownloadBetaScreen", direction="left"
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    @patch("src.app.screens.main_screen.MainScreen.set_screen")
+    @patch("src.app.screens.main_screen.MainScreen.manager")
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_on_release_wipe(
         self, mock_get_running_app, mock_manager, mock_set_screen, mock_set_background
     ):
 
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+        mock_config = MagicMock()
+        attrs = {"get.return_value": "krux-v0.0.1.zip"}
+        mock_config.configure_mock(**attrs)
+        mock_get_running_app.return_value = mock_config
 
         screen = MainScreen()
         self.render(screen)
@@ -531,7 +680,6 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
         calls_set_background = []
@@ -539,16 +687,10 @@ class TestMainScreen(GraphicUnitTest):
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
             screen.update(name="SelectVersionScreen", key="device", value=device)
-            flash_action = getattr(screen, "on_release_main_flash")
             wipe_action = getattr(screen, "on_release_main_wipe")
-            flash_action(flash_button)
             wipe_action(wipe_button)
 
-            calls_set_background.append(call(wid="main_flash", rgba=(0, 0, 0, 1)))
             calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 1)))
-            calls_set_screen.append(
-                call(name="DownloadStableZipScreen", direction="left")
-            )
             calls_set_screen.append(call(name="WipeScreen", direction="left"))
 
         mock_set_background.assert_has_calls(calls_set_background)

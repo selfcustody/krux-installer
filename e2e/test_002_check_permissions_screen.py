@@ -1,9 +1,14 @@
+import sys
 from unittest.mock import patch, MagicMock, call
+from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.check_permissions_screen import CheckPermissionsScreen
 
 
+# WARNING: Do not run these tests on windows
+# they will break because it do not have the builtin 'grp' module
+@mark.skipif(sys.platform == "win32", reason="does not run on windows")
 class TestAboutScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

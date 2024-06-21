@@ -26,8 +26,6 @@ import re
 import typing
 import sys
 import time
-import distro
-import grp
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
@@ -35,6 +33,10 @@ from kivy.cache import Cache
 from .base_screen import BaseScreen
 from src.i18n import T
 from pysudoer import SudoerLinux
+
+if not sys.platform.startswith("win"):
+    import distro
+    import grp
 
 
 class CheckPermissionsScreen(BaseScreen):
@@ -178,7 +180,6 @@ class CheckPermissionsScreen(BaseScreen):
                 if self.group == group.gr_name:
                     self.debug(f"Found {group.gr_name}")
                     for user in group[3]:
-                        print(user)
                         if user == self.user:
                             self.debug(f"'{self.user}' already in group '{self.group}'")
                             self.in_dialout = True

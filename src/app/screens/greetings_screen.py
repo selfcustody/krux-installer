@@ -21,26 +21,14 @@
 """
 greetings_screen.py
 """
-import os
-import re
-import typing
 import sys
-import time
 from functools import partial
 from kivy.clock import Clock
-from kivy.app import App
-from kivy.cache import Cache
 from .base_screen import BaseScreen
-from src.i18n import T
-from pysudoer import SudoerLinux
-
-if sys.platform == "linux":
-    import grp
-    import distro
 
 
 class GreetingsScreen(BaseScreen):
-    """GreetingsScreen show Krux logo and check if user is in dialout group in linux"""
+    """GreetingsScreen show Krux logo"""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -51,56 +39,15 @@ class GreetingsScreen(BaseScreen):
 
         # Build grid where buttons will be placed
         self.make_grid(wid=f"{self.id}_grid", rows=1)
-        self.bin = None
-        self.bin_args = None
-        self.group = None
-        self.user = None
-        self.in_dialout = False
 
         # START of on_press buttons
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
-        def on_permission_created(output: str):
-            self.debug(f"output={output}")
-
-            self.ids[f"{self.id}_button"].text = "\n".join(
-                [
-                    f"[size=32sp][color=#efcc00]{output}[/color][/size]",
-                    "",
-                    f"[size=16sp]{self.translate("You may need to logout (or even reboot)")}",
-                    f"{self.translate("and back in for the new group to take effect")}.",
-                    "",
-                    f"{self.translate("Do not worry, this message won't appear again")}.[/size]",
-                ]
-            )
-            self.bin = None
-            self.bin_args = None
-            self.group = None
-            self.user = None
-
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
             self.set_background(wid=f"{instance.id}", rgba=(0, 0, 0, 1))
-            if (
-                sys.platform == "linux"
-                and self.bin
-                and self.bin_args
-                and self.group
-                and self.user
-            ):
-                cmd = [self.bin]
-                for a in self.bin_args:
-                    cmd.append(a)
-                cmd.append(self.group)
-                cmd.append(self.user)
-
-                self.debug(f"cmd={cmd}")
-                sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
-                sudoer.exec(cmd=cmd, env={}, callback=on_permission_created)
-            else:
-                self.set_screen(name="MainScreen", direction="left")
 
         self.make_button(
             row=0,
@@ -129,108 +76,18 @@ class GreetingsScreen(BaseScreen):
         )
 
     def update(self, *args, **kwargs):
-        """
-        In linux, will check for user permission on group
-        dialout (debian-like) and uucp (archlinux-like) and
-        add user to that group to allow sudoless flash
-        """
+        """Update to go to some screen (MainScreen or CheckPermissionsScreen)"""
         name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if name in ("ConfigKruxInstaller", "GreetingsScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
+        if name in ("GreetingsScreen"):
+            self.debug(f"Updating {self.name} from {name}")
         else:
             raise ValueError(f"Invalid screen: {name}")
 
-        if key == "check_user":
-
-            self.user = os.environ.get("USER")
-            self.debug(f"Checking permissions for {self.user}")
-
-            setup_msg = self.translate("Setup")
-            for_msg = self.translate("for")
-
-            self.ids[f"{self.id}_button"].text = (
-                f"[size=32sp][color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color][/size]"
-            )
-
-            if distro.id() == "debian" or distro.like() == "debian":
-                self.bin = "/usr/bin/usermod"
-                self.bin_arg = ["-a", "-G"]
-                self.group = "dialout"
-
-            elif distro.id() == "arch" or distro.id() == "manjaro":
-                self.bin = "/usr/bin/usermod"
-                self.bin_args = ["-a", "-G"]
-                self.group = "uucp"
-
-            else:
-                raise RuntimeError(f"Not implemented for '{distro.name(pretty=True)}'")
-
-            fn = partial(self.update, name=self.name, key="check_group")
-            Clock.schedule_once(fn, 2)
-
-        elif key == "check_group":
-
-            self.debug(f"Checking {self.group} permissions for {self.user}")
-            check_msg = self.translate("Checking")
-            perm_msg = self.translate("permissions for")
-
-            self.ids[f"{self.id}_button"].text = (
-                f"[size=32sp][color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]"
-            )
-
-            for group in grp.getgrall():
-                print(group)
-                if self.group == group.gr_name:
-                    self.debug(f"Found {group.gr_name}")
-                    for user in group[3]:
-                        if user == self.user:
-                            self.debug(f"'{self.user}' already in group '{self.group}'")
-                            self.in_dialout = True
-
-            self.debug(f"in_dialout={self.in_dialout}")
-            if not self.in_dialout:
-                fn = partial(self.update, name=self.name, key="show_permission_message")
-            else:
-                fn = partial(self.update, name=self.name, key="skip_permission_message")
-
-            Clock.schedule_once(fn, 2)
-
-        elif key == "show_permission_message":
-            self.debug(f"Creating permission for {self.user}")
-            warn_msg = self.translate("WARNING")
-            first_msg = self.translate("This is the first run of KruxInstaller in")
-            access_msg = self.translate(
-                "and it appears that you do not have privileged access to make flash procedures"
-            )
-            proceed_msg = self.translate(
-                "To proceed, click in the screen and a prompt will ask for your password"
-            )
-            exec_msg = self.translate("to execute the following command")
-
-            self.ids[f"{self.id}_button"].text = "\n".join(
-                [
-                    "[size=32sp][color=#efcc00]WARNING[/color][/size]",
-                    "",
-                    f'[size=16sp]{first_msg} "{distro.name(pretty=True)}"',
-                    f"{access_msg}.",
-                    proceed_msg,
-                    f"{exec_msg}:",
-                    ""
-                    f"[color=#00ff00]{self.bin} {" ".join(self.bin_args)} {self.group} {self.user}[/color][/size]",
-                ]
-            )
-
-        elif key == "skip_permission_message":
-            self.debug(f"{self.user} permissioned")
-            partial(
-                self.update, name=self.name, key="change_screen", value="MainScreen"
-            )
-
-        elif key == "change_screen":
-            if not value is None and value in ("MainScreen"):
+        if key == "change_screen":
+            if not value is None and value in ("MainScreen", "CheckPermissionsScreen"):
                 self.set_screen(name=value, direction="left")
             else:
                 raise ValueError(f"Invalid value for '{key}': {value}")
@@ -239,17 +96,23 @@ class GreetingsScreen(BaseScreen):
 
     def on_enter(self):
         """
-        check if user belongs to dialout|uucp group
-        (groups that manage /tty/USB files)
-        if belongs, add user to it
+        check platform and if is linux, go to CheckPermissionsScreen,
+        otherwise, go to MainScreen
         """
         if sys.platform == "linux":
-            fn = partial(self.update, name=self.name, key="check_user")
+            fn = partial(
+                self.update,
+                name=self.name,
+                key="change_screen",
+                value="CheckPermissionsScreen",
+            )
 
         elif sys.platform == "macos" or sys.platform == "win32":
-            fn = partial(self.update, name=self.name, key="skip_permission_message")
+            fn = partial(
+                self.update, name=self.name, key="change_screen", value="MainScreen"
+            )
 
         else:
             raise RuntimeError(f"Not implemented for {sys.platform}")
 
-        Clock.schedule_once(fn, 5)
+        Clock.schedule_once(fn, 2.1)

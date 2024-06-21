@@ -27,6 +27,8 @@ from kivy.cache import Cache
 from kivy.core.window import Window
 from kivy.lang.builder import Builder
 from src.app.config_krux_installer import ConfigKruxInstaller
+from src.app.screens.greetings_screen import GreetingsScreen
+from src.app.screens.check_permissions_screen import CheckPermissionsScreen
 from src.app.screens.main_screen import MainScreen
 from src.app.screens.select_device_screen import SelectDeviceScreen
 from src.app.screens.select_version_screen import SelectVersionScreen
@@ -46,7 +48,6 @@ from src.app.screens.warning_already_downloaded_screen import (
     WarningAlreadyDownloadedScreen,
 )
 from src.app.screens.flash_screen import FlashScreen
-from src.app.screens.greetings_screen import GreetingsScreen
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -63,6 +64,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
 
         screens = [
             GreetingsScreen(),
+            CheckPermissionsScreen(),
             MainScreen(),
             SelectDeviceScreen(),
             SelectVersionScreen(),

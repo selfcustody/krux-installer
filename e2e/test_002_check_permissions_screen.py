@@ -232,6 +232,67 @@ class TestAboutScreen(GraphicUnitTest):
     @patch("sys.platform", "linux")
     @patch("src.app.screens.base_screen.App.get_running_app")
     @patch(
+        "src.app.screens.check_permissions_screen.distro.name", return_value="MockOS"
+    )
+    @patch("src.app.screens.check_permissions_screen.grp")
+    def test_check_group_not_in_group(
+        self, mock_grp, mock_distro_name, mock_get_running_app
+    ):
+
+        mocked_group = MagicMock()
+        mocked_group.gr_name = "mockedgroup"
+        mocked_group.__iter__ = MagicMock(return_value=[0, 1, 2, 3])
+
+        attrs = {
+            "getgrall.return_value": [mocked_group],
+        }
+        mock_grp.configure_mock(**attrs)
+
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock()
+
+        screen = CheckPermissionsScreen()
+        screen.user = "mockeduser"
+        screen.bin = "mock"
+        screen.bin_args = ["-a", "-G"]
+        screen.group = "mockedgroup"
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[0]
+
+        # Do the test
+        screen.update(name="CheckPermissionsScreen", key="check_group")
+        message = "\n".join(
+            [
+                "[size=32sp][color=#efcc00]WARNING[/color][/size]",
+                "",
+                '[size=16sp]This is the first run of KruxInstaller in "MockOS"',
+                "and it appears that you do not have privileged access to make flash procedures.",
+                "To proceed, click in the screen and a prompt will ask for your password",
+                "to execute the following command:",
+                "[color=#00ff00]mock -a -G mockedgroup mockeduser[/color][/size]",
+            ]
+        )
+
+        # default assertions
+        self.assertEqual(button.text, message)
+        self.assertEqual(screen.in_dialout, False)
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+        mock_distro_name.assert_called_once_with(pretty=True)
+        mock_grp.getgrall.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
         "src.app.screens.check_permissions_screen.os.environ.get",
         return_value="mockeduser",
     )

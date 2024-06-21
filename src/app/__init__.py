@@ -22,6 +22,7 @@
 __init__.py
 """
 import os
+import sys
 from kivy.app import App
 from kivy.cache import Cache
 from kivy.core.window import Window
@@ -62,9 +63,13 @@ class KruxInstallerApp(ConfigKruxInstaller):
     def build(self):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
 
-        screens = [
-            GreetingsScreen(),
-            CheckPermissionsScreen(),
+        screens = []
+        screens.append(GreetingsScreen())
+
+        if sys.platform == "linux":
+            screens.append(CheckPermissionsScreen())
+
+        screens = screens + [
             MainScreen(),
             SelectDeviceScreen(),
             SelectVersionScreen(),

@@ -294,3 +294,55 @@ class TestAboutScreen(GraphicUnitTest):
         mock_partial.assert_called_with(
             screen.update, name=screen.name, key="change_screen", value="MainScreen"
         )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch("src.app.screens.greetings_screen.GreetingsScreen.set_background")
+    def test_press_button(self, mock_set_background, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[0]
+
+        # Do the test
+        action = getattr(screen, "on_press_greetings_screen_button")
+        action(button)
+
+        # patch assertions
+        mock_set_background.assert_called_once_with(
+            wid="greetings_screen_button", rgba=(0.25, 0.25, 0.25, 1)
+        )
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch("src.app.screens.greetings_screen.GreetingsScreen.set_background")
+    def test_release_button(self, mock_set_background, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[0]
+
+        # Do the test
+        action = getattr(screen, "on_release_greetings_screen_button")
+        action(button)
+
+        # patch assertions
+        mock_set_background.assert_called_once_with(
+            wid="greetings_screen_button", rgba=(0, 0, 0, 1)
+        )
+        mock_get_running_app.assert_called_once()

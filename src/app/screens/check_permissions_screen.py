@@ -66,13 +66,8 @@ class CheckPermissionsScreen(BaseScreen):
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
             self.set_background(wid=f"{instance.id}", rgba=(0, 0, 0, 1))
-            if (
-                sys.platform == "linux"
-                and self.bin
-                and self.bin_args
-                and self.group
-                and self.user
-            ):
+
+            if self.on_permission_created:
                 cmd = (
                     [self.bin] + [a for a in self.bin_args] + [self.group] + [self.user]
                 )
@@ -80,7 +75,9 @@ class CheckPermissionsScreen(BaseScreen):
                 sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
                 sudoer.exec(cmd=cmd, env={}, callback=self.on_permission_created)
             else:
-                self.set_screen(name="MainScreen", direction="left")
+                raise RuntimeError(
+                    f"Invalid on_permission_created: {self.on_permission_created}"
+                )
 
         self.make_button(
             row=0,
@@ -91,34 +88,6 @@ class CheckPermissionsScreen(BaseScreen):
             on_press=_press,
             on_release=_release,
         )
-
-    def make_on_permissions_created(self) -> typing.Callable:
-        """Create a callback to change"""
-
-        def callback(output: str):
-            self.debug(f"output={output}")
-            logout_msg = self.translate("You may need to logout (or even reboot)")
-            backin_msg = self.translate("and back in for the new group to take effect")
-            not_worry_msg = self.translate(
-                "Do not worry, this message won't appear again"
-            )
-
-            self.ids[f"{self.id}_button"].text = "\n".join(
-                [
-                    f"[size=32sp][color=#efcc00]{output}[/color][/size]",
-                    "",
-                    f"[size=16sp]{logout_msg}",
-                    f"{backin_msg}.",
-                    "",
-                    f"{not_worry_msg}.[/size]",
-                ]
-            )
-            self.bin = None
-            self.bin_args = None
-            self.group = None
-            self.user = None
-
-        return callback
 
     def update(self, *args, **kwargs):
         """
@@ -210,8 +179,47 @@ class CheckPermissionsScreen(BaseScreen):
                         f"[color=#00ff00]{self.bin} {" ".join(self.bin_args)} {self.group} {self.user}[/color][/size]",
                     ]
                 )
+
+                # Check if callback is created and create if isnt exist
+                # (in tests you can mock it and the conditional below will not be called)
+                if self.on_permission_created is None:
+                    fn = partial(
+                        self.update, name=self.name, key="make_on_permission_created"
+                    )
+                    Clock.schedule_once(fn, 2.1)
+
             else:
                 self.set_screen(name="MainScreen", direction="left")
+
+        elif key == "make_on_permission_created":
+
+            def on_permission_created(output: str):
+                self.debug(f"output={output}")
+                logout_msg = self.translate("You may need to logout (or even reboot)")
+                backin_msg = self.translate(
+                    "and back in for the new group to take effect"
+                )
+                not_worry_msg = self.translate(
+                    "Do not worry, this message won't appear again"
+                )
+
+                self.ids[f"{self.id}_button"].text = "\n".join(
+                    [
+                        f"[size=32sp][color=#efcc00]{output}[/color][/size]",
+                        "",
+                        f"[size=16sp]{logout_msg}",
+                        f"{backin_msg}.",
+                        "",
+                        f"{not_worry_msg}.[/size]",
+                    ]
+                )
+
+                self.bin = None
+                self.bin_args = None
+                self.group = None
+                self.user = None
+
+            self.on_permission_created = on_permission_created
 
         else:
             raise ValueError(f"Invalid key: '{key}'")

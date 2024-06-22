@@ -339,6 +339,51 @@ class TestAboutScreen(GraphicUnitTest):
         mock_like.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_update_make_on_permission_created(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock()
+
+        screen = CheckPermissionsScreen()
+        screen.user = "mockeduser"
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[0]
+
+        # Do the test
+        screen.update(name="CheckPermissionsScreen", key="make_on_permission_created")
+        text = "\n".join(
+            [
+                "[size=32sp][color=#efcc00]mocked command[/color][/size]",
+                "",
+                "[size=16sp]You may need to logout (or even reboot)",
+                "and back in for the new group to take effect.",
+                "",
+                "Do not worry, this message won't appear again.[/size]",
+            ]
+        )
+        screen.on_permission_created(output="mocked command")
+
+        # default assertions
+        self.assertFalse(screen.on_permission_created is None)
+        self.assertEqual(button.text, text)
+        self.assertEqual(screen.bin, None)
+        self.assertEqual(screen.bin_args, None)
+        self.assertEqual(screen.group, None)
+        self.assertEqual(screen.user, None)
+
+        # Do test again
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "mockos")
     @patch("src.app.screens.check_permissions_screen.App.get_running_app")
     @patch("src.app.screens.check_permissions_screen.partial")
@@ -423,6 +468,48 @@ class TestAboutScreen(GraphicUnitTest):
         "src.app.screens.check_permissions_screen.CheckPermissionsScreen.set_background"
     )
     @patch("src.app.screens.check_permissions_screen.SudoerLinux.exec")
+    def test_fail_on_release_greetings_button(
+        self, mock_exec, mock_set_background, mock_get_running_app
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = CheckPermissionsScreen()
+        screen.bin = "mock"
+        screen.bin_args = ["-a", "-G"]
+        screen.group = "mockedgroup"
+        screen.user = "mockeduser"
+
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[0]
+        action = getattr(screen, "on_release_check_permissions_screen_button")
+
+        # Do the test
+        with self.assertRaises(RuntimeError) as exc_info:
+            action(button)
+
+        # default assertions
+        self.assertEqual(str(exc_info.exception), "Invalid on_permission_created: None")
+
+        # patch assertions
+        mock_get_running_app.assert_called_once()
+        mock_set_background.assert_called_once_with(
+            wid="check_permissions_screen_button", rgba=(0, 0, 0, 1)
+        )
+        assert not mock_exec.called
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch("src.app.screens.check_permissions_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.check_permissions_screen.CheckPermissionsScreen.set_background"
+    )
+    @patch("src.app.screens.check_permissions_screen.SudoerLinux.exec")
     def test_on_release_greetings_button(
         self, mock_exec, mock_set_background, mock_get_running_app
     ):
@@ -445,6 +532,7 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_release_check_permissions_screen_button")
 
         # Do the test
+        screen.update(name="CheckPermissionsScreen", key="make_on_permission_created")
         action(button)
 
         # patch assertions

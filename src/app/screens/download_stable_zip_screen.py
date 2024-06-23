@@ -40,15 +40,27 @@ class DownloadStableZipScreen(BaseDownloadScreen):
             wid="download_stable_zip_screen", name="DownloadStableZipScreen", **kwargs
         )
         self.to_screen = "DownloadStableZipSha256Screen"
+        self.on_progress = None
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""
-        if kwargs.get("key") == "version":
-            self.version = kwargs.get("value")
-            self.downloader = ZipDownloader(
-                version=self.version,
-                destdir=App.get_running_app().config.get("destdir", "assets"),
-            )
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        if name in (
+            "ConfigKruxInstaller",
+            "MainScreen",
+            "WarningAlreadyDownloadedScreen",
+        ):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
+
+        if key == "locale":
+            self.locale = value
+
+        elif key == "on_progress":
 
             def on_progress(data: bytes):
                 # calculate downloaded percentage
@@ -81,7 +93,18 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                     time.sleep(2.1)  # 2.1 remember 21000000
                     self.trigger()
 
-            self.downloader.on_write_to_buffer = on_progress
+            setattr(DownloadStableZipScreen, "on_progress", on_progress)
+
+        elif key == "version":
+            self.version = value
+            self.downloader = ZipDownloader(
+                version=self.version,
+                destdir=App.get_running_app().config.get("destdir", "assets"),
+            )
+
+            self.downloader.on_write_to_buffer = getattr(
+                DownloadStableZipScreen, "on_progress"
+            )
 
             self.ids[f"{self.id}_label_info"].text = "\n".join(
                 [
@@ -91,3 +114,6 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                     f"to {self.downloader.destdir}/krux-{self.version}.zip",
                 ]
             )
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

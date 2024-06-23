@@ -80,10 +80,21 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 if instance.id == "warning_download_again_button":
                     main_screen = self.manager.get_screen("MainScreen")
                     download_screen = self.manager.get_screen("DownloadStableZipScreen")
-                    fn = partial(
-                        download_screen.update, key="version", value=main_screen.version
-                    )
-                    Clock.schedule_once(fn, 0)
+                    partials = [
+                        partial(
+                            download_screen.update, name=self.name, key="on_progress"
+                        ),
+                        partial(
+                            download_screen.update,
+                            name=self.name,
+                            key="version",
+                            value=main_screen.version,
+                        ),
+                    ]
+
+                    for fn in partials:
+                        Clock.schedule_once(fn, 0)
+
                     self.set_screen(name="DownloadStableZipScreen", direction="right")
 
                 if instance.id == "warning_proceed_button":

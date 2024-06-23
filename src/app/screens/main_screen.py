@@ -157,6 +157,11 @@ class MainScreen(BaseScreen):
                             screen = self.manager.get_screen(to_screen)
                             partials.append(
                                 partial(
+                                    screen.update, name=self.name, key="on_progress"
+                                )
+                            )
+                            partials.append(
+                                partial(
                                     screen.update,
                                     name=self.name,
                                     key="version",

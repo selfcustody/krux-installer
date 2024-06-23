@@ -31,7 +31,7 @@ from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.sha256_downloader import Sha256Downloader
 
 
-class DownloadStableZipSha256Screen(BaseScreen, BaseDownloadScreen):
+class DownloadStableZipSha256Screen(BaseDownloadScreen):
     """DownloadStableZipSha256Screen download the sha256sum file for official krux zip release"""
 
     def __init__(self, **kwargs):
@@ -40,8 +40,7 @@ class DownloadStableZipSha256Screen(BaseScreen, BaseDownloadScreen):
             name="DownloadStableZipSha256Screen",
             **kwargs,
         )
-        self.make_grid(wid="download_stable_zip_sha256_screen_grid", rows=2)
-        self.setup(wid=self.id, to_screen="DownloadStableZipSigScreen")
+        self.to_screen = "DownloadStableZipSigScreen"
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""
@@ -84,18 +83,3 @@ class DownloadStableZipSha256Screen(BaseScreen, BaseDownloadScreen):
                     f"to {self.downloader.destdir}/krux-{self.version}.zip.sha256.txt",
                 ]
             )
-
-    def on_enter(self):
-        """Event fired when the screen is displayed and the entering animation is complete"""
-        if not self.downloader is None:
-
-            def callback(dt):
-                screen = self.manager.get_screen(self.to_screen)
-                fn = partial(screen.update, key="version", value=self.version)
-                Clock.schedule_once(fn, 0)
-                self.set_screen(name=self.to_screen, direction="left")
-
-            self.build_thread(callback)
-            self.thread.start()
-        else:
-            raise ValueError("Downloader isnt configured. Use `update` method first")

@@ -22,8 +22,6 @@
 download_selfcustody_pem_screen.py
 """
 import time
-from threading import Thread
-from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
@@ -31,7 +29,7 @@ from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.pem_downloader import PemDownloader
 
 
-class DownloadSelfcustodyPemScreen(BaseScreen, BaseDownloadScreen):
+class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
     """DownloadSelfcustodyPemScreen download the selfcustody's public key certificate"""
 
     def __init__(self, **kwargs):
@@ -40,8 +38,8 @@ class DownloadSelfcustodyPemScreen(BaseScreen, BaseDownloadScreen):
             name="DownloadSelfcustodyPemScreen",
             **kwargs,
         )
-        self.make_grid(wid=f"{self.id}_grid", rows=2)
-        self.setup(wid=self.id, to_screen="VerifyStableZipScreen")
+
+        self.to_screen = "VerifyStableZipScreen"
 
         self.downloader = PemDownloader(
             destdir=App.get_running_app().config.get("destdir", "assets"),
@@ -86,7 +84,8 @@ class DownloadSelfcustodyPemScreen(BaseScreen, BaseDownloadScreen):
             def callback(dt):
                 self.set_screen(name=self.to_screen, direction="left")
 
-            self.build_thread(callback)
+            self.trigger = callback
+            self.thread = self.downloader.download
             self.thread.start()
         else:
             raise ValueError("Downloader isnt configured. Use `update` method first")

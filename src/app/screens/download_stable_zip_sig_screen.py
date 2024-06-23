@@ -31,7 +31,7 @@ from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.sig_downloader import SigDownloader
 
 
-class DownloadStableZipSigScreen(BaseScreen, BaseDownloadScreen):
+class DownloadStableZipSigScreen(BaseDownloadScreen):
     """DownloadStableZipSigScreen download the sig file for official krux zip release"""
 
     def __init__(self, **kwargs):
@@ -40,8 +40,8 @@ class DownloadStableZipSigScreen(BaseScreen, BaseDownloadScreen):
             name="DownloadStableZipSigScreen",
             **kwargs,
         )
-        self.make_grid(wid="download_stable_zip_sig_screen_grid", rows=2)
-        self.setup(wid=self.id, to_screen="DownloadSelfcustodyPemScreen")
+
+        self.to_screen = "DownloadSelfcustodyPemScreen"
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""
@@ -91,7 +91,8 @@ class DownloadStableZipSigScreen(BaseScreen, BaseDownloadScreen):
             def callback(dt):
                 self.set_screen(name=self.to_screen, direction="left")
 
-            self.build_thread(callback)
+            self.trigger = callback
+            self.thread = self.downloader.download
             self.thread.start()
         else:
             raise ValueError("Downloader isnt configured. Use `update` method first")

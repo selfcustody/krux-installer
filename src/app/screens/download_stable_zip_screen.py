@@ -32,16 +32,14 @@ from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.zip_downloader import ZipDownloader
 
 
-class DownloadStableZipScreen(BaseScreen, BaseDownloadScreen):
+class DownloadStableZipScreen(BaseDownloadScreen):
     """DownloadStableZipScreen download a official krux zip release"""
 
     def __init__(self, **kwargs):
         super().__init__(
             wid="download_stable_zip_screen", name="DownloadStableZipScreen", **kwargs
         )
-        self.make_grid(wid="download_stable_zip_screen_grid", rows=2)
-        self.setup(wid=self.id, to_screen="DownloadStableZipSha256Screen")
-        Clock.max_iteration = 20
+        self.to_screen = "DownloadStableZipSha256Screen"
 
     def update(self, *args, **kwargs):
         """Update screen with version key"""
@@ -89,21 +87,7 @@ class DownloadStableZipScreen(BaseScreen, BaseDownloadScreen):
                 [
                     "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    "" f"to {self.downloader.destdir}/krux-{self.version}.zip",
+                    "",
+                    f"to {self.downloader.destdir}/krux-{self.version}.zip",
                 ]
             )
-
-    def on_enter(self):
-        """Event fired when the screen is displayed and the entering animation is complete"""
-        if not self.downloader is None:
-
-            def callback(dt):
-                screen = self.manager.get_screen(self.to_screen)
-                fn = partial(screen.update, key="version", value=self.version)
-                Clock.schedule_once(fn, 0)
-                self.set_screen(name=self.to_screen, direction="left")
-
-            self.build_thread(callback)
-            self.thread.start()
-        else:
-            raise ValueError("Downloader isnt configured. Use `update` method first")

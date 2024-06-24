@@ -127,6 +127,56 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch("src.app.screens.download_stable_zip_screen.DownloadStableZipScreen.manager")
+    @patch("src.app.screens.download_stable_zip_screen.partial")
+    @patch("src.app.screens.download_stable_zip_screen.Clock.schedule_once")
+    @patch(
+        "src.app.screens.download_stable_zip_screen.DownloadStableZipScreen.set_screen"
+    )
+    def test_on_trigger(
+        self,
+        mock_set_screen,
+        mock_schedule_once,
+        mock_partial,
+        mock_manager,
+        mock_get_running_app,
+    ):
+        # Mocks
+        mock_manager.get_screen = MagicMock()
+
+        # screen
+        screen = DownloadStableZipScreen()
+        screen.version = "v0.0.1"
+
+        # pylint: disable=no-member
+        screen.trigger = screen.on_trigger
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        # pylint: disable=no-member
+        DownloadStableZipScreen.on_trigger(0)
+
+        # default assertions
+        self.assertFalse(screen.on_trigger is None)
+        self.assertFalse(screen.trigger is None)
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")],
+            any_order=True,
+        )
+        mock_manager.get_screen.assert_called_once_with("DownloadStableZipSha256Screen")
+        mock_partial.assert_called_once()
+        mock_schedule_once.assert_called_once()
+        mock_set_screen.assert_called_once_with(
+            name="DownloadStableZipSha256Screen", direction="left"
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
     def test_on_progress(self, mock_get_running_app):
         # mock
         file = io.BytesIO()

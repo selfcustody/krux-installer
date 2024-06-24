@@ -134,16 +134,32 @@ class BaseDownloadScreen(BaseScreen):
         self.debug(f"getter::trigger={self._thread}")
 
     def on_enter(self):
-        """Event fired when the screen is displayed and the entering animation is complete"""
+        """
+        Event fired when the screen is displayed and the entering animation is complete.
+
+        Every inherithed class should implement it own `on_trigger` and `on_progress`
+        staticmethods. The method `on_progress` should call `self.trigger` ath the end:
+
+        ```python
+        Myclass(BaseDownloadScreen):
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(wid="example_screen", name="ExampleScreen", **kwargs)
+
+                def on_trigger(dt):
+                    # do something
+
+                def on_progress(data: bytes):
+                    # do something
+                    self.trigger()
+
+                setattr(self.__class__, "on_trigger", on_trigger)
+                setattr(self.__class__, "on_progress", on_progress)
+        ```
+        """
         if not self.downloader is None:
-
-            def callback(dt):
-                screen = self.manager.get_screen(self.to_screen)
-                fn = partial(screen.update, key="version", value=self.version)
-                Clock.schedule_once(fn, 0)
-                self.set_screen(name=self.to_screen, direction="left")
-
-            self.trigger = callback
+            self.trigger = getattr(self.__class__, "on_trigger")
+            self.downloader.on_write_to_buffer = getattr(self.__class__, "on_progress")
             self.thread = self.downloader.download
             self.thread.start()
         else:

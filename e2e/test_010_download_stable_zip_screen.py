@@ -99,7 +99,35 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_on_progress(self, mock_get_running_app):
+    @patch("src.app.screens.download_stable_zip_screen.ZipDownloader")
+    def test_update_version(self, mock_downloader, mock_get_running_app):
+        attrs = {"get.side_effect": ["en-US.UTF8", "mockdir"]}
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.configure_mock(**attrs)
+
+        screen = DownloadStableZipScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+
+        screen.update(name="ConfigKruxInstaller", key="version", value="v0.0.1")
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [
+                call().config.get("locale", "lang"),
+                call().config.get("destdir", "assets"),
+            ],
+            any_order=True,
+        )
+        mock_downloader.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_on_progress(self, mock_get_running_app):
         # mock
         file = io.BytesIO()
 
@@ -116,7 +144,6 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        screen.update(name="ConfigKruxInstaller", key="on_progress")
         text = "\n".join(
             ["[size=100sp][b]2.24%[/b][/size]", "[size=16sp]0.00 of 0.00 MB[/size]"]
         )
@@ -142,7 +169,7 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     @patch("src.app.screens.download_stable_zip_screen.time.sleep", side_effect=[True])
-    def test_update_on_progress_done(self, mock_sleep, mock_get_running_app):
+    def test_on_progress_done(self, mock_sleep, mock_get_running_app):
         # mock
         file = io.BytesIO()
 
@@ -161,7 +188,6 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        screen.update(name="ConfigKruxInstaller", key="on_progress")
         text_progress = "\n".join(
             ["[size=100sp][b]100.00%[/b][/size]", "[size=16sp]0.00 of 0.00 MB[/size]"]
         )

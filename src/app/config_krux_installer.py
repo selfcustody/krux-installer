@@ -160,7 +160,7 @@ class ConfigKruxInstaller(BaseKruxInstaller):
             warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
             verify = self.screen_manager.get_screen("VerifyStableZipScreen")
             unzip = self.screen_manager.get_screen("UnzipStableScreen")
-            check = self.screen_manager.get_screen("CHeckPermissionsScreen")
+            check = self.screen_manager.get_screen("CheckPermissionsScreen")
 
             partials = [
                 partial(

@@ -113,7 +113,6 @@ class TestBaseDownloadScreen(GraphicUnitTest):
     @patch("src.app.screens.base_download_screen.Clock.create_trigger")
     @patch("src.app.screens.base_download_screen.Thread")
     def test_on_enter(self, mock_thread, mock_create_trigger, mock_get_running_app):
-
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
         screen.to_screen = "AnotherMockScreen"
         screen.downloader = MagicMock()
@@ -124,11 +123,16 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        screen.on_enter()
+        setattr(BaseDownloadScreen, "on_trigger", MagicMock())
+        # pylint: disable=no-member
+        BaseDownloadScreen.on_trigger.return_value = True
 
-        # default assertions
-        self.assertFalse(screen.trigger is None)
-        self.assertFalse(screen.thread is None)
+        setattr(BaseDownloadScreen, "on_progress", MagicMock())
+
+        # pylint: disable=no-member
+        BaseDownloadScreen.on_progress.return_value = True
+
+        screen.on_enter()
 
         # patch tests
         mock_get_running_app.assert_has_calls(

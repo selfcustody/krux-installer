@@ -22,7 +22,6 @@
 download_stable_zip_sha256_screen.py
 """
 import time
-from threading import Thread
 from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
@@ -42,38 +41,71 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
         )
         self.to_screen = "DownloadStableZipSigScreen"
 
-    def update(self, *args, **kwargs):
-        """Update screen with version key"""
-        if kwargs.get("key") == "version":
-            self.version = kwargs.get("value")
-            self.downloader = Sha256Downloader(
-                version=kwargs.get("value"),
-                destdir=App.get_running_app().config.get("destdir", "assets"),
+        # Define some staticmethods in dynamic way
+        # (so they can be called in tests)
+        def on_trigger(dt):
+            screen = self.manager.get_screen(self.to_screen)
+            fn = partial(screen.update, key="version", value=self.version)
+            Clock.schedule_once(fn, 0)
+            self.set_screen(name=self.to_screen, direction="left")
+
+        def on_progress(data: bytes):
+            # calculate downloaded percentage
+            len1 = self.downloader.downloaded_len
+            len2 = self.downloader.content_len
+            p = len1 / len2
+
+            # Format bytes (one liner)
+            # https://stackoverflow.com/questions/
+            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+            down1 = f"{len1/(1<<20):,.2f}"
+            down2 = f"{len2/(1<<20):,.2f}"
+
+            # Put all in Label widget
+            self.ids[f"{self.id}_label_progress"].text = "\n".join(
+                [
+                    f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
+                    f"[size=16sp]{down1} of {down2} MB[/size]",
+                ]
             )
 
-            def on_progress(data: bytes):
-                len1 = self.downloader.downloaded_len
-                len2 = self.downloader.content_len
-                p = len1 / len2
-                self.ids[f"{self.id}_label_progress"].text = "\n".join(
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            if p == 1.00:
+                self.ids[f"{self.id}_label_info"].text = "\n".join(
                     [
-                        f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
-                        f"[size=16sp]{len1} of {len2} B[/size]",
+                        f"{self.downloader.destdir}/krux-{self.version}.zip downloaded",
                     ]
                 )
+                time.sleep(2.1)  # 2.1 remember 21000000
+                self.trigger()
 
-                # When finish, change the label, wait some seconds
-                # and then change screen
-                if p == 1.00:
-                    self.ids[f"{self.id}_label_info"].text = "\n".join(
-                        [
-                            f"{self.downloader.destdir}/krux-{self.version}.zip.sha256.txt downloaded",
-                        ]
-                    )
-                    time.sleep(2.1)  # 2.1 remember 21000000
-                    self.trigger()
+        self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
+        setattr(self.__class__, "on_trigger", on_trigger)
 
-            self.downloader.on_write_to_buffer = on_progress
+        self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
+        setattr(self.__class__, "on_progress", on_progress)
+
+    def update(self, *args, **kwargs):
+        """Update screen with version key. Should be called before `on_enter`"""
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        if name in ("ConfigKruxInstaller", "DownloadStableZipScreen"):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
+
+        if key == "locale":
+            self.locale = value
+
+        elif key == "version":
+            self.version = value
+            self.downloader = Sha256Downloader(
+                version=value,
+                destdir=App.get_running_app().config.get("destdir", "assets"),
+            )
 
             self.ids[f"{self.id}_label_info"].text = "\n".join(
                 [
@@ -83,3 +115,6 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
                     f"to {self.downloader.destdir}/krux-{self.version}.zip.sha256.txt",
                 ]
             )
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

@@ -23,7 +23,6 @@ download_stable_zip_screen.py
 """
 import math
 import time
-from threading import Thread
 from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
@@ -45,7 +44,9 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         # (so they can be called in tests)
         def on_trigger(dt):
             screen = self.manager.get_screen(self.to_screen)
-            fn = partial(screen.update, key="version", value=self.version)
+            fn = partial(
+                screen.update, name=self.name, key="version", value=self.version
+            )
             Clock.schedule_once(fn, 0)
             self.set_screen(name=self.to_screen, direction="left")
 

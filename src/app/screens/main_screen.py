@@ -169,7 +169,23 @@ class MainScreen(BaseScreen):
                             to_screen = "DownloadBetaScreen"
                             screen = self.manager.get_screen(to_screen)
                             partials.append(
-                                partial(screen.update, key="device", value=self.device)
+                                partial(
+                                    screen.update,
+                                    name=self.name,
+                                    key="firmware",
+                                    value="kboot.kfpkg",
+                                )
+                            )
+                            partials.append(
+                                partial(
+                                    screen.update,
+                                    name=self.name,
+                                    key="device",
+                                    value=self.device,
+                                )
+                            )
+                            partials.append(
+                                partial(screen.update, name=self.name, key="downloader")
                             )
 
                         # Execute the partials

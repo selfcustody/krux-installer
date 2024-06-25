@@ -23,64 +23,109 @@ main_screen.py
 """
 import math
 import re
-from threading import Thread
+import time
+from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.uix.label import Label
-from src.app.screens.base_screen import BaseScreen
+from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
 
 
-class DownloadBetaScreen(BaseScreen):
+class DownloadBetaScreen(BaseDownloadScreen):
     """DownloadBetaScreen manage the download process of beta releases"""
 
     def __init__(self, **kwargs):
         super().__init__(
             wid="download_beta_screen", name="DownloadBetaScreen", **kwargs
         )
-        self.make_grid(wid="download_beta_screen_grid", rows=2)
-        self.downloader = None
-        self.downloader_thread = None
+        self.to_screen = "FlashScreen"
+        self.firmware = None
+        self.device = None
 
-        # progress label
-        progress = Label(
-            text="", markup=True, font_size="80sp", valign="center", halign="center"
-        )
-        progress.id = "download_progress"
-        self.ids["download_beta_screen_grid"].add_widget(progress)
-        self.ids[progress.id] = WeakProxy(progress)
+        # Define some staticmethods in dynamic way
+        # (so they can be called in tests)
+        def on_trigger(dt):
+            screen = self.manager.get_screen(self.to_screen)
+            fn = partial(
+                screen.update, name=self.name, key="version", value=self.version
+            )
+            Clock.schedule_once(fn, 0)
+            self.set_screen(name=self.to_screen, direction="left")
 
-        # build label
-        asset_label = Label(markup=True, valign="center", halign="center")
-        asset_label.id = "asset_label"
-        self.ids["download_beta_screen_grid"].add_widget(asset_label)
-        self.ids[asset_label.id] = WeakProxy(asset_label)
+        def on_progress(data: bytes):
+            # calculate downloaded percentage
+            len1 = self.downloader.downloaded_len
+            len2 = self.downloader.content_len
+            p = len1 / len2
+
+            # Format bytes (one liner)
+            # https://stackoverflow.com/questions/
+            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+            down1 = f"{len1/(1<<20):,.2f}"
+            down2 = f"{len2/(1<<20):,.2f}"
+
+            # Put all in Label widget
+            self.ids[f"{self.id}_label_progress"].text = "\n".join(
+                [
+                    f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
+                    f"[size=16sp]{down1} of {down2} MB[/size]",
+                ]
+            )
+
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            if p == 1.00:
+                self.ids[f"{self.id}_label_info"].text = "\n".join(
+                    [
+                        f"{self.downloader.destdir}/{self.firmware} downloaded",
+                    ]
+                )
+                time.sleep(2.1)  # 2.1 remember 21000000
+                self.trigger()
+
+        self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
+        setattr(self.__class__, "on_trigger", on_trigger)
+
+        self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
+        setattr(self.__class__, "on_progress", on_progress)
 
     def update(self, *args, **kwargs):
-        """Update screen with device key"""
-        if kwargs.get("key") == "device":
+        """Update screen with version key. Should be called before `on_enter`"""
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        if name in ("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen"):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
+
+        if key == "locale":
+            self.locale = value
+
+        elif key == "firmware":
+            if value in ("kboot.kfpkg", "firmware.bin"):
+                self.firmware = value
+            else:
+                raise ValueError(f"Invalid firmware: {value}")
+
+        elif key == "device":
+            if value in ("m5stickv", "amigo", "dock", "bit", "cube"):
+                self.device = value
+            else:
+                raise ValueError(f"Invalid device: {value}")
+
+        elif key == "downloader":
             self.downloader = BetaDownloader(
-                device=kwargs.get("value"),
-                binary_type="kboot.kfpkg",
+                device=self.device,
+                binary_type=self.firmware,
                 destdir=App.get_running_app().config.get("destdir", "assets"),
             )
 
-            def on_progress(data: bytes):
-                l1 = self.downloader.downloaded_len
-                l2 = self.downloader.content_len
-                p = l1 / l2
-                self.ids["download_progress"].text = "\n".join(
-                    [
-                        f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
-                        f"[size=16sp]{l1} of {l2} B[/size]",
-                    ]
-                )
-
-            self.downloader.on_write_to_buffer = on_progress
-
-            self.ids["asset_label"].text = "\n".join(
+            self.ids[f"{self.id}_label_info"].text = "\n".join(
                 [
                     "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
@@ -88,6 +133,5 @@ class DownloadBetaScreen(BaseScreen):
                 ]
             )
 
-    def on_enter(self):
-        """Event fired when the screen is displayed: the entering animation is complete"""
-        Thread(target=self.downloader.download).start()
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

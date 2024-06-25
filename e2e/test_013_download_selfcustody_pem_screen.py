@@ -2,17 +2,17 @@ import io
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
-from src.app.screens.download_stable_zip_sig_screen import (
-    DownloadStableZipSigScreen,
+from src.app.screens.download_selfcustody_pem_screen import (
+    DownloadSelfcustodyPemScreen,
 )
 
 
-class TestDownloadStableZipSigScreen(GraphicUnitTest):
+class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     def test_init(self, mock_get_running_app):
-        screen = DownloadStableZipSigScreen()
+        screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
         # get your Window instance safely
@@ -24,14 +24,13 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         self.assertEqual(screen.downloader, None)
         self.assertEqual(screen.thread, None)
         self.assertEqual(screen.trigger, None)
-        self.assertEqual(screen.version, None)
-        self.assertEqual(screen.to_screen, "DownloadSelfcustodyPemScreen")
-        self.assertEqual(grid.id, "download_stable_zip_sig_screen_grid")
+        self.assertEqual(screen.to_screen, "VerifyStableZipScreen")
+        self.assertEqual(grid.id, "download_selfcustody_pem_screen_grid")
         self.assertEqual(
-            grid.children[1].id, "download_stable_zip_sig_screen_label_progress"
+            grid.children[1].id, "download_selfcustody_pem_screen_label_progress"
         )
         self.assertEqual(
-            grid.children[0].id, "download_stable_zip_sig_screen_label_info"
+            grid.children[0].id, "download_selfcustody_pem_screen_label_info"
         )
 
         # patch assertions
@@ -42,7 +41,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     def test_fail_update_invalid_name(self, mock_get_running_app):
-        screen = DownloadStableZipSigScreen()
+        screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
         # get your Window instance safely
@@ -63,7 +62,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     def test_fail_update_key(self, mock_get_running_app):
-        screen = DownloadStableZipSigScreen()
+        screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
         # get your Window instance safely
@@ -84,7 +83,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     def test_update_locale(self, mock_get_running_app):
-        screen = DownloadStableZipSigScreen()
+        screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
         # get your Window instance safely
@@ -103,20 +102,20 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
-    @patch("src.app.screens.download_stable_zip_sig_screen.SigDownloader")
-    def test_update_version(self, mock_downloader, mock_get_running_app):
+    @patch("src.app.screens.download_selfcustody_pem_screen.PemDownloader")
+    def test_update_public_key_certificate(self, mock_downloader, mock_get_running_app):
         attrs = {"get.side_effect": ["en-US.UTF8", "mockdir"]}
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.configure_mock(**attrs)
 
-        screen = DownloadStableZipSigScreen()
+        screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
         # do tests
-        screen.update(name=screen.name, key="version", value="v0.0.1")
+        screen.update(name=screen.name, key="public-key-certificate")
 
         # patch assertions
         mock_get_running_app.assert_has_calls(
@@ -131,24 +130,15 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     @patch(
-        "src.app.screens.download_stable_zip_sig_screen.DownloadStableZipSigScreen.manager"
-    )
-    @patch("src.app.screens.download_stable_zip_sig_screen.partial")
-    @patch("src.app.screens.download_stable_zip_sig_screen.Clock.schedule_once")
-    @patch(
-        "src.app.screens.download_stable_zip_sig_screen.DownloadStableZipSigScreen.set_screen"
+        "src.app.screens.download_selfcustody_pem_screen.DownloadSelfcustodyPemScreen.set_screen"
     )
     def test_on_trigger(
         self,
         mock_set_screen,
-        mock_schedule_once,
-        mock_partial,
-        mock_manager,
         mock_get_running_app,
     ):
         # screen
-        screen = DownloadStableZipSigScreen()
-        screen.version = "v0.0.1"
+        screen = DownloadSelfcustodyPemScreen()
 
         # pylint: disable=no-member
         screen.trigger = screen.on_trigger
@@ -159,7 +149,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
 
         # do tests
         # pylint: disable=no-member
-        DownloadStableZipSigScreen.on_trigger(0)
+        DownloadSelfcustodyPemScreen.on_trigger(0)
 
         # default assertions
         self.assertFalse(screen.on_trigger is None)
@@ -170,11 +160,8 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
             [call().config.get("locale", "lang")],
             any_order=True,
         )
-        mock_manager.get_screen.assert_called_once_with("DownloadSelfcustodyPemScreen")
-        mock_partial.assert_called_once()
-        mock_schedule_once.assert_called_once()
         mock_set_screen.assert_called_once_with(
-            name="DownloadSelfcustodyPemScreen", direction="left"
+            name="VerifyStableZipScreen", direction="left"
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -189,7 +176,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         )
 
         # screen
-        screen = DownloadStableZipSigScreen()
+        screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
         # get your Window instance safely
@@ -202,15 +189,15 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
 
         # default assertions
         with patch(
-            "src.app.screens.download_stable_zip_sig_screen.DownloadStableZipSigScreen.downloader"
+            "src.app.screens.download_selfcustody_pem_screen.DownloadSelfcustodyPemScreen.downloader"
         ) as mock_downloader:
             mock_downloader.downloaded_len = 8
             mock_downloader.content_len = file.getbuffer().nbytes
 
             # pylint: disable=no-member
-            DownloadStableZipSigScreen.on_progress(data=bytes(file.read(8)))
+            DownloadSelfcustodyPemScreen.on_progress(data=bytes(file.read(8)))
             self.assertEqual(
-                screen.ids["download_stable_zip_sig_screen_label_progress"].text,
+                screen.ids["download_selfcustody_pem_screen_label_progress"].text,
                 text,
             )
 
@@ -222,7 +209,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     @patch(
-        "src.app.screens.download_stable_zip_sig_screen.time.sleep",
+        "src.app.screens.download_selfcustody_pem_screen.time.sleep",
         side_effect=[True],
     )
     def test_on_progress_done(self, mock_sleep, mock_get_running_app):
@@ -235,7 +222,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         )
 
         # screen
-        screen = DownloadStableZipSigScreen()
+        screen = DownloadSelfcustodyPemScreen()
         screen.version = "v0.0.1"
         screen.trigger = MagicMock()
         self.render(screen)
@@ -247,24 +234,24 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         text_progress = "\n".join(
             ["[size=100sp][b]100.00%[/b][/size]", "[size=16sp]357 of 357 B[/size]"]
         )
-        text_label = "tmpmock/krux-v0.0.1.zip.sig downloaded"
+        text_label = "tmpmock/selfcustody.pem downloaded"
 
         # default assertions
         with patch(
-            "src.app.screens.download_stable_zip_sig_screen.DownloadStableZipSigScreen.downloader"
+            "src.app.screens.download_selfcustody_pem_screen.DownloadSelfcustodyPemScreen.downloader"
         ) as mock_downloader:
             mock_downloader.destdir = "tmpmock"
             mock_downloader.downloaded_len = file.getbuffer().nbytes
             mock_downloader.content_len = file.getbuffer().nbytes
 
             # pylint: disable=no-member
-            DownloadStableZipSigScreen.on_progress(data=bytes(file.read(8)))
+            DownloadSelfcustodyPemScreen.on_progress(data=bytes(file.read(8)))
             self.assertEqual(
-                screen.ids["download_stable_zip_sig_screen_label_progress"].text,
+                screen.ids["download_selfcustody_pem_screen_label_progress"].text,
                 text_progress,
             )
             self.assertEqual(
-                screen.ids["download_stable_zip_sig_screen_label_info"].text,
+                screen.ids["download_selfcustody_pem_screen_label_info"].text,
                 text_label,
             )
 

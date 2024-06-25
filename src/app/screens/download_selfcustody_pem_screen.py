@@ -41,9 +41,10 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
 
         self.to_screen = "VerifyStableZipScreen"
 
-        self.downloader = PemDownloader(
-            destdir=App.get_running_app().config.get("destdir", "assets"),
-        )
+        # Define some staticmethods in dynamic way
+        # (so they can be called in tests)
+        def on_trigger(dt):
+            self.set_screen(name=self.to_screen, direction="left")
 
         def on_progress(data: bytes):
             len1 = self.downloader.downloaded_len
@@ -68,24 +69,42 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
                 time.sleep(2.1)  # 2.1 remember 21000000
                 self.trigger()
 
-        self.downloader.on_write_to_buffer = on_progress
-        self.ids[f"{self.id}_label_info"].text = "\n".join(
-            [
-                "Downloading",
-                f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                "" f"to {self.downloader.destdir}/selfcustody.pem",
-            ]
-        )
+        self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
+        setattr(self.__class__, "on_trigger", on_trigger)
 
-    def on_enter(self):
-        """Event fired when the screen is displayed and the entering animation is complete"""
-        if not self.downloader is None:
+        self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
+        setattr(self.__class__, "on_progress", on_progress)
 
-            def callback(dt):
-                self.set_screen(name=self.to_screen, direction="left")
+    def update(self, *args, **kwargs):
+        """Update screen with version key. Should be called before `on_enter`"""
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
 
-            self.trigger = callback
-            self.thread = self.downloader.download
-            self.thread.start()
+        if name in (
+            "ConfigKruxInstaller",
+            "DownloadStableZipSigScreen",
+            "DownloadSelfcustodyPemScreen",
+        ):
+            self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError("Downloader isnt configured. Use `update` method first")
+            raise ValueError(f"Invalid screen name: {name}")
+
+        if key == "locale":
+            self.locale = value
+
+        elif key == "public-key-certificate":
+            self.downloader = PemDownloader(
+                destdir=App.get_running_app().config.get("destdir", "assets"),
+            )
+
+            self.ids[f"{self.id}_label_info"].text = "\n".join(
+                [
+                    "Downloading",
+                    f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
+                    "" f"to {self.downloader.destdir}/selfcustody.pem",
+                ]
+            )
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

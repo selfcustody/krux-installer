@@ -22,7 +22,6 @@
 download_stable_zip_sig_screen.py
 """
 import time
-from threading import Thread
 from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
@@ -45,6 +44,14 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
         def on_trigger(dt):
+            screen = self.manager.get_screen(self.to_screen)
+            fn = partial(
+                screen.update,
+                name=self.name,
+                key="public-key-certificate",
+                value=self.version,
+            )
+            Clock.schedule_once(fn, 0)
             self.set_screen(name=self.to_screen, direction="left")
 
         def on_progress(data: bytes):
@@ -81,7 +88,11 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if name in ("ConfigKruxInstaller", "DownloadStableZipSigScreen"):
+        if name in (
+            "ConfigKruxInstaller",
+            "DownloadStableZipSha256Screen",
+            "DownloadStableZipSigScreen",
+        ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
             raise ValueError(f"Invalid screen name: {name}")

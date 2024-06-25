@@ -45,7 +45,9 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
         # (so they can be called in tests)
         def on_trigger(dt):
             screen = self.manager.get_screen(self.to_screen)
-            fn = partial(screen.update, key="version", value=self.version)
+            fn = partial(
+                screen.update, name=self.name, key="version", value=self.version
+            )
             Clock.schedule_once(fn, 0)
             self.set_screen(name=self.to_screen, direction="left")
 

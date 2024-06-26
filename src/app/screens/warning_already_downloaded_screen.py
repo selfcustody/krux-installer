@@ -45,7 +45,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             **kwargs,
         )
 
-        self.make_grid(wid="warning_already_downloaded_screen_grid", rows=2)
+        self.make_grid(wid=f"{self.id}_grid", rows=2)
         with self.canvas.before:
             Color(0, 0, 0, 1)
             Rectangle(size=(Window.width, Window.height))
@@ -56,16 +56,16 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             valign="center",
             halign="center",
         )
-        warning.id = "warning_label"
-        self.ids["warning_already_downloaded_screen_grid"].add_widget(warning)
+        warning.id = f"{self.id}_label"
+        self.ids[f"{self.id}_grid"].add_widget(warning)
         self.ids[warning.id] = WeakProxy(warning)
 
         stack = StackLayout()
-        stack.id = "stack_layout_buttons"
-        self.ids["warning_already_downloaded_screen_grid"].add_widget(stack)
+        stack.id = f"{self.id}_stack_buttons"
+        self.ids[f"{self.id}_grid"].add_widget(stack)
         self.ids[stack.id] = WeakProxy(stack)
 
-        buttons = ["warning_download_again_button", "warning_proceed_button"]
+        buttons = [f"{self.id}_download_button", f"{self.id}_proceed_button"]
 
         for wid in buttons:
 
@@ -77,7 +77,8 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 self.debug(f"Calling Button::{instance.id}::on_release")
                 self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
 
-                if instance.id == "warning_download_again_button":
+                print(instance.id)
+                if instance.id == f"{self.id}_download_button":
                     main_screen = self.manager.get_screen("MainScreen")
                     download_screen = self.manager.get_screen("DownloadStableZipScreen")
                     fn = partial(
@@ -89,7 +90,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                     Clock.schedule_once(fn, 0)
                     self.set_screen(name="DownloadStableZipScreen", direction="right")
 
-                if instance.id == "warning_proceed_button":
+                if instance.id == f"{self.id}_proceed_button":
                     self.set_screen(name="VerifyStableZipScreen", direction="right")
 
             btn = Button(
@@ -99,7 +100,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 size_hint=(0.5, None),
             )
             btn.id = wid
-            self.ids["stack_layout_buttons"].add_widget(btn)
+            self.ids[f"{self.id}_stack_buttons"].add_widget(btn)
             self.ids[btn.id] = WeakProxy(btn)
             btn.bind(on_press=_press)
             btn.bind(on_release=_release)
@@ -112,7 +113,11 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if name in ("ConfigKruxInstaller", "MainScreen"):
+        if name in (
+            "ConfigKruxInstaller",
+            "MainScreen",
+            "WarningAlreadyDownloadedScreen",
+        ):
             self.debug(f"Updating {self.name} from {name}")
         else:
             raise ValueError(f"Invalid screen name: {name}")
@@ -121,7 +126,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         if key == "locale":
             self.locale = value
 
-        if key == "version":
+        elif key == "version":
             warning_msg = self.translate("Assets already downloaded")
             ask_proceed = self.translate(
                 "Do you want to proceed with the same file or do you want to download it again?"
@@ -129,18 +134,24 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             download_msg = self.translate("Download again")
             proceed_msg = self.translate("Proceed with current file")
 
-            self.ids["warning_download_again_button"].text = (
+            self.ids[f"{self.id}_download_button"].text = (
                 f"[color=#00ff00]{download_msg}[/color]"
             )
-            self.ids["warning_proceed_button"].text = (
+            self.ids[f"{self.id}_proceed_button"].text = (
                 f"[color=#00ccef]{proceed_msg}[/color]"
             )
-            self.ids["warning_label"].text = "\n".join(
+            self.ids[f"{self.id}_label"].text = "\n".join(
                 [
                     f"[size=32sp][color=#efcc00][b]{warning_msg}[/b][/color][/size]",
                     "",
                     f"[size=20sp][color=#efcc00]krux-{value}.zip[/color][/size]",
+                    f"[size=20sp][color=#efcc00]krux-{value}.zip.sha256.txt[/color][/size]",
+                    f"[size=20sp][color=#efcc00]krux-{value}.zip.sig[/color][/size]",
+                    f"[size=20sp][color=#efcc00]selfcustody.pem[/color][/size]",
                     "",
                     f"[size=16sp]{ask_proceed}[/size]",
                 ]
             )
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

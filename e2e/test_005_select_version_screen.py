@@ -15,6 +15,10 @@ MOCKED_FOUND_API = [
 
 class TestSelectVersionScreen(GraphicUnitTest):
 
+    @classmethod
+    def teardown_class(cls):
+        EventLoop.exit()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     def test_render_select_version_screen(self, mock_get_running_app):

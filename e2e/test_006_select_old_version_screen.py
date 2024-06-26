@@ -16,6 +16,10 @@ OLD_VERSIONS = [d["tag_name"] for d in MOCKED_FOUND_API]
 
 class TestSelectOldVersionScreen(GraphicUnitTest):
 
+    @classmethod
+    def teardown_class(cls):
+        EventLoop.exit()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     def test_render_main_screen(self, mock_get_running_app):

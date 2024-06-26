@@ -7,6 +7,10 @@ from src.app.screens.download_stable_zip_screen import DownloadStableZipScreen
 
 class TestDownloadStableZipScreen(GraphicUnitTest):
 
+    @classmethod
+    def teardown_class(cls):
+        EventLoop.exit()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     def test_init(self, mock_get_running_app):

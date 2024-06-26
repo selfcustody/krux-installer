@@ -177,7 +177,9 @@ class CheckPermissionsScreen(BaseScreen):
                         proceed_msg,
                         f"{exec_msg}:",
                         ""
-                        f"[color=#00ff00]{self.bin} {" ".join(self.bin_args)} {self.group} {self.user}[/color][/size]",
+                        # a little hack on join method (the `or []` clause)
+                        # to avoid errors when screen do not completly exit in tests
+                        f"[color=#00ff00]{self.bin} {" ".join(self.bin_args or [])} {self.group} {self.user}[/color][/size]",
                     ]
                 )
 

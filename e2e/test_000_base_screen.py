@@ -8,6 +8,10 @@ from src.app.screens.base_screen import BaseScreen
 
 class TestBaseScreen(GraphicUnitTest):
 
+    @classmethod
+    def teardown_class(cls):
+        EventLoop.exit()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     def test_render(self, mock_get_running_app):

@@ -6,6 +6,10 @@ from src.app.screens.greetings_screen import GreetingsScreen
 
 class TestAboutScreen(GraphicUnitTest):
 
+    @classmethod
+    def teardown_class(cls):
+        EventLoop.exit()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     def test_render_main_screen_only_logo(self, mock_get_running_app):

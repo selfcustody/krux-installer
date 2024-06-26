@@ -11,6 +11,10 @@ from src.app.screens.check_permissions_screen import CheckPermissionsScreen
 @mark.skipif(sys.platform == "win32", reason="does not run on windows")
 class TestAboutScreen(GraphicUnitTest):
 
+    @classmethod
+    def teardown_class(cls):
+        EventLoop.exit()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     def test_update_fail_invalid_name(self, mock_get_running_app):

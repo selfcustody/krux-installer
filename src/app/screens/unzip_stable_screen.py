@@ -47,6 +47,10 @@ class UnzipStableScreen(BaseScreen):
         #    Color(0, 0, 0, 1)
         #    Rectangle(size=(Window.width, Window.height))
 
+        self.assets_dir = UnzipStableScreen.get_destdir_assets()
+        self.device = None
+        self.version = None
+
     def update(self, *args, **kwargs):
         """Update widget from other screens"""
 
@@ -55,7 +59,11 @@ class UnzipStableScreen(BaseScreen):
         value = kwargs.get("value")
 
         # Check if update to screen
-        if name in ("ConfigKruxInstaller"):
+        if name in (
+            "ConfigKruxInstaller",
+            "VerifyStableZipScreen",
+            "UnzipStableScreen",
+        ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
             raise ValueError(f"Invalid screen name: {name}")
@@ -64,28 +72,38 @@ class UnzipStableScreen(BaseScreen):
         if key == "locale":
             self.locale = value
 
-    def on_pre_enter(self):
-        """Before enter screen, configure some texts and widgets"""
-        self.ids[f"{self.id}_grid"].clear_widgets()
+        elif key == "version":
+            self.version = value
 
+        elif key == "device":
+            self.device = value
+
+        elif key == "clear":
+            if len(self.ids[f"{self.id}_grid"].ids) > 0:
+                self.debug(f"Clearing '{self.id}_grid'")
+                self.ids[f"{self.id}_grid"].clear_widgets()
+
+        elif key == "flash-button":
+            self.build_extract_to_flash_button()
+
+        elif key == "airgap-button":
+            self.build_extract_to_airgap_button()
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')
+
+    def build_extract_to_flash_button(self):
+        self.debug("Building flash button")
+        zip_file = f"{self.assets_dir}/krux-{self.version}.zip"
+        base_path = f"krux-{self.version}/maixpy_{self.device}"
+        rel_path = f"{self.assets_dir}/{base_path}"
         flash_msg = self.translate("Flash update with")
-        airgap_msg = self.translate("Airgap update with")
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
 
-        assets_dir = App.get_running_app().config.get("destdir", "assets")
-        main_screen = self.manager.get_screen("MainScreen")
-        zip_file = f"{assets_dir}/krux-{main_screen.version}.zip"
-        base_path = f"krux-{main_screen.version}/maixpy_{main_screen.device}"
-
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
-            if instance.id == f"{self.id}_flash_button":
-                file_path = f"{base_path}/kboot.kfpkg"
-
-            if instance.id == f"{self.id}_airgap_button":
-                file_path = f"{base_path}/firmware.bin"
-
+            file_path = f"{rel_path}/kboot.kfpkg"
             self.ids[instance.id].text = "\n".join(
                 [extract_msg, f"[size=14sp][color=#efcc00]{file_path}[/color][/size]"]
             )
@@ -93,26 +111,78 @@ class UnzipStableScreen(BaseScreen):
 
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
-            to_screen = None
-
-            if instance.id == f"{self.id}_flash_button":
-                file_path = f"{base_path}/kboot.kfpkg"
-                unziper = KbootUnzip(
-                    filename=zip_file, device=main_screen.device, output=assets_dir
-                )
-                to_screen = "FlashScreen"
-
-            if instance.id == f"{self.id}_airgap_button":
-                file_path = f"{base_path}/firmware.bin"
-                unziper = FirmwareUnzip(
-                    filename=zip_file, device=main_screen.device, output=assets_dir
-                )
-                to_screen = "AirgapScreen"
-
-            screen = self.manager.get_screen(to_screen)
+            file_path = f"{base_path}/kboot.kfpkg"
+            unziper = KbootUnzip(
+                filename=zip_file, device=self.device, output=self.assets_dir
+            )
+            screen = self.manager.get_screen("FlashScreen")
             fns = [
                 partial(screen.update, key="firmware", value=file_path),
-                partial(screen.update, key="device", value=main_screen.device),
+                partial(screen.update, key="device", value=self.device),
+            ]
+
+            for fn in fns:
+                Clock.schedule_once(fn, 0)
+
+            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+            unziper.load()
+
+            self.ids[instance.id].text = "\n".join(
+                [
+                    extracted_msg,
+                    f"[size=12sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
+                ]
+            )
+
+            time.sleep(4)
+            self.set_screen(name="FlashScreen", direction="left")
+
+        setattr(UnzipStableScreen, f"on_press_{self.id}_flash_button", _press)
+        setattr(UnzipStableScreen, f"on_release_{self.id}_flash_button", _release)
+
+        self.make_button(
+            id=f"{self.id}_flash_button",
+            root_widget=f"{self.id}_grid",
+            text=f"\n".join(
+                [
+                    flash_msg,
+                    f"[size=14sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
+                ]
+            ),
+            markup=True,
+            row=0,
+            on_press=getattr(UnzipStableScreen, f"on_press_{self.id}_flash_button"),
+            on_release=getattr(UnzipStableScreen, f"on_release_{self.id}_flash_button"),
+        )
+
+    def build_extract_to_airgap_button(self):
+        self.debug("Building airgap button")
+        zip_file = f"{self.assets_dir}/krux-{self.version}.zip"
+        base_path = f"krux-{self.version}/maixpy_{self.device}"
+        rel_path = f"{self.assets_dir}/{base_path}"
+        airgap_msg = self.translate("Airgap update with")
+        extract_msg = self.translate("Unziping")
+        extracted_msg = self.translate("Unziped")
+
+        def _press(instance):
+            self.debug(f"Calling Button::{instance.id}::on_press")
+            file_path = f"{rel_path}/firmware.bin"
+            self.ids[instance.id].text = "\n".join(
+                [extract_msg, f"[size=14sp][color=#efcc00]{file_path}[/color][/size]"]
+            )
+            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+
+        def _release(instance):
+            self.debug(f"Calling Button::{instance.id}::on_release")
+            file_path = f"{base_path}/firmware.bin"
+            unziper = FirmwareUnzip(
+                filename=zip_file, device=self.device, output=self.assets_dir
+            )
+
+            screen = self.manager.get_screen("AirgapScreen")
+            fns = [
+                partial(screen.update, key="firmware", value=file_path),
+                partial(screen.update, key="device", value=self.device),
             ]
             for fn in fns:
                 Clock.schedule_once(fn, 0)
@@ -121,26 +191,17 @@ class UnzipStableScreen(BaseScreen):
             unziper.load()
 
             self.ids[instance.id].text = "\n".join(
-                [extracted_msg, f"[size=12sp][color=#efcc00]{file_path}[/color][/size]"]
+                [
+                    extracted_msg,
+                    f"[size=12sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
+                ]
             )
 
             time.sleep(4)
-            self.set_screen(name=to_screen, direction="left")
+            self.set_screen(name="AirgapScreen", direction="left")
 
-        self.make_button(
-            id=f"{self.id}_flash_button",
-            root_widget=f"{self.id}_grid",
-            text=f"\n".join(
-                [
-                    flash_msg,
-                    f"[size=14sp][color=#efcc00]{assets_dir}/krux-{main_screen.version}/maixpy_{main_screen.device}/kboot.kfpkg[/color][/size]",
-                ]
-            ),
-            markup=True,
-            row=0,
-            on_press=_press,
-            on_release=_release,
-        )
+        setattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button", _press)
+        setattr(UnzipStableScreen, f"on_release_{self.id}_airgap_button", _release)
 
         self.make_button(
             id=f"{self.id}_airgap_button",
@@ -148,11 +209,13 @@ class UnzipStableScreen(BaseScreen):
             text="\n".join(
                 [
                     airgap_msg,
-                    f"[size=14sp][color=#efcc00]{assets_dir}/krux-{main_screen.version}/maixpy_{main_screen.device}/firmware.bin[/color][/size]",
+                    f"[size=14sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
                 ]
             ),
             markup=True,
             row=0,
-            on_press=_press,
-            on_release=_release,
+            on_press=getattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button"),
+            on_release=getattr(
+                UnzipStableScreen, f"on_release_{self.id}_airgap_button"
+            ),
         )

@@ -134,3 +134,8 @@ class BaseScreen(Screen, Trigger):
         self.debug(
             f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
         )
+
+    @staticmethod
+    def get_destdir_assets():
+        app = App.get_running_app()
+        return app.config.get("destdir", "assets")

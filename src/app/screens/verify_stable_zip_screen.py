@@ -83,6 +83,29 @@ class VerifyStableZipScreen(BaseScreen):
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
 
             if self.success:
+                main_screen = self.manager.get_screen("MainScreen")
+                unzip_screen = self.manager.get_screen("UnzipStableScreen")
+
+                fns = [
+                    partial(
+                        unzip_screen.update,
+                        name=self.name,
+                        key="version",
+                        value=main_screen.version,
+                    ),
+                    partial(
+                        unzip_screen.update,
+                        name=self.name,
+                        key="device",
+                        value=main_screen.device,
+                    ),
+                    partial(unzip_screen.update, name=self.name, key="clear"),
+                    partial(unzip_screen.update, name=self.name, key="flash-button"),
+                    partial(unzip_screen.update, name=self.name, key="airgap-button"),
+                ]
+                for fn in fns:
+                    Clock.schedule_once(fn, 0)
+
                 self.set_screen(name="UnzipStableScreen", direction="left")
             else:
                 self.set_screen(name="MainScreen", direction="right")

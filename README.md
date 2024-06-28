@@ -12,6 +12,73 @@ Make sure you have python:
 ```bash
 python --version
 ```
+## Linux
+
+Generally, all Linux come with python.
+
+### MacOS
+
+Before installing `krux-installer` source code, you will need:
+
+1. to install `brew` package manager:
+
+```bash
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+2. Install latest `python`:
+
+```bash
+brew install python
+```
+
+and add this line to your `~/.zshrc`:
+
+```bash
+alias python=python3
+```
+
+3. Ensure `openssl`:
+
+Python's `ssl` module relies on OpenSSL for cryptographic operations. Ensure that OpenSSL
+is installed on your system and is compatible with the Python version you're using.
+
+Since we expect that you're using the Python installed with Homebrew, it's recommended to
+install OpenSSL through Homebrew if it's not already installed:
+
+```bash
+brew install openssl
+```
+
+After installing OpenSSL, make sure it's linked correctly:
+
+```bash
+brew link --force openssl
+```
+
+This ensures that the OpenSSL libraries are available in the expected
+locations that Python can find and use.
+
+4. Patch your `~/.zshrc` (or equivalent):
+
+Library paths on MacOS involves verifying that the environment variables and system
+configurationsare correctyly set to find the necessary libraries, such as OpenSSL,
+which is crucial for the `ssl` module in Python.
+
+On MacOS, the dynamic linker tool `dyld` uses environment variabes to locate shared
+libraries. The primary environment variable for specifying library paths is `DYLD_LIBRARY_PATH`.
+
+Adding the lines below to your `~/.zshrc` (or similar) the `DYLD_LIBRARY_PATH` will be set
+each time you open a new terminal session (and therefore the OpenSSL libraries
+`libcrypto.dylib` and `libssl.dylib` will can be found):
+
+```bash
+OPENSSL_MAJOR_VERSION=`openssl --version | awk '{ print $2}' | cut -d . -f1`
+OPENSSL_FULL_VERSION=`openssl --version | awk ' { print $2}'`
+export DYLD_LIBRARY_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VERSION/$OPENSSL_FULL_VERSION/lib:$DYLD_LIBRARY_PATH"
+```
+
+## Install poetry
 
 Make sure you have `poetry` installed:
 
@@ -82,7 +149,7 @@ poetry run poe test --no-xvfb
 At the moment, you'll need to [patch some code on `kivy`](https://github.com/kivy/kivy/issues/8653#issuecomment-2028509695)
 to build the Graphical User Interface:
 
-**Linux and macOS**:
+**Linux**:
 
 ```
 poetry run poe patch-nix
@@ -94,6 +161,24 @@ poetry run poe patch-nix
 poetry run poe patch-win
 ```
 
+**MacOS**:
+
+
+Then install  `python`, and `openssl`
+modules with the `brew` package manager:
+
+``
+- Install latest python: ``
+find the `ssl` library (necessary for make https requests with `requests` module).
+
+Con
+
+
+To do this, you will need these lines 
+
+```
+poetry run poe patch-nix
+```
 
 Then you can build `krux-installer` as standalone executable:
 

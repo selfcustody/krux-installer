@@ -29,8 +29,9 @@ from pathlib import Path
 from platform import system
 import PyInstaller.__main__
 
+SYSTEM = system()
 # build executable for following systems
-if system() not in ("Linux", "Windows", "Darwin"):
+if SYSTEM not in ("Linux", "Windows", "Darwin"):
     raise OSError(f"OS '{system()}' not implemented")
 
 # Get root path to properly setup
@@ -40,14 +41,19 @@ PYFILE = f"{PYNAME}.py"
 KFILE = str(ROOT_PATH / PYFILE)
 I18NS = str(ROOT_PATH / "src" / "i18n")
 
-BUILDER_ARGS = [
-    PYFILE,
-    "--add-data=pyproject.toml:.",
-    "--add-data=krux_installer.kv:.",
-]
+BUILDER_ARGS = []
+
+# Necessary for get version and
+# another infos in application
+BUILDER_ARGS.append("--add-data=pyproject.toml:.")
+
+# For darwin system, will be necessary
+# to add a hidden import for ssl
+# (necessary for request module)
+if SYSTEM in ("Darwin"):
+    BUILDER_ARGS.append("--hidden-import=ssl")
 
 # Add i18n translations
-
 for f in listdir(I18NS):
     i18n_abs = join(I18NS, f)
     i18n_rel = join("src", "i18n")
@@ -58,9 +64,24 @@ for f in listdir(I18NS):
 
 BUILDER_ARGS.append("--windowed")
 BUILDER_ARGS.append("--onefile")
-BUILDER_ARGS.append(f"-n={PYNAME}")
+BUILDER_ARGS.append(f"--name={PYNAME}")
 
-print("RUN " + " \\\n ".join(BUILDER_ARGS))
+# The application has window
+BUILDER_ARGS.append("--windowed")
+
+# Specifics about operational system
+# on how will behave as file or bundled app
+if SYSTEM in ("Windows", "Darwin"):
+    BUILDER_ARGS.append("--noconsole")
+    
+elif SYSTEM in ("Linux"):
+    BUILDER_ARGS.append("--onefile")
+
+
+# Add which python file will be bundled
+BUILDER_ARGS.append(PYFILE)
+
+print("RUN pyinstaller " + " \\\n ".join(BUILDER_ARGS))
 print()
 
 # Now build

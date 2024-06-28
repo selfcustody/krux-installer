@@ -157,12 +157,13 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             on_press=MagicMock(),
             on_release=MagicMock(),
         )
-        print(screen.ids[f"{screen.id}_grid"])
-        # do tests
-        screen.update(name="VerifyStableZipScreen", key="clear")
 
-        # default assertions
-        self.assertEqual(len(screen.ids[f"{screen.id}_grid"].children), 1)
+        # do tests
+        with patch.object(
+            screen.ids[f"{screen.id}_grid"], "clear_widgets"
+        ) as mock_clear:
+            screen.update(name="VerifyStableZipScreen", key="clear")
+            mock_clear.assert_called_once()
 
         # patch assertions
         mock_get_running_app.assert_has_calls(
@@ -340,8 +341,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
     @patch("src.app.screens.unzip_stable_screen.KbootUnzip")
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.manager")
+    @patch("src.app.screens.unzip_stable_screen.time.sleep")
     def test_on_release_flash_button(
         self,
+        mock_sleep,
         mock_manager,
         mock_kboot_unzip,
         mock_set_background,
@@ -387,6 +390,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_manager.get_screen.assert_called_once_with("FlashScreen")
+        mock_sleep.assert_called_once_with(2.1)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
@@ -397,8 +401,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
     @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.manager")
+    @patch("src.app.screens.unzip_stable_screen.time.sleep")
     def test_on_release_aigap_button(
         self,
+        mock_sleep,
         mock_manager,
         mock_firmware_unzip,
         mock_set_background,
@@ -444,3 +450,4 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_manager.get_screen.assert_called_once_with("AirgapScreen")
+        mock_sleep.assert_called_once_with(2.1)

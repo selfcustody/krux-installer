@@ -79,9 +79,11 @@ class UnzipStableScreen(BaseScreen):
             self.device = value
 
         elif key == "clear":
-            if len(self.ids[f"{self.id}_grid"].ids) > 0:
+            if len(self.ids[f"{self.id}_grid"].children) > 0:
                 self.debug(f"Clearing '{self.id}_grid'")
                 self.ids[f"{self.id}_grid"].clear_widgets()
+            else:
+                self.debug(f"Skip clearing '{self.id}_grid'")
 
         elif key == "flash-button":
             self.build_extract_to_flash_button()
@@ -134,7 +136,7 @@ class UnzipStableScreen(BaseScreen):
                 ]
             )
 
-            time.sleep(4)
+            time.sleep(2.1)
             self.set_screen(name="FlashScreen", direction="left")
 
         setattr(UnzipStableScreen, f"on_press_{self.id}_flash_button", _press)
@@ -197,7 +199,7 @@ class UnzipStableScreen(BaseScreen):
                 ]
             )
 
-            time.sleep(4)
+            time.sleep(2.1)
             self.set_screen(name="AirgapScreen", direction="left")
 
         setattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button", _press)

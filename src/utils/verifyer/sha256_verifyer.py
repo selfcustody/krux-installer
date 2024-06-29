@@ -45,7 +45,7 @@ class Sha256Verifyer(BaseVerifyer):
 
         # pylint: disable=unspecified-encoding
         with open(self.filename, self.read_mode) as f_data:
-            # Read and update hash string value in blocks of 1K
+            # Read and update hash string value in blocks of 1K bytes
             for byte_block in iter(lambda: f_data.read(1024), b""):
                 self.debug(f"load::block={byte_block}")
                 sha256_hash.update(byte_block)

@@ -49,30 +49,6 @@ class VerifyStableZipScreen(BaseScreen):
         )
         self.success = False
         self.make_grid(wid=f"{self.id}_grid", rows=1)
-        with self.canvas.before:
-            Color(0, 0, 0, 1)
-            Rectangle(size=(Window.width, Window.height))
-
-    def update(self, *args, **kwargs):
-        """Update widget from other screens"""
-
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-
-        # Check if update to screen
-        if name in ("ConfigKruxInstaller"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            raise ValueError(f"Invalid screen name: {name}")
-
-        # Check locale
-        if key == "locale":
-            self.locale = value
-
-    def on_pre_enter(self):
-        self.ids[f"{self.id}_grid"].clear_widgets()
-        verifying_msg = self.translate("Verifying integrity and authenticity")
 
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
@@ -110,18 +86,46 @@ class VerifyStableZipScreen(BaseScreen):
             else:
                 self.set_screen(name="MainScreen", direction="right")
 
+        setattr(VerifyStableZipScreen, f"on_press_{self.id}_button", _press)
+        setattr(VerifyStableZipScreen, f"on_release_{self.id}_button", _release)
+
+        with self.canvas.before:
+            Color(0, 0, 0, 1)
+            Rectangle(size=(Window.width, Window.height))
+
+    def update(self, *args, **kwargs):
+        """Update widget from other screens"""
+
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        # Check if update to screen
+        if name in ("ConfigKruxInstaller"):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
+
+        # Check locale
+        if key == "locale":
+            self.locale = value
+
+    def on_pre_enter(self):
+        self.ids[f"{self.id}_grid"].clear_widgets()
+        verifying_msg = self.translate("Verifying integrity and authenticity")
+
         self.make_button(
             id=f"{self.id}_button",
             root_widget=f"{self.id}_grid",
             text=f"[size=32sp][color=#efcc00]{verifying_msg}[/color][/size]",
             markup=True,
             row=0,
-            on_press=_press,
-            on_release=_release,
+            on_press=getattr(VerifyStableZipScreen, f"on_press_{self.id}_button"),
+            on_release=getattr(VerifyStableZipScreen, f"on_release_{self.id}_button"),
         )
 
     def on_enter(self):
-        assets_dir = App.get_running_app().config.get("destdir", "assets")
+        assets_dir = VerifyStableZipScreen.get_destdir_assets()
         main_screen = self.manager.get_screen("MainScreen")
 
         result_sha256 = self.verify_sha256(

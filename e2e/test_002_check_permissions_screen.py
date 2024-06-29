@@ -34,7 +34,9 @@ class TestAboutScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), "Invalid screen: Mock")
 
         # patch assertions
-        mock_get_running_app.assert_called_once()
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
@@ -56,7 +58,9 @@ class TestAboutScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), "Invalid key: 'mock'")
 
         # patch assertions
-        mock_get_running_app.assert_called_once()
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")

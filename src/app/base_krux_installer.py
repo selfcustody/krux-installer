@@ -33,11 +33,6 @@ DEFAULT_DESTDIR = tempfile.mkdtemp()
 DEFAULT_BAUDRATE = 1500000
 DEFAULT_LOCALE = "en-US"
 
-if "LOGLEVEL" in os.environ:
-    Logger.setLevel(LOG_LEVELS[os.environ["LOGLEVEL"]])
-else:
-    Logger.setLevel(LOG_LEVELS["info"])
-
 
 class BaseKruxInstaller(App, Trigger):
     """BaseKruxInstller is the base for Appliction"""
@@ -46,6 +41,11 @@ class BaseKruxInstaller(App, Trigger):
         super().__init__(**kwargs)
         self.screens = []
         self.screen_manager = ScreenManager()
+
+        if "LOGLEVEL" in os.environ:
+            Logger.setLevel(LOG_LEVELS[os.environ["LOGLEVEL"]])
+        else:
+            Logger.setLevel(LOG_LEVELS["info"])
 
     @property
     def screens(self) -> typing.List[Screen]:

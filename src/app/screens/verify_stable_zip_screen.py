@@ -21,6 +21,7 @@
 """
 verify_stable_zip_screen.py
 """
+import io
 import time
 from functools import partial
 from kivy.clock import Clock

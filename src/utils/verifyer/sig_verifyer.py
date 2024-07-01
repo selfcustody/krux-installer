@@ -43,5 +43,6 @@ class SigVerifyer(CheckVerifyer):
             algorithm = asymmetric.ec.ECDSA(hashes.SHA256())
             self.certificate.verify(self.signature, self.data, algorithm)
             return True
-        except InvalidSignature:
+        except InvalidSignature as exc_info:
+            print(exc_info)
             return False

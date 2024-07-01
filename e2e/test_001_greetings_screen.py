@@ -248,10 +248,10 @@ class TestAboutScreen(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("sys.platform", "macos")
+    @patch("sys.platform", "darwin")
     @patch("src.app.screens.base_screen.App.get_running_app")
     @patch("src.app.screens.greetings_screen.partial")
-    def test_on_enter_in_macos(self, mock_partial, mock_get_running_app):
+    def test_on_enter_in_darwin(self, mock_partial, mock_get_running_app):
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock()
 

@@ -102,7 +102,7 @@ class VerifyStableZipScreen(BaseScreen):
         value = kwargs.get("value")
 
         # Check if update to screen
-        if name in ("ConfigKruxInstaller"):
+        if name in ("ConfigKruxInstaller", "VerifyStableZipScreen"):
             self.debug(f"Updating {self.name} from {name}...")
         else:
             raise ValueError(f"Invalid screen name: {name}")
@@ -110,6 +110,9 @@ class VerifyStableZipScreen(BaseScreen):
         # Check locale
         if key == "locale":
             self.locale = value
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')
 
     def on_pre_enter(self):
         self.ids[f"{self.id}_grid"].clear_widgets()

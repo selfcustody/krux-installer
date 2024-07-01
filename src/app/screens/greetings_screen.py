@@ -107,7 +107,7 @@ class GreetingsScreen(BaseScreen):
                 value="CheckPermissionsScreen",
             )
 
-        elif sys.platform == "macos" or sys.platform == "win32":
+        elif sys.platform == "darwin" or sys.platform == "win32":
             fn = partial(
                 self.update, name=self.name, key="change_screen", value="MainScreen"
             )

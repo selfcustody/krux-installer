@@ -205,3 +205,215 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         mock_verify_signature.assert_called_once_with(
             assets_dir="mockdir", version=mock_manager.get_screen().version
         )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_update_invalid_name(self, mock_get_running_app):
+        screen = VerifyStableZipScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name="MockScreen")
+
+        # default assertions
+        self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_update_key(self, mock_get_running_app):
+        screen = VerifyStableZipScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name=screen.name, key="mock")
+
+        # default assertions
+        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_update_locale(self, mock_get_running_app):
+        screen = VerifyStableZipScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        screen.update(name="ConfigKruxInstaller", key="locale", value="en_US.UTF-8")
+
+        # default assertions
+        self.assertEqual(screen.locale, "en_US.UTF-8")
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_background"
+    )
+    def test_on_press_verify_stable_zip_screen_button(
+        self, mock_set_background, mock_get_running_app
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = VerifyStableZipScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # DO tests
+        screen.on_pre_enter()
+        button = screen.ids[f"{screen.id}_button"]
+        action = getattr(VerifyStableZipScreen, f"on_press_{screen.id}_button")
+        action(button)
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+        mock_set_background.assert_called_once_with(
+            wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_background"
+    )
+    @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.manager")
+    @patch("src.app.screens.verify_stable_zip_screen.partial")
+    @patch("src.app.screens.verify_stable_zip_screen.Clock.schedule_once")
+    @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_screen")
+    def test_on_release_verify_stable_zip_screen_button_success(
+        self,
+        mock_set_screen,
+        mock_schedule_once,
+        mock_partial,
+        mock_manager,
+        mock_set_background,
+        mock_get_running_app,
+    ):
+        mock_manager.get_screen = MagicMock()
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = VerifyStableZipScreen()
+        screen.success = True
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # DO tests
+        screen.on_pre_enter()
+        button = screen.ids[f"{screen.id}_button"]
+        action = getattr(screen, f"on_release_{screen.id}_button")
+        action(button)
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+        # mock_kboot_unzip.load.assert_called_once()
+        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
+        mock_manager.get_screen.assert_has_calls(
+            [call("MainScreen"), call("UnzipStableScreen")]
+        )
+
+        mock_partial.assert_has_calls(
+            [
+                call(
+                    mock_manager.get_screen().update,
+                    name="VerifyStableZipScreen",
+                    key="version",
+                    value=mock_manager.get_screen().version,
+                ),
+                call(
+                    mock_manager.get_screen().update,
+                    name="VerifyStableZipScreen",
+                    key="device",
+                    value=mock_manager.get_screen().device,
+                ),
+                call(
+                    mock_manager.get_screen().update,
+                    name="VerifyStableZipScreen",
+                    key="clear",
+                ),
+                call(
+                    mock_manager.get_screen().update,
+                    name="VerifyStableZipScreen",
+                    key="flash-button",
+                ),
+                call(
+                    mock_manager.get_screen().update,
+                    name="VerifyStableZipScreen",
+                    key="airgap-button",
+                ),
+            ]
+        )
+
+        assert len(mock_schedule_once.mock_calls) == 5
+        mock_schedule_once.assert_has_calls([call(mock_partial(), 0)])
+        mock_set_screen.assert_called_once_with(
+            name="UnzipStableScreen", direction="left"
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_background"
+    )
+    @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_screen")
+    def test_on_release_verify_stable_zip_screen_button_failed(
+        self,
+        mock_set_screen,
+        mock_set_background,
+        mock_get_running_app,
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = VerifyStableZipScreen()
+        screen.success = False
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # DO tests
+        screen.on_pre_enter()
+        button = screen.ids[f"{screen.id}_button"]
+        action = getattr(screen, f"on_release_{screen.id}_button")
+        action(button)
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
+        # mock_kboot_unzip.load.assert_called_once()
+        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
+        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")

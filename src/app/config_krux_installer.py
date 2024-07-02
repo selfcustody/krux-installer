@@ -95,9 +95,7 @@ class ConfigKruxInstaller(BaseKruxInstaller):
     def get_application_config(self) -> str:
         """Custom path for config.ini"""
         ConfigKruxInstaller.create_app_dir(name="config")
-        file = ConfigKruxInstaller.create_app_file(
-            context="config", name="config.ini"
-        )
+        file = ConfigKruxInstaller.create_app_file(context="config", name="config.ini")
 
         self.debug(f"ConfigKruxInstaller.get_application_config = {file}")
         return super(BaseKruxInstaller, self).get_application_config(file)

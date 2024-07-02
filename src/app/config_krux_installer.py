@@ -23,94 +23,99 @@ krux_installer.py
 """
 import os
 import sys
+import ctypes
+import locale
 from functools import partial
 from kivy.clock import Clock
 from src.app.base_krux_installer import BaseKruxInstaller
-
-if os.name == "posix":
-    LANG = os.getenv("LANG")
-else:
-    import platform
-
-    if platform.system() == "Windows":
-        import ctypes
-        import locale
-
-        windll = ctypes.windll.kernel32
-        windll.GetUserDefaultUILanguage()
-        LANG = locale.windows_locale[windll.GetUserDefaultUILanguage()]
-    else:
-        raise OSError(f"OS '{platform.system()}' not recognized")
-
-
-DEFAULT_BAUDRATE = 1500000
 
 
 class ConfigKruxInstaller(BaseKruxInstaller):
     """BaseKruxInstller is the base for Appliction"""
 
-    # pylint: disable=signature-differs,arguments-differ
-    def get_application_config(self) -> str:
-        """Custom path for config.ini"""
+    @staticmethod
+    def get_system_lang():
+        """Get operational system LANG"""
+        if sys.platform in ("linux", "darwin"):
+            return os.getenv("LANG")
+
+        if sys.platform == "win32":
+            windll = ctypes.windll.kernel32
+            return locale.windows_locale[windll.GetUserDefaultUILanguage()]
+
+        raise OSError(f"OS '{sys.platform}' not recognized")
+
+    @staticmethod
+    def get_app_dir(name: str) -> str:
+        """ "Get the full path of config folder"""
+        if not name in ("config", "local"):
+            raise ValueError(f"Invalid name: '{name}'")
+
         _system = sys.platform
         localappdata = None
         _kruxappdata = None
+
         if _system == "linux":
             localappdata = os.path.expanduser("~")
-            _kruxappdata = os.path.join(localappdata, ".config", "krux-installer")
-        elif _system == "win32":
+            return os.path.join(localappdata, f".{name}", "krux-installer")
+
+        if _system == "win32":
             localappdata = os.getenv("LOCALAPPDATA")
-            _kruxappdata = os.path.join(localappdata, "krux-installer")
-        elif _system == "darwin":
+            return os.path.join(localappdata, "krux-installer", name)
+
+        if _system == "darwin":
             localappdata = os.path.expanduser("~")
-            _kruxappdata = os.path.join(
-                localappdata, "Library", "Application Support", "krux-installer"
+            return os.path.join(
+                localappdata, "Library", "Application Support", "krux-installer", name
             )
-        else:
-            raise OSError(f"Not supported: {sys.platform}")
 
-        _kruxconfig = os.path.join(_kruxappdata, "config.ini")
+        raise OSError(f"Not supported: {sys.platform}")
 
-        if not os.path.exists(_kruxappdata):
-            os.makedirs(_kruxappdata)
+    @staticmethod
+    def create_app_dir(name: str) -> bool:
+        """ "Create the config folder"""
+        path = ConfigKruxInstaller.get_app_dir(name=name)
+        if not os.path.exists(path):
+            print(path)
+            os.makedirs(path)
+        return path
 
-        if not os.path.exists(_kruxconfig):
-            with open(_kruxconfig, "w", encoding="utf8"):
-                pass
+    @staticmethod
+    def create_app_file(context: str, name: str) -> bool:
+        """ "Create config.ini file"""
+        path = ConfigKruxInstaller.get_app_dir(name=context)
+        file = os.path.join(path, name)
+        if not os.path.exists(file):
+            with open(file, "w", encoding="utf8") as f:
+                f.write("# Generated config. Do not edit this manually!\n")
 
-        self.debug(f"ConfigKruxInstaller.get_application_config = {_kruxconfig}")
-        return super(BaseKruxInstaller, self).get_application_config(_kruxconfig)
+        return file
+
+    # pylint: disable=signature-differs,arguments-differ
+    def get_application_config(self) -> str:
+        """Custom path for config.ini"""
+        ConfigKruxInstaller.create_app_dir(name="config")
+        file = ConfigKruxInstaller.create_app_file(
+            context="config", name="config.ini"
+        )
+
+        self.debug(f"ConfigKruxInstaller.get_application_config = {file}")
+        return super(BaseKruxInstaller, self).get_application_config(file)
 
     def build_config(self, config):
         """Create default configurations for app"""
-        _system = sys.platform
-        localdata = None
-        _kruxdata = None
-        if _system == "linux":
-            localdata = os.path.expanduser("~")
-            _kruxdata = os.path.join(localdata, ".local", "krux-installer")
-        elif _system == "win32":
-            localdata = os.getenv("LOCALAPPDATA")
-            _kruxdata = os.path.join(localdata, "krux-installer")
-        elif _system == "darwin":
-            localdata = os.path.expanduser("~")
-            _kruxdata = os.path.join(
-                localdata, "Library", "Application Support", "krux-installer"
-            )
-        else:
-            raise OSError(f"Not supported: {sys.platform}")
+        _dir = ConfigKruxInstaller.create_app_dir(name="local")
 
-        if not os.path.exists(_kruxdata):
-            os.makedirs(_kruxdata)
+        config.setdefaults("destdir", {"assets": _dir})
+        self.debug(f"{config}.destdir={_dir}")
 
-        config.setdefaults("destdir", {"assets": _kruxdata})
-        self.debug(f"{config}.destdir={_kruxdata}")
+        baudrate = 1500000
+        config.setdefaults("flash", {"baudrate": baudrate})
+        self.debug(f"{config}.baudrate={baudrate}")
 
-        config.setdefaults("flash", {"baudrate": DEFAULT_BAUDRATE})
-        self.debug(f"{config}.baudrate={DEFAULT_BAUDRATE}")
-
-        config.setdefaults("locale", {"lang": LANG})
-        self.debug(f"{config}.lang={LANG}")
+        lang = ConfigKruxInstaller.get_system_lang()
+        config.setdefaults("locale", {"lang": lang})
+        self.debug(f"{config}.lang={lang}")
 
     def build_settings(self, settings):
         """Create settings panel"""

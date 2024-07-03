@@ -23,6 +23,7 @@ krux_installer.py
 """
 import os
 import sys
+import json
 import ctypes
 import locale
 from functools import partial
@@ -46,42 +47,39 @@ class ConfigKruxInstaller(BaseKruxInstaller):
         raise OSError(f"OS '{sys.platform}' not recognized")
 
     @staticmethod
-    def get_app_dir(name: str) -> str:
+    def get_app_dir(name: str) -> str | None:
         """ "Get the full path of config folder"""
-        if not name in ("config", "local"):
+        if name not in ("config", "local"):
             raise ValueError(f"Invalid name: '{name}'")
 
         _system = sys.platform
-        localappdata = None
-        _kruxappdata = None
 
-        if _system == "linux":
+        if _system in ("linux", "darwin"):
             localappdata = os.path.expanduser("~")
             return os.path.join(localappdata, f".{name}", "krux-installer")
 
         if _system == "win32":
-            localappdata = os.getenv("LOCALAPPDATA")
-            return os.path.join(localappdata, "krux-installer", name)
+            if "LOCALAPPDATA" in os.environ:
+                localappdata = os.environ["LOCALAPPDATA"]
+                if localappdata is not None and localappdata != "":
+                    return os.path.join(localappdata, "krux-installer", name)
 
-        if _system == "darwin":
-            localappdata = os.path.expanduser("~")
-            return os.path.join(
-                localappdata, "Library", "Application Support", "krux-installer", name
-            )
+                raise EnvironmentError("LOCALAPPDATA is empty")
+
+            raise EnvironmentError("LOCALAPPDATA environment variable not found")
 
         raise OSError(f"Not supported: {sys.platform}")
 
     @staticmethod
-    def create_app_dir(name: str) -> bool:
+    def create_app_dir(name: str) -> str:
         """ "Create the config folder"""
         path = ConfigKruxInstaller.get_app_dir(name=name)
         if not os.path.exists(path):
-            print(path)
             os.makedirs(path)
         return path
 
     @staticmethod
-    def create_app_file(context: str, name: str) -> bool:
+    def create_app_file(context: str, name: str) -> str:
         """ "Create config.ini file"""
         path = ConfigKruxInstaller.get_app_dir(name=context)
         file = os.path.join(path, name)
@@ -98,7 +96,7 @@ class ConfigKruxInstaller(BaseKruxInstaller):
         file = ConfigKruxInstaller.create_app_file(context="config", name="config.ini")
 
         self.debug(f"ConfigKruxInstaller.get_application_config = {file}")
-        return super(BaseKruxInstaller, self).get_application_config(file)
+        return super().get_application_config(file)
 
     def build_config(self, config):
         """Create default configurations for app"""
@@ -117,22 +115,22 @@ class ConfigKruxInstaller(BaseKruxInstaller):
 
     def build_settings(self, settings):
         """Create settings panel"""
-        jsondata = """[
-            { 
+        json_data = [
+            {
                 "type": "path",
                 "title": "Assets's destination path",
                 "desc": "Destination path of downloaded assets",
                 "section": "destdir",
-                "key": "assets"
-            },            
-            { 
+                "key": "assets",
+            },
+            {
                 "type": "numeric",
                 "title": "Flash baudrate",
                 "desc": "Applied baudrate during the flash process",
                 "section": "flash",
-                "key": "baudrate"
-            },            
-            { 
+                "key": "baudrate",
+            },
+            {
                 "type": "options",
                 "title": "Locale",
                 "desc": "Application locale",
@@ -145,12 +143,14 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                     "fr_FR.UTF-8",
                     "it_IT.UTF-8",
                     "pt_BR.UTF-8",
-                    "ru_RU.UTF-8"
-                ]
-            }
-        ]"""
-        self.debug(f"{settings}.data={jsondata}")
-        settings.add_json_panel("Settings", self.config, data=jsondata)
+                    "ru_RU.UTF-8",
+                ],
+            },
+        ]
+
+        json_str = json.dumps(json_data)
+        self.debug(f"{settings}.data={json_str}")
+        settings.add_json_panel("Settings", self.config, data=json_str)
 
     def on_config_change(self, config, section, key, value):
         if section == "locale" and key == "lang":

@@ -1,6 +1,7 @@
 import os
+import json
 from unittest.mock import patch, MagicMock, call, mock_open
-from kivy.base import EventLoop, EventLoopBase
+from kivy.base import EventLoop
 from kivy.tests.common import GraphicUnitTest
 from src.app.config_krux_installer import ConfigKruxInstaller
 
@@ -11,21 +12,18 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     def teardown_class(cls):
         EventLoop.exit()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
     @patch("sys.platform", "linux")
     def test_get_system_lang_linux(self):
         lang = ConfigKruxInstaller.get_system_lang()
         self.assertEqual(lang, "en-US.UTF-8")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
     @patch("sys.platform", "darwin")
     def test_get_system_lang_darwin(self):
         lang = ConfigKruxInstaller.get_system_lang()
         self.assertEqual(lang, "en-US.UTF-8")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
     @patch("sys.platform", "win32")
     @patch("src.app.config_krux_installer.ctypes")
@@ -45,7 +43,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         mock_ctypes.windll.kernel32.GetUserDefaultUILanguage.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
     @patch("sys.platform", "mockos")
     def test_fail_get_system_lang(self):
@@ -54,7 +51,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         self.assertEqual(str(exc_info.exception), "OS 'mockos' not recognized")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
     def test_get_app_dir_config_linux(self, mock_expanduser):
@@ -66,36 +62,45 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         # patch assertions
         mock_expanduser.assert_called_once_with("~")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch.dict(os.environ, {"LOCALAPPDATA": "mockdir"}, clear=True)
     @patch("sys.platform", "win32")
-    @patch("src.app.config_krux_installer.os.getenv", return_value="mockdir")
-    def test_get_app_dir_config_win32(self, mock_getenv):
+    def test_get_app_dir_config_win32(self):
         app = ConfigKruxInstaller()
         _dir = app.get_app_dir(name="config")
 
         self.assertEqual(_dir, os.path.join("mockdir", "krux-installer", "config"))
 
-        # patch assertions
-        mock_getenv.assert_called_once_with("LOCALAPPDATA")
+    @patch.dict(os.environ, {"LOCALAPPDATA": ""}, clear=True)
+    @patch("sys.platform", "win32")
+    def test_fail_get_app_dir_config_win32_empty(self):
+        app = ConfigKruxInstaller()
+        with self.assertRaises(EnvironmentError) as exc_info:
+            app.get_app_dir(name="config")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+        self.assertEqual(str(exc_info.exception), "LOCALAPPDATA is empty")
+
+    @patch.dict(os.environ, {"MOCKAPPDATA": "mockdir"}, clear=True)
+    @patch("sys.platform", "win32")
+    def test_fail_get_app_dir_config_win32_not_found(self):
+        app = ConfigKruxInstaller()
+        with self.assertRaises(EnvironmentError) as exc_info:
+            app.get_app_dir(name="config")
+
+        self.assertEqual(
+            str(exc_info.exception), "LOCALAPPDATA environment variable not found"
+        )
+
     @patch("sys.platform", "darwin")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
     def test_get_app_dir_config_darwin(self, mock_expanduser):
         app = ConfigKruxInstaller()
         _dir = app.get_app_dir(name="config")
 
-        self.assertEqual(
-            _dir,
-            os.path.join(
-                "mockdir", "Library", "Application Support", "krux-installer", "config"
-            ),
-        )
+        self.assertEqual(_dir, os.path.join("mockdir", ".config", "krux-installer"))
 
         # patch assertions
         mock_expanduser.assert_called_once_with("~")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "mockos")
     def test_fail_get_app_dir_config_wrong_name(self):
         app = ConfigKruxInstaller()
@@ -105,7 +110,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         self.assertEqual(str(exc_info.exception), "Invalid name: 'mock'")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "mockos")
     def test_fail_get_app_dir_config_wrong_os(self):
         app = ConfigKruxInstaller()
@@ -115,7 +119,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         self.assertEqual(str(exc_info.exception), "Not supported: mockos")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False])
@@ -126,28 +129,27 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         dir_test = os.path.join("mockdir", ".config", "krux-installer")
 
         self.assertEqual(_dir, dir_test)
+
         # patch assertions
         mock_expanduser.assert_called_once_with("~")
         mock_exists.assert_called_once_with(dir_test)
         mock_makedirs.assert_called_once_with(dir_test)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch.dict(os.environ, {"LOCALAPPDATA": "mockdir"}, clear=True)
     @patch("sys.platform", "win32")
-    @patch("src.app.config_krux_installer.os.getenv", return_value="mockdir")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False])
     @patch("src.app.config_krux_installer.os.makedirs")
-    def test_create_app_dir_win32(self, mock_makedirs, mock_exists, mock_getenv):
+    def test_create_app_dir_win32(self, mock_makedirs, mock_exists):
         app = ConfigKruxInstaller()
         _dir = app.create_app_dir(name="config")
         dir_test = os.path.join("mockdir", "krux-installer", "config")
 
         self.assertEqual(_dir, dir_test)
+
         # patch assertions
-        mock_getenv.assert_called_once_with("LOCALAPPDATA")
         mock_exists.assert_called_once_with(dir_test)
         mock_makedirs.assert_called_once_with(dir_test)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "darwin")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False])
@@ -155,17 +157,15 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     def test_create_app_dir_darwin(self, mock_makedirs, mock_exists, mock_expanduser):
         app = ConfigKruxInstaller()
         _dir = app.create_app_dir(name="config")
-        dir_test = os.path.join(
-            "mockdir", "Library", "Application Support", "krux-installer", "config"
-        )
+        dir_test = os.path.join("mockdir", ".config", "krux-installer")
 
         self.assertEqual(_dir, dir_test)
+
         # patch assertions
         mock_expanduser.assert_called_once_with("~")
         mock_exists.assert_called_once_with(dir_test)
         mock_makedirs.assert_called_once_with(dir_test)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False, False])
@@ -188,12 +188,11 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             any_order=True,
         )
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch.dict(os.environ, {"LOCALAPPDATA": "mockdir"}, clear=True)
     @patch("sys.platform", "win32")
-    @patch("src.app.config_krux_installer.os.getenv", return_value="mockdir")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False, False])
     @patch("builtins.open", new_callable=mock_open)
-    def test_create_app_file_win32(self, open_mock, mock_exists, mock_getenv):
+    def test_create_app_file_win32(self, open_mock, mock_exists):
         app = ConfigKruxInstaller()
         file = app.create_app_file(context="config", name="config.ini")
         file_test = os.path.join("mockdir", "krux-installer", "config", "config.ini")
@@ -201,7 +200,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         self.assertEqual(file, file_test)
 
         # patch assertions
-        mock_getenv.assert_called_once_with("LOCALAPPDATA")
         mock_exists.assert_called_once_with(file_test)
         open_mock.assert_has_calls(
             [
@@ -211,7 +209,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             any_order=True,
         )
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "darwin")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False, False])
@@ -221,10 +218,8 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         file = app.create_app_file(context="config", name="config.ini")
         file_test = os.path.join(
             "mockdir",
-            "Library",
-            "Application Support",
+            ".config",
             "krux-installer",
-            "config",
             "config.ini",
         )
 
@@ -239,4 +234,119 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 call().write("# Generated config. Do not edit this manually!\n"),
             ],
             any_order=True,
+        )
+
+    @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir")
+    @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_file")
+    @patch("src.app.config_krux_installer.BaseKruxInstaller.get_application_config")
+    def test_get_application_config(
+        self, mock_get_application_config, mock_create_app_file, mock_create_app_dir
+    ):
+        mock_create_app_file.return_value = os.path.join("mockfile")
+        app = ConfigKruxInstaller()
+        app.get_application_config()
+
+        # patch assertions
+        mock_create_app_dir.assert_called_once_with(name="config")
+        mock_create_app_file.assert_called_once_with(
+            context="config", name="config.ini"
+        )
+        mock_get_application_config.assert_called_once_with("mockfile")
+
+    @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir")
+    @patch("src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang")
+    def test_build_config(self, mock_get_system_lang, mock_create_app_dir):
+        mock_create_app_dir.return_value = "mockdir"
+        config = MagicMock()
+        config.setdefaults = MagicMock()
+        mock_get_system_lang.return_value = "en_US.UTF8"
+
+        app = ConfigKruxInstaller()
+        app.build_config(config)
+
+        # patch assertions
+        mock_create_app_dir.assert_called_once_with(name="local")
+        config.setdefaults.assert_has_calls(
+            [
+                call("destdir", {"assets": "mockdir"}),
+                call("flash", {"baudrate": 1500000}),
+                call("locale", {"lang": "en_US.UTF8"}),
+            ]
+        )
+
+    def test_build_settings(self):
+        settings = MagicMock()
+        settings.add_json_panel = MagicMock()
+        app = ConfigKruxInstaller()
+        app.build_settings(settings)
+
+        json_data = [
+            {
+                "type": "path",
+                "title": "Assets's destination path",
+                "desc": "Destination path of downloaded assets",
+                "section": "destdir",
+                "key": "assets",
+            },
+            {
+                "type": "numeric",
+                "title": "Flash baudrate",
+                "desc": "Applied baudrate during the flash process",
+                "section": "flash",
+                "key": "baudrate",
+            },
+            {
+                "type": "options",
+                "title": "Locale",
+                "desc": "Application locale",
+                "section": "locale",
+                "key": "lang",
+                "options": [
+                    "af_ZA.UTF-8",
+                    "en_US.UTF-8",
+                    "es_ES.UTF-8",
+                    "fr_FR.UTF-8",
+                    "it_IT.UTF-8",
+                    "pt_BR.UTF-8",
+                    "ru_RU.UTF-8",
+                ],
+            },
+        ]
+
+        # patch assertions
+        settings.add_json_panel.assert_has_calls(
+            [call("Settings", None, data=json.dumps(json_data))], any_order=True
+        )
+
+    def test_on_config_change(self):
+        app = ConfigKruxInstaller()
+
+        app.screen_manager = MagicMock()
+        app.screen_manager.get_screen = MagicMock()
+        app.screens = [
+            MagicMock(name="MainScreen"),
+            MagicMock(name="SelectVersionScreen"),
+            MagicMock(name="SelectOldVersionScreen"),
+            MagicMock(name="WarningAlreadyDownloadedScreen"),
+            MagicMock(name="WarningBetaScreen"),
+            MagicMock(name="VerifyStableZipScreen"),
+            MagicMock(name="UnzipStableScreen"),
+            MagicMock(name="CheckPermissionsScreen"),
+        ]
+
+        # Do tests
+        app.on_config_change(None, "locale", key="lang", value="mock")
+
+        # patch assertions
+        app.screen_manager.get_screen.assert_has_calls(
+            [
+                call("MainScreen"),
+                call("SelectVersionScreen"),
+                call("SelectOldVersionScreen"),
+                call("WarningAlreadyDownloadedScreen"),
+                call("WarningBetaScreen"),
+                call("VerifyStableZipScreen"),
+                call("UnzipStableScreen"),
+                call("CheckPermissionsScreen"),
+            ]
         )

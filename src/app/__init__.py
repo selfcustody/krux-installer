@@ -21,12 +21,8 @@
 """
 __init__.py
 """
-import os
 import sys
-from kivy.app import App
-from kivy.cache import Cache
 from kivy.core.window import Window
-from kivy.lang.builder import Builder
 from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.greetings_screen import GreetingsScreen
 from src.app.screens.check_permissions_screen import CheckPermissionsScreen
@@ -60,16 +56,25 @@ class KruxInstallerApp(ConfigKruxInstaller):
         self.debug(f"Window.size={Window.size}")
         Window.clearcolor = (0.9, 0.9, 0.9, 1)
 
-    def build(self):
-        """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
+    def setup_screen_manager(self):
+        """Loop through defined screens (if have at lease one) and add it to screen_manager"""
+        if len(self.screens) > 0:
+            for screen in self.screens:
+                msg = f"adding screen '{screen.name}'"
+                self.debug(msg)
+                self.screen_manager.add_widget(screen)
 
-        screens = []
-        screens.append(GreetingsScreen())
+        else:
+            raise RuntimeError("Cannot setup screen_manager: screen list is empty")
+
+    def setup_screens(self):
+        """ "Configure all screens given an OS"""
+        self.screens.append(GreetingsScreen())
 
         if sys.platform == "linux":
-            screens.append(CheckPermissionsScreen())
+            self.screens.append(CheckPermissionsScreen())
 
-        screens = screens + [
+        self.screens = self.screens + [
             MainScreen(),
             SelectDeviceScreen(),
             SelectVersionScreen(),
@@ -87,9 +92,8 @@ class KruxInstallerApp(ConfigKruxInstaller):
             FlashScreen(),
         ]
 
-        for screen in screens:
-            msg = f"adding screen '{screen.name}'"
-            self.debug(msg)
-            self.screen_manager.add_widget(screen)
-
+    def build(self):
+        """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
+        self.setup_screens()
+        self.setup_screen_manager()
         return self.screen_manager

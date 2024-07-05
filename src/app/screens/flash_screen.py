@@ -21,15 +21,13 @@
 """
 main_screen.py
 """
-import os
 import sys
 import math
-import distro
+from kivy.app import App
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from kivy.uix.label import Label
 from src.app.screens.base_screen import BaseScreen
 from kivy_circular_progress_bar import CircularProgressBar
 from src.utils.flasher import Flasher
@@ -41,15 +39,51 @@ class FlashScreen(BaseScreen):
     def __init__(self, **kwargs):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
         self.firmware = None
-        self.device = None
-
-        self.make_grid(wid="flash_screen_grid", rows=1)
+        self.baudrate = None
+        self.make_grid(wid=f"{self.id}_grid", rows=1)
 
         with self.canvas.before:
             Color(0, 0, 0, 1)
             Rectangle(size=(Window.width, Window.height))
 
-        progress_bar_label = Label(text="0.0%", valign="center", halign="center")
+    def on_pre_enter(self):
+        self.ids[f"{self.id}_grid"].clear_widgets()
+        verifying_msg = self.translate("Preparing flash")
+
+        def _flash(file_type: str, iteration: int, total: int, suffix: str):
+            self.info(f"file_type: {file_type}")
+            self.info(f"iteration: {iteration}")
+            self.info(f"total: {total}")
+            self.info(f"suffix: {suffix}")
+            print()
+            
+        setattr(FlashScreen, "on_flash", _flash)
+
+        def _press(instance):
+            self.debug(f"Calling Button::{instance.id}::on_press")
+            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+            self.ids[f"{self.id}_button"].text = ""
+
+        def _release(instance):
+            self.debug(f"Calling Button::{instance.id}::on_release")
+            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+            flasher = Flasher(firmware=self.firmware, baudrate=self.baudrate)
+            flasher.flash(callback=getattr(FlashScreen, "on_flash"))
+
+        
+        setattr(FlashScreen, f"on_press_{self.id}_button", _press)
+        setattr(FlashScreen, f"on_release_{self.id}_button", _release)
+
+        self.make_button(
+            id=f"{self.id}_button",
+            root_widget=f"{self.id}_grid",
+            text=f"[size=32sp][color=#efcc00]{verifying_msg}[/color][/size]",
+            markup=True,
+            row=0,
+            on_press=getattr(FlashScreen, f"on_press_{self.id}_button"),
+            on_release=getattr(FlashScreen, f"on_release_{self.id}_button")
+        )
+        
         progress_bar = CircularProgressBar(
             pos=(Window.width / 2 - 100, Window.height / 2)
         )
@@ -58,52 +92,26 @@ class FlashScreen(BaseScreen):
         progress_bar.thickness = 15
         progress_bar.cap_style = "square"
 
-        progress_bar.id = "flash_screen_progress_bar"
-        self.ids["flash_screen_grid"].add_widget(progress_bar)
+        progress_bar.id = f"{self.id}_progress_bar"
+        self.ids[f"{self.id}_button"].add_widget(progress_bar)
         self.ids[progress_bar.id] = WeakProxy(progress_bar)
-
-    def on_pre_enter(self):
-        self.ids[f"{self.id}_grid"].clear_widgets()
-        verifying_msg = self.translate("Preparing flash")
-
-        def _press(instance):
-            self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-
-        def _release(instance):
-            self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-
-            if self.success:
-                self.set_screen(name="UnzipStableScreen", direction="left")
-            else:
-                self.set_screen(name="MainScreen", direction="right")
-
-        self.make_button(
-            id=f"{self.id}_button",
-            root_widget=f"{self.id}_grid",
-            text=f"[size=32sp][color=#efcc00]{verifying_msg}[/color][/size]",
-            markup=True,
-            row=0,
-            on_press=_press,
-            on_release=_release,
-        )
 
     def update(self, *args, **kwargs):
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if key == "firmware":
-            self.firmware = kwargs.get("value")
+        if key == "baudrate":
+            self.baudrate = value
+            
+        if key == "firmware":            
+            self.firmware = value
             self.ids["flash_screen_button"].text = "\n".join(
                 [
-                    "[size=32sp][color=#efcc00]Firmware to flash[/color][/size]",
-                    f"[size=14]{self.firmware}[/size]",
+                    "[size=32sp][color=#efcc00]Click on screen",
+                    "to flash the firmware[/color][/size]",
+                    f"[size=16]{self.firmware}[/size]"
                 ]
             )
-
-        if key == "device":
-            self.device = kwargs.get("value")
 
         if key == "progress":
             self.ids["flash_screen_progress_bar"].value = kwargs.get("value")

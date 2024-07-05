@@ -23,8 +23,8 @@
 __init__.py
 """
 import typing
-from .trigger_flasher import TriggerFlasher
-
+from src.utils.flasher.trigger_flasher import TriggerFlasher
+from src.utils.selector import VALID_DEVICES
 
 # Example of parsing progress
 # def get_progress(file_type_str, iteration, total, suffix):
@@ -47,25 +47,35 @@ class Flasher(TriggerFlasher):
     :attr:`KTool.process`.
     """
 
-    def __init__(self, firmware: str):
+    def __init__(self, firmware: str, baudrate: int):
         super().__init__()
         self.firmware = firmware
+        self.baudrate = baudrate
+        print(f"baudrate: {self.baudrate}")
 
-    def flash(self, device: str, callback: typing.Callable = None):
+    def flash(self, callback: typing.Callable = None):
         """
         Detect available ports, try default flash process and
         if not work, try custom port
         """
+        for device in VALID_DEVICES:
+            print(f"device in {self.firmware}: {device in self.firmware}")
+            if device in self.firmware:
+                self.port = device
+                self.board = device
+                break
 
-        port = self.get_port(device=device)
-        if self.is_port_working(port.device):
+        if self.port is None:
+            raise RuntimeError("Is device connected?")
+        
+        if self.is_port_working(self.port):
             try:
-                self.process_flash(port=port.device, callback=callback)
+                self.process_flash(callback=callback)
 
             # pylint: disable=broad-exception-caught
             except Exception as exc_info:
                 self.process_exception(
-                    oldport=port,
+                    oldport=self.port,
                     exc_info=exc_info,
                     process=self.process_flash,
                     callback=callback,

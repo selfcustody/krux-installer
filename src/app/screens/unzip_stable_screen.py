@@ -21,6 +21,7 @@
 """
 verify_stable_zip_screen.py
 """
+import os
 import time
 from functools import partial
 from kivy.clock import Clock
@@ -111,14 +112,18 @@ class UnzipStableScreen(BaseScreen):
 
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
-            file_path = f"{base_path}/kboot.kfpkg"
+            file_path = os.path.join(base_path, "kboot.kfpkg")
+            baudrate = UnzipStableScreen.get_baudrate()
+            full_path = os.path.join(self.assets_dir, file_path)
+            
             unziper = KbootUnzip(
                 filename=zip_file, device=self.device, output=self.assets_dir
             )
+            
             screen = self.manager.get_screen("FlashScreen")
             fns = [
-                partial(screen.update, key="firmware", value=file_path),
-                partial(screen.update, key="device", value=self.device),
+                partial(screen.update, key="firmware", value=full_path),
+                partial(screen.update, key="baudrate", value=baudrate),
             ]
 
             for fn in fns:

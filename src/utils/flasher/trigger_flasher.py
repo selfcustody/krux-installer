@@ -38,12 +38,6 @@ class TriggerFlasher(BaseFlasher):
         super().__init__()
         self.ktool = KTool()
 
-    def get_port(self, device: str):
-        """Get available port from device name"""
-        self.ports = device
-        self.board = device
-        return next(self.ports)
-
     def is_port_working(self, port) -> bool:
         """Check if a port is working"""
         try:
@@ -53,28 +47,32 @@ class TriggerFlasher(BaseFlasher):
         except SerialException:
             return False
 
-    def process_flash(self, port: str, callback: typing.Callable = None):
+    def process_flash(self, callback: typing.Callable = None):
         """
         Setup proper port, board and firmware to execute
         :attr:`KTool.process` to write proper krux
         """
+        self.info(f"device: {self.port}")
+        self.info(f"baudrate: {self.baudrate}")
+        self.info(f"board: {self.board}")
+        self.info(f"firmware: {self.firmware}")
         if not callback:
             self.ktool.print_callback = print
             self.ktool.process(
                 terminal=False,
-                dev=port,
-                baudrate=1500000,
+                dev=self.port,
+                baudrate=int(self.baudrate),
                 board=self.board,
                 file=self.firmware,
             )
         else:
             self.ktool.process(
                 terminal=False,
-                dev=port,
-                baudrate=1500000,
+                dev=self.port,
+                baudrate=int(self.baudrate),
                 board=self.board,
                 file=self.firmware,
-                callback=callback,
+                callback=callback
             )
 
     def process_wipe(self, port: str, callback: typing.Callable = None):
@@ -88,7 +86,7 @@ class TriggerFlasher(BaseFlasher):
             self.ktool.print_callback = callback
 
         sys.argv = []
-        newargs = ["-B", self.board, "-b", "1500000", "-p", port, "-E"]
+        newargs = ["-B", self.board, "-b", self.baudrate, "-p", self.port, "-E"]
         sys.argv.extend(newargs)
         self.ktool.process()
 
@@ -105,7 +103,7 @@ class TriggerFlasher(BaseFlasher):
         """
         if re.findall(r"Greeting fail", str(exc_info)):
 
-            port = next(self.ports)
+            port = next(self._available_ports_generator)
             msg = f"Port {oldport} didnt work, trying {port}"
 
             if callback:

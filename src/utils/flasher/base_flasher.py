@@ -25,8 +25,8 @@ base_flasher.py
 import os
 import typing
 from serial.tools import list_ports
-from ..trigger import Trigger
-
+from src.utils.trigger import Trigger
+from src.utils.selector import VALID_DEVICES
 
 class BaseFlasher(Trigger):
     """
@@ -34,7 +34,21 @@ class BaseFlasher(Trigger):
     """
 
     VALID_BOARDS = ("goE", "dan")
-
+    VALID_BAUDRATES = (
+        9600,
+        19200,
+        28800,
+        38400,
+        57600,
+        76800,
+        115200,
+        230400,
+        460800,
+        576000,
+        921600,
+        1500000
+    )
+    
     @property
     def firmware(self) -> str:
         """Getter for firmware's full path"""
@@ -51,29 +65,28 @@ class BaseFlasher(Trigger):
         self._firmware = value
 
     @property
-    def ports(self) -> typing.Generator:
-        """Getter for firmware's full path"""
-        self.debug(f"ports::getter={self._ports}")
-        return self._ports
+    def port(self) -> str:
+        """Getter for device port system full path"""
+        self.debug(f"ports::getter={self._port}")
+        return self._port
 
-    @ports.setter
-    def ports(self, value: typing.Generator):
+    @port.setter
+    def port(self, value: str):
         """Setter for available ports's full path by giving device name"""
         if value in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit", "cube"):
-            self._ports = list_ports.grep("0403")
-            self.debug(f"ports::setter={list(self._ports)}")
+            vid = "0403"
 
-        elif value == "dock":
-            self._ports = list_ports.grep("7523")
-            self.debug(f"ports::setter={list(self._ports)}")
-
-        elif value == "yahboom":
-            self._ports = list_ports.grep("7523")
-            self.debug(f"ports::setter={list(self._ports)}")
-
+        elif value in ("dock", "yahboom"):
+            vid = "7523"
+            
         else:
             raise ValueError(f"Device not implemented: {value}")
-
+        
+        self._available_ports_generator = list_ports.grep(vid)
+        port = next(self._available_ports_generator)
+        self._port = port.device
+        self.debug(f"ports::setter={self._port}")
+        
     @property
     def board(self) -> str:
         """Return a new instance of board"""
@@ -97,3 +110,17 @@ class BaseFlasher(Trigger):
 
         else:
             raise ValueError(f"Device not implemented: {value}")
+
+    @property
+    def baudrate(self) -> int:
+        """Getter for baudrate"""
+        self.debug(f"baudrate::getter={self._baudrate}")
+        return self._baudrate
+
+    @baudrate.setter
+    def baudrate(self, value: int):
+        if value in BaseFlasher.VALID_BAUDRATES:
+            self.debug(f"baudrate::setter={value}")
+            self._baudrate = value
+        else:
+            raise ValueError(f"Invalid baudrate: {str(value)}")

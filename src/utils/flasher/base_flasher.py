@@ -23,10 +23,10 @@
 base_flasher.py
 """
 import os
-import typing
 from serial.tools import list_ports
 from src.utils.trigger import Trigger
 from src.utils.selector import VALID_DEVICES
+
 
 class BaseFlasher(Trigger):
     """
@@ -46,9 +46,9 @@ class BaseFlasher(Trigger):
         460800,
         576000,
         921600,
-        1500000
+        1500000,
     )
-    
+
     @property
     def firmware(self) -> str:
         """Getter for firmware's full path"""
@@ -78,15 +78,15 @@ class BaseFlasher(Trigger):
 
         elif value in ("dock", "yahboom"):
             vid = "7523"
-            
+
         else:
             raise ValueError(f"Device not implemented: {value}")
-        
+
         self._available_ports_generator = list_ports.grep(vid)
         port = next(self._available_ports_generator)
         self._port = port.device
         self.debug(f"ports::setter={self._port}")
-        
+
     @property
     def board(self) -> str:
         """Return a new instance of board"""
@@ -96,6 +96,9 @@ class BaseFlasher(Trigger):
     @board.setter
     def board(self, value: str):
         """Setter for board giving device name"""
+        if value not in VALID_DEVICES:
+            raise ValueError(f"Device not implemented: {value}")
+
         if value in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit", "cube"):
             self._board = "goE"
             self.debug(f"board::setter={self._board}")
@@ -107,9 +110,6 @@ class BaseFlasher(Trigger):
         elif value == "yahboom":
             self._board = "goE"
             self.debug(f"ports::setter={self._board}")
-
-        else:
-            raise ValueError(f"Device not implemented: {value}")
 
     @property
     def baudrate(self) -> int:

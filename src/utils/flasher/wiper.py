@@ -29,21 +29,22 @@ from .trigger_flasher import TriggerFlasher
 class Wiper(TriggerFlasher):
     """Class to wipe some specific board"""
 
-    def wipe(self, device: str, callback: typing.Callable = None):
-        """Erase all data in device"""
+    def __init__(self, baudrate: int):
+        super().__init__()
+        self.baudrate = baudrate
 
-        port = self.get_port(device=device)
-        if self.is_port_working(port.device):
+    def wipe(self, callback: typing.Callable = None):
+        """Detect available ports, try default erase process and
+        it not work, try custom port"""
+        self.detect_device()
+        if self.is_port_working(self.port):
             try:
-                self.process_wipe(port=port.device, callback=callback)
+                self.process_wipe(callback=callback)
 
             # pylint: disable=broad-exception-caught
-            except Exception as exc_info:
+            except Exception as exc:
                 self.process_exception(
-                    oldport=port,
-                    exc_info=exc_info,
-                    process=self.process_wipe,
-                    callback=callback,
+                    exception=exc, process_type="wipe", callback=callback
                 )
         else:
-            raise RuntimeError(f"Port not working: {port.device}")
+            raise RuntimeError(f"Port not working: {self.port}")

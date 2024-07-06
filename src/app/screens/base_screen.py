@@ -139,7 +139,7 @@ class BaseScreen(Screen, Trigger):
     def get_destdir_assets():
         app = App.get_running_app()
         return app.config.get("destdir", "assets")
-    
+
     @staticmethod
     def get_baudrate():
         app = App.get_running_app()

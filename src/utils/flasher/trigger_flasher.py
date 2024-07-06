@@ -22,13 +22,13 @@
 """
 trigger_flasher.py
 """
-import re
 import sys
 import typing
 from serial import Serial
 from serial.serialutil import SerialException
-from .base_flasher import BaseFlasher
-from ..kboot.build.ktool import KTool
+from src.utils.flasher.base_flasher import BaseFlasher
+from src.utils.kboot.build.ktool import KTool
+from src.utils.selector import VALID_DEVICES
 
 
 class TriggerFlasher(BaseFlasher):
@@ -37,6 +37,17 @@ class TriggerFlasher(BaseFlasher):
     def __init__(self):
         super().__init__()
         self.ktool = KTool()
+
+    def detect_device(self):
+        """
+        Detect port and board to be used
+        given a valid device in VALID_DEVICES and VALID_BOARDS
+        """
+        for device in VALID_DEVICES:
+            if device in self.firmware:
+                self.info(f"Detected valid {device} for {self.firmware}")
+                self.port = device
+                self.board = device
 
     def is_port_working(self, port) -> bool:
         """Check if a port is working"""
@@ -47,7 +58,7 @@ class TriggerFlasher(BaseFlasher):
         except SerialException:
             return False
 
-    def process_flash(self, callback: typing.Callable = None):
+    def process_flash(self, callback: typing.Callable):
         """
         Setup proper port, board and firmware to execute
         :attr:`KTool.process` to write proper krux
@@ -56,35 +67,28 @@ class TriggerFlasher(BaseFlasher):
         self.info(f"baudrate: {self.baudrate}")
         self.info(f"board: {self.board}")
         self.info(f"firmware: {self.firmware}")
-        if not callback:
-            self.ktool.print_callback = print
-            self.ktool.process(
-                terminal=False,
-                dev=self.port,
-                baudrate=int(self.baudrate),
-                board=self.board,
-                file=self.firmware,
-            )
-        else:
-            self.ktool.process(
-                terminal=False,
-                dev=self.port,
-                baudrate=int(self.baudrate),
-                board=self.board,
-                file=self.firmware,
-                callback=callback
-            )
 
-    def process_wipe(self, port: str, callback: typing.Callable = None):
+        self.ktool.process(
+            terminal=False,
+            dev=self.port,
+            baudrate=int(self.baudrate),
+            board=self.board,
+            file=self.firmware,
+            callback=callback,
+        )
+
+    def process_wipe(self, callback: typing.Callable):
         """
         Setup proper port, board and firmware to execute
         :attr:`KTool.process` to erase device
         """
-        if not callback:
-            self.ktool.print_callback = print
-        else:
-            self.ktool.print_callback = callback
+        self.ktool.print_callback = callback
 
+        # Following odudex tip,
+        # expand ktool arguments like
+        # running it on terminal
+        # in its source code, if any argument
+        # is given, it will search for sys.argv arguments
         sys.argv = []
         newargs = ["-B", self.board, "-b", self.baudrate, "-p", self.port, "-E"]
         sys.argv.extend(newargs)
@@ -92,32 +96,27 @@ class TriggerFlasher(BaseFlasher):
 
     def process_exception(
         self,
-        oldport: str,
-        exc_info: Exception,
-        process: typing.Callable = None,
-        callback: typing.Callable = None,
+        exception: Exception,
+        process_type: str,
+        callback: typing.Callable,
     ):
         """
         Generally, Amigos have two ports. If the first fail
         use this function to process
         """
-        if re.findall(r"Greeting fail", str(exc_info)):
+        self.info(str(exception))
+        if "Greeting fail" in str(exception):
+            oldport = self.port
+            newport = next(self._available_ports_generator)
+            msg = f"Port {oldport} didnt work, trying {newport.device}"
 
-            port = next(self._available_ports_generator)
-            msg = f"Port {oldport} didnt work, trying {port}"
+            # make a way to set _port without use _
+            # pylint: disable=attribute-defined-outside-init
+            self._port = newport.device
+            self.info(str(exception))
+            self.info(msg)
+            proc = getattr(self, f"process_{process_type}")
+            proc(callback=callback)
 
-            if callback:
-                callback(msg)
-            else:
-                print(f"\033[31;1m[ERROR]\033[0m {str(exc_info)}")
-                print(f"\033[33;1m[WARN]\033[0m {msg}")
-                print("*")
-
-            if process:
-                process(port=port.device, callback=callback)
         else:
-            if callback:
-                msg = str(exc_info)
-                callback(msg)
-            else:
-                print(f"\033[31;1m[ERROR]\033[0m {str(exc_info)}")
+            raise RuntimeError(str(exception))

@@ -115,11 +115,11 @@ class UnzipStableScreen(BaseScreen):
             file_path = os.path.join(base_path, "kboot.kfpkg")
             baudrate = UnzipStableScreen.get_baudrate()
             full_path = os.path.join(self.assets_dir, file_path)
-            
+
             unziper = KbootUnzip(
                 filename=zip_file, device=self.device, output=self.assets_dir
             )
-            
+
             screen = self.manager.get_screen("FlashScreen")
             fns = [
                 partial(screen.update, key="firmware", value=full_path),

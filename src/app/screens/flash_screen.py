@@ -56,7 +56,7 @@ class FlashScreen(BaseScreen):
             self.info(f"total: {total}")
             self.info(f"suffix: {suffix}")
             print()
-            
+
         setattr(FlashScreen, "on_flash", _flash)
 
         def _press(instance):
@@ -70,7 +70,6 @@ class FlashScreen(BaseScreen):
             flasher = Flasher(firmware=self.firmware, baudrate=self.baudrate)
             flasher.flash(callback=getattr(FlashScreen, "on_flash"))
 
-        
         setattr(FlashScreen, f"on_press_{self.id}_button", _press)
         setattr(FlashScreen, f"on_release_{self.id}_button", _release)
 
@@ -81,9 +80,9 @@ class FlashScreen(BaseScreen):
             markup=True,
             row=0,
             on_press=getattr(FlashScreen, f"on_press_{self.id}_button"),
-            on_release=getattr(FlashScreen, f"on_release_{self.id}_button")
+            on_release=getattr(FlashScreen, f"on_release_{self.id}_button"),
         )
-        
+
         progress_bar = CircularProgressBar(
             pos=(Window.width / 2 - 100, Window.height / 2)
         )
@@ -102,14 +101,14 @@ class FlashScreen(BaseScreen):
 
         if key == "baudrate":
             self.baudrate = value
-            
-        if key == "firmware":            
+
+        if key == "firmware":
             self.firmware = value
             self.ids["flash_screen_button"].text = "\n".join(
                 [
                     "[size=32sp][color=#efcc00]Click on screen",
                     "to flash the firmware[/color][/size]",
-                    f"[size=16]{self.firmware}[/size]"
+                    f"[size=16]{self.firmware}[/size]",
                 ]
             )
 

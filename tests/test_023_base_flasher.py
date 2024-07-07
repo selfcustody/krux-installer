@@ -26,41 +26,41 @@ class TestBaseFlasher(TestCase):
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
-    def test_set_ports_amigo(self, mock_grep):
+    def test_set_port_amigo(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "amigo"
+        f.port = "amigo"
         mock_grep.assert_called_once_with("0403")
 
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
-    def test_set_ports_amigo_tft(self, mock_grep):
+    def test_set_port_amigo_tft(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "amigo_tft"
+        f.port = "amigo_tft"
         mock_grep.assert_called_once_with("0403")
 
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
-    def test_set_ports_amigo_ips(self, mock_grep):
+    def test_set_port_amigo_ips(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "amigo_ips"
+        f.port = "amigo_ips"
         mock_grep.assert_called_once_with("0403")
 
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
-    def test_set_ports_m5stickv(self, mock_grep):
+    def test_set_port_m5stickv(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "m5stickv"
+        f.port = "m5stickv"
         mock_grep.assert_called_once_with("0403")
 
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
-    def test_set_ports_bit(self, mock_grep):
+    def test_set_port_bit(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "bit"
+        f.port = "bit"
         mock_grep.assert_called_once_with("0403")
 
     @patch(
@@ -68,29 +68,29 @@ class TestBaseFlasher(TestCase):
     )
     def test_set_ports_cube(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "cube"
+        f.port = "cube"
         mock_grep.assert_called_once_with("0403")
 
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
-    def test_set_ports_dock(self, mock_grep):
+    def test_set_port_dock(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "dock"
+        f.port = "dock"
         mock_grep.assert_called_once_with("7523")
 
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
-    def test_set_ports_yahboom(self, mock_grep):
+    def test_set_port_yahboom(self, mock_grep):
         f = BaseFlasher()
-        f.ports = "yahboom"
+        f.port = "yahboom"
         mock_grep.assert_called_once_with("7523")
 
-    def test_fail_set_ports(self):
+    def test_fail_set_port(self):
         with self.assertRaises(ValueError) as exc_info:
             f = BaseFlasher()
-            f.ports = "mock"
+            f.port = "mock"
 
         self.assertEqual(str(exc_info.exception), "Device not implemented: mock")
 

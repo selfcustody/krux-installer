@@ -23,20 +23,27 @@
 wiper.py
 """
 import typing
-from .trigger_flasher import TriggerFlasher
+from src.utils.flasher.trigger_flasher import TriggerFlasher
+from src.utils.selector import VALID_DEVICES
 
 
 class Wiper(TriggerFlasher):
     """Class to wipe some specific board"""
 
-    def __init__(self, baudrate: int):
+    def __init__(self, device: str, baudrate: int):
         super().__init__()
+        self.device = device
         self.baudrate = baudrate
 
-    def wipe(self, callback: typing.Callable = None):
+    def wipe(self, callback: typing.Callable):
         """Detect available ports, try default erase process and
         it not work, try custom port"""
-        self.detect_device()
+        for dev in VALID_DEVICES:
+            if dev == self.device:
+                self.info(f"Detected valid {self.device} to be wiped")
+                self.port = self.device
+                self.board = self.device
+
         if self.is_port_working(self.port):
             try:
                 self.process_wipe(callback=callback)

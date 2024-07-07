@@ -30,239 +30,73 @@ from .shared_mocks import MockListPortsGrep
 
 class TestWiper(TestCase):
 
-    @patch("sys.platform", "linux")
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.base_flasher.next")
     @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
     @patch("src.utils.flasher.wiper.Wiper.process_wipe")
-    def test_wipe_amigo_no_callback_linux(
-        self, mock_process_wipe, mock_is_port_working
+    def test_wipe_success(
+        self, mock_process_wipe, mock_is_port_working, mock_next, mock_list_ports
     ):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            f = Wiper()
-            f.wipe(device="amigo")
-            mock_get_port.assert_called_once_with(device="amigo")
-            mock_is_port_working.assert_called_once_with("/mock/path0")
-            mock_process_wipe.assert_called_once_with(port="/mock/path0", callback=None)
+        callback = MagicMock()
+        f = Wiper(device="amigo", baudrate=1500000)
+        f.wipe(callback=callback)
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+        mock_is_port_working.assert_called_once_with(mock_next().device)
+        mock_process_wipe.assert_called_once_with(callback=callback)
 
-    @patch("sys.platform", "darwin")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch("src.utils.flasher.wiper.Wiper.process_wipe")
-    def test_wipe_amigo_no_callback_darwin(
-        self, mock_process_wipe, mock_is_port_working
+    def test_fail_wipe_wrong_baudrate(self):
+        with self.assertRaises(ValueError) as exc_info:
+            Wiper(device="amigo", baudrate=1234567)
+
+        self.assertEqual(str(exc_info.exception), "Invalid baudrate: 1234567")
+
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.base_flasher.next")
+    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=False)
+    def test_fail_port_not_working(
+        self, mock_is_port_working, mock_next, mock_list_ports
     ):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            f = Wiper()
-            f.wipe(device="amigo")
-            mock_get_port.assert_called_once_with(device="amigo")
-            mock_is_port_working.assert_called_once_with("/mock/path0")
-            mock_process_wipe.assert_called_once_with(port="/mock/path0", callback=None)
+        callback = MagicMock()
+        with self.assertRaises(RuntimeError) as exc_info:
+            f = Wiper(device="amigo", baudrate=1500000)
+            f.wipe(callback=callback)
 
-    @patch("sys.platform", "win32")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch("src.utils.flasher.wiper.Wiper.process_wipe")
-    def test_wipe_amigo_no_callback_win32(
-        self, mock_process_wipe, mock_is_port_working
-    ):
-        with patch("src.utils.flasher.wiper.Wiper.get_port") as mock_get_port:
-            mock_get_port.return_value = MockListPortsGrep().devices[0]
-            f = Wiper()
-            f.wipe(device="amigo")
-            mock_get_port.assert_called_once_with(device="amigo")
-            mock_is_port_working.assert_called_once_with("MOCK0")
-            mock_process_wipe.assert_called_once_with(port="MOCK0", callback=None)
+        # patch assertions
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+        mock_is_port_working.assert_called_once_with(mock_next().device)
 
-    @patch("sys.platform", "linux")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch("src.utils.flasher.wiper.Wiper.process_wipe")
-    def test_wipe_amigo_callback_linux(self, mock_process_wipe, mock_is_port_working):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            callback = MagicMock()
-            f = Wiper()
-            f.wipe(device="amigo", callback=callback)
-            mock_get_port.assert_called_once_with(device="amigo")
-            mock_is_port_working.assert_called_once_with("/mock/path0")
-            mock_process_wipe.assert_called_once_with(
-                port="/mock/path0", callback=callback
-            )
+        # default assertions
+        self.assertEqual(
+            str(exc_info.exception), f"Port not working: {mock_next().device}"
+        )
 
-    @patch("sys.platform", "darwin")
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.base_flasher.next")
     @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch("src.utils.flasher.wiper.Wiper.process_wipe")
-    def test_wipe_amigo_callback_darwin(self, mock_process_wipe, mock_is_port_working):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            callback = MagicMock()
-            f = Wiper()
-            f.wipe(device="amigo", callback=callback)
-            mock_get_port.assert_called_once_with(device="amigo")
-            mock_is_port_working.assert_called_once_with("/mock/path0")
-            mock_process_wipe.assert_called_once_with(
-                port="/mock/path0", callback=callback
-            )
-
-    @patch("sys.platform", "win32")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch("src.utils.flasher.wiper.Wiper.process_wipe")
-    def test_wipe_amigo_callback_win32(self, mock_process_wipe, mock_is_port_working):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            callback = MagicMock()
-            f = Wiper()
-            f.wipe(device="amigo", callback=callback)
-            mock_get_port.assert_called_once_with(device="amigo")
-            mock_is_port_working.assert_called_once_with("MOCK0")
-            mock_process_wipe.assert_called_once_with(port="MOCK0", callback=callback)
-
-    @patch("sys.platform", "linux")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch(
-        "src.utils.flasher.wiper.Wiper.process_wipe",
-        side_effect=Exception("Greeting fail: mock test"),
-    )
+    @patch("src.utils.kboot.build.ktool.KTool.process")
     @patch("src.utils.flasher.wiper.Wiper.process_exception")
-    # pylint: disable=too-many-arguments
-    def test_wipe_amigo_greeting_fail_no_callback_linux(
+    def test_wipe_greeting_fail(
         self,
         mock_process_exception,
-        mock_process_flash,
+        mock_process,
         mock_is_port_working,
+        mock_next,
+        mock_list_ports,
     ):
+        mock_exception = Exception("Greeting fail: mock test")
+        mock_process.side_effect = [mock_exception, True]
 
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            with self.assertRaises(Exception) as exc_info:
-                f = Wiper()
-                f.wipe(device="amigo")
-                mock_get_port.assert_called_once_with(device="amigo")
-                mock_is_port_working.assert_called_once_with("/mock/path0")
-                mock_process_flash.assert_called_once_with(
-                    port="/mock/path0", callback=None
-                )
-                mock_process_exception.assert_called_once_with(
-                    oldport="/mock/path0",
-                    exc_info=exc_info.exception,
-                    process=f.process_wipe,
-                    callback=None,
-                )
+        callback = MagicMock()
+        f = Wiper(device="amigo", baudrate=1500000)
+        f.wipe(callback=callback)
 
-    @patch("sys.platform", "darwin")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch(
-        "src.utils.flasher.wiper.Wiper.process_wipe",
-        side_effect=Exception("Greeting fail: mock test"),
-    )
-    @patch("src.utils.flasher.wiper.Wiper.process_exception")
-    # pylint: disable=too-many-arguments
-    def test_wipe_amigo_greeting_fail_no_callback_darwin(
-        self,
-        mock_process_exception,
-        mock_process_flash,
-        mock_is_port_working,
-    ):
-
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            with self.assertRaises(Exception) as exc_info:
-                f = Wiper()
-                f.wipe(device="amigo")
-                mock_get_port.assert_called_once_with(device="amigo")
-                mock_is_port_working.assert_called_once_with("/mock/path0")
-                mock_process_flash.assert_called_once_with(
-                    port="/mock/path0", callback=None
-                )
-                mock_process_exception.assert_called_once_with(
-                    oldport="/mock/path0",
-                    exc_info=exc_info.exception,
-                    process=f.process_wipe,
-                    callback=None,
-                )
-
-    @patch("sys.platform", "win32")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
-    @patch(
-        "src.utils.flasher.wiper.Wiper.process_wipe",
-        side_effect=Exception("Greeting fail: mock test"),
-    )
-    @patch("src.utils.flasher.wiper.Wiper.process_exception")
-    # pylint: disable=too-many-arguments
-    def test_wipe_amigo_greeting_fail_no_callback_win32(
-        self,
-        mock_process_exception,
-        mock_process_flash,
-        mock_is_port_working,
-    ):
-
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            with self.assertRaises(Exception) as exc_info:
-                f = Wiper()
-                f.wipe(device="amigo")
-                mock_get_port.assert_called_once_with(device="amigo")
-                mock_is_port_working.assert_called_once_with("MOCK0")
-                mock_process_flash.assert_called_once_with(port="MOCK0", callback=None)
-                mock_process_exception.assert_called_once_with(
-                    oldport="MOCK0",
-                    exc_info=exc_info.exception,
-                    process=f.process_wipe,
-                    callback=None,
-                )
-
-    @patch("sys.platform", "linux")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=False)
-    def test_fail_wipe_amigo_linux(self, mock_is_port_working):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            with self.assertRaises(RuntimeError) as exc_info:
-                f = Wiper()
-                f.wipe(device="amigo")
-                mock_get_port.assert_called_once_with(device="amigo")
-                mock_is_port_working.assert_called_once_with("/mock/path0")
-        self.assertEqual(str(exc_info.exception), "Port not working: /mock/path0")
-
-    @patch("sys.platform", "darwin")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=False)
-    def test_fail_wipe_amigo_darwin(self, mock_is_port_working):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            with self.assertRaises(RuntimeError) as exc_info:
-                f = Wiper()
-                f.wipe(device="amigo")
-                mock_get_port.assert_called_once_with(device="amigo")
-                mock_is_port_working.assert_called_once_with("/mock/path0")
-        self.assertEqual(str(exc_info.exception), "Port not working: /mock/path0")
-
-    @patch("sys.platform", "win32")
-    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=False)
-    def test_fail_wipe_amigo_win32(self, mock_is_port_working):
-        with patch(
-            "src.utils.flasher.wiper.Wiper.get_port",
-            return_value=MockListPortsGrep().devices[0],
-        ) as mock_get_port:
-            with self.assertRaises(RuntimeError) as exc_info:
-                f = Wiper()
-                f.wipe(device="amigo")
-                mock_get_port.assert_called_once_with(device="amigo")
-                mock_is_port_working.assert_called_once_with("MOCK0")
-        self.assertEqual(str(exc_info.exception), "Port not working: MOCK0")
+        # patch assertions
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+        mock_is_port_working.assert_called_once_with(mock_next().device)
+        mock_process_exception.assert_called_once_with(
+            exception=mock_exception, process_type="wipe", callback=callback
+        )
+        mock_process.assert_called_once()

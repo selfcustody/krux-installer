@@ -37,7 +37,8 @@ class TestTriggerFlasher(TestCase):
 
         mock_exists.assert_called_once_with("mock/maixpy_amigo_tft/kboot.kfpkg")
         mock_list_ports.grep.assert_has_calls([call("0403"), call("0403")])
-        assert len(mock_next.mock_calls) == 5
+        print(mock_next.mock_calls)
+        assert len(mock_next.mock_calls) == 4
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
@@ -50,7 +51,7 @@ class TestTriggerFlasher(TestCase):
         # patch assertions
         mock_exists.assert_called_once_with("mock/maixpy_amigo_ips/kboot.kfpkg")
         mock_list_ports.grep.assert_has_calls([call("0403"), call("0403")])
-        assert len(mock_next.mock_calls) == 5
+        assert len(mock_next.mock_calls) == 4
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)

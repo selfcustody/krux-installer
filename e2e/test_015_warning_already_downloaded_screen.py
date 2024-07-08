@@ -115,18 +115,34 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         # do tests
         label_text = "\n".join(
             [
-                "[size=32sp][color=#efcc00][b]Assets already downloaded[/b][/color][/size]",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "",
+                "[size=36sp][color=#efcc00][b]Assets already downloaded[/b][/color][/size]",
+                "",
+                "",
                 "",
                 "[size=20sp][color=#efcc00]krux-v0.0.1.zip[/color][/size]",
+                "",
                 "[size=20sp][color=#efcc00]krux-v0.0.1.zip.sha256.txt[/color][/size]",
+                "",
                 "[size=20sp][color=#efcc00]krux-v0.0.1.zip.sig[/color][/size]",
+                "",
                 "[size=20sp][color=#efcc00]selfcustody.pem[/color][/size]",
                 "",
+                "",
+                "",
                 "[size=16sp]Do you want to proceed with the same file or do you want to download it again?[/size]",
+                "",
+                "",
+                "",
             ]
         )
         download_text = "[color=#00ff00]Download again[/color]"
-        proceed_text = "[color=#00ccef]Proceed with current file[/color]"
+        proceed_text = "[color=#00ccef]Proceed with files[/color]"
 
         screen.update(name=screen.name, key="version", value="v0.0.1")
 
@@ -236,8 +252,20 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_manager.get_screen.assert_has_calls(
             [call("MainScreen"), call("DownloadStableZipScreen")]
         )
-        mock_schedule_once.assert_called_once()
-        mock_partial.assert_called_once()
+        mock_partial.assert_has_calls(
+            [
+                call(screen.update, name=screen.name, key="canvas"),
+                call(
+                    mock_manager.get_screen().update,
+                    name=screen.name,
+                    key="version",
+                    value=mock_manager.get_screen().version,
+                ),
+            ]
+        )
+        mock_schedule_once.assert_has_calls(
+            [call(mock_partial(), 0), call(mock_partial(), 0)]
+        )
         mock_set_screen.assert_called_once_with(
             name="DownloadStableZipScreen", direction="right"
         )

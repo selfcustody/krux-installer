@@ -99,8 +99,8 @@ class BaseScreen(Screen, Trigger):
         root_widget: str,
         id: str,
         text: str,
-        markup: str,
-        row: str,
+        markup: bool,
+        row: int,
         on_press: typing.Callable,
         on_release: typing.Callable,
     ):
@@ -134,6 +134,28 @@ class BaseScreen(Screen, Trigger):
         self.debug(
             f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
         )
+
+    def make_stack_button(
+        self,
+        root_widget: str,
+        wid: str,
+        on_press: typing.Callable,
+        on_release: typing.Callable,
+        size_hint: typing.Tuple[float, float],
+    ):
+        btn = Button(
+            markup=True,
+            font_size=Window.size[0] // 30,
+            background_color=(0, 0, 0, 1),
+            size_hint=size_hint,
+        )
+        btn.id = wid
+        self.ids[root_widget].add_widget(btn)
+        self.ids[btn.id] = WeakProxy(btn)
+        btn.bind(on_press=on_press)
+        btn.bind(on_release=on_release)
+        setattr(self, f"on_press_{wid}", on_press)
+        setattr(self, f"on_release_{wid}", on_release)
 
     @staticmethod
     def get_destdir_assets():

@@ -77,7 +77,6 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 self.debug(f"Calling Button::{instance.id}::on_release")
                 self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
 
-                print(instance.id)
                 if instance.id == f"{self.id}_download_button":
                     main_screen = self.manager.get_screen("MainScreen")
                     download_screen = self.manager.get_screen("DownloadStableZipScreen")
@@ -93,19 +92,16 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 if instance.id == f"{self.id}_proceed_button":
                     self.set_screen(name="VerifyStableZipScreen", direction="right")
 
-            btn = Button(
-                markup=True,
-                font_size=Window.size[0] // 30,
-                background_color=(0, 0, 0, 1),
+            self.make_stack_button(
+                root_widget=f"{self.id}_stack_buttons",
+                wid=wid,
                 size_hint=(0.5, None),
+                on_press=_press,
+                on_release=_release,
             )
-            btn.id = wid
-            self.ids[f"{self.id}_stack_buttons"].add_widget(btn)
-            self.ids[btn.id] = WeakProxy(btn)
-            btn.bind(on_press=_press)
-            btn.bind(on_release=_release)
-            setattr(self, f"on_press_{wid}", _press)
-            setattr(self, f"on_release_{wid}", _release)
+
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)
 
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
@@ -126,13 +122,19 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         if key == "locale":
             self.locale = value
 
+        elif key == "canvas":
+            # prepare background
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
+
         elif key == "version":
             warning_msg = self.translate("Assets already downloaded")
             ask_proceed = self.translate(
                 "Do you want to proceed with the same file or do you want to download it again?"
             )
             download_msg = self.translate("Download again")
-            proceed_msg = self.translate("Proceed with current file")
+            proceed_msg = self.translate("Proceed with files")
 
             self.ids[f"{self.id}_download_button"].text = (
                 f"[color=#00ff00]{download_msg}[/color]"
@@ -142,14 +144,30 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             )
             self.ids[f"{self.id}_label"].text = "\n".join(
                 [
-                    f"[size=32sp][color=#efcc00][b]{warning_msg}[/b][/color][/size]",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    f"[size=36sp][color=#efcc00][b]{warning_msg}[/b][/color][/size]",
+                    "",
+                    "",
                     "",
                     f"[size=20sp][color=#efcc00]krux-{value}.zip[/color][/size]",
+                    "",
                     f"[size=20sp][color=#efcc00]krux-{value}.zip.sha256.txt[/color][/size]",
+                    "",
                     f"[size=20sp][color=#efcc00]krux-{value}.zip.sig[/color][/size]",
-                    f"[size=20sp][color=#efcc00]selfcustody.pem[/color][/size]",
+                    "",
+                    "[size=20sp][color=#efcc00]selfcustody.pem[/color][/size]",
+                    "",
+                    "",
                     "",
                     f"[size=16sp]{ask_proceed}[/size]",
+                    "",
+                    "",
+                    "",
                 ]
             )
 

@@ -22,8 +22,12 @@
 download_selfcustody_pem_screen.py
 """
 import time
+from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
 from src.app.screens.base_screen import BaseScreen
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.pem_downloader import PemDownloader
@@ -44,36 +48,30 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
         def on_trigger(dt):
+            time.sleep(2.1)
             self.set_screen(name=self.to_screen, direction="left")
 
         def on_progress(data: bytes):
-            len1 = self.downloader.downloaded_len
-            len2 = self.downloader.content_len
-            p = len1 / len2
-            p = p if p <= 1.00 else 1.00
-            self.ids[f"{self.id}_label_progress"].text = "\n".join(
-                [
-                    f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
-                    f"[size=16sp]{len1} of {len2} B[/size]",
-                ]
+            # calculate downloaded percentage
+            fn = partial(
+                self.update,
+                name=self.name,
+                key="progress",
+                value={
+                    "downloaded_len": self.downloader.downloaded_len,
+                    "content_len": self.downloader.content_len,
+                },
             )
-
-            # When finish, change the label, wait some seconds
-            # and then change screen
-            if p == 1.00:
-                self.ids[f"{self.id}_label_info"].text = "\n".join(
-                    [
-                        f"{self.downloader.destdir}/selfcustody.pem downloaded",
-                    ]
-                )
-                time.sleep(2.1)  # 2.1 remember 21000000
-                self.trigger()
+            Clock.schedule_once(fn, 0)
 
         self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
         setattr(self.__class__, "on_trigger", on_trigger)
 
         self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
         setattr(self.__class__, "on_progress", on_progress)
+
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)
 
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
@@ -93,18 +91,55 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         if key == "locale":
             self.locale = value
 
+        elif key == "canvas":
+            # prepare background
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
+
         elif key == "public-key-certificate":
             self.downloader = PemDownloader(
                 destdir=App.get_running_app().config.get("destdir", "assets"),
             )
 
-            self.ids[f"{self.id}_label_info"].text = "\n".join(
+            self.ids[f"{self.id}_info"].text = "\n".join(
                 [
                     "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
                     "" f"to {self.downloader.destdir}/selfcustody.pem",
                 ]
             )
+
+        elif key == "progress":
+            # calculate percentage of download
+            lens = [value["downloaded_len"], value["content_len"]]
+
+            percent = lens[0] / lens[1]
+
+            if percent > 1.0:
+                percent = 1.0
+
+            if lens[0] > lens[1]:
+                lens[0] = lens[1]
+
+            self.ids[f"{self.id}_progress"].text = "\n".join(
+                [
+                    f"[size=100sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                    "",
+                    f"[size=16sp]{lens[0]} of {lens[1]} B[/size]",
+                ]
+            )
+
+            if percent == 1.00:
+                self.ids[f"{self.id}_info"].text = "\n".join(
+                    [
+                        f"{self.downloader.destdir}/selfcustody.pem downloaded",
+                    ]
+                )
+
+                # When finish, change the label, wait some seconds
+                # and then change screen
+                self.trigger()
 
         else:
             raise ValueError(f'Invalid key: "{key}"')

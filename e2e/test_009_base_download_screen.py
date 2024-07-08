@@ -29,8 +29,8 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         self.assertEqual(screen.version, None)
         self.assertEqual(screen.to_screen, "AnotherMockScreen")
         self.assertEqual(grid.id, "mock_screen_grid")
-        self.assertEqual(grid.children[1].id, "mock_screen_label_progress")
-        self.assertEqual(grid.children[0].id, "mock_screen_label_info")
+        self.assertEqual(grid.children[1].id, "mock_screen_progress")
+        self.assertEqual(grid.children[0].id, "mock_screen_info")
 
         # patch assertions
         mock_get_running_app.assert_has_calls(

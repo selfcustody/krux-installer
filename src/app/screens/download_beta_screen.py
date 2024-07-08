@@ -21,15 +21,13 @@
 """
 main_screen.py
 """
-import math
-import re
 import time
 from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
 
@@ -48,6 +46,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
         def on_trigger(dt):
+            time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
             fn = partial(
                 screen.update, name=self.name, key="version", value=self.version
@@ -57,40 +56,25 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         def on_progress(data: bytes):
             # calculate downloaded percentage
-            len1 = self.downloader.downloaded_len
-            len2 = self.downloader.content_len
-            p = len1 / len2
-
-            # Format bytes (one liner)
-            # https://stackoverflow.com/questions/
-            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-            down1 = f"{len1/(1<<20):,.2f}"
-            down2 = f"{len2/(1<<20):,.2f}"
-
-            # Put all in Label widget
-            self.ids[f"{self.id}_label_progress"].text = "\n".join(
-                [
-                    f"[size=100sp][b]{p * 100.00:.2f}%[/b][/size]",
-                    f"[size=16sp]{down1} of {down2} MB[/size]",
-                ]
+            fn = partial(
+                self.update,
+                name=self.name,
+                key="progress",
+                value={
+                    "downloaded_len": self.downloader.downloaded_len,
+                    "content_len": self.downloader.content_len,
+                },
             )
-
-            # When finish, change the label, wait some seconds
-            # and then change screen
-            if p == 1.00:
-                self.ids[f"{self.id}_label_info"].text = "\n".join(
-                    [
-                        f"{self.downloader.destdir}/{self.firmware} downloaded",
-                    ]
-                )
-                time.sleep(2.1)  # 2.1 remember 21000000
-                self.trigger()
+            Clock.schedule_once(fn, 0)
 
         self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
         setattr(self.__class__, "on_trigger", on_trigger)
 
         self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
         setattr(self.__class__, "on_progress", on_progress)
+
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)
 
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
@@ -105,6 +89,12 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         if key == "locale":
             self.locale = value
+
+        elif key == "canvas":
+            # prepare background
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
 
         elif key == "firmware":
             if value in ("kboot.kfpkg", "firmware.bin"):
@@ -125,13 +115,41 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 destdir=App.get_running_app().config.get("destdir", "assets"),
             )
 
-            self.ids[f"{self.id}_label_info"].text = "\n".join(
+            self.ids[f"{self.id}_info"].text = "\n".join(
                 [
                     "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
                     "" f"to {self.downloader.destdir}",
                 ]
             )
+
+        elif key == "progress":
+            # calculate percentage of download
+            lens = [value["downloaded_len"], value["content_len"]]
+            percent = lens[0] / lens[1]
+
+            # Format bytes (one liner) in MB
+            # https://stackoverflow.com/questions/
+            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+            downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
+            self.ids[f"{self.id}_progress"].text = "\n".join(
+                [
+                    f"[size=100sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                    "",
+                    f"[size=16sp]{downs[0]} of {downs[1]} MB[/size]",
+                ]
+            )
+
+            if percent == 1.00:
+                self.ids[f"{self.id}_info"].text = "\n".join(
+                    [
+                        f"{self.downloader.destdir}/kboot.kfpkg downloaded",
+                    ]
+                )
+
+                # When finish, change the label, wait some seconds
+                # and then change screen
+                self.trigger()
 
         else:
             raise ValueError(f'Invalid key: "{key}"')

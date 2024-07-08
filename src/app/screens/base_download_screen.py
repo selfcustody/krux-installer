@@ -24,10 +24,7 @@ base_download_screen.py
 import typing
 from functools import partial
 from threading import Thread
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from kivy.clock import Clock, ClockEvent
-from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.uix.label import Label
 from src.app.screens.base_screen import BaseScreen
@@ -41,25 +38,15 @@ class BaseDownloadScreen(BaseScreen):
         super().__init__(wid=wid, name=name, **kwargs)
         self.make_grid(wid=f"{self.id}_grid", rows=2)
 
-        # since labels update to fast
-        # maybe its better to increase
-        # the default value of `Clock.max_iteration`
-        Clock.max_iteration = 20
-
-        self.downloader = None
-        self.thread = None
-        self.trigger = None
+        self._downloader = None
+        self._thread = None
+        self._trigger = None
         self.version = None
-        self.to_screen = None
-
-        # prepare background
-        with self.canvas.before:
-            Color(0, 0, 0, 1)
-            Rectangle(size=(Window.width, Window.height))
+        self._to_screen = None
 
         # progress label
         progress = Label(
-            text="[size=40sp]Connecting...[/size]",
+            text="[color=#efcc00][size=40sp]Connecting...[/size][/color]",
             markup=True,
             valign="center",
             halign="center",
@@ -69,12 +56,12 @@ class BaseDownloadScreen(BaseScreen):
         asset_label = Label(markup=True, valign="center", halign="center")
 
         # setup progress label
-        progress.id = f"{self.id}_label_progress"
+        progress.id = f"{self.id}_progress"
         self.ids[f"{self.id}_grid"].add_widget(progress)
         self.ids[progress.id] = WeakProxy(progress)
 
         # setup information label
-        asset_label.id = f"{self.id}_label_info"
+        asset_label.id = f"{self.id}_info"
         self.ids[f"{self.id}_grid"].add_widget(asset_label)
         self.ids[asset_label.id] = WeakProxy(asset_label)
 

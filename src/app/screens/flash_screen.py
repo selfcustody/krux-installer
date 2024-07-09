@@ -21,9 +21,10 @@
 """
 main_screen.py
 """
-import sys
 import math
+from functools import partial
 from kivy.app import App
+from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.graphics.vertex_instructions import Rectangle
@@ -42,22 +43,29 @@ class FlashScreen(BaseScreen):
         self.baudrate = None
         self.make_grid(wid=f"{self.id}_grid", rows=1)
 
-        with self.canvas.before:
-            Color(0, 0, 0, 1)
-            Rectangle(size=(Window.width, Window.height))
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)
 
     def on_pre_enter(self):
         self.ids[f"{self.id}_grid"].clear_widgets()
         verifying_msg = self.translate("Preparing flash")
 
-        def _flash(file_type: str, iteration: int, total: int, suffix: str):
+        def on_print_callback(*args, **kwargs):
+            self.info(f"print_callback arg: {args}")
+            self.info(f"print_callback kwargs: {kwargs}")
+            print()
+
+        def on_process_callback(
+            file_type: str, iteration: int, total: int, suffix: str
+        ):
             self.info(f"file_type: {file_type}")
             self.info(f"iteration: {iteration}")
             self.info(f"total: {total}")
             self.info(f"suffix: {suffix}")
             print()
 
-        setattr(FlashScreen, "on_flash", _flash)
+        setattr(FlashScreen, "on_print_callback", on_print_callback)
+        setattr(FlashScreen, "on_process_callback", on_process_callback)
 
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
@@ -67,8 +75,13 @@ class FlashScreen(BaseScreen):
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-            flasher = Flasher(firmware=self.firmware, baudrate=self.baudrate)
-            flasher.flash(callback=getattr(FlashScreen, "on_flash"))
+            flasher = Flasher()
+            flasher.firmware = self.firmware
+            flasher.baudrate = self.baudrate
+            flasher.ktool.__class__.print_callback = getattr(
+                FlashScreen, "on_print_callback"
+            )
+            flasher.flash(callback=getattr(FlashScreen, "on_process_callback"))
 
         setattr(FlashScreen, f"on_press_{self.id}_button", _press)
         setattr(FlashScreen, f"on_release_{self.id}_button", _release)
@@ -96,13 +109,37 @@ class FlashScreen(BaseScreen):
         self.ids[progress_bar.id] = WeakProxy(progress_bar)
 
     def update(self, *args, **kwargs):
+        """Update screen with firmware key. Should be called before `on_enter`"""
+        name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
+
+        if name in (
+            "ConfigKruxInstaller",
+            "UnzipStableScreen",
+            "DownloadBetaScreen",
+            "FlashScreen",
+        ):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            raise ValueError(f"Invalid screen name: {name}")
+
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        if key == "locale":
+            self.locale = value
+
+        elif key == "canvas":
+            # prepare background
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
 
         if key == "baudrate":
             self.baudrate = value
 
-        if key == "firmware":
+        elif key == "firmware":
             self.firmware = value
             self.ids["flash_screen_button"].text = "\n".join(
                 [

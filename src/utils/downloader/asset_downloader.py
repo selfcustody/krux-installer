@@ -49,6 +49,9 @@ class AssetDownloader(StreamDownloader):
     def destdir(self, value):
         """Setter for destination dir where the downloaded file will be placed"""
         self.debug(f"destdir::setter={value}")
+        if not os.path.exists(value):
+            os.makedirs(value, exist_ok=True)
+
         self._destdir = value
 
     @property

@@ -122,8 +122,8 @@ class UnzipStableScreen(BaseScreen):
 
             screen = self.manager.get_screen("FlashScreen")
             fns = [
-                partial(screen.update, key="firmware", value=full_path),
-                partial(screen.update, key="baudrate", value=baudrate),
+                partial(screen.update, name=self.name, key="firmware", value=full_path),
+                partial(screen.update, name=self.name, key="baudrate", value=baudrate),
             ]
 
             for fn in fns:

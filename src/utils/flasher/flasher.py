@@ -46,11 +46,6 @@ class Flasher(TriggerFlasher):
     :attr:`KTool.process`.
     """
 
-    def __init__(self, firmware: str, baudrate: int):
-        super().__init__()
-        self.firmware = firmware
-        self.baudrate = baudrate
-
     def flash(self, callback: typing.Callable):
         """
         Detect available ports, try default flash process and

@@ -30,19 +30,14 @@ from src.utils.selector import VALID_DEVICES
 class Wiper(TriggerFlasher):
     """Class to wipe some specific board"""
 
-    def __init__(self, device: str, baudrate: int):
-        super().__init__()
-        self.device = device
-        self.baudrate = baudrate
-
-    def wipe(self, callback: typing.Callable):
+    def wipe(self, device: str, callback: typing.Callable):
         """Detect available ports, try default erase process and
         it not work, try custom port"""
         for dev in VALID_DEVICES:
-            if dev == self.device:
-                self.info(f"Detected valid {self.device} to be wiped")
-                self.port = self.device
-                self.board = self.device
+            if dev == device:
+                self.info(f"Detected valid {device} to be wiped")
+                self.port = device
+                self.board = device
 
         if self.is_port_working(self.port):
             try:

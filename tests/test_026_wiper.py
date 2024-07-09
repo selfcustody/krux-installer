@@ -38,8 +38,9 @@ class TestWiper(TestCase):
         self, mock_process_wipe, mock_is_port_working, mock_next, mock_list_ports
     ):
         callback = MagicMock()
-        f = Wiper(device="amigo", baudrate=1500000)
-        f.wipe(callback=callback)
+        f = Wiper()
+        f.baudrate = 1500000
+        f.wipe(device="amigo", callback=callback)
         mock_list_ports.grep.assert_called_once_with("0403")
         mock_next.assert_called_once()
         mock_is_port_working.assert_called_once_with(mock_next().device)
@@ -47,7 +48,8 @@ class TestWiper(TestCase):
 
     def test_fail_wipe_wrong_baudrate(self):
         with self.assertRaises(ValueError) as exc_info:
-            Wiper(device="amigo", baudrate=1234567)
+            f = Wiper()
+            f.baudrate = 1234567
 
         self.assertEqual(str(exc_info.exception), "Invalid baudrate: 1234567")
 
@@ -59,8 +61,9 @@ class TestWiper(TestCase):
     ):
         callback = MagicMock()
         with self.assertRaises(RuntimeError) as exc_info:
-            f = Wiper(device="amigo", baudrate=1500000)
-            f.wipe(callback=callback)
+            f = Wiper()
+            f.baudrate = 1500000
+            f.wipe(device="amigo", callback=callback)
 
         # patch assertions
         mock_list_ports.grep.assert_called_once_with("0403")
@@ -89,8 +92,9 @@ class TestWiper(TestCase):
         mock_process.side_effect = [mock_exception, True]
 
         callback = MagicMock()
-        f = Wiper(device="amigo", baudrate=1500000)
-        f.wipe(callback=callback)
+        f = Wiper()
+        f.baudrate = 1500000
+        f.wipe(device="amigo", callback=callback)
 
         # patch assertions
         mock_list_ports.grep.assert_called_once_with("0403")

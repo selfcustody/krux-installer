@@ -21,6 +21,7 @@
 """
 main_screen.py
 """
+import os
 import time
 from functools import partial
 from kivy.app import App
@@ -48,10 +49,20 @@ class DownloadBetaScreen(BaseDownloadScreen):
         def on_trigger(dt):
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
-            fn = partial(
-                screen.update, name=self.name, key="version", value=self.version
+            baudrate = DownloadBetaScreen.get_baudrate()
+            destdir = DownloadBetaScreen.get_destdir_assets()
+            firmware = os.path.join(
+                destdir, "krux_binaries", f"maixpy_{self.device}", self.firmware
             )
-            Clock.schedule_once(fn, 0)
+            print(self.firmware)
+            partials = [
+                partial(screen.update, name=self.name, key="baudrate", value=baudrate),
+                partial(screen.update, name=self.name, key="firmware", value=firmware),
+            ]
+
+            for fn in partials:
+                Clock.schedule_once(fn, 0)
+
             self.set_screen(name=self.to_screen, direction="left")
 
         def on_progress(data: bytes):
@@ -109,10 +120,12 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 raise ValueError(f"Invalid device: {value}")
 
         elif key == "downloader":
+            destdir = DownloadBetaScreen.get_destdir_assets()
+            destdir = os.path.join(destdir, "krux_binaries", f"maixpy_{self.device}")
             self.downloader = BetaDownloader(
                 device=self.device,
                 binary_type=self.firmware,
-                destdir=App.get_running_app().config.get("destdir", "assets"),
+                destdir=destdir,
             )
 
             self.ids[f"{self.id}_info"].text = "\n".join(

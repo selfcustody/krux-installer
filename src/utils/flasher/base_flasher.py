@@ -23,6 +23,7 @@
 base_flasher.py
 """
 import os
+import typing
 from serial.tools import list_ports
 from src.utils.trigger import Trigger
 from src.utils.selector import VALID_DEVICES
@@ -119,8 +120,29 @@ class BaseFlasher(Trigger):
 
     @baudrate.setter
     def baudrate(self, value: int):
+        """Setter for baudrate"""
         if value in BaseFlasher.VALID_BAUDRATES:
             self.debug(f"baudrate::setter={value}")
             self._baudrate = value
         else:
             raise ValueError(f"Invalid baudrate: {str(value)}")
+
+    @property
+    def print_callback(self):
+        """
+        Getter for print_callback. KTool have two callbacks:
+            - print_callback: a property of an instance of KTool that do KTool.log calls
+            - callback: an argument of `process` method that parse the progress of flash
+        """
+        self.debug(f"print_callback::getter={self._print_callback}")
+        return self._print_callback
+
+    @print_callback.setter
+    def print_callback(self, value: typing.Callable):
+        """
+        Getter for print_callback. KTool have two callbacks:
+            - print_callback: a property of an instance of KTool that do KTool.log calls
+            - callback: an argument of `process` method that parse the progress of flash
+        """
+        self.debug(f"print_callback::setter={value}")
+        self._print_callback = value

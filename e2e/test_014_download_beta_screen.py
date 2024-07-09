@@ -1,3 +1,4 @@
+import os
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -242,7 +243,9 @@ class TestDownloadBetaScreen(GraphicUnitTest):
 
         # screen
         screen = DownloadBetaScreen()
-        screen.version = "odudex/krux_binaries"
+        screen.baudrate = 1500000
+        screen.device = "amigo"
+        screen.firmware = "kboot.kfpkg"
 
         # pylint: disable=no-member
         screen.trigger = screen.on_trigger
@@ -266,14 +269,27 @@ class TestDownloadBetaScreen(GraphicUnitTest):
         )
         mock_sleep.assert_called_once_with(2.1)
         mock_manager.get_screen.assert_called_once_with("FlashScreen")
+
+        p = os.path.join(
+            mock_get_running_app().config.get(),
+            "krux_binaries",
+            "maixpy_amigo",
+            "kboot.kfpkg",
+        )
         mock_partial.assert_has_calls(
             [
                 call(screen.update, name=screen.name, key="canvas"),
                 call(
                     mock_manager.get_screen().update,
                     name=screen.name,
-                    key="version",
-                    value="odudex/krux_binaries",
+                    key="baudrate",
+                    value=1,
+                ),
+                call(
+                    mock_manager.get_screen().update,
+                    name=screen.name,
+                    key="firmware",
+                    value=p,
                 ),
             ]
         )

@@ -20,7 +20,9 @@ class TestFlasher(TestCase):
         mock_exists,
     ):
         callback = MagicMock()
-        f = Flasher(firmware="mock/maixpy_amigo/kboot.kfpkg", baudrate=1500000)
+        f = Flasher()
+        f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
+        f.baudrate = 1500000
         f.flash(callback=callback)
         mock_exists.assert_called_once_with("mock/maixpy_amigo/kboot.kfpkg")
         mock_list_ports.grep.assert_called_once_with("0403")
@@ -31,7 +33,8 @@ class TestFlasher(TestCase):
     @patch("os.path.exists", return_value=False)
     def test_fail_flash_firmware_not_exist(self, mock_exists):
         with self.assertRaises(ValueError) as exc_info:
-            Flasher(firmware="mock/maixpy_amigo/kboot.kfpkg", baudrate=1500000)
+            f = Flasher()
+            f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
 
         self.assertEqual(
             str(exc_info.exception), "File do not exist: mock/maixpy_amigo/kboot.kfpkg"
@@ -41,7 +44,9 @@ class TestFlasher(TestCase):
     @patch("os.path.exists", return_value=True)
     def test_fail_flash_wrong_baudrate(self, mock_exists):
         with self.assertRaises(ValueError) as exc_info:
-            Flasher(firmware="mock/maixpy_amigo/kboot.kfpkg", baudrate=1234567)
+            f = Flasher()
+            f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
+            f.baudrate = 1234567
 
         self.assertEqual(str(exc_info.exception), "Invalid baudrate: 1234567")
         mock_exists.assert_called_once_with("mock/maixpy_amigo/kboot.kfpkg")
@@ -55,7 +60,9 @@ class TestFlasher(TestCase):
     ):
         callback = MagicMock()
         with self.assertRaises(RuntimeError) as exc_info:
-            f = Flasher(firmware="mock/maixpy_amigo/kboot.kfpkg", baudrate=1500000)
+            f = Flasher()
+            f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
+            f.baudrate = 1500000
             f.flash(callback=callback)
 
         # patch assertions
@@ -88,7 +95,9 @@ class TestFlasher(TestCase):
         mock_process.side_effect = [mock_exception, True]
 
         callback = MagicMock()
-        f = Flasher(firmware="mock/maixpy_amigo/kboot.kfpkg", baudrate=1500000)
+        f = Flasher()
+        f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
+        f.baudrate = 1500000
         f.flash(callback=callback)
 
         # patch assertions

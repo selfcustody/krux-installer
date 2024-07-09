@@ -144,7 +144,7 @@ class BaseDownloadScreen(BaseScreen):
                 setattr(self.__class__, "on_progress", on_progress)
         ```
         """
-        if not self.downloader is None:
+        if self.downloader is not None:
             self.trigger = getattr(self.__class__, "on_trigger")
             self.downloader.on_write_to_buffer = getattr(self.__class__, "on_progress")
             self.thread = self.downloader.download

@@ -22,91 +22,115 @@
 main_screen.py
 """
 import math
+import typing
 from functools import partial
+from threading import Thread
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from src.app.screens.base_screen import BaseScreen
-from kivy_circular_progress_bar import CircularProgressBar
+from kivy.uix.label import Label
+from src.app.screens.base_flash_screen import BaseFlashScreen
 from src.utils.flasher import Flasher
 
 
-class FlashScreen(BaseScreen):
+class FlashScreen(BaseFlashScreen):
     """Flash screen is where flash occurs"""
 
     def __init__(self, **kwargs):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
-        self.firmware = None
-        self.baudrate = None
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
-
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
     def on_pre_enter(self):
         self.ids[f"{self.id}_grid"].clear_widgets()
-        verifying_msg = self.translate("Preparing flash")
 
         def on_print_callback(*args, **kwargs):
-            self.info(f"print_callback arg: {args}")
-            self.info(f"print_callback kwargs: {kwargs}")
-            print()
+            text = " ".join(str(x) for x in args)
+            text = text.replace(
+                "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00] INFO [/color]"
+            )
+            text = text.replace(
+                "\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]"
+            )
+            text = text.replace(
+                "\x1b[33mInitialize K210 SPI Flash",
+                "[color=#efcc00]Initialize K210 SPI Flash[/color]",
+            )
+            text = text.replace("Flash ID: \x1b[33m", "Flash ID: [color=#efcc00]")
+            text = text.replace(
+                "\x1b[0m, unique ID: \x1b[33m", "[/color], unique ID: [color=#efcc00]"
+            )
+            text = text.replace("\x1b[0m, size: \x1b[33m", "[/color], size: ")
+            text = text.replace("\x1b[0m MB", "[/color] MB")
+            text = text.replace("\x1b[0m", "")
+            text = text.replace("\x1b[33m", "")
+            text = text.replace("\rProgramming", "Programming")
+
+            if text.startswith("[color=#00ff00] INFO [/color]"):
+                self.output.append(text)
+
+            if "Rebooting...\n" in text:
+                self.is_done = True
+
+            if len(self.output) > 20:
+                del self.output[:1]
+
+            self.ids[f"{self.id}_info"].text = "\n".join(self.output)
+            self.info(text)
 
         def on_process_callback(
             file_type: str, iteration: int, total: int, suffix: str
         ):
-            self.info(f"file_type: {file_type}")
-            self.info(f"iteration: {iteration}")
-            self.info(f"total: {total}")
-            self.info(f"suffix: {suffix}")
-            print()
+
+            percent = (iteration / total) * 100
+            self.ids[f"{self.id}_progress"].text = "\n".join(
+                [f"[size=100sp]{percent:.2f} %[/size]", "", f"{file_type} at {suffix}"]
+            )
+
+        def on_trigger_callback(dt):
+            pass
 
         setattr(FlashScreen, "on_print_callback", on_print_callback)
         setattr(FlashScreen, "on_process_callback", on_process_callback)
+        setattr(FlashScreen, "on_trigger_callback", on_trigger_callback)
 
-        def _press(instance):
-            self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-            self.ids[f"{self.id}_button"].text = ""
-
-        def _release(instance):
-            self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-            flasher = Flasher()
-            flasher.firmware = self.firmware
-            flasher.baudrate = self.baudrate
-            flasher.ktool.__class__.print_callback = getattr(
-                FlashScreen, "on_print_callback"
-            )
-            flasher.flash(callback=getattr(FlashScreen, "on_process_callback"))
-
-        setattr(FlashScreen, f"on_press_{self.id}_button", _press)
-        setattr(FlashScreen, f"on_release_{self.id}_button", _release)
-
-        self.make_button(
-            id=f"{self.id}_button",
+        self.make_label(
+            wid=f"{self.id}_progress",
+            text="",
             root_widget=f"{self.id}_grid",
-            text=f"[size=32sp][color=#efcc00]{verifying_msg}[/color][/size]",
             markup=True,
-            row=0,
-            on_press=getattr(FlashScreen, f"on_press_{self.id}_button"),
-            on_release=getattr(FlashScreen, f"on_release_{self.id}_button"),
+            halign="center",
+        )
+        self.make_label(
+            wid=f"{self.id}_info",
+            text="",
+            root_widget=f"{self.id}_grid",
+            markup=True,
+            halign="justify",
         )
 
-        progress_bar = CircularProgressBar(
-            pos=(Window.width / 2 - 100, Window.height / 2)
-        )
-        progress_bar.widget_size = math.floor(Window.width * 0.50)
-        progress_bar.progress_colour = (0, 1, 0.5, 0)
-        progress_bar.thickness = 15
-        progress_bar.cap_style = "square"
-
-        progress_bar.id = f"{self.id}_progress_bar"
-        self.ids[f"{self.id}_button"].add_widget(progress_bar)
-        self.ids[progress_bar.id] = WeakProxy(progress_bar)
+    def on_enter(self):
+        """
+        Event fired when the screen is displayed and the entering animation is complete.
+        """
+        if self.flasher is not None:
+            self.output = []
+            self.progress = ""
+            self.is_done = False
+            self.trigger = getattr(self.__class__, "on_trigger_callback")
+            self.flasher.ktool.__class__.print_callback = getattr(
+                self.__class__, "on_print_callback"
+            )
+            self.thread = partial(
+                self.flasher.flash,
+                callback=getattr(self.__class__, "on_process_callback"),
+            )
+            self.thread.start()
+        else:
+            raise ValueError("Flasher isnt configured. Use `update` method first")
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
@@ -141,13 +165,17 @@ class FlashScreen(BaseScreen):
 
         elif key == "firmware":
             self.firmware = value
-            self.ids["flash_screen_button"].text = "\n".join(
-                [
-                    "[size=32sp][color=#efcc00]Click on screen",
-                    "to flash the firmware[/color][/size]",
-                    f"[size=16]{self.firmware}[/size]",
-                ]
-            )
+
+        elif key == "flasher":
+            self.flasher = Flasher()
+            self.flasher.firmware = self.firmware
+            self.flasher.baudrate = self.baudrate
 
         if key == "progress":
-            self.ids["flash_screen_progress_bar"].value = kwargs.get("value")
+            self.ids[f"{self.id}_button"].text = "\n".join(
+                [
+                    "[size=8sp]" "\n".join(self.output),
+                    "[/size]",
+                    self.progress,
+                ]
+            )

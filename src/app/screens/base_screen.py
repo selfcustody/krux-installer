@@ -24,6 +24,7 @@ base_screen.py
 import typing
 from functools import partial
 from kivy.app import App
+from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.core.window import Window
@@ -80,7 +81,7 @@ class BaseScreen(Screen, Trigger):
 
     def make_grid(self, wid: str, rows: int):
         """Build grid where buttons will be placed"""
-        if not wid in self.ids:
+        if wid not in self.ids:
             self.debug(f"Building GridLayout::{wid}")
             grid = GridLayout(cols=1, rows=rows)
             grid.id = wid
@@ -88,6 +89,24 @@ class BaseScreen(Screen, Trigger):
             self.ids[wid] = WeakProxy(grid)
         else:
             self.debug(f"GridLayout::{wid} already exist")
+
+    def make_subgrid(self, wid: str, rows: int, root_widget: str):
+        """Build grid where buttons will be placed"""
+        self.debug(f"Building GridLayout::{wid}")
+        grid = GridLayout(cols=1, rows=rows)
+        grid.id = wid
+        self.ids[root_widget].add_widget(grid)
+        self.ids[wid] = WeakProxy(grid)
+
+    def make_label(
+        self, wid: str, text: str, root_widget: str, markup: bool, halign: str
+    ):
+        """Build grid where buttons will be placed"""
+        self.debug(f"Building GridLayout::{wid}")
+        label = Label(text=text, markup=markup, halign=halign)
+        label.id = wid
+        self.ids[root_widget].add_widget(label)
+        self.ids[wid] = WeakProxy(label)
 
     def clear_grid(self, wid: str):
         """Clear GridLayout widget"""

@@ -124,6 +124,7 @@ class UnzipStableScreen(BaseScreen):
             fns = [
                 partial(screen.update, name=self.name, key="firmware", value=full_path),
                 partial(screen.update, name=self.name, key="baudrate", value=baudrate),
+                partial(screen.update, name=self.name, key="flasher"),
             ]
 
             for fn in fns:

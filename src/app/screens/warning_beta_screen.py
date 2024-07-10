@@ -109,3 +109,6 @@ class WarningBetaScreen(BaseScreen):
             ]
 
             self.ids["warning_beta_screen_warn"].text = "\n".join(text)
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

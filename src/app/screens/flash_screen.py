@@ -171,7 +171,7 @@ class FlashScreen(BaseFlashScreen):
             self.flasher.firmware = self.firmware
             self.flasher.baudrate = self.baudrate
 
-        if key == "progress":
+        elif key == "progress":
             self.ids[f"{self.id}_button"].text = "\n".join(
                 [
                     "[size=8sp]" "\n".join(self.output),
@@ -179,3 +179,6 @@ class FlashScreen(BaseFlashScreen):
                     self.progress,
                 ]
             )
+
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

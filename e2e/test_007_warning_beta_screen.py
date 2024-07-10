@@ -122,7 +122,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_locale(self, mock_get_running_app):
+    def test_fail_update_locale_wrong_name(self, mock_get_running_app):
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
@@ -136,4 +136,22 @@ class TestSelectVersionScreen(GraphicUnitTest):
             screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
         self.assertEqual(str(exc_info.exception), "Invalid screen name: Mock")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_update_locale_wrong_key(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = WarningBetaScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name="ConfigKruxInstaller", key="mock")
+
+        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
         mock_get_running_app.assert_called_once()

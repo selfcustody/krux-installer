@@ -45,6 +45,7 @@ from src.app.screens.warning_already_downloaded_screen import (
     WarningAlreadyDownloadedScreen,
 )
 from src.app.screens.flash_screen import FlashScreen
+from src.app.screens.wipe_screen import WipeScreen
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -90,6 +91,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             DownloadBetaScreen(),
             WarningAlreadyDownloadedScreen(),
             FlashScreen(),
+            WipeScreen(),
         ]
 
     def build(self):

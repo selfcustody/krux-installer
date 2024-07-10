@@ -28,10 +28,8 @@ from threading import Thread
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from kivy.uix.label import Label
 from src.app.screens.base_flash_screen import BaseFlashScreen
 from src.utils.flasher import Flasher
 

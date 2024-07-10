@@ -90,7 +90,7 @@ class TriggerFlasher(BaseFlasher):
         # in its source code, if any argument
         # is given, it will search for sys.argv arguments
         sys.argv = []
-        newargs = ["-B", self.board, "-b", self.baudrate, "-p", self.port, "-E"]
+        newargs = ["-B", self.board, "-b", str(self.baudrate), "-p", self.port, "-E"]
         sys.argv.extend(newargs)
         self.ktool.process()
 

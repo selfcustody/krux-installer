@@ -143,9 +143,7 @@ class MainScreen(BaseScreen):
 
                         # Check if any release file exists
                         if re.findall(r"^v\d+\.\d+\.\d$", self.version):
-                            resources = App.get_running_app().config.get(
-                                "destdir", "assets"
-                            )
+                            resources = MainScreen.get_destdir_assets()
                             zipfile = os.path.join(
                                 resources, f"krux-{self.version}.zip"
                             )
@@ -199,8 +197,38 @@ class MainScreen(BaseScreen):
 
                 elif instance.id == "main_wipe":
                     if self.will_wipe:
+                        # do a click effect
+                        self.set_background(wid="main_flash", rgba=(0, 0, 0, 1))
+
+                        # partials are functions that call `update`
+                        # method in screen before go to them
+                        partials = []
+
+                        to_screen = "WipeScreen"
+                        screen = self.manager.get_screen(to_screen)
+                        baudrate = MainScreen.get_baudrate()
+                        partials.append(
+                            partial(
+                                screen.update,
+                                name=self.name,
+                                key="device",
+                                value=self.device,
+                            )
+                        )
+                        partials.append(
+                            partial(
+                                screen.update,
+                                name=self.name,
+                                key="wiper",
+                                value=baudrate,
+                            )
+                        )
+                        # Execute the partials
+                        for fn in partials:
+                            Clock.schedule_once(fn, 0)
+
                         self.set_background(wid="main_wipe", rgba=(0, 0, 0, 1))
-                        self.set_screen(name="WipeScreen", direction="left")
+                        self.set_screen(name=to_screen, direction="left")
                     else:
                         self.debug(f"Button::{instance.id} disabled")
 

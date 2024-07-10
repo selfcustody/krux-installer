@@ -80,9 +80,8 @@ class UnzipStableScreen(BaseScreen):
             self.device = value
 
         elif key == "clear":
-            if len(self.ids[f"{self.id}_grid"].children) > 0:
-                self.debug(f"Clearing '{self.id}_grid'")
-                self.ids[f"{self.id}_grid"].clear_widgets()
+            self.debug(f"Clearing '{self.id}_grid'")
+            self.ids[f"{self.id}_grid"].clear_widgets()
 
         elif key == "flash-button":
             self.build_extract_to_flash_button()

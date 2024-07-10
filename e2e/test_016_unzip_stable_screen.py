@@ -1,7 +1,6 @@
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
-from kivy.uix.label import Label
 from src.app.screens.unzip_stable_screen import (
     UnzipStableScreen,
 )
@@ -170,7 +169,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_get_running_app.assert_has_calls(
             [call().config.get("locale", "lang")], any_order=True
         )
-        
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     @patch(

@@ -1,5 +1,6 @@
 import os
 import json
+import sys
 from unittest.mock import patch, MagicMock, call, mock_open
 from kivy.base import EventLoop
 from kivy.tests.common import GraphicUnitTest
@@ -331,22 +332,26 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             MagicMock(name="WarningBetaScreen"),
             MagicMock(name="VerifyStableZipScreen"),
             MagicMock(name="UnzipStableScreen"),
-            MagicMock(name="CheckPermissionsScreen"),
         ]
+
+        if sys.platform == "linux":
+            app.screens.append(MagicMock(name="CheckPermissionsScreen"))
 
         # Do tests
         app.on_config_change(None, "locale", key="lang", value="mock")
 
         # patch assertions
-        app.screen_manager.get_screen.assert_has_calls(
-            [
-                call("MainScreen"),
-                call("SelectVersionScreen"),
-                call("SelectOldVersionScreen"),
-                call("WarningAlreadyDownloadedScreen"),
-                call("WarningBetaScreen"),
-                call("VerifyStableZipScreen"),
-                call("UnzipStableScreen"),
-                call("CheckPermissionsScreen"),
-            ]
-        )
+        calls = [
+            call("MainScreen"),
+            call("SelectVersionScreen"),
+            call("SelectOldVersionScreen"),
+            call("WarningAlreadyDownloadedScreen"),
+            call("WarningBetaScreen"),
+            call("VerifyStableZipScreen"),
+            call("UnzipStableScreen"),
+        ]
+
+        if sys.platform == "linux":
+            calls.append(call("CheckPermissionsScreen"))
+
+        app.screen_manager.get_screen.assert_has_calls(calls)

@@ -69,15 +69,7 @@ class SelectVersionScreen(BaseScreen):
             # START of on_press buttons
             def _press(instance):
                 self.debug(f"Calling Button::{instance.id}::on_press")
-                if instance.id in (
-                    "select_version_latest",
-                    "select_version_beta",
-                    "select_version_old",
-                    "select_version_back",
-                ):
-                    self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-
-            # END of on_press buttons
+                self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
             # START of on_release_buttons
             def _release(instance):
@@ -159,3 +151,5 @@ class SelectVersionScreen(BaseScreen):
 
             if "select_version_back" in self.ids:
                 self.ids["select_version_back"].text = self.translate("Back")
+        else:
+            raise ValueError(f'Invalid key: "{key}"')

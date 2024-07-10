@@ -160,7 +160,7 @@ class FlashScreen(BaseFlashScreen):
                 Color(0, 0, 0, 1)
                 Rectangle(size=(Window.width, Window.height))
 
-        if key == "baudrate":
+        elif key == "baudrate":
             self.baudrate = value
 
         elif key == "firmware":

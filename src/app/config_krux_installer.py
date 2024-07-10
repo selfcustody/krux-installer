@@ -163,7 +163,6 @@ class ConfigKruxInstaller(BaseKruxInstaller):
             warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
             verify = self.screen_manager.get_screen("VerifyStableZipScreen")
             unzip = self.screen_manager.get_screen("UnzipStableScreen")
-            check = self.screen_manager.get_screen("CheckPermissionsScreen")
 
             partials = [
                 partial(
@@ -217,10 +216,18 @@ class ConfigKruxInstaller(BaseKruxInstaller):
                 partial(
                     unzip.update, name="ConfigKruxInstaller", key="locale", value=value
                 ),
-                partial(
-                    check.update, name="ConfigKruxInstaller", key="locale", value=value
-                ),
             ]
+
+            if sys.platform == "linux":
+                check = self.screen_manager.get_screen("CheckPermissionsScreen")
+                partials.append(
+                    partial(
+                        check.update,
+                        name="ConfigKruxInstaller",
+                        key="locale",
+                        value=value,
+                    )
+                )
 
             for fn in partials:
                 Clock.schedule_once(fn, 0)

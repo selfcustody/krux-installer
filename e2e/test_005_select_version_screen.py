@@ -215,7 +215,9 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch("src.utils.selector.requests")
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
     @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_locale(self, mock_get_running_app, mock_manager, mock_requests):
+    def test_update_locale_old_versions(
+        self, mock_get_running_app, mock_manager, mock_requests
+    ):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
@@ -248,7 +250,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_locale(self, mock_get_running_app):
+    def test_fail_update_locale_name(self, mock_get_running_app):
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
@@ -262,4 +264,22 @@ class TestSelectVersionScreen(GraphicUnitTest):
             screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
         self.assertEqual(str(exc_info.exception), "Invalid screen name: Mock")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_update_locale_key(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = SelectVersionScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        with self.assertRaises(ValueError) as exc_info:
+            screen.update(name="ConfigKruxInstaller", key="mock", value="pt_BR.UTF-8")
+
+        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
         mock_get_running_app.assert_called_once()

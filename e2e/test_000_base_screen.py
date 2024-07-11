@@ -105,6 +105,53 @@ class TestBaseScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_make_subgrid(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.make_grid(wid="mock_grid", rows=1)
+        screen.make_subgrid(wid="mock_subgrid", rows=1, root_widget="mock_grid")
+        self.render(screen)
+
+        EventLoop.ensure_window()
+
+        self.assertTrue("mock_grid" in screen.ids)
+        self.assertTrue("mock_subgrid" in screen.ids)
+        self.assertEqual(screen.id, "mock")
+        self.assertEqual(screen.name, "Mock")
+
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_make_label(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.make_grid(wid="mock_grid", rows=1)
+        screen.make_label(
+            wid="mock_label",
+            root_widget="mock_grid",
+            halign="center",
+            text="mock",
+            markup=False,
+        )
+        self.render(screen)
+
+        EventLoop.ensure_window()
+
+        self.assertTrue("mock_grid" in screen.ids)
+        self.assertTrue("mock_label" in screen.ids)
+        self.assertEqual(screen.ids["mock_label"].text, "mock")
+        self.assertEqual(screen.id, "mock")
+        self.assertEqual(screen.name, "Mock")
+
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
     def test_make_button(self, mock_get_running_app):
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock(return_value="en-US")

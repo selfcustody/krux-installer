@@ -1,6 +1,5 @@
 import os
 import json
-import sys
 from unittest.mock import patch, MagicMock, call, mock_open
 from kivy.base import EventLoop
 from kivy.tests.common import GraphicUnitTest
@@ -136,6 +135,24 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         mock_exists.assert_called_once_with(dir_test)
         mock_makedirs.assert_called_once_with(dir_test)
 
+    @patch("sys.platform", "linux")
+    @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
+    @patch("src.app.config_krux_installer.os.path.exists", side_effect=[True])
+    @patch("src.app.config_krux_installer.os.makedirs")
+    def test_skip_create_app_dir_linux(
+        self, mock_makedirs, mock_exists, mock_expanduser
+    ):
+        app = ConfigKruxInstaller()
+        _dir = app.create_app_dir(name="config")
+        dir_test = os.path.join("mockdir", ".config", "krux-installer")
+
+        self.assertEqual(_dir, dir_test)
+
+        # patch assertions
+        mock_expanduser.assert_called_once_with("~")
+        mock_exists.assert_called_once_with(dir_test)
+        assert len(mock_makedirs.mock_calls) == 0
+
     @patch.dict(os.environ, {"LOCALAPPDATA": "mockdir"}, clear=True)
     @patch("sys.platform", "win32")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False])
@@ -150,6 +167,21 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         # patch assertions
         mock_exists.assert_called_once_with(dir_test)
         mock_makedirs.assert_called_once_with(dir_test)
+
+    @patch.dict(os.environ, {"LOCALAPPDATA": "mockdir"}, clear=True)
+    @patch("sys.platform", "win32")
+    @patch("src.app.config_krux_installer.os.path.exists", side_effect=[True])
+    @patch("src.app.config_krux_installer.os.makedirs")
+    def test_skip_create_app_dir_win32(self, mock_makedirs, mock_exists):
+        app = ConfigKruxInstaller()
+        _dir = app.create_app_dir(name="config")
+        dir_test = os.path.join("mockdir", "krux-installer", "config")
+
+        self.assertEqual(_dir, dir_test)
+
+        # patch assertions
+        mock_exists.assert_called_once_with(dir_test)
+        assert len(mock_makedirs.mock_calls) == 0
 
     @patch("sys.platform", "darwin")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
@@ -166,6 +198,24 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         mock_expanduser.assert_called_once_with("~")
         mock_exists.assert_called_once_with(dir_test)
         mock_makedirs.assert_called_once_with(dir_test)
+
+    @patch("sys.platform", "darwin")
+    @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
+    @patch("src.app.config_krux_installer.os.path.exists", side_effect=[True])
+    @patch("src.app.config_krux_installer.os.makedirs")
+    def test_skip_create_app_dir_darwin(
+        self, mock_makedirs, mock_exists, mock_expanduser
+    ):
+        app = ConfigKruxInstaller()
+        _dir = app.create_app_dir(name="config")
+        dir_test = os.path.join("mockdir", ".config", "krux-installer")
+
+        self.assertEqual(_dir, dir_test)
+
+        # patch assertions
+        mock_expanduser.assert_called_once_with("~")
+        mock_exists.assert_called_once_with(dir_test)
+        assert len(mock_makedirs.mock_calls) == 0
 
     @patch("sys.platform", "linux")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
@@ -189,6 +239,22 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             any_order=True,
         )
 
+    @patch("sys.platform", "linux")
+    @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
+    @patch("src.app.config_krux_installer.os.path.exists", side_effect=[True, True])
+    @patch("builtins.open", new_callable=mock_open)
+    def test_skip_create_app_file_linux(self, open_mock, mock_exists, mock_expanduser):
+        app = ConfigKruxInstaller()
+        file = app.create_app_file(context="config", name="config.ini")
+        file_test = os.path.join("mockdir", ".config", "krux-installer", "config.ini")
+
+        self.assertEqual(file, file_test)
+
+        # patch assertions
+        mock_expanduser.assert_called_once_with("~")
+        mock_exists.assert_called_once_with(file_test)
+        assert len(open_mock.mock_calls) == 0
+
     @patch.dict(os.environ, {"LOCALAPPDATA": "mockdir"}, clear=True)
     @patch("sys.platform", "win32")
     @patch("src.app.config_krux_installer.os.path.exists", side_effect=[False, False])
@@ -209,6 +275,21 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             ],
             any_order=True,
         )
+
+    @patch.dict(os.environ, {"LOCALAPPDATA": "mockdir"}, clear=True)
+    @patch("sys.platform", "win32")
+    @patch("src.app.config_krux_installer.os.path.exists", side_effect=[True, True])
+    @patch("builtins.open", new_callable=mock_open)
+    def test_skip_create_app_file_win32(self, open_mock, mock_exists):
+        app = ConfigKruxInstaller()
+        file = app.create_app_file(context="config", name="config.ini")
+        file_test = os.path.join("mockdir", "krux-installer", "config", "config.ini")
+
+        self.assertEqual(file, file_test)
+
+        # patch assertions
+        mock_exists.assert_called_once_with(file_test)
+        assert len(open_mock.mock_calls) == 0
 
     @patch("sys.platform", "darwin")
     @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
@@ -236,6 +317,27 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             ],
             any_order=True,
         )
+
+    @patch("sys.platform", "darwin")
+    @patch("src.app.config_krux_installer.os.path.expanduser", return_value="mockdir")
+    @patch("src.app.config_krux_installer.os.path.exists", side_effect=[True, True])
+    @patch("builtins.open", new_callable=mock_open)
+    def test_skip_create_app_file_darwin(self, open_mock, mock_exists, mock_expanduser):
+        app = ConfigKruxInstaller()
+        file = app.create_app_file(context="config", name="config.ini")
+        file_test = os.path.join(
+            "mockdir",
+            ".config",
+            "krux-installer",
+            "config.ini",
+        )
+
+        self.assertEqual(file, file_test)
+
+        # patch assertions
+        mock_expanduser.assert_called_once_with("~")
+        mock_exists.assert_called_once_with(file_test)
+        assert len(open_mock.mock_calls) == 0
 
     @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir")
     @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_file")
@@ -319,7 +421,142 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             [call("Settings", None, data=json.dumps(json_data))], any_order=True
         )
 
-    def test_on_config_change(self):
+    @patch("src.app.config_krux_installer.partial")
+    def test_skip_on_config_change_linux(self, mock_partial):
+        app = ConfigKruxInstaller()
+
+        # Do tests
+        app.on_config_change(None, "test", key="mock", value="skip")
+        assert len(mock_partial.mock_calls) == 0
+
+    @patch("sys.platform", "linux")
+    @patch("src.app.config_krux_installer.partial")
+    def test_on_config_change_linux(self, mock_partial):
+
+        app = ConfigKruxInstaller()
+
+        app.screen_manager = MagicMock()
+        app.screen_manager.get_screen = MagicMock()
+        app.screens = [
+            MagicMock(name="MainScreen"),
+            MagicMock(name="SelectVersionScreen"),
+            MagicMock(name="SelectOldVersionScreen"),
+            MagicMock(name="WarningAlreadyDownloadedScreen"),
+            MagicMock(name="WarningBetaScreen"),
+            MagicMock(name="VerifyStableZipScreen"),
+            MagicMock(name="UnzipStableScreen"),
+            MagicMock(name="CheckPermissionsScreen"),
+        ]
+
+        # Do tests
+        app.on_config_change(None, "locale", key="lang", value="mock")
+
+        # patch assertions
+        calls_get_screen = [
+            call("MainScreen"),
+            call("SelectVersionScreen"),
+            call("SelectOldVersionScreen"),
+            call("WarningAlreadyDownloadedScreen"),
+            call("WarningBetaScreen"),
+            call("VerifyStableZipScreen"),
+            call("UnzipStableScreen"),
+            call("CheckPermissionsScreen"),
+        ]
+
+        calls_partial = [
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="version",
+                value=app.screen_manager.get_screen().version,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="device",
+                value=app.screen_manager.get_screen().device,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="flash",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="wipe",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="settings",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="about",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+        ]
+
+        app.screen_manager.get_screen.assert_has_calls(calls_get_screen, any_order=True)
+        mock_partial.assert_has_calls(calls_partial)
+
+    @patch("sys.platform", "win32")
+    @patch("src.app.config_krux_installer.partial")
+    def test_on_config_change_win32(self, mock_partial):
+
         app = ConfigKruxInstaller()
 
         app.screen_manager = MagicMock()
@@ -334,14 +571,11 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             MagicMock(name="UnzipStableScreen"),
         ]
 
-        if sys.platform == "linux":
-            app.screens.append(MagicMock(name="CheckPermissionsScreen"))
-
         # Do tests
         app.on_config_change(None, "locale", key="lang", value="mock")
 
         # patch assertions
-        calls = [
+        calls_get_screen = [
             call("MainScreen"),
             call("SelectVersionScreen"),
             call("SelectOldVersionScreen"),
@@ -351,7 +585,202 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             call("UnzipStableScreen"),
         ]
 
-        if sys.platform == "linux":
-            calls.append(call("CheckPermissionsScreen"))
+        calls_partial = [
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="version",
+                value=app.screen_manager.get_screen().version,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="device",
+                value=app.screen_manager.get_screen().device,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="flash",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="wipe",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="settings",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="about",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+        ]
 
-        app.screen_manager.get_screen.assert_has_calls(calls)
+        app.screen_manager.get_screen.assert_has_calls(calls_get_screen, any_order=True)
+        mock_partial.assert_has_calls(calls_partial)
+
+    @patch("sys.platform", "darwin")
+    @patch("src.app.config_krux_installer.partial")
+    def test_on_config_change_darwin(self, mock_partial):
+
+        app = ConfigKruxInstaller()
+
+        app.screen_manager = MagicMock()
+        app.screen_manager.get_screen = MagicMock()
+        app.screens = [
+            MagicMock(name="MainScreen"),
+            MagicMock(name="SelectVersionScreen"),
+            MagicMock(name="SelectOldVersionScreen"),
+            MagicMock(name="WarningAlreadyDownloadedScreen"),
+            MagicMock(name="WarningBetaScreen"),
+            MagicMock(name="VerifyStableZipScreen"),
+            MagicMock(name="UnzipStableScreen"),
+        ]
+
+        # Do tests
+        app.on_config_change(None, "locale", key="lang", value="mock")
+
+        # patch assertions
+        calls_get_screen = [
+            call("MainScreen"),
+            call("SelectVersionScreen"),
+            call("SelectOldVersionScreen"),
+            call("WarningAlreadyDownloadedScreen"),
+            call("WarningBetaScreen"),
+            call("VerifyStableZipScreen"),
+            call("UnzipStableScreen"),
+        ]
+
+        calls_partial = [
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="version",
+                value=app.screen_manager.get_screen().version,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="device",
+                value=app.screen_manager.get_screen().device,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="flash",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="wipe",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="settings",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="about",
+                value=None,
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+            call(
+                app.screen_manager.get_screen().update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value="mock",
+            ),
+        ]
+
+        app.screen_manager.get_screen.assert_has_calls(calls_get_screen, any_order=True)
+        mock_partial.assert_has_calls(calls_partial)

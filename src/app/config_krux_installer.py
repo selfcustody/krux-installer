@@ -28,10 +28,11 @@ import ctypes
 import locale
 from functools import partial
 from kivy.clock import Clock
+from src.utils.trigger import Trigger
 from src.app.base_krux_installer import BaseKruxInstaller
 
 
-class ConfigKruxInstaller(BaseKruxInstaller):
+class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
     """BaseKruxInstller is the base for Appliction"""
 
     @staticmethod
@@ -92,10 +93,12 @@ class ConfigKruxInstaller(BaseKruxInstaller):
     # pylint: disable=signature-differs,arguments-differ
     def get_application_config(self) -> str:
         """Custom path for config.ini"""
-        ConfigKruxInstaller.create_app_dir(name="config")
-        file = ConfigKruxInstaller.create_app_file(context="config", name="config.ini")
+        dirname = ConfigKruxInstaller.create_app_dir(name="config")
+        self.debug(f"Application directory: {dirname}")
 
+        file = ConfigKruxInstaller.create_app_file(context="config", name="config.ini")
         self.debug(f"ConfigKruxInstaller.get_application_config = {file}")
+
         return super().get_application_config(file)
 
     def build_config(self, config):
@@ -231,3 +234,6 @@ class ConfigKruxInstaller(BaseKruxInstaller):
 
             for fn in partials:
                 Clock.schedule_once(fn, 0)
+
+        else:
+            self.debug(f"Skip on_config_change for {section}::{key}={value}")

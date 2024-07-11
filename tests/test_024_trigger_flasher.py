@@ -356,7 +356,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_amigo.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "goE", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_called_once_with("0403")
             mock_process.assert_called_once()
@@ -378,7 +378,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_amigo_tft.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "goE", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_has_calls([call("0403"), call("0403")])
             mock_process.assert_called_once()
@@ -400,7 +400,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_amigo_ips.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "goE", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_has_calls([call("0403"), call("0403")])
             mock_process.assert_called_once()
@@ -422,7 +422,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_dock.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "dan", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "dan", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_called_once_with("7523")
             mock_process.assert_called_once()
@@ -444,7 +444,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_m5stickv.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "goE", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_called_once_with("0403")
             mock_process.assert_called_once()
@@ -466,7 +466,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_bit.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "goE", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_called_once_with("0403")
             mock_process.assert_called_once()
@@ -488,7 +488,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_yahboom.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "goE", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_called_once_with("7523")
             mock_process.assert_called_once()
@@ -510,7 +510,7 @@ class TestTriggerFlasher(TestCase):
             f.process_wipe(callback=callback)
             mock_exists.assert_called_once_with("mock/maixpy_cube.kfpkg")
             self.assertEqual(
-                sys.argv, ["-B", "goE", "-b", 1500000, "-p", mock_next().device, "-E"]
+                sys.argv, ["-B", "goE", "-b", "1500000", "-p", mock_next().device, "-E"]
             )
             mock_list_ports.grep.assert_called_once_with("0403")
             mock_process.assert_called_once()

@@ -75,6 +75,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "DownloadBetaScreen",
             "WarningAlreadyDownloadedScreen",
             "FlashScreen",
+            "WipeScreen",
         )
         for screen in app.screens:
             self.assertIn(screen.name, allowed_screens)
@@ -108,6 +109,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "DownloadBetaScreen",
             "WarningAlreadyDownloadedScreen",
             "FlashScreen",
+            "WipeScreen",
         )
         for screen in app.screens:
             self.assertIn(screen.name, allowed_screens)
@@ -141,6 +143,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "DownloadBetaScreen",
             "WarningAlreadyDownloadedScreen",
             "FlashScreen",
+            "WipeScreen",
         )
         for screen in app.screens:
             self.assertIn(screen.name, allowed_screens)

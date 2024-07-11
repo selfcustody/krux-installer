@@ -198,7 +198,7 @@ class MainScreen(BaseScreen):
                 elif instance.id == "main_wipe":
                     if self.will_wipe:
                         # do a click effect
-                        self.set_background(wid="main_flash", rgba=(0, 0, 0, 1))
+                        self.set_background(wid="main_wipe", rgba=(0, 0, 0, 1))
 
                         # partials are functions that call `update`
                         # method in screen before go to them

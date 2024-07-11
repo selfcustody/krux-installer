@@ -21,13 +21,14 @@
 """
 main_screen.py
 """
+import os
 import math
 import typing
 from functools import partial
 from threading import Thread
 from kivy.clock import Clock, ClockEvent
-from src.app.screens.base_screen import BaseScreen
 from src.utils.flasher import Flasher
+from src.app.screens.base_screen import BaseScreen
 
 
 class BaseFlashScreen(BaseScreen):
@@ -36,6 +37,13 @@ class BaseFlashScreen(BaseScreen):
     def __init__(self, wid: str, name: str, **kwargs):
         super().__init__(wid=wid, name=name, **kwargs)
         self.make_grid(wid=f"{self.id}_grid", rows=2)
+        self._firmware = None
+        self._baudrate = None
+        self._thread = None
+        self._trigger = None
+        self._output = None
+        self._progress = None
+        self._is_done = False
 
     @property
     def firmware(self) -> str:
@@ -46,8 +54,11 @@ class BaseFlashScreen(BaseScreen):
     @firmware.setter
     def firmware(self, value: str):
         """Setter for firmware"""
-        self.debug(f"setter::firmware={value}")
-        self._firmware = value
+        if os.path.exists(value):
+            self.debug(f"setter::firmware={value}")
+            self._firmware = value
+        else:
+            raise ValueError(f"Firmware not exist: {value}")
 
     @property
     def baudrate(self) -> str:
@@ -75,12 +86,8 @@ class BaseFlashScreen(BaseScreen):
 
         See https://kivy.org/doc/stable/guide/events.html
         """
-        if value is not None:
-            self._thread = Thread(name=self.name, target=value)
-        else:
-            self._thread = value
-
         self.debug(f"setter::thread={self._thread}->{value}")
+        self._thread = Thread(name=self.name, target=value)
 
     @property
     def trigger(self) -> ClockEvent:
@@ -91,11 +98,8 @@ class BaseFlashScreen(BaseScreen):
     @trigger.setter
     def trigger(self, value: typing.Callable):
         """Create a `ClockEvent` given a callback"""
-        if not value is None:
-            self._trigger = Clock.create_trigger(value)
-        else:
-            self._trigger = None
         self.debug(f"getter::trigger={self._trigger}")
+        self._trigger = Clock.create_trigger(value)
 
     @property
     def output(self) -> typing.List[str]:
@@ -124,11 +128,11 @@ class BaseFlashScreen(BaseScreen):
     @property
     def is_done(self) -> bool:
         """Getter for done"""
-        self.debug(f"getter::done={self._donw}")
-        return self._done
+        self.debug(f"getter::done={self._is_done}")
+        return self._is_done
 
     @is_done.setter
     def is_done(self, value: bool):
         """Setter for done"""
         self.debug(f"setter::done={value}")
-        self._done = value
+        self._is_done = value

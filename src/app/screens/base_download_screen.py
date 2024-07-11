@@ -98,12 +98,8 @@ class BaseDownloadScreen(BaseScreen):
 
         See https://kivy.org/doc/stable/guide/events.html
         """
-        if not value is None:
-            self._thread = Thread(name=self.name, target=value)
-        else:
-            self._thread = value
-
         self.debug(f"setter::thread={self._thread}->{value}")
+        self._thread = Thread(name=self.name, target=value)
 
     @property
     def trigger(self) -> ClockEvent:
@@ -114,11 +110,8 @@ class BaseDownloadScreen(BaseScreen):
     @trigger.setter
     def trigger(self, value: typing.Callable):
         """Create a `ClockEvent` given a callback"""
-        if not value is None:
-            self._trigger = Clock.create_trigger(value)
-        else:
-            self._trigger = None
         self.debug(f"getter::trigger={self._thread}")
+        self._trigger = Clock.create_trigger(value)
 
     def on_enter(self):
         """

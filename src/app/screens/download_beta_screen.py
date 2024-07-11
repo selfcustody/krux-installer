@@ -54,10 +54,10 @@ class DownloadBetaScreen(BaseDownloadScreen):
             firmware = os.path.join(
                 destdir, "krux_binaries", f"maixpy_{self.device}", self.firmware
             )
-            print(self.firmware)
             partials = [
                 partial(screen.update, name=self.name, key="baudrate", value=baudrate),
                 partial(screen.update, name=self.name, key="firmware", value=firmware),
+                partial(screen.update, name=self.name, key="flasher"),
             ]
 
             for fn in partials:

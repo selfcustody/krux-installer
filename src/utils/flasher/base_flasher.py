@@ -97,10 +97,15 @@ class BaseFlasher(Trigger):
     @board.setter
     def board(self, value: str):
         """Setter for board giving device name"""
-        if value not in VALID_DEVICES:
-            raise ValueError(f"Device not implemented: {value}")
-
-        if value in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit", "cube"):
+        if value in (
+            "amigo",
+            "amigo_tft",
+            "amigo_ips",
+            "m5stickv",
+            "bit",
+            "yahboom",
+            "cube",
+        ):
             self._board = "goE"
             self.debug(f"board::setter={self._board}")
 
@@ -108,9 +113,8 @@ class BaseFlasher(Trigger):
             self._board = "dan"
             self.debug(f"board::setter={self._board}")
 
-        elif value == "yahboom":
-            self._board = "goE"
-            self.debug(f"ports::setter={self._board}")
+        else:
+            raise ValueError(f"Device not implemented: {value}")
 
     @property
     def baudrate(self) -> int:

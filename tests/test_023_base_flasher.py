@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 from src.utils.flasher.base_flasher import BaseFlasher
 from .shared_mocks import PropertyInstanceMock, MockListPortsGrep
 
@@ -94,26 +94,54 @@ class TestBaseFlasher(TestCase):
 
         self.assertEqual(str(exc_info.exception), "Device not implemented: mock")
 
-    @patch(
-        "src.utils.flasher.base_flasher.BaseFlasher.board",
-        new_callable=PropertyInstanceMock,
-    )
-    def test_set_board_goe(self, mock_board):
+    def test_set_board_amigo(self):
         f = BaseFlasher()
-        f.board = "goE"
-        mock_board.assert_called_once_with(f, "goE")
+        f.board = "amigo"
+        self.assertEqual(f.board, "goE")
 
-    @patch(
-        "src.utils.flasher.base_flasher.BaseFlasher.board",
-        new_callable=PropertyInstanceMock,
-    )
-    def test_set_board_dan(self, mock_board):
+    def test_set_board_amigo_tft(self):
         f = BaseFlasher()
-        f.board = "dan"
-        mock_board.assert_called_once_with(f, "dan")
+        f.board = "amigo_tft"
+        self.assertEqual(f.board, "goE")
+
+    def test_set_board_amigo_ips(self):
+        f = BaseFlasher()
+        f.board = "amigo_ips"
+        self.assertEqual(f.board, "goE")
+
+    def test_set_board_m5stickv(self):
+        f = BaseFlasher()
+        f.board = "m5stickv"
+        self.assertEqual(f.board, "goE")
+
+    def test_set_board_bit(self):
+        f = BaseFlasher()
+        f.board = "bit"
+        self.assertEqual(f.board, "goE")
+
+    def test_set_board_dock(self):
+        f = BaseFlasher()
+        f.board = "dock"
+        self.assertEqual(f.board, "dan")
+
+    def test_set_board_yahboom(self):
+        f = BaseFlasher()
+        f.board = "yahboom"
+        self.assertEqual(f.board, "goE")
+
+    def test_set_board_cube(self):
+        f = BaseFlasher()
+        f.board = "cube"
+        self.assertEqual(f.board, "goE")
 
     def test_fail_set_board(self):
         with self.assertRaises(ValueError) as exc_info:
             f = BaseFlasher()
             f.board = "mock"
         self.assertEqual(str(exc_info.exception), "Device not implemented: mock")
+
+    def test_set_print_callback(self):
+        f = BaseFlasher()
+        f.print_callback = MagicMock()
+        f.print_callback()
+        f.print_callback.assert_called_once()

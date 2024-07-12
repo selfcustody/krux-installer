@@ -22,7 +22,6 @@
 wipe_screen.py
 """
 import os
-from pathlib import Path
 from functools import partial
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -38,9 +37,6 @@ class WipeScreen(BaseFlashScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
-        root_path = Path(__file__).parent.parent.parent.parent
-        self.warning_src = os.path.join(root_path, "assets", "warning.png")
-        self.done_src = os.path.join(root_path, "assets", "done.png")
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -85,20 +81,38 @@ class WipeScreen(BaseFlashScreen):
         def on_process_callback(
             file_type: str, iteration: int, total: int, suffix: str
         ):
-            pass
+            self.ids[f"{self.id}_progress"].text += "="
 
         def on_trigger_callback(dt):
-            self.ids[f"{self.id}_loader"].source = self.done_src
+            self.ids[f"{self.id}_loader"].source = self.done_img
             self.ids[f"{self.id}_loader"].reload()
+            self.ids[f"{self.id}_progress"].text = "[size=48sp][b]DONE![/b][/size]"
 
         setattr(WipeScreen, "on_print_callback", on_print_callback)
         setattr(WipeScreen, "on_process_callback", on_process_callback)
         setattr(WipeScreen, "on_trigger_callback", on_trigger_callback)
 
+        self.make_subgrid(
+            wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
+        )
+
         self.make_gif(
             wid=f"{self.id}_loader",
-            source=self.warning_src,
-            root_widget=f"{self.id}_grid",
+            source=self.warn_img,
+            root_widget=f"{self.id}_subgrid",
+        )
+
+        self.make_label(
+            wid=f"{self.id}_progress",
+            text="\n".join(
+                [
+                    "[size=36sp]Screen will appear fronzen until done.[/size]",
+                    "[size=24sp][b]PLEASE DO NOT UNPLUG YOUR DEVICE![/b][/size]",
+                ]
+            ),
+            root_widget=f"{self.id}_subgrid",
+            markup=True,
+            halign="center",
         )
 
         self.make_label(

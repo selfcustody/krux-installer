@@ -24,6 +24,7 @@ main_screen.py
 import os
 import math
 import typing
+from pathlib import Path
 from functools import partial
 from threading import Thread
 from kivy.clock import Clock, ClockEvent
@@ -37,6 +38,9 @@ class BaseFlashScreen(BaseScreen):
     def __init__(self, wid: str, name: str, **kwargs):
         super().__init__(wid=wid, name=name, **kwargs)
         self.make_grid(wid=f"{self.id}_grid", rows=2)
+        root_assets_path = Path(__file__).parent.parent.parent.parent
+        self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
+        self._done_img = os.path.join(root_assets_path, "assets", "done.png")
         self._firmware = None
         self._baudrate = None
         self._thread = None
@@ -44,6 +48,18 @@ class BaseFlashScreen(BaseScreen):
         self._output = None
         self._progress = None
         self._is_done = False
+
+    @property
+    def warn_img(self) -> str:
+        """Getter for warn_img"""
+        self.debug(f"getter::firmware={self._warn_img}")
+        return self._warn_img
+
+    @property
+    def done_img(self) -> str:
+        """Getter for done_img"""
+        self.debug(f"getter::firmware={self._done_img}")
+        return self._done_img
 
     @property
     def firmware(self) -> str:

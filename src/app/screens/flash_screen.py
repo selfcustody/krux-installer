@@ -47,6 +47,7 @@ class FlashScreen(BaseFlashScreen):
 
         def on_print_callback(*args, **kwargs):
             text = " ".join(str(x) for x in args)
+            self.info(text)
             text = text.replace(
                 "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00] INFO [/color]"
             )
@@ -72,36 +73,52 @@ class FlashScreen(BaseFlashScreen):
 
             if "Rebooting...\n" in text:
                 self.is_done = True
+                self.trigger()
 
-            if len(self.output) > 20:
+            if len(self.output) > 18:
                 del self.output[:1]
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
-            self.info(text)
 
         def on_process_callback(
             file_type: str, iteration: int, total: int, suffix: str
         ):
-
             percent = (iteration / total) * 100
             self.ids[f"{self.id}_progress"].text = "\n".join(
-                [f"[size=100sp]{percent:.2f} %[/size]", "", f"{file_type} at {suffix}"]
+                [
+                    f"[size=100sp]{percent:.2f} %[/size]",
+                    "",
+                    f"[size=28sp]Flashing [color=#efcc00][b]{file_type}[/b][/color] at [color=#efcc00][b]{suffix}[/b][/color][/size]",
+                ]
             )
 
         def on_trigger_callback(dt):
-            pass
+            self.ids[f"{self.id}_loader"].source = self.done_img
+            self.ids[f"{self.id}_loader"].reload()
+            self.ids[f"{self.id}_progress"].text = "[size=48sp][b]DONE![/b][/size]"
 
         setattr(FlashScreen, "on_print_callback", on_print_callback)
         setattr(FlashScreen, "on_process_callback", on_process_callback)
         setattr(FlashScreen, "on_trigger_callback", on_trigger_callback)
 
+        self.make_subgrid(
+            wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
+        )
+
+        self.make_gif(
+            wid=f"{self.id}_loader",
+            source=self.warn_img,
+            root_widget=f"{self.id}_subgrid",
+        )
+
         self.make_label(
             wid=f"{self.id}_progress",
             text="",
-            root_widget=f"{self.id}_grid",
+            root_widget=f"{self.id}_subgrid",
             markup=True,
             halign="center",
         )
+
         self.make_label(
             wid=f"{self.id}_info",
             text="",

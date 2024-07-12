@@ -39,6 +39,7 @@ ROOT_PATH = Path(__file__).parent.parent.absolute()
 PYNAME = "krux-installer"
 PYFILE = f"{PYNAME}.py"
 KFILE = str(ROOT_PATH / PYFILE)
+ASSETS = str(ROOT_PATH / "assets")
 I18NS = str(ROOT_PATH / "src" / "i18n")
 
 BUILDER_ARGS = []
@@ -53,6 +54,12 @@ BUILDER_ARGS.append("--add-data=pyproject.toml:.")
 if SYSTEM in ("Darwin"):
     BUILDER_ARGS.append("--hidden-import=ssl")
 
+# some assets 
+for f in listdir(ASSETS):
+    img_abs = join(ASSETS, f)
+    if isfile(img_abs):
+        BUILDER_ARGS.append(f"--add-data={img_abs}:assets")
+        
 # Add i18n translations
 for f in listdir(I18NS):
     i18n_abs = join(I18NS, f)

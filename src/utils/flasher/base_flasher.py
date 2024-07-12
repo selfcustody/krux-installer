@@ -26,7 +26,6 @@ import os
 import typing
 from serial.tools import list_ports
 from src.utils.trigger import Trigger
-from src.utils.selector import VALID_DEVICES
 
 
 class BaseFlasher(Trigger):

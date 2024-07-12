@@ -27,6 +27,7 @@ from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.image import Image
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.graphics import Color, Line
@@ -107,6 +108,14 @@ class BaseScreen(Screen, Trigger):
         label.id = wid
         self.ids[root_widget].add_widget(label)
         self.ids[wid] = WeakProxy(label)
+
+    def make_gif(self, wid: str, source: str, root_widget: str):
+        """Build grid where buttons will be placed"""
+        self.debug(f"Building Image::{wid}")
+        image = Image(source=source, fit_mode="scale-down")
+        image.id = wid
+        self.ids[root_widget].add_widget(image)
+        self.ids[wid] = WeakProxy(image)
 
     def clear_grid(self, wid: str):
         """Clear GridLayout widget"""

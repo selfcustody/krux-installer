@@ -21,12 +21,14 @@
 """
 wipe_screen.py
 """
-
+import os
+from pathlib import Path
 from functools import partial
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
+from kivy.uix.image import Image
 from src.utils.flasher.wiper import Wiper
 from src.app.screens.base_flash_screen import BaseFlashScreen
 
@@ -36,6 +38,9 @@ class WipeScreen(BaseFlashScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
+        root_path = Path(__file__).parent.parent.parent.parent
+        self.warning_src = os.path.join(root_path, "assets", "warning.png")
+        self.done_src = os.path.join(root_path, "assets", "done.png")
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -44,6 +49,7 @@ class WipeScreen(BaseFlashScreen):
 
         def on_print_callback(*args, **kwargs):
             text = " ".join(str(x) for x in args)
+            self.info(text)
             text = text.replace(
                 "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00] INFO [/color]"
             )
@@ -64,7 +70,7 @@ class WipeScreen(BaseFlashScreen):
             text = text.replace("\x1b[33m", "")
             text = text.replace(
                 "[INFO] Erasing the whole SPI Flash",
-                "[color=#00ff00] INFO [/color] [color=#efcc00] Erasing the whole SPI Flash [/color]",
+                "[color=#00ff00] INFO [/color] [color=#efcc00]Erasing the whole SPI Flash [/color]",
             )
 
             if text.startswith("[color=#00ff00] INFO [/color]"):
@@ -72,9 +78,9 @@ class WipeScreen(BaseFlashScreen):
 
             if "SPI Flash erased." in text:
                 self.is_done = True
+                self.trigger()
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
-            self.info(text)
 
         def on_process_callback(
             file_type: str, iteration: int, total: int, suffix: str
@@ -82,11 +88,18 @@ class WipeScreen(BaseFlashScreen):
             pass
 
         def on_trigger_callback(dt):
-            pass
+            self.ids[f"{self.id}_loader"].source = self.done_src
+            self.ids[f"{self.id}_loader"].reload()
 
         setattr(WipeScreen, "on_print_callback", on_print_callback)
         setattr(WipeScreen, "on_process_callback", on_process_callback)
         setattr(WipeScreen, "on_trigger_callback", on_trigger_callback)
+
+        self.make_gif(
+            wid=f"{self.id}_loader",
+            source=self.warning_src,
+            root_widget=f"{self.id}_grid",
+        )
 
         self.make_label(
             wid=f"{self.id}_info",
@@ -114,6 +127,9 @@ class WipeScreen(BaseFlashScreen):
                 callback=getattr(self.__class__, "on_process_callback"),
             )
             self.thread.start()
+
+            self.ids[f"{self.id}_loader"].anim_delay = 0.1
+            self.ids[f"{self.id}_loader"]._coreimage.anim_reset(True)
         else:
             raise ValueError("Wiper isnt configured. Use `update` method first")
 
@@ -150,15 +166,6 @@ class WipeScreen(BaseFlashScreen):
         elif key == "wiper":
             self.wiper = Wiper()
             self.wiper.baudrate = value
-
-        elif key == "progress":
-            self.ids[f"{self.id}_button"].text = "\n".join(
-                [
-                    "[size=8sp]" "\n".join(self.output),
-                    "[/size]",
-                    self.progress,
-                ]
-            )
 
         else:
             raise ValueError(f'Invalid key: "{key}"')

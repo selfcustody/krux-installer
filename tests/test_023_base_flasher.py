@@ -1,7 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
 from src.utils.flasher.base_flasher import BaseFlasher
-from .shared_mocks import PropertyInstanceMock, MockListPortsGrep
+from .shared_mocks import MockListPortsGrep
 
 
 class TestBaseFlasher(TestCase):

@@ -46,6 +46,7 @@ class WipeScreen(BaseFlashScreen):
         def on_print_callback(*args, **kwargs):
             text = " ".join(str(x) for x in args)
             self.info(text)
+
             text = text.replace(
                 "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00] INFO [/color]"
             )
@@ -73,7 +74,6 @@ class WipeScreen(BaseFlashScreen):
                 self.output.append(text)
 
             if "SPI Flash erased." in text:
-                self.is_done = True
                 self.trigger()
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
@@ -81,7 +81,7 @@ class WipeScreen(BaseFlashScreen):
         def on_process_callback(
             file_type: str, iteration: int, total: int, suffix: str
         ):
-            self.ids[f"{self.id}_progress"].text += "="
+            pass
 
         def on_trigger_callback(dt):
             self.ids[f"{self.id}_loader"].source = self.done_img
@@ -93,12 +93,12 @@ class WipeScreen(BaseFlashScreen):
         setattr(WipeScreen, "on_trigger_callback", on_trigger_callback)
 
         self.make_subgrid(
-            wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
+            wid=f"{self.id}_subgrid", rows=3, root_widget=f"{self.id}_grid"
         )
 
-        self.make_gif(
+        self.make_image(
             wid=f"{self.id}_loader",
-            source=self.warn_img,
+            source=self.load_img,
             root_widget=f"{self.id}_subgrid",
         )
 
@@ -106,8 +106,11 @@ class WipeScreen(BaseFlashScreen):
             wid=f"{self.id}_progress",
             text="\n".join(
                 [
-                    "[size=36sp]Screen will appear fronzen until done.[/size]",
-                    "[size=24sp][b]PLEASE DO NOT UNPLUG YOUR DEVICE![/b][/size]",
+                    # "[size=36sp]Screen will appear fronzen until done.[/size]",
+                    "[size=20sp][b]PLEASE DO NOT UNPLUG YOUR DEVICE[/b]",
+                    "[b]UNTIL YOU SEE THE MESSAGE",
+                    "[color=#efcc00]SPI Flash erased[/color]",
+                    "[b]IN THE PROMPT BELOW [/b][/size]",
                 ]
             ),
             root_widget=f"{self.id}_subgrid",
@@ -141,9 +144,6 @@ class WipeScreen(BaseFlashScreen):
                 callback=getattr(self.__class__, "on_process_callback"),
             )
             self.thread.start()
-
-            self.ids[f"{self.id}_loader"].anim_delay = 0.1
-            self.ids[f"{self.id}_loader"]._coreimage.anim_reset(True)
         else:
             raise ValueError("Wiper isnt configured. Use `update` method first")
 

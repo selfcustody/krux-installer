@@ -105,7 +105,7 @@ class FlashScreen(BaseFlashScreen):
             wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
         )
 
-        self.make_gif(
+        self.make_image(
             wid=f"{self.id}_loader",
             source=self.warn_img,
             root_widget=f"{self.id}_subgrid",

@@ -21,7 +21,9 @@
 """
 base_screen.py
 """
+import os
 import typing
+from pathlib import Path
 from functools import partial
 from kivy.app import App
 from kivy.uix.label import Label
@@ -33,6 +35,7 @@ from kivy.weakproxy import WeakProxy
 from kivy.graphics import Color, Line
 from kivy.uix.screenmanager import Screen
 from src.utils.trigger import Trigger
+from src.app.screens.loading_wheel import LoadingWheel
 from src.i18n import T
 from src.utils.selector import VALID_DEVICES
 
@@ -45,10 +48,33 @@ class BaseScreen(Screen, Trigger):
         self.id = wid
         self.name = name
 
+        root_assets_path = Path(__file__).parent.parent.parent.parent
+        self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
+        self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
+        self._done_img = os.path.join(root_assets_path, "assets", "done.png")
+
         locale = App.get_running_app().config.get("locale", "lang")
         locale = locale.split(".")
         locale = f"{locale[0].replace("-", "_")}.{locale[1]}"
         self.locale = locale
+
+    @property
+    def warn_img(self) -> str:
+        """Getter for warn_img"""
+        self.debug(f"getter::firmware={self._warn_img}")
+        return self._warn_img
+
+    @property
+    def load_img(self) -> str:
+        """Getter for load_img"""
+        self.debug(f"getter::firmware={self._load_img}")
+        return self._load_img
+
+    @property
+    def done_img(self) -> str:
+        """Getter for done_img"""
+        self.debug(f"getter::firmware={self._done_img}")
+        return self._done_img
 
     @property
     def locale(self) -> str:
@@ -109,13 +135,28 @@ class BaseScreen(Screen, Trigger):
         self.ids[root_widget].add_widget(label)
         self.ids[wid] = WeakProxy(label)
 
-    def make_gif(self, wid: str, source: str, root_widget: str):
+    def make_image(self, wid: str, source: str, root_widget: str):
         """Build grid where buttons will be placed"""
         self.debug(f"Building Image::{wid}")
         image = Image(source=source, fit_mode="scale-down")
         image.id = wid
         self.ids[root_widget].add_widget(image)
         self.ids[wid] = WeakProxy(image)
+
+    def make_loading_wheel(self, wid: str, root_widget: str, width: int):
+        self.debug(f"Building LoadingWheel::{wid}")
+        wheel = LoadingWheel()
+        root = self.ids[root_widget]
+        wheel.id = wid
+        wheel.pos = (Window.size[0] // 2, Window.size[1] // 2)
+        print(wheel.pos)
+        wheel.radius = 50
+        wheel.angle_start = 0
+        wheel.angle_end = 360
+        wheel.segments = 100
+        wheel.width = width
+        self.ids[root_widget].add_widget(wheel)
+        self.ids[wid] = WeakProxy(wheel)
 
     def clear_grid(self, wid: str):
         """Clear GridLayout widget"""

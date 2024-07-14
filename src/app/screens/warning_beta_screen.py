@@ -32,7 +32,7 @@ class WarningBetaScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="warning_beta_screen", name="WarningBetaScreen", **kwargs)
-        self.make_grid(wid="warning_beta_screen_grid", rows=1)
+        self.make_grid(wid="warning_beta_screen_grid", rows=2)
 
         warning = self.translate("WARNING")
         test_repo = self.translate("This is our test repository")

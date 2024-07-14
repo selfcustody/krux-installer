@@ -20,9 +20,9 @@ opencv-python = "^4.9.0.80"
 cryptography = "^42.0.5"
 qrcode = "^7.4.2"
 easy-i18n = "^1.2.0"
-kivy-circular-progress-bar = {git = "https://github.com/qlrd/kivy-circular-progress-bar.git"}
 pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
 distro = "^1.9.0"
+pillow = "^10.4.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.1.1"

@@ -29,7 +29,7 @@ jobs:
           $signame = "krux-$firmware_version.zip.sig"
           $pemname = "selfcustody.pem"
           $extraResources = "$loc\extraResources"
-          $opensslVersion = "3.2.1"
+          $opensslVersion = "3.3.1"
           $release_url = "https://github.com/selfcustody/krux/releases/download"
           $raw_url = "https://raw.githubusercontent.com/selfcustody/krux/main"
           $app_version = node -e "console.log(require('./package.json').version)"

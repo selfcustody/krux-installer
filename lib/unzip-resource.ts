@@ -174,10 +174,10 @@ export default class UnzipResourceHandler extends Handler {
               const error = new Error(`Device '${device}' not used anymore in version ${version}. Use 'maixpy_amigo' instead`)
               this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack})
             }
-            if (device.match(/maixpy_cube/g)) {
-              const error = new Error(`Device '${device}' not implemented for version '${version}'`)
-              this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack})
-            }
+            //if (device.match(/maixpy_cube/g)) {
+            //  const error = new Error(`Device '${device}' not implemented for version '${version}'`)
+            //  this.send(`${this.name}:error`, { name: error.name, message: error.message, stack: error.stack})
+            //}
           }
           this.onUnzip(zipFilePath, resources, device, os, isMac10, options)
         } else if (version === 'Select version') {

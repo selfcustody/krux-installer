@@ -186,6 +186,9 @@ export default class FlashHandler extends Handler {
       // setup flash command
       let flasher = null
 
+      // special command for MacOS
+      let xattr = null
+      
       this.send(`${this.name}:data`, `\x1b[32m$> ${flash.command} ${flash.args.join(' ')}\x1b[0m\n\n`)
 
       if (os === 'linux') {
@@ -193,6 +196,7 @@ export default class FlashHandler extends Handler {
         flasher = await sudoer.spawn(flash.command, flash.args.join(' '), { env: process.env })
       } else if (os === 'darwin') {
         const sudoer = new SudoerDarwin()
+        xattr = await sudoer.spawn('xattr', `-rc ${cwd}`, {env: process.env})
         flasher = await sudoer.spawn(flash.command, flash.args.join(' '), { env: process.env })
       } else if (os === 'win32') {
         flasher = spawn(flash.command, flash.args)
@@ -200,6 +204,26 @@ export default class FlashHandler extends Handler {
 
       let err = null
       let output = ''
+
+      if (xattr !== null) {
+        xattr.stdout.on('data', (data: any) => {
+          output = Buffer.from(data, 'utf-8').toString()
+          this.send(`${this.name}:data`, output)
+        })
+        
+        xattr.stderr.on('data', (data: any) => {
+          output = Buffer.from(data, 'utf-8').toString()
+          err = new Error(output)
+          this.send(`${this.name}:data`, output)
+        })
+
+        xattr.on('close', (code: any) => {
+          if (err) {
+            this.send(`${this.name}:error`, { was: 'flash', done: false , name: err.name, message: err.message, stack: err.stack })
+          }
+        })
+      }
+      
 
       flasher.stdout.on('data', (data: any) => {
         output = Buffer.from(data, 'utf-8').toString()

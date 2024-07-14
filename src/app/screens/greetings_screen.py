@@ -24,6 +24,9 @@ greetings_screen.py
 import sys
 from functools import partial
 from kivy.clock import Clock
+from kivy.graphics import Color
+from kivy.graphics import Rectangle
+from kivy.core.window import Window
 from .base_screen import BaseScreen
 
 
@@ -40,39 +43,9 @@ class GreetingsScreen(BaseScreen):
         # Build grid where buttons will be placed
         self.make_grid(wid=f"{self.id}_grid", rows=1)
 
-        # START of on_press buttons
-        def _press(instance):
-            self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-
-        def _release(instance):
-            self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=f"{instance.id}", rgba=(0, 0, 0, 1))
-
-        self.make_button(
-            row=0,
-            id=f"{self.id}_button",
-            root_widget=f"{self.id}_grid",
-            text="\n".join(
-                [
-                    "     ██           ",
-                    "     ██           ",
-                    "     ██           ",
-                    "   ██████         ",
-                    "     ██           ",
-                    "       ██   ██       ",
-                    "       ██  ██        ",
-                    "      ████         ",
-                    "       ██  ██        ",
-                    "       ██   ██       ",
-                    "       ██    ██      ",
-                    "                    ",
-                    "   KRUX INSTALLER   ",
-                ]
-            ),
-            markup=True,
-            on_press=_press,
-            on_release=_release,
+        # Build logo
+        self.make_image(
+            wid=f"{self.id}_logo", root_widget=f"{self.id}_grid", source=self.logo_img
         )
 
     def update(self, *args, **kwargs):
@@ -87,10 +60,17 @@ class GreetingsScreen(BaseScreen):
             raise ValueError(f"Invalid screen: {name}")
 
         if key == "change_screen":
-            if not value is None and value in ("MainScreen", "CheckPermissionsScreen"):
+            if value is not None and value in ("MainScreen", "CheckPermissionsScreen"):
                 self.set_screen(name=value, direction="left")
             else:
                 raise ValueError(f"Invalid value for '{key}': {value}")
+
+        elif key == "canvas":
+
+            with self.canvas.before:
+                Color(0, 0, 0)
+                Rectangle(pos=(0, 0), size=Window.size)
+
         else:
             raise ValueError(f"Invalid key: '{key}'")
 
@@ -99,20 +79,37 @@ class GreetingsScreen(BaseScreen):
         check platform and if is linux, go to CheckPermissionsScreen,
         otherwise, go to MainScreen
         """
+
+        partials = [(partial(self.update, name=self.name, key="canvas"), 0)]
+
         if sys.platform == "linux":
-            fn = partial(
-                self.update,
-                name=self.name,
-                key="change_screen",
-                value="CheckPermissionsScreen",
+            partials.append(
+                (
+                    partial(
+                        self.update,
+                        name=self.name,
+                        key="change_screen",
+                        value="CheckPermissionsScreen",
+                    ),
+                    2.1,
+                )
             )
 
         elif sys.platform == "darwin" or sys.platform == "win32":
-            fn = partial(
-                self.update, name=self.name, key="change_screen", value="MainScreen"
+            partials.append(
+                (
+                    partial(
+                        self.update,
+                        name=self.name,
+                        key="change_screen",
+                        value="MainScreen",
+                    ),
+                    2.1,
+                )
             )
 
         else:
             raise RuntimeError(f"Not implemented for {sys.platform}")
 
-        Clock.schedule_once(fn, 2.1)
+        for fn in partials:
+            Clock.schedule_once(*fn)

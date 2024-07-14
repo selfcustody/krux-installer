@@ -28,15 +28,10 @@ import sys
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
-from kivy.cache import Cache
-from kivy.uix.popup import Popup
-from kivy.uix.label import Label
-from kivy.uix.button import Button
 from .base_screen import BaseScreen
 from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.utils.selector import VALID_DEVICES
 from src.i18n import T
-from pysudoer import SudoerLinux
 
 
 class MainScreen(BaseScreen):
@@ -47,7 +42,7 @@ class MainScreen(BaseScreen):
 
         # Prepare some variables
         self.device = "select a new one"
-        self.version = "v24.03.0"
+        self.version = "select a new one"
         self.will_flash = False
         self.will_wipe = False
 
@@ -61,12 +56,12 @@ class MainScreen(BaseScreen):
         buttons = [
             (
                 "main_select_version",
-                f"{self.translate("Version")}: [color=#00AABB]{self.version}[/color]",
+                f"{self.translate("Version")}: [color=#00AABB]{self.translate(self.version)}[/color]",
                 True,
             ),
             (
                 "main_select_device",
-                f"{self.translate("Device")}: [color=#00AABB]{self.translate("select a new one")}[/color]",
+                f"{self.translate("Device")}: [color=#00AABB]{self.translate(self.device)}[/color]",
                 True,
             ),
             ("main_flash", f"[color=#333333]{self.translate("Flash")}[/color]", True),

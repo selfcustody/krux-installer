@@ -32,10 +32,8 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
-from kivy.graphics import Color, Line
 from kivy.uix.screenmanager import Screen
 from src.utils.trigger import Trigger
-from src.app.screens.loading_wheel import LoadingWheel
 from src.i18n import T
 from src.utils.selector import VALID_DEVICES
 
@@ -49,6 +47,7 @@ class BaseScreen(Screen, Trigger):
         self.name = name
 
         root_assets_path = Path(__file__).parent.parent.parent.parent
+        self._logo_img = os.path.join(root_assets_path, "assets", "logo.png")
         self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
@@ -59,21 +58,27 @@ class BaseScreen(Screen, Trigger):
         self.locale = locale
 
     @property
+    def logo_img(self) -> str:
+        """Getter for logo_img"""
+        self.debug(f"getter::logo_img={self._logo_img}")
+        return self._logo_img
+
+    @property
     def warn_img(self) -> str:
         """Getter for warn_img"""
-        self.debug(f"getter::firmware={self._warn_img}")
+        self.debug(f"getter::warn_img={self._warn_img}")
         return self._warn_img
 
     @property
     def load_img(self) -> str:
         """Getter for load_img"""
-        self.debug(f"getter::firmware={self._load_img}")
+        self.debug(f"getter::load_img={self._load_img}")
         return self._load_img
 
     @property
     def done_img(self) -> str:
         """Getter for done_img"""
-        self.debug(f"getter::firmware={self._done_img}")
+        self.debug(f"getter::done_img={self._done_img}")
         return self._done_img
 
     @property

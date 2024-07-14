@@ -184,7 +184,9 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        self.assertEqual(device_button.text, "Version: [color=#00AABB]v24.03.0[/color]")
+        self.assertEqual(
+            device_button.text, "Version: [color=#00AABB]select a new one[/color]"
+        )
         self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
         self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
         self.assertTrue(flash_button.markup)

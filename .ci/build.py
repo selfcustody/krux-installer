@@ -40,6 +40,7 @@ PYNAME = "krux-installer"
 PYFILE = f"{PYNAME}.py"
 KFILE = str(ROOT_PATH / PYFILE)
 ASSETS = str(ROOT_PATH / "assets")
+ICON = join(ASSETS, "icon.png")
 I18NS = str(ROOT_PATH / "src" / "i18n")
 
 BUILDER_ARGS = []
@@ -69,12 +70,15 @@ for f in listdir(I18NS):
             BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
 
 
-BUILDER_ARGS.append("--windowed")
-BUILDER_ARGS.append("--onefile")
-BUILDER_ARGS.append(f"--name={PYNAME}")
-
 # The application has window
 BUILDER_ARGS.append("--windowed")
+
+# Tha application is a GUI
+BUILDER_ARGS.append("--onefile")
+
+# Some important infos
+BUILDER_ARGS.append(f"--name={PYNAME}")
+BUILDER_ARGS.append(f"--icon={ICON}")
 
 # Specifics about operational system
 # on how will behave as file or bundled app

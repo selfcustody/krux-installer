@@ -152,7 +152,8 @@ class VerifyStableZipScreen(BaseScreen):
 
         sha256_data_0.load()
         sha256_data_1.load()
-        checksum = sha256_data_0.verify(sha256_data_1.data)
+        sha256_txt_hash = sha256_data_1.data.split(" ")[0]
+        checksum = sha256_data_0.verify(sha256_txt_hash)
 
         # memorize result
         self.success = checksum
@@ -168,7 +169,7 @@ class VerifyStableZipScreen(BaseScreen):
                 f"[size=14sp][color={"#00FF00" if checksum else "#FF0000"}]{sha256_data_0.data}[/color][/size]",
                 "",
                 f"[size=16sp][b]{assets_dir}/krux-{version}.zip.sha256.txt[/b][/size]",
-                f"[size=14sp][color={"#00FF00" if checksum else "#FF0000"}]{sha256_data_1.data}[/color][/size]",
+                f"[size=14sp][color={"#00FF00" if checksum else "#FF0000"}]{sha256_txt_hash}[/color][/size]",
                 f"[size=14sp]Result: [b]{success_msg if checksum else failed_msg}[/b][/size]",
                 "",
                 "",

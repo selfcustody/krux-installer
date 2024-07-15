@@ -22,6 +22,8 @@
 __init__.py
 """
 import sys
+from functools import partial
+from kivy.clock import Clock
 from kivy.core.window import Window
 from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.greetings_screen import GreetingsScreen
@@ -46,6 +48,7 @@ from src.app.screens.warning_already_downloaded_screen import (
 )
 from src.app.screens.flash_screen import FlashScreen
 from src.app.screens.wipe_screen import WipeScreen
+from src.utils.selector import Selector
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -56,6 +59,17 @@ class KruxInstallerApp(ConfigKruxInstaller):
         Window.size = (640, 800)
         self.debug(f"Window.size={Window.size}")
         Window.clearcolor = (0.9, 0.9, 0.9, 1)
+
+    def build(self):
+        """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
+        self.setup_screens()
+        self.setup_screen_manager()
+        return self.screen_manager
+
+    def on_start(self):
+        """When application starts, verify system and check latest firmware version"""
+        self.on_get_latest_version()
+        self.on_greetings()
 
     def setup_screen_manager(self):
         """Loop through defined screens (if have at lease one) and add it to screen_manager"""
@@ -69,7 +83,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             raise RuntimeError("Cannot setup screen_manager: screen list is empty")
 
     def setup_screens(self):
-        """ "Configure all screens given an OS"""
+        """Configure all screens given an OS"""
         self.screens.append(GreetingsScreen())
 
         if sys.platform == "linux":
@@ -94,8 +108,29 @@ class KruxInstallerApp(ConfigKruxInstaller):
             WipeScreen(),
         ]
 
-    def build(self):
-        """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
-        self.setup_screens()
-        self.setup_screen_manager()
-        return self.screen_manager
+    def on_greetings(self):
+        """
+        When application start, after greeting user with the krux logo, it will need to check if
+        user is running app in linux or non-linux. If running in linux, the user will be
+        redirect to CheckPermissionsScreen and then to MainScreen. Win32 and Mac will be
+        redirect to MainScreen.
+        """
+
+        greetings_screen = self.screen_manager.get_screen("GreetingsScreen")
+
+        fn = partial(
+            greetings_screen.update, name="KruxInstallerApp", key="check_permissions"
+        )
+        Clock.schedule_once(fn, 0)
+
+    def on_get_latest_version(self):
+        """Get the latest version of installer"""
+        selector = Selector()
+        main_screen = self.screen_manager.get_screen("MainScreen")
+        fn = partial(
+            main_screen.update,
+            name="KruxInstallerApp",
+            key="version",
+            value=selector.releases[0],
+        )
+        Clock.schedule_once(fn, 0)

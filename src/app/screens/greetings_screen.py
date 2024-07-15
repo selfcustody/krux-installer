@@ -54,7 +54,7 @@ class GreetingsScreen(BaseScreen):
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if name in ("GreetingsScreen"):
+        if name in ("GreetingsScreen", "KruxInstallerApp"):
             self.debug(f"Updating {self.name} from {name}")
         else:
             raise ValueError(f"Invalid screen: {name}")
@@ -71,45 +71,43 @@ class GreetingsScreen(BaseScreen):
                 Color(0, 0, 0)
                 Rectangle(pos=(0, 0), size=Window.size)
 
+        elif key == "check_permissions":
+            # check platform and if is linux, go to CheckPermissionsScreen,
+            # otherwise, go to MainScreen
+
+            partials = [(partial(self.update, name=self.name, key="canvas"), 0)]
+
+            if sys.platform == "linux":
+                partials.append(
+                    (
+                        partial(
+                            self.update,
+                            name=self.name,
+                            key="change_screen",
+                            value="CheckPermissionsScreen",
+                        ),
+                        2.1,
+                    )
+                )
+
+            elif sys.platform == "darwin" or sys.platform == "win32":
+                partials.append(
+                    (
+                        partial(
+                            self.update,
+                            name=self.name,
+                            key="change_screen",
+                            value="MainScreen",
+                        ),
+                        2.1,
+                    )
+                )
+
+            else:
+                raise RuntimeError(f"Not implemented for {sys.platform}")
+
+            for fn in partials:
+                Clock.schedule_once(*fn)
+
         else:
             raise ValueError(f"Invalid key: '{key}'")
-
-    def on_enter(self):
-        """
-        check platform and if is linux, go to CheckPermissionsScreen,
-        otherwise, go to MainScreen
-        """
-
-        partials = [(partial(self.update, name=self.name, key="canvas"), 0)]
-
-        if sys.platform == "linux":
-            partials.append(
-                (
-                    partial(
-                        self.update,
-                        name=self.name,
-                        key="change_screen",
-                        value="CheckPermissionsScreen",
-                    ),
-                    2.1,
-                )
-            )
-
-        elif sys.platform == "darwin" or sys.platform == "win32":
-            partials.append(
-                (
-                    partial(
-                        self.update,
-                        name=self.name,
-                        key="change_screen",
-                        value="MainScreen",
-                    ),
-                    2.1,
-                )
-            )
-
-        else:
-            raise RuntimeError(f"Not implemented for {sys.platform}")
-
-        for fn in partials:
-            Clock.schedule_once(*fn)

@@ -299,6 +299,7 @@ class MainScreen(BaseScreen):
 
         # Check if update to screen
         if name in (
+            "KruxInstallerApp",
             "ConfigKruxInstaller",
             "MainScreen",
             "SelectDeviceScreen",

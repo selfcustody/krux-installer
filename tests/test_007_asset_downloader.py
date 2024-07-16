@@ -1,7 +1,7 @@
 import io
 import sys
 from unittest import TestCase
-from unittest.mock import MagicMock, patch, mock_open, call
+from unittest.mock import MagicMock, patch, mock_open
 from src.utils.downloader.asset_downloader import AssetDownloader
 from .shared_mocks import PropertyInstanceMock
 
@@ -53,39 +53,6 @@ class TestAssetDownloader(TestCase):
 
         self.assertEqual(str(exc_info.exception), "Write Mode 'r' not supported")
 
-    @patch(
-        "src.utils.downloader.asset_downloader.AssetDownloader.on_data",
-        new_callable=PropertyInstanceMock,
-    )
-    @patch("tempfile.gettempdir")
-    def test_init_on_data(self, mock_gettempdir, mock_on_data):
-        mock_gettempdir.return_value = "/tmp/dir"
-
-        a = AssetDownloader(
-            url="https://github.com/selfcustody/krux/asset.zip",
-            destdir=mock_gettempdir(),
-            write_mode="w",
-        )
-
-        calls = [call(a, a.progress_bar), call(a, a.write_to_buffer)]
-        mock_on_data.assert_has_calls(calls)
-
-    @patch(
-        "src.utils.downloader.asset_downloader.AssetDownloader.on_write_to_buffer",
-        new_callable=PropertyInstanceMock,
-    )
-    @patch("tempfile.gettempdir")
-    def test_init_on_write_to_buffer(self, mock_gettempdir, mock_on_write):
-        mock_gettempdir.return_value = "/tmp/dir"
-
-        a = AssetDownloader(
-            url="https://github.com/selfcustody/krux/asset.zip",
-            destdir=mock_gettempdir(),
-            write_mode="w",
-        )
-
-        mock_on_write.assert_called_once_with(a, a.progress_bar)
-
     @patch("builtins.open", new_callable=mock_open)
     @patch("tempfile.gettempdir")
     @patch("src.utils.downloader.stream_downloader.requests")
@@ -116,7 +83,8 @@ class TestAssetDownloader(TestCase):
             write_mode="wb",
         )
 
-        a.download()
+        mock_on_data = MagicMock()
+        a.download(on_data=mock_on_data)
 
         if sys.platform in ("linux", "darwin"):
             open_mock.assert_called_once_with("/tmp/dir/asset.zip", "wb")
@@ -154,7 +122,8 @@ class TestAssetDownloader(TestCase):
             write_mode="w",
         )
 
-        a.download()
+        mock_on_data = MagicMock()
+        a.download(on_data=mock_on_data)
 
         if sys.platform in ("linux", "darwin"):
             open_mock.assert_called_once_with(

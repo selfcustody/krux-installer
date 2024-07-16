@@ -32,10 +32,10 @@ class TriggerDownloader(BaseDownloader):
 
     def __init__(self, url: str):
         super().__init__(url=url)
-        self.content_len = 0
-        self.filename = None
-        self.downloaded_len = 0
-        self.chunk_size = 1024
+        self._content_len = 0
+        self._filename = ""
+        self._downloaded_len = 0
+        self._chunk_size = 1024
 
     @property
     def content_len(self) -> int:
@@ -82,5 +82,11 @@ class TriggerDownloader(BaseDownloader):
     @chunk_size.setter
     def chunk_size(self, value: int):
         """Setter for the size of chunks on downloaded data"""
-        self._chunk_size = value
-        self.debug(f"chunk_size::setter={self._chunk_size}")
+        # How to check if a given number is a power of two
+        # see
+        # https://stackoverflow.com/questions/57025836/how-to-check-if-a-given-number-is-a-power-of-two#57025941
+        if (value & (value - 1) == 0) and value != 0:
+            self.debug(f"chunk_size::setter={value}")
+            self._chunk_size = value
+        else:
+            raise ValueError(f"{value} isnt a power of 2")

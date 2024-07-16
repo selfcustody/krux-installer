@@ -1,4 +1,3 @@
-from io import BytesIO
 from unittest import TestCase
 from unittest.mock import patch
 from src.utils.downloader.base_downloader import BaseDownloader
@@ -80,11 +79,3 @@ class TestBaseDownloader(TestCase):
         self.assertEqual(
             str(exc_info.exception), "Invalid url: https://gitlab.com/selfcustody/krux"
         )
-
-    def test_fail_set_buffer(self):
-        url = "https://github.com/selfcustody/krux"
-        downloader = BaseDownloader(url=url)
-        with self.assertRaises(AttributeError) as exc_info:
-            downloader.buffer = BytesIO()
-
-        self.assertEqual(str(exc_info.exception), "You're forbidden to set buffer")

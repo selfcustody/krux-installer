@@ -23,7 +23,6 @@
 trigger_downloader.py
 """
 import re
-import typing
 from io import BytesIO
 from ..trigger import Trigger
 
@@ -41,13 +40,9 @@ class BaseDownloader(Trigger):
         self.url = url
 
     @property
-    def buffer(self) -> typing.SupportsBytes:
+    def buffer(self) -> BytesIO:
         """Getter for the buffer of the file to be downloaded"""
         return self._buffer
-
-    @buffer.setter
-    def buffer(self, value):
-        raise AttributeError("You're forbidden to set buffer")
 
     @property
     def url(self) -> str:

@@ -23,7 +23,6 @@
 stream_downloader.py
 """
 import os
-import sys
 import typing
 import requests
 from .trigger_downloader import TriggerDownloader
@@ -34,23 +33,6 @@ class StreamDownloader(TriggerDownloader):
     Download files in a stream mode
     """
 
-    def __init__(self, url: str):
-        super().__init__(url=url)
-        self.progress_bar_size = 64
-        self.on_data = self.progress_bar
-
-    @property
-    def progress_bar_size(self) -> int:
-        """Getter for the size of progress_bar"""
-        self.debug(f"progress_bar_size::getter={self._progress_bar_size}")
-        return self._progress_bar_size
-
-    @progress_bar_size.setter
-    def progress_bar_size(self, value: int):
-        """Setter for the size of progress_bar"""
-        self._progress_bar_size = value
-        self.debug(f"progress_bar_size::setter={self._progress_bar_size}")
-
     @property
     def on_data(self) -> typing.Callable:
         """Getter for callback to be used in each increment of downloaded stream"""
@@ -60,31 +42,10 @@ class StreamDownloader(TriggerDownloader):
     @on_data.setter
     def on_data(self, value: typing.Callable):
         """Setter for the callback to be used in each increment of downloaded stream"""
-        self._on_data = value
         self.debug(f"on_data::setter={value}")
+        self._on_data = value
 
-    def progress_bar(
-        self,
-        data: bytes,  # pylint: disable=unused-argument
-    ):
-        """
-        Default :attr:`on_data` for :function:`download_zip_file`. It writes
-        a progress bar, the percent of amount downloaded and the velocity
-        of download.
-        """
-        percent = self.downloaded_len / self.content_len
-        bar_amount = int(self.progress_bar_size * percent)
-        total_bars = "=" * bar_amount
-        missing_bars = " " * (self.progress_bar_size - bar_amount)
-        percent = f"{percent * 100.0:.2f}"
-        cli_bar = f"\r[{total_bars}{missing_bars}]"
-        dld_mb = f"{self.downloaded_len / 1000000:.2f}"
-        tot_mb = f"{self.content_len / 1000000:.2f}"
-        sys.stdout.write(f"{cli_bar} {dld_mb} of {tot_mb} Mb ({percent}%)")
-        if bar_amount == self.progress_bar_size:
-            sys.stdout.write("")
-
-    def download_file_stream(self, url: str) -> str:
+    def download_file_stream(self, url: str):
         """
         Given a :attr:`url`, download a large file in a streaming manner to given
         destination folder (:attr:`dest_dir`)
@@ -95,6 +56,8 @@ class StreamDownloader(TriggerDownloader):
 
         Then return the name
         """
+        # Get the filename by url and construct the request
+        # Check for any HTTPError and then process chunks of data
         try:
             self.filename = os.path.basename(url)
             self.debug(f"download_file_stream::filename={self.filename}")
@@ -129,21 +92,22 @@ class StreamDownloader(TriggerDownloader):
 
         # get some contents to calculate the amount
         # of downloaded data
-        self.content_len = int(res.headers.get("Content-Length"))
+        content_len = res.headers.get("Content-Length")
+        if content_len:
+            self.content_len = int(content_len)
+        else:
+            raise ValueError(f"Empty Content-Length response for {url}")
+
         self.debug(f"download_file_stream::content_len={self.content_len}")
 
-        # Add chunks to BufferError
+        # Get the chunks of bytes data
+        # and pass it to a post-processing
+        # method defined as `on_data`
         for chunk in res.iter_content(chunk_size=self.chunk_size):
-            if self._on_data is not None:
-                self.downloaded_len += len(chunk)
-                self.debug(
-                    f"download_file_stream::downloaded_len={self.downloaded_len}"
-                )
-                self.on_data(data=chunk)
-            else:
-                raise NotImplementedError(
-                    "on_data function not implemented to callback data"
-                )
+            self.downloaded_len += len(chunk)
+            self.debug(f"download_file_stream::downloaded_len={self.downloaded_len}")
+            self.on_data(data=chunk)
 
+        # Now you can close connection
         self.debug("downloaded_file_stream::closing_connection")
         res.close()

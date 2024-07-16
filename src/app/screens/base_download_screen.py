@@ -42,9 +42,10 @@ class BaseDownloadScreen(BaseScreen):
         self._thread = None
         self._trigger = None
         self.version = None
-        self._to_screen = None
+        self._to_screen = ""
 
-        # progress label
+        # progress label, show a "Connecting"
+        # before start the download to make
         progress = Label(
             text="[color=#efcc00][size=40sp]Connecting...[/size][/color]",
             markup=True,
@@ -53,6 +54,8 @@ class BaseDownloadScreen(BaseScreen):
         )
 
         # information label
+        # it has data about url
+        # and downloaded paths
         asset_label = Label(markup=True, valign="center", halign="center")
 
         # setup progress label
@@ -76,7 +79,7 @@ class BaseDownloadScreen(BaseScreen):
         self._to_screen = value
 
     @property
-    def downloader(self) -> AssetDownloader:
+    def downloader(self) -> AssetDownloader | None:
         self.debug(f"getter::downloader={self._downloader}")
         return self._downloader
 
@@ -86,12 +89,12 @@ class BaseDownloadScreen(BaseScreen):
         self._downloader = value
 
     @property
-    def thread(self) -> Thread:
+    def thread(self) -> Thread | None:
         self.debug(f"getter::thread={self._thread}")
         return self._thread
 
     @thread.setter
-    def thread(self, value: typing.Callable):
+    def thread(self, value: Thread):
         """
         Wait until download thread finish,
         when finished call this callback
@@ -99,7 +102,7 @@ class BaseDownloadScreen(BaseScreen):
         See https://kivy.org/doc/stable/guide/events.html
         """
         self.debug(f"setter::thread={self._thread}->{value}")
-        self._thread = Thread(name=self.name, target=value)
+        self._thread = value
 
     @property
     def trigger(self) -> ClockEvent:
@@ -119,28 +122,19 @@ class BaseDownloadScreen(BaseScreen):
 
         Every inherithed class should implement it own `on_trigger` and `on_progress`
         staticmethods. The method `on_progress` should call `self.trigger` ath the end:
-
-        ```python
-        Myclass(BaseDownloadScreen):
-
-            def __init__(self, *args, **kwargs):
-                super().__init__(wid="example_screen", name="ExampleScreen", **kwargs)
-
-                def on_trigger(dt):
-                    # do something
-
-                def on_progress(data: bytes):
-                    # do something
-                    self.trigger()
-
-                setattr(self.__class__, "on_trigger", on_trigger)
-                setattr(self.__class__, "on_progress", on_progress)
-        ```
         """
         if self.downloader is not None:
+            # on trigger should be defined on inherited classes
             self.trigger = getattr(self.__class__, "on_trigger")
-            self.downloader.on_write_to_buffer = getattr(self.__class__, "on_progress")
-            self.thread = self.downloader.download
+
+            # on progress should be defined on inherited classes
+            on_progress = getattr(self.__class__, "on_progress")
+            _fn = partial(self.downloader.download, on_data=on_progress)
+
+            # Now run it as a partial function
+            # on parallel thread to not block
+            # the process during the kivy cycles
+            self.thread = Thread(name=self.name, target=_fn)
             self.thread.start()
         else:
             raise ValueError("Downloader isnt configured. Use `update` method first")

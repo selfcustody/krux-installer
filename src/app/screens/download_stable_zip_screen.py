@@ -42,8 +42,13 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         )
         self.to_screen = "DownloadStableZipSha256Screen"
 
-        # Define some staticmethods in dynamic way
-        # (so they can be called in tests)
+        # Define some staticmethods in
+        # dynamic way, so they can be
+        # called in `on_enter` method of
+        # BaseDownloadScreen and in tests
+
+        # This is a function that will be called
+        # when the download thread is finished
         def on_trigger(dt):
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
@@ -53,8 +58,9 @@ class DownloadStableZipScreen(BaseDownloadScreen):
             Clock.schedule_once(fn, 0)
             self.set_screen(name=self.to_screen, direction="left")
 
+        # This is a function that will be called
+        # when a bunch of data are streamed from github
         def on_progress(data: bytes):
-            # calculate downloaded percentage
             fn = partial(
                 self.update,
                 name=self.name,
@@ -66,12 +72,14 @@ class DownloadStableZipScreen(BaseDownloadScreen):
             )
             Clock.schedule_once(fn, 0)
 
+        # Now define the functions as staticmethods of class
         self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
         setattr(self.__class__, "on_trigger", on_trigger)
 
         self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
         setattr(self.__class__, "on_progress", on_progress)
 
+        # Once finished, update canvas
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 

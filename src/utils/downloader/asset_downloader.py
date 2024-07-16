@@ -35,8 +35,6 @@ class AssetDownloader(StreamDownloader):
     def __init__(self, url: str, destdir: str, write_mode: str):
         super().__init__(url=url)
         self.destdir = destdir
-        self.on_data = self.write_to_buffer
-        self.on_write_to_buffer = self.progress_bar
         self.write_mode = write_mode
 
     @property
@@ -55,22 +53,6 @@ class AssetDownloader(StreamDownloader):
         self._destdir = value
 
     @property
-    def on_write_to_buffer(self):
-        """
-        Getter for callback to be executed after a data is wrote to buffer
-        """
-        self.debug("on_write_to_buffer::getter")
-        return self._on_write_to_buffer
-
-    @on_write_to_buffer.setter
-    def on_write_to_buffer(self, value: typing.Callable):
-        """
-        Setter for callback to be executed after a data is wrote to buffer
-        """
-        self.debug("on_write_to_buffer::setter")
-        self._on_write_to_buffer = value
-
-    @property
     def write_mode(self) -> str:
         """Getter for write mode ('wb' or 'w')"""
         self.debug(f"write_mode::getter={self._write_mode}")
@@ -85,31 +67,28 @@ class AssetDownloader(StreamDownloader):
         else:
             raise ValueError(f"Write Mode '{value}' not supported")
 
-    def write_to_buffer(self, data: bytes):
-        """
-        Callback to be used when writing streamed data to buffer
-        and pass the same data to :attr:`_callback_on_write_to_buffer`
-        """
-        if self.on_write_to_buffer is not None:
-            self.debug(f"write_to_buffer::buffer::write={data}")
-            self.buffer.write(data)
-
-            self.debug("write_to_buffer::_callback_on_write_to_buffer")
-            self.on_write_to_buffer(data)
-        else:
-            raise NotImplementedError("on_write_to_buffer bound method not set")
-
-    def download(self) -> str:
+    def download(self, on_data: typing.Callable) -> str:
         """
         Download some zip release given its version and put it
         on a destination directory (default: OS temporary dir)
         """
+
+        # Before the download the file stream,
+        # you can define some method to be called
+        # after the buffer is wrote
+        def _on_data(data: bytes):
+            self.buffer.write(data)
+            on_data(data)
+
+        self.on_data = _on_data
         self.download_file_stream(url=self.url)
 
+        # Once the data is downloaded, you can
+        # put it on a file
         destfile = os.path.join(self.destdir, self.filename)
         self.debug(f"download::destfile={destfile}")
-
         self.debug(f"download::write::{self.write_mode}={self.buffer.getvalue()}")
+
         if self.write_mode == "wb":
             # pylint: disable=unspecified-encoding
             with open(destfile, self.write_mode) as file:

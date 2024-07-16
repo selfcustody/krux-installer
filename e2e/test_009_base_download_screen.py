@@ -58,17 +58,16 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         mock_get_running_app.assert_has_calls(
             [call().config.get("locale", "lang")], any_order=True
         )
-        assert mock_create_trigger.called
+        mock_create_trigger.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
-    @patch("src.app.screens.base_download_screen.Thread")
-    def test_set_thread(self, mock_thread, mock_get_running_app):
-        mock_func = MagicMock()
+    def test_set_thread(self, mock_get_running_app):
+        mock_target = MagicMock()
 
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
         screen.to_screen = "AnotherMockScreen"
-        screen.thread = mock_func
+        screen.thread = MagicMock(name="mock", target=mock_target)
         self.render(screen)
 
         # get your Window instance safely
@@ -81,7 +80,6 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         mock_get_running_app.assert_has_calls(
             [call().config.get("locale", "lang")], any_order=True
         )
-        mock_thread.assert_called_once_with(name=screen.name, target=mock_func)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
@@ -114,13 +112,15 @@ class TestBaseDownloadScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch("src.app.screens.base_download_screen.partial")
     @patch("src.app.screens.base_download_screen.Clock.create_trigger")
-    @patch("src.app.screens.base_download_screen.Thread")
-    def test_on_enter(self, mock_thread, mock_create_trigger, mock_get_running_app):
+    @patch("src.app.screens.base_download_screen.Thread.start")
+    def test_on_enter(
+        self, mock_thread, mock_create_trigger, mock_partial, mock_get_running_app
+    ):
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
         screen.to_screen = "AnotherMockScreen"
-        screen.downloader = MagicMock()
-        screen.downloader.download = MagicMock()
+
         self.render(screen)
 
         # get your Window instance safely
@@ -135,6 +135,7 @@ class TestBaseDownloadScreen(GraphicUnitTest):
 
         # pylint: disable=no-member
         BaseDownloadScreen.on_progress.return_value = True
+        screen.downloader = MagicMock()
 
         screen.on_enter()
 
@@ -142,7 +143,11 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         mock_get_running_app.assert_has_calls(
             [call().config.get("locale", "lang")], any_order=True
         )
-        assert mock_create_trigger.called
-        mock_thread.assert_called_once_with(
-            name=screen.name, target=screen.downloader.download
+
+        on_progress = getattr(BaseDownloadScreen, "on_progress")
+        mock_partial.assert_called_once_with(
+            screen.downloader.download, on_data=on_progress
         )
+        mock_create_trigger.assert_called()
+        mock_thread.assert_called_once()
+        # (name=screen.name, target=mock_partial())

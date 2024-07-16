@@ -148,21 +148,6 @@ class BaseScreen(Screen, Trigger):
         self.ids[root_widget].add_widget(image)
         self.ids[wid] = WeakProxy(image)
 
-    def make_loading_wheel(self, wid: str, root_widget: str, width: int):
-        self.debug(f"Building LoadingWheel::{wid}")
-        wheel = LoadingWheel()
-        root = self.ids[root_widget]
-        wheel.id = wid
-        wheel.pos = (Window.size[0] // 2, Window.size[1] // 2)
-        print(wheel.pos)
-        wheel.radius = 50
-        wheel.angle_start = 0
-        wheel.angle_end = 360
-        wheel.segments = 100
-        wheel.width = width
-        self.ids[root_widget].add_widget(wheel)
-        self.ids[wid] = WeakProxy(wheel)
-
     def clear_grid(self, wid: str):
         """Clear GridLayout widget"""
         self.debug(f"Clearing widgets from GridLayout::{wid}")

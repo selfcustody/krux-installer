@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -28,6 +30,42 @@ class TestBaseScreen(GraphicUnitTest):
         # your asserts
         self.assertEqual(window.children[0], screen)
         self.assertEqual(window.children[0].height, window.height)
+
+        mock_get_running_app.assert_called_once()
+
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_get_logo_img(self, mock_get_running_app):
+        root = Path(__file__).parent.parent
+        logo = os.path.join(root, "assets", "logo.png")
+        screen = BaseScreen(wid="mock", name="Mock")
+        self.assertEqual(screen.logo_img, logo)
+
+        mock_get_running_app.assert_called_once()
+
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_get_warn_img(self, mock_get_running_app):
+        root = Path(__file__).parent.parent
+        warn = os.path.join(root, "assets", "warning.png")
+        screen = BaseScreen(wid="mock", name="Mock")
+        self.assertEqual(screen.warn_img, warn)
+
+        mock_get_running_app.assert_called_once()
+
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_get_load_gif(self, mock_get_running_app):
+        root = Path(__file__).parent.parent
+        warn = os.path.join(root, "assets", "load.gif")
+        screen = BaseScreen(wid="mock", name="Mock")
+        self.assertEqual(screen.load_img, warn)
+
+        mock_get_running_app.assert_called_once()
+
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_get_done_img(self, mock_get_running_app):
+        root = Path(__file__).parent.parent
+        warn = os.path.join(root, "assets", "done.png")
+        screen = BaseScreen(wid="mock", name="Mock")
+        self.assertEqual(screen.done_img, warn)
 
         mock_get_running_app.assert_called_once()
 

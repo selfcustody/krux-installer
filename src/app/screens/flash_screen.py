@@ -68,11 +68,13 @@ class FlashScreen(BaseFlashScreen):
             text = text.replace("\x1b[33m", "")
             text = text.replace("\rProgramming", "Programming")
 
-            if text.startswith("[color=#00ff00] INFO [/color]"):
+            if "INFO" in text:
                 self.output.append(text)
 
+            elif "Programming BIN" in text:
+                self.output[len(self.output) - 1] = text
+
             if "Rebooting...\n" in text:
-                self.is_done = True
                 self.trigger()
 
             if len(self.output) > 18:
@@ -131,21 +133,20 @@ class FlashScreen(BaseFlashScreen):
         """
         Event fired when the screen is displayed and the entering animation is complete.
         """
-        if self.flasher is not None:
+        if hasattr(self, "flasher"):
             self.output = []
-            self.progress = ""
-            self.is_done = False
             self.trigger = getattr(self.__class__, "on_trigger_callback")
             self.flasher.ktool.__class__.print_callback = getattr(
                 self.__class__, "on_print_callback"
             )
-            self.thread = partial(
+            on_process_callback = partial(
                 self.flasher.flash,
                 callback=getattr(self.__class__, "on_process_callback"),
             )
+            self.thread = Thread(name=self.name, target=on_process_callback)
             self.thread.start()
         else:
-            raise ValueError("Flasher isnt configured. Use `update` method first")
+            raise RuntimeError("Flasher isnt configured")
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
@@ -185,15 +186,6 @@ class FlashScreen(BaseFlashScreen):
             self.flasher = Flasher()
             self.flasher.firmware = self.firmware
             self.flasher.baudrate = self.baudrate
-
-        elif key == "progress":
-            self.ids[f"{self.id}_button"].text = "\n".join(
-                [
-                    "[size=8sp]" "\n".join(self.output),
-                    "[/size]",
-                    self.progress,
-                ]
-            )
 
         else:
             raise ValueError(f'Invalid key: "{key}"')

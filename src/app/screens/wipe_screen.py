@@ -23,6 +23,7 @@ wipe_screen.py
 """
 import os
 from functools import partial
+from threading import Thread
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
@@ -138,11 +139,12 @@ class WipeScreen(BaseFlashScreen):
             self.wiper.ktool.__class__.print_callback = getattr(
                 self.__class__, "on_print_callback"
             )
-            self.thread = partial(
+            on_process_callback = partial(
                 self.wiper.wipe,
                 device=self.device,
                 callback=getattr(self.__class__, "on_process_callback"),
             )
+            self.thread = Thread(name=self.name, target=on_process_callback)
             self.thread.start()
         else:
             raise ValueError("Wiper isnt configured. Use `update` method first")

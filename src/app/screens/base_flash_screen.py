@@ -80,7 +80,7 @@ class BaseFlashScreen(BaseScreen):
         return self._thread
 
     @thread.setter
-    def thread(self, value: typing.Callable):
+    def thread(self, value: Thread):
         """
         Wait until download thread finish,
         when finished call this callback
@@ -88,7 +88,7 @@ class BaseFlashScreen(BaseScreen):
         See https://kivy.org/doc/stable/guide/events.html
         """
         self.debug(f"setter::thread={self._thread}->{value}")
-        self._thread = Thread(name=self.name, target=value)
+        self._thread = value
 
     @property
     def trigger(self) -> ClockEvent:
@@ -113,27 +113,3 @@ class BaseFlashScreen(BaseScreen):
         """Setter for info"""
         self.debug(f"setter::output={value}")
         self._output = value
-
-    @property
-    def progress(self) -> str:
-        """Getter for progress"""
-        self.debug(f"getter::progress={self._progress}")
-        return self._progress
-
-    @progress.setter
-    def progress(self, value: str):
-        """Setter for info"""
-        self.debug(f"setter::progress={value}")
-        self._progress = value
-
-    @property
-    def is_done(self) -> bool:
-        """Getter for done"""
-        self.debug(f"getter::done={self._is_done}")
-        return self._is_done
-
-    @is_done.setter
-    def is_done(self, value: bool):
-        """Setter for done"""
-        self.debug(f"setter::done={value}")
-        self._is_done = value

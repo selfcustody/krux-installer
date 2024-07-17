@@ -113,9 +113,8 @@ class TestFlashScreen(GraphicUnitTest):
         )
         mock_color.assert_called_once_with(0, 0, 0, 1)
 
-        # TODO Check why the below happens
-        # In linux, it will set window dimension to 640, 800
-        # In Mac, it will set window 1280, 1600
+        # Check why the below happens: In linux, it will set window
+        # dimension to 640, 800. In Mac, it will set window 1280, 1600
         args, kwargs = mock_rectangle.call_args_list[-1]
         self.assertTrue("size" in kwargs)
         self.assertEqual(len(args), 0)

@@ -70,12 +70,14 @@ class FlashScreen(BaseFlashScreen):
 
             if "INFO" in text:
                 self.output.append(text)
+                if "Rebooting" in text:
+                    self.trigger()
 
             elif "Programming BIN" in text:
-                self.output[len(self.output) - 1] = text
+                self.output[-1] = text
 
-            if "Rebooting...\n" in text:
-                self.trigger()
+            else:
+                self.warning(f"Message not recognized: {text}")
 
             if len(self.output) > 18:
                 del self.output[:1]

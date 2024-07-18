@@ -118,6 +118,7 @@ class TestFlasher(TestCase):
                 ),
             ]
         )
+
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.flasher.base_flasher.next")
@@ -148,11 +149,13 @@ class TestFlasher(TestCase):
             any_order=True,
         )
         mock_ktool_log.assert_called_once_with("Port mock not working")
-            
+
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.flasher.base_flasher.next")
-    @patch("src.utils.flasher.flasher.Flasher.is_port_working", side_effect=[True, False])
+    @patch(
+        "src.utils.flasher.flasher.Flasher.is_port_working", side_effect=[True, False]
+    )
     @patch("src.utils.kboot.build.ktool.KTool.process")
     @patch("src.utils.flasher.base_flasher.KTool.log")
     def test_fail_flash_after_first_greeting_fail_port_not_working(
@@ -194,11 +197,14 @@ class TestFlasher(TestCase):
                 ),
             ]
         )
-        mock_ktool_log.assert_has_calls([
-            call(f"Greeting fail: mock test for {mock_next().device}"),
-            call(""),
-            call(f"Port {mock_list_ports.grep().__next__()} not working")
-        ])
+        mock_ktool_log.assert_has_calls(
+            [
+                call(f"Greeting fail: mock test for {mock_next().device}"),
+                call(""),
+                # pylint: disable=unnecessary-dunder-call
+                call(f"Port {mock_list_ports.grep().__next__()} not working"),
+            ]
+        )
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
@@ -217,7 +223,7 @@ class TestFlasher(TestCase):
     ):
         mock_exception = Exception("Greeting fail: mock test")
         mock_process.side_effect = [mock_exception]
-        
+
         next_exception = StopIteration("Stop iteration mock")
         mock_next.side_effect = [MagicMock(device="mock"), next_exception]
 
@@ -248,8 +254,6 @@ class TestFlasher(TestCase):
                 ),
             ]
         )
-        mock_ktool_log.assert_has_calls([
-            call("Greeting fail: mock test for mock"),
-            call(""),
-            call("")
-        ])
+        mock_ktool_log.assert_has_calls(
+            [call("Greeting fail: mock test for mock"), call(""), call("")]
+        )

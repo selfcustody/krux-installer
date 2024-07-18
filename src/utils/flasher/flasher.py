@@ -92,8 +92,6 @@ class Flasher(BaseFlasher):
                 except StopIteration as stop_exc:
                     self.ktool.__class__.log(str(stop_exc))
 
-                except Exception as _exc:
-                    self.ktool.__class__.log(str(_exc))
         else:
             exc = RuntimeError(f"Port {self.port} not working")
             self.ktool.__class__.log(str(exc))

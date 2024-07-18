@@ -49,7 +49,7 @@ class FlashScreen(BaseFlashScreen):
             text = " ".join(str(x) for x in args)
             self.info(text)
             text = text.replace(
-                "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00] INFO [/color]"
+                "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
             )
             text = text.replace(
                 "\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]"
@@ -76,8 +76,9 @@ class FlashScreen(BaseFlashScreen):
             elif "Programming BIN" in text:
                 self.output[-1] = text
 
-            else:
-                self.warning(f"Message not recognized: {text}")
+            elif "*" in text:
+                self.output.append("*")
+                self.output.append("")
 
             if len(self.output) > 18:
                 del self.output[:1]

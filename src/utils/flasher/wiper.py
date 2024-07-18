@@ -22,15 +22,15 @@
 """
 wiper.py
 """
-import typing
-from src.utils.flasher.trigger_flasher import TriggerFlasher
+import sys
+from src.utils.flasher.base_flasher import BaseFlasher
 from src.utils.selector import VALID_DEVICES
 
 
-class Wiper(TriggerFlasher):
+class Wiper(BaseFlasher):
     """Class to wipe some specific board"""
 
-    def wipe(self, device: str, callback: typing.Callable):
+    def wipe(self, device: str):
         """Detect available ports, try default erase process and
         it not work, try custom port"""
         for dev in VALID_DEVICES:
@@ -41,12 +41,39 @@ class Wiper(TriggerFlasher):
 
         if self.is_port_working(self.port):
             try:
-                self.process_wipe(callback=callback)
+                sys.argv.extend(
+                    ["-B", self.board, "-b", str(self.baudrate), "-p", self.port, "-E"]
+                )
+
+                self.ktool.process()
 
             # pylint: disable=broad-exception-caught
             except Exception as exc:
-                self.process_exception(
-                    exception=exc, process_type="wipe", callback=callback
-                )
+                self.ktool.__class__.log(str(exc))
+
+                try:
+                    newport = next(self._available_ports_generator)
+                    if self.is_port_working(newport.device):
+                        sys.argv = [
+                            "--port",
+                            newport.device,
+                            "--Board",
+                            self.board,
+                            "--baudrate",
+                            str(self.baudrate),
+                            "-E",
+                        ]
+                        self.ktool.process()
+
+                    else:
+                        exc = RuntimeError(f"Port {newport} not working")
+                        self.ktool.__class__.log(str(exc))
+
+                except StopIteration as stop_exc:
+                    self.ktool.__class__.log(str(stop_exc))
+
+                except Exception as _exc:
+                    self.ktool.__class__.log(str(_exc))
         else:
-            raise RuntimeError(f"Port not working: {self.port}")
+            exc = RuntimeError(f"Port {self.port} not working")
+            self.ktool.__class__.log(str(exc))

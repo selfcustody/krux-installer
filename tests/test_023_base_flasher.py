@@ -1,5 +1,7 @@
 from unittest import TestCase
 from unittest.mock import MagicMock, patch
+
+from serial import SerialException
 from src.utils.flasher.base_flasher import BaseFlasher
 from .shared_mocks import MockListPortsGrep
 
@@ -145,3 +147,21 @@ class TestBaseFlasher(TestCase):
         f.print_callback = MagicMock()
         f.print_callback()
         f.print_callback.assert_called_once()
+
+    @patch("src.utils.flasher.base_flasher.Serial", side_effect=SerialException())
+    def test_fail_is_port_working(self, mock_serial):
+
+        f = BaseFlasher()
+        result = f.is_port_working(port="mock")
+        self.assertFalse(result)
+
+        mock_serial.assert_called_once_with("mock")
+
+    @patch("src.utils.flasher.base_flasher.Serial")
+    def test_is_port_working(self, mock_serial):
+
+        f = BaseFlasher()
+        result = f.is_port_working(port="mock")
+        self.assertTrue(result)
+
+        mock_serial.assert_called_once_with("mock")

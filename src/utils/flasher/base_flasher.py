@@ -24,8 +24,11 @@ base_flasher.py
 """
 import os
 import typing
+from serial import Serial
+from serial.serialutil import SerialException
 from serial.tools import list_ports
 from src.utils.trigger import Trigger
+from src.utils.kboot.build.ktool import KTool
 
 
 class BaseFlasher(Trigger):
@@ -48,6 +51,10 @@ class BaseFlasher(Trigger):
         921600,
         1500000,
     )
+
+    def __init__(self):
+        super().__init__()
+        self.ktool = KTool()
 
     @property
     def firmware(self) -> str:
@@ -149,3 +156,12 @@ class BaseFlasher(Trigger):
         """
         self.debug(f"print_callback::setter={value}")
         self._print_callback = value
+
+    def is_port_working(self, port) -> bool:
+        """Check if a port is working"""
+        try:
+            serialport = Serial(port)
+            serialport.close()
+            return True
+        except SerialException:
+            return False

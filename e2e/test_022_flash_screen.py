@@ -255,10 +255,7 @@ class TestFlashScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
-    @patch("src.app.screens.flash_screen.FlashScreen.warning")
-    def test_on_print_callback_message_not_recognized(
-        self, mock_warning, mock_get_running_app
-    ):
+    def test_on_print_callback_message_not_recognized(self, mock_get_running_app):
         screen = FlashScreen()
         screen.output = []
         screen.on_pre_enter()
@@ -278,8 +275,6 @@ class TestFlashScreen(GraphicUnitTest):
         mock_get_running_app.assert_has_calls(
             [call().config.get("locale", "lang")], any_order=True
         )
-
-        mock_warning.assert_called_once_with(f"Message not recognized: {warn}")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")

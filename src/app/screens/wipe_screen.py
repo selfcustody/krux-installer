@@ -49,7 +49,7 @@ class WipeScreen(BaseFlashScreen):
             self.info(text)
 
             text = text.replace(
-                "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00] INFO [/color]"
+                "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
             )
             text = text.replace(
                 "\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]"
@@ -68,21 +68,22 @@ class WipeScreen(BaseFlashScreen):
             text = text.replace("\x1b[33m", "")
             text = text.replace(
                 "[INFO] Erasing the whole SPI Flash",
-                "[color=#00ff00] INFO [/color] [color=#efcc00]Erasing the whole SPI Flash [/color]",
+                "[color=#00ff00]INFO[/color][color=#efcc00] Erasing the whole SPI Flash [/color]",
             )
 
-            if text.startswith("[color=#00ff00] INFO [/color]"):
-                self.output.append(text)
+            text = text.replace(
+                "\x1b[31m\x1b[1m[ERROR]\x1b[0m", "[color=#ff0000]ERROR[/color]"
+            )
+
+            self.output.append(text)
+
+            if len(self.output) > 18:
+                del self.output[:1]
 
             if "SPI Flash erased." in text:
                 self.trigger()
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
-
-        def on_process_callback(
-            file_type: str, iteration: int, total: int, suffix: str
-        ):
-            pass
 
         def on_trigger_callback(dt):
             self.ids[f"{self.id}_loader"].source = self.done_img
@@ -90,7 +91,6 @@ class WipeScreen(BaseFlashScreen):
             self.ids[f"{self.id}_progress"].text = "[size=48sp][b]DONE![/b][/size]"
 
         setattr(WipeScreen, "on_print_callback", on_print_callback)
-        setattr(WipeScreen, "on_process_callback", on_process_callback)
         setattr(WipeScreen, "on_trigger_callback", on_trigger_callback)
 
         self.make_subgrid(
@@ -139,11 +139,7 @@ class WipeScreen(BaseFlashScreen):
             self.wiper.ktool.__class__.print_callback = getattr(
                 self.__class__, "on_print_callback"
             )
-            on_process_callback = partial(
-                self.wiper.wipe,
-                device=self.device,
-                callback=getattr(self.__class__, "on_process_callback"),
-            )
+            on_process_callback = partial(self.wiper.wipe, device=self.device)
             self.thread = Thread(name=self.name, target=on_process_callback)
             self.thread.start()
         else:

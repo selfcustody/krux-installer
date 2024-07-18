@@ -1,5 +1,5 @@
 from unittest import TestCase
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 from src.utils.flasher import Flasher
 from .shared_mocks import MockListPortsGrep
 
@@ -10,15 +10,16 @@ class TestFlasher(TestCase):
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.flasher.base_flasher.next")
     @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
-    @patch("src.utils.flasher.flasher.Flasher.process_flash")
+    @patch("src.utils.kboot.build.ktool.KTool.process")
     def test_flash_success(
         self,
-        mock_process_flash,
+        mock_process,
         mock_is_port_working,
         mock_next,
         mock_list_ports,
         mock_exists,
     ):
+        mock_next.return_value = MagicMock(device="mock")
         callback = MagicMock()
         f = Flasher()
         f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
@@ -27,8 +28,20 @@ class TestFlasher(TestCase):
         mock_exists.assert_called_once_with("mock/maixpy_amigo/kboot.kfpkg")
         mock_list_ports.grep.assert_called_once_with("0403")
         mock_next.assert_called_once()
-        mock_is_port_working.assert_called_once_with(mock_next().device)
-        mock_process_flash.assert_called_once_with(callback=callback)
+        mock_is_port_working.assert_has_calls(
+            [
+                call(mock_next().device),
+            ],
+            any_order=True,
+        )
+        mock_process.assert_called_once_with(
+            terminal=False,
+            dev="mock",
+            baudrate=1500000,
+            board="goE",
+            file="mock/maixpy_amigo/kboot.kfpkg",
+            callback=callback,
+        )
 
     @patch("os.path.exists", return_value=False)
     def test_fail_flash_firmware_not_exist(self, mock_exists):
@@ -54,37 +67,10 @@ class TestFlasher(TestCase):
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.flasher.base_flasher.next")
-    @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=False)
-    def test_fail_port_not_working(
-        self, mock_is_port_working, mock_next, mock_list_ports, mock_exists
-    ):
-        callback = MagicMock()
-        with self.assertRaises(RuntimeError) as exc_info:
-            f = Flasher()
-            f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
-            f.baudrate = 1500000
-            f.flash(callback=callback)
-
-        # patch assertions
-        mock_exists.assert_called_once_with("mock/maixpy_amigo/kboot.kfpkg")
-        mock_list_ports.grep.assert_called_once_with("0403")
-        mock_next.assert_called_once()
-        mock_is_port_working.assert_called_once_with(mock_next().device)
-
-        # default assertions
-        self.assertEqual(
-            str(exc_info.exception), f"Port not working: {mock_next().device}"
-        )
-
-    @patch("os.path.exists", return_value=True)
-    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
-    @patch("src.utils.flasher.base_flasher.next")
     @patch("src.utils.flasher.flasher.Flasher.is_port_working", return_value=True)
     @patch("src.utils.kboot.build.ktool.KTool.process")
-    @patch("src.utils.flasher.flasher.Flasher.process_exception")
     def test_flash_greeting_fail(
         self,
-        mock_process_exception,
         mock_process,
         mock_is_port_working,
         mock_next,
@@ -104,15 +90,31 @@ class TestFlasher(TestCase):
         mock_exists.assert_called_once_with("mock/maixpy_amigo/kboot.kfpkg")
         mock_list_ports.grep.assert_called_once_with("0403")
         mock_next.assert_called_once()
-        mock_is_port_working.assert_called_once_with(mock_next().device)
-        mock_process_exception.assert_called_once_with(
-            exception=mock_exception, process_type="flash", callback=callback
+        mock_is_port_working.assert_has_calls(
+            [
+                call(mock_next().device),
+                # pylint: disable=unnecessary-dunder-call
+                call(mock_list_ports.grep().__next__().device),
+            ]
         )
-        mock_process.assert_called_once_with(
-            terminal=False,
-            dev=mock_next().device,
-            baudrate=1500000,
-            board="goE",
-            file="mock/maixpy_amigo/kboot.kfpkg",
-            callback=callback,
+        mock_process.assert_has_calls(
+            [
+                call(
+                    terminal=False,
+                    dev=mock_next().device,
+                    baudrate=1500000,
+                    board="goE",
+                    file="mock/maixpy_amigo/kboot.kfpkg",
+                    callback=callback,
+                ),
+                call(
+                    terminal=False,
+                    # pylint: disable=unnecessary-dunder-call
+                    dev=mock_list_ports.grep().__next__().device,
+                    baudrate=1500000,
+                    board="goE",
+                    file="mock/maixpy_amigo/kboot.kfpkg",
+                    callback=callback,
+                ),
+            ]
         )

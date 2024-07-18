@@ -23,7 +23,8 @@
 __init__.py
 """
 import typing
-from src.utils.flasher.trigger_flasher import TriggerFlasher
+from src.utils.selector import VALID_DEVICES
+from src.utils.flasher.base_flasher import BaseFlasher
 
 # Example of parsing progress
 # def get_progress(file_type_str, iteration, total, suffix):
@@ -39,7 +40,7 @@ from src.utils.flasher.trigger_flasher import TriggerFlasher
 #        sys.stdout.write(msg)
 
 
-class Flasher(TriggerFlasher):
+class Flasher(BaseFlasher):
     """
     A class to parse KTool outputs: We don't want to modify the
     KTool structure, instead, only redirect what happens in
@@ -51,15 +52,48 @@ class Flasher(TriggerFlasher):
         Detect available ports, try default flash process and
         if not work, try custom port
         """
-        self.detect_device()
+        for device in VALID_DEVICES:
+            if device in self.firmware:
+                self.port = device
+                self.board = device
+
         if self.is_port_working(self.port):
             try:
-                self.process_flash(callback=callback)
+                self.ktool.process(
+                    terminal=False,
+                    dev=self.port,
+                    baudrate=int(self.baudrate),
+                    board=self.board,
+                    file=self.firmware,
+                    callback=callback,
+                )
 
             # pylint: disable=broad-exception-caught
             except Exception as exc:
-                self.process_exception(
-                    exception=exc, process_type="flash", callback=callback
-                )
+                self.ktool.__class__.log(f"{str(exc)} for {self.port}")
+                self.ktool.__class__.log("")
+
+                try:
+                    newport = next(self._available_ports_generator)
+                    if self.is_port_working(newport.device):
+                        self.ktool.process(
+                            terminal=False,
+                            dev=newport.device,
+                            baudrate=int(self.baudrate),
+                            board=self.board,
+                            file=self.firmware,
+                            callback=callback,
+                        )
+
+                    else:
+                        exc = RuntimeError(f"Port {newport} not working")
+                        self.ktool.__class__.log(str(exc))
+
+                except StopIteration as stop_exc:
+                    self.ktool.__class__.log(str(stop_exc))
+
+                except Exception as _exc:
+                    self.ktool.__class__.log(str(_exc))
         else:
-            raise RuntimeError(f"Port not working: {self.port}")
+            exc = RuntimeError(f"Port {self.port} not working")
+            self.ktool.__class__.log(str(exc))

@@ -252,6 +252,35 @@ class TestFlashScreen(GraphicUnitTest):
         mock_get_running_app.assert_has_calls(
             [call().config.get("locale", "lang")], any_order=True
         )
+    
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_on_print_callback_separator(self, mock_get_running_app):
+        screen = FlashScreen()
+        screen.output = []
+        screen.on_pre_enter()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        on_print_callback = getattr(FlashScreen, "on_print_callback")
+
+        # Let's "print" some previous infos
+        for i in range(19):
+            on_print_callback(f"[color=#00ff00] INFO [/color] mock test message {i}")
+
+        self.assertEqual(len(screen.output), 18)
+
+        # Now print programming BIN
+        on_print_callback("*")
+        self.assertEqual(screen.output[-2], "*")
+        self.assertEqual(screen.output[-1], "")
+
+        # patch assertions
+        mock_get_running_app.assert_has_calls(
+            [call().config.get("locale", "lang")], any_order=True
+        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")

@@ -79,6 +79,10 @@ class TestFlasher(TestCase):
     ):
         mock_exception = Exception("Greeting fail: mock test")
         mock_process.side_effect = [mock_exception, True]
+        mock_next.side_effect = [MagicMock(device="mocked")]
+        mock_list_ports.grep.return_value.__next__.side_effect = [
+            MagicMock(device="mocked_next")
+        ]
 
         callback = MagicMock()
         f = Flasher()
@@ -92,16 +96,15 @@ class TestFlasher(TestCase):
         mock_next.assert_called_once()
         mock_is_port_working.assert_has_calls(
             [
-                call(mock_next().device),
-                # pylint: disable=unnecessary-dunder-call
-                call(mock_list_ports.grep().__next__().device),
+                call("mocked"),
+                call("mocked_next"),
             ]
         )
         mock_process.assert_has_calls(
             [
                 call(
                     terminal=False,
-                    dev=mock_next().device,
+                    dev="mocked",
                     baudrate=1500000,
                     board="goE",
                     file="mock/maixpy_amigo/kboot.kfpkg",
@@ -109,8 +112,7 @@ class TestFlasher(TestCase):
                 ),
                 call(
                     terminal=False,
-                    # pylint: disable=unnecessary-dunder-call
-                    dev=mock_list_ports.grep().__next__().device,
+                    dev="mocked_next",
                     baudrate=1500000,
                     board="goE",
                     file="mock/maixpy_amigo/kboot.kfpkg",
@@ -167,8 +169,12 @@ class TestFlasher(TestCase):
         mock_list_ports,
         mock_exists,
     ):
-        mock_exception = Exception("Greeting fail: mock test")
+        mock_exception = RuntimeError("Greeting fail: mock test")
         mock_process.side_effect = [mock_exception]
+        mock_next.side_effect = [MagicMock(device="mocked")]
+        mock_list_ports.grep.return_value.__next__.side_effect = [
+            MagicMock(device="mocked_next")
+        ]
 
         callback = MagicMock()
         f = Flasher()
@@ -180,16 +186,12 @@ class TestFlasher(TestCase):
         mock_exists.assert_called_once_with("mock/maixpy_amigo/kboot.kfpkg")
         mock_list_ports.grep.assert_called_once_with("0403")
         mock_next.assert_called_once()
-        mock_is_port_working.assert_has_calls(
-            [
-                call(mock_next().device),
-            ]
-        )
+        mock_is_port_working.assert_has_calls([call("mocked"), call("mocked_next")])
         mock_process.assert_has_calls(
             [
                 call(
                     terminal=False,
-                    dev=mock_next().device,
+                    dev="mocked",
                     baudrate=1500000,
                     board="goE",
                     file="mock/maixpy_amigo/kboot.kfpkg",
@@ -199,17 +201,18 @@ class TestFlasher(TestCase):
         )
         mock_ktool_log.assert_has_calls(
             [
-                call(f"Greeting fail: mock test for {mock_next().device}"),
+                call("Greeting fail: mock test for mocked"),
                 call(""),
-                # pylint: disable=unnecessary-dunder-call
-                call(f"Port {mock_list_ports.grep().__next__()} not working"),
+                call("Port mocked_next not working"),
             ]
         )
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.flasher.base_flasher.next")
-    @patch("src.utils.flasher.flasher.Flasher.is_port_working", side_effect=[True])
+    @patch(
+        "src.utils.flasher.flasher.Flasher.is_port_working", side_effect=[True, True]
+    )
     @patch("src.utils.kboot.build.ktool.KTool.process")
     @patch("src.utils.flasher.base_flasher.KTool.log")
     def test_fail_flash_after_first_greeting_fail_stop_iteration(
@@ -222,10 +225,10 @@ class TestFlasher(TestCase):
         mock_exists,
     ):
         mock_exception = Exception("Greeting fail: mock test")
-        mock_process.side_effect = [mock_exception]
+        mock_process.side_effect = [mock_exception, True]
 
-        next_exception = StopIteration("Stop iteration mock")
-        mock_next.side_effect = [MagicMock(device="mock"), next_exception]
+        mock_next.side_effect = [MagicMock(device="mocked")]
+        mock_list_ports.grep.return_value.__next__.side_effect = [StopIteration()]
 
         callback = MagicMock()
         f = Flasher()
@@ -239,14 +242,14 @@ class TestFlasher(TestCase):
         mock_next.assert_called_once()
         mock_is_port_working.assert_has_calls(
             [
-                call("mock"),
+                call("mocked"),
             ]
         )
         mock_process.assert_has_calls(
             [
                 call(
                     terminal=False,
-                    dev="mock",
+                    dev="mocked",
                     baudrate=1500000,
                     board="goE",
                     file="mock/maixpy_amigo/kboot.kfpkg",
@@ -255,5 +258,5 @@ class TestFlasher(TestCase):
             ]
         )
         mock_ktool_log.assert_has_calls(
-            [call("Greeting fail: mock test for mock"), call(""), call("")]
+            [call("Greeting fail: mock test for mocked"), call("")]
         )

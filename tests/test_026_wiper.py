@@ -23,7 +23,7 @@
 base_flasher.py
 """
 from unittest import TestCase
-from unittest.mock import patch, call
+from unittest.mock import patch, call, MagicMock
 from src.utils.flasher import Wiper
 from .shared_mocks import MockListPortsGrep
 
@@ -45,11 +45,18 @@ class TestWiper(TestCase):
         mock_is_port_working.assert_called_once_with(mock_next().device)
         mock_process.assert_called_once()
 
+    def test_fail_wipe_wrong_baudrate(self):
+        with self.assertRaises(ValueError) as exc_info:
+            f = Wiper()
+            f.baudrate = 1234567
+
+        self.assertEqual(str(exc_info.exception), "Invalid baudrate: 1234567")
+
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
     @patch("src.utils.flasher.base_flasher.next")
     @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=True)
     @patch("src.utils.kboot.build.ktool.KTool.process")
-    def test_wipe_greeting_fail(
+    def test_wipe_after_first_greeting_fail(
         self,
         mock_process,
         mock_is_port_working,
@@ -58,6 +65,10 @@ class TestWiper(TestCase):
     ):
         mock_exception = Exception("Greeting fail: mock test")
         mock_process.side_effect = [mock_exception, True]
+        mock_next.side_effect = [MagicMock(device="mocked")]
+        mock_list_ports.grep.return_value.__next__.side_effect = [
+            MagicMock(device="mocked_next")
+        ]
 
         f = Wiper()
         f.baudrate = 1500000
@@ -68,9 +79,107 @@ class TestWiper(TestCase):
         mock_next.assert_called_once()
         mock_is_port_working.assert_has_calls(
             [
-                call(mock_next().device),
-                # pylint: disable=unnecessary-dunder-call
-                call(mock_list_ports.grep().__next__().device),
+                call("mocked"),
+                call("mocked_next"),
             ]
         )
         mock_process.assert_has_calls([call(), call()])
+
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.base_flasher.next")
+    @patch("src.utils.flasher.wiper.Wiper.is_port_working", return_value=False)
+    @patch("src.utils.flasher.base_flasher.KTool.log")
+    def test_fail_wipe_port_not_working(
+        self, mock_ktool_log, mock_is_port_working, mock_next, mock_list_ports
+    ):
+        mock_next.return_value = MagicMock(device="mocked")
+
+        f = Wiper()
+        f.baudrate = 1500000
+        f.wipe(device="amigo")
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+        mock_is_port_working.assert_has_calls(
+            [
+                call("mocked"),
+            ],
+            any_order=True,
+        )
+        mock_ktool_log.assert_called_once_with("Port mocked not working")
+
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.base_flasher.next")
+    @patch("src.utils.flasher.wiper.Wiper.is_port_working", side_effect=[True, False])
+    @patch("src.utils.kboot.build.ktool.KTool.process")
+    @patch("src.utils.flasher.base_flasher.KTool.log")
+    def test_fail_wipe_after_first_greeting_fail_port_not_working(
+        self,
+        mock_ktool_log,
+        mock_process,
+        mock_is_port_working,
+        mock_next,
+        mock_list_ports,
+    ):
+        mock_exception = Exception("Greeting fail: mock test")
+        mock_process.side_effect = [mock_exception]
+        mock_next.side_effect = [MagicMock(device="mocked")]
+        mock_list_ports.grep.return_value.__next__.side_effect = [
+            MagicMock(device="mocked_next"),
+        ]
+
+        f = Wiper()
+        f.baudrate = 1500000
+        f.wipe(device="amigo")
+
+        # patch assertions
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+        mock_is_port_working.assert_has_calls(
+            [
+                call("mocked"),
+                call("mocked_next"),
+            ]
+        )
+        mock_process.assert_called_once()
+        mock_ktool_log.assert_has_calls(
+            [
+                call("Greeting fail: mock test for mocked"),
+                call(""),
+                call("Port mocked_next not working"),
+            ]
+        )
+
+    @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
+    @patch("src.utils.flasher.base_flasher.next")
+    @patch("src.utils.flasher.wiper.Wiper.is_port_working", side_effect=[True, True])
+    @patch("src.utils.kboot.build.ktool.KTool.process")
+    @patch("src.utils.flasher.base_flasher.KTool.log")
+    def test_fail_wipe_after_first_greeting_fail_stop_iteration(
+        self,
+        mock_ktool_log,
+        mock_process,
+        mock_is_port_working,
+        mock_next,
+        mock_list_ports,
+    ):
+        mock_exception = Exception("Greeting fail: mock test")
+        mock_process.side_effect = [mock_exception, True]
+        mock_next.side_effect = [MagicMock(device="mocked")]
+        mock_list_ports.grep.return_value.__next__.side_effect = [StopIteration()]
+
+        f = Wiper()
+        f.baudrate = 1500000
+        f.wipe(device="amigo")
+
+        # patch assertions
+        mock_list_ports.grep.assert_called_once_with("0403")
+        mock_next.assert_called_once()
+        mock_is_port_working.assert_has_calls(
+            [
+                call("mocked"),
+            ]
+        )
+        # mock_process.assert_called_once()
+        mock_ktool_log.assert_has_calls(
+            [call("Greeting fail: mock test for mocked"), call("")]
+        )

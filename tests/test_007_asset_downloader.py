@@ -5,6 +5,12 @@ from unittest.mock import MagicMock, patch, mock_open
 from src.utils.downloader.asset_downloader import AssetDownloader
 from .shared_mocks import PropertyInstanceMock
 
+MOCKED_FOUND_API = [
+    {"author": "test", "tag_name": "v0.0.1"},
+    {"author": "test", "tag_name": "v0.1.0"},
+    {"author": "test", "tag_name": "v1.0.0"},
+]
+
 
 class TestAssetDownloader(TestCase):
 
@@ -74,6 +80,8 @@ class TestAssetDownloader(TestCase):
 
         mock_response = MagicMock()
         mock_response.status_code = 200
+        mock_response.headers = {"Content-Length": "210000"}
+        mock_response.json.return_value = MOCKED_FOUND_API
         mock_response.iter_content.return_value = stream
         mock_requests.get.return_value = mock_response
 

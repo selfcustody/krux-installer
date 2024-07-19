@@ -76,11 +76,11 @@ class AssetDownloader(StreamDownloader):
         # Before the download the file stream,
         # you can define some method to be called
         # after the buffer is wrote
-        def _on_data(data: bytes):
+        def local_on_data(data: bytes):
             self.buffer.write(data)
             on_data(data)
 
-        self.on_data = _on_data
+        self.on_data = local_on_data
         self.download_file_stream(url=self.url)
 
         # Once the data is downloaded, you can

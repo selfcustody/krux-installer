@@ -42,6 +42,7 @@ class BaseDownloader(Trigger):
     @property
     def buffer(self) -> BytesIO:
         """Getter for the buffer of the file to be downloaded"""
+        self.debug(f"buffer::getter={self._buffer}")
         return self._buffer
 
     @property

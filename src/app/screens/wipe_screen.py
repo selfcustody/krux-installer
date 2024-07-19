@@ -38,6 +38,7 @@ class WipeScreen(BaseFlashScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
+        self.wiper = None
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -143,7 +144,7 @@ class WipeScreen(BaseFlashScreen):
             self.thread = Thread(name=self.name, target=on_process_callback)
             self.thread.start()
         else:
-            raise ValueError("Wiper isnt configured. Use `update` method first")
+            raise RuntimeError("Wiper isnt configured")
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""

@@ -96,7 +96,7 @@ class StreamDownloader(TriggerDownloader):
         if content_len:
             self.content_len = int(content_len)
         else:
-            raise ValueError(f"Empty Content-Length response for {url}")
+            raise RuntimeError(f"Empty Content-Length response for {url}")
 
         self.debug(f"download_file_stream::content_len={self.content_len}")
 

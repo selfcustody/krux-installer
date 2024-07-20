@@ -153,7 +153,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 ]
             )
 
-            if percent == 1.00:
+            if percent == 1.0:
                 self.ids[f"{self.id}_info"].text = "\n".join(
                     [
                         f"{self.downloader.destdir}/kboot.kfpkg downloaded",

@@ -80,13 +80,21 @@ class BaseDownloadScreen(BaseScreen):
 
     @property
     def downloader(self) -> AssetDownloader | None:
+        """Get an `AssetDownloader`"""
         self.debug(f"getter::downloader={self._downloader}")
         return self._downloader
 
     @downloader.setter
     def downloader(self, value: AssetDownloader):
+        """Set an `AssetDownloader`"""
         self.debug(f"setter::downloader={value}")
         self._downloader = value
+
+    @downloader.deleter
+    def downloader(self):
+        """Delete an `AssetDownloader`"""
+        self.debug(f"deleter::downloader={self._downloader}")
+        del self._downloader
 
     @property
     def thread(self) -> Thread | None:
@@ -107,14 +115,20 @@ class BaseDownloadScreen(BaseScreen):
     @property
     def trigger(self) -> ClockEvent:
         """Trigger is a `ClockEvent` that should be triggered after download is done"""
-        self.debug(f"getter::trigger={self._thread}")
+        self.debug(f"getter::trigger={self._trigger}")
         return self._trigger
 
     @trigger.setter
     def trigger(self, value: typing.Callable):
         """Create a `ClockEvent` given a callback"""
-        self.debug(f"getter::trigger={self._thread}")
+        self.debug(f"getter::trigger={value}")
         self._trigger = Clock.create_trigger(value)
+
+    @trigger.deleter
+    def trigger(self):
+        """Delete a `ClockEvent`"""
+        self.debug(f"deleter::trigger={self._trigger}")
+        del self._trigger
 
     def on_enter(self):
         """

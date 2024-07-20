@@ -166,6 +166,58 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_update_progress_100_percent(self, mock_get_running_app):
+        attrs = {"get.side_effect": ["en-US.UTF8", "mockdir"]}
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.configure_mock(**attrs)
+
+        screen = DownloadStableZipScreen()
+        screen.version = "v24.07.0"
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        with patch.object(screen, "trigger") as mock_trigger, patch.object(
+            screen, "downloader"
+        ) as mock_downloader:
+
+            mock_downloader.destdir = "mockdir"
+            screen.update(
+                name="ConfigKruxInstaller",
+                key="progress",
+                value={"downloaded_len": 21000000, "content_len": 21000000},
+            )
+
+            # do tests
+            text_progress = "\n".join(
+                [
+                    "[size=100sp][b]100.00 %[/b][/size]",
+                    "",
+                    "[size=16sp]20.03 of 20.03 MB[/size]",
+                ]
+            )
+
+            text_info = "mockdir/krux-v24.07.0.zip downloaded"
+
+            self.assertEqual(
+                screen.ids["download_stable_zip_screen_progress"].text, text_progress
+            )
+            self.assertEqual(
+                screen.ids["download_stable_zip_screen_info"].text, text_info
+            )
+
+            # patch assertions
+            mock_get_running_app.assert_has_calls(
+                [call().config.get("locale", "lang")],
+                any_order=True,
+            )
+
+            assert len(mock_trigger.mock_calls) >= 1
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
     @patch("src.app.screens.download_stable_zip_screen.ZipDownloader")
     @patch("src.app.screens.download_stable_zip_screen.partial")
     @patch("src.app.screens.download_stable_zip_screen.Clock.schedule_once")

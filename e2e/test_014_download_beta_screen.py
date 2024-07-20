@@ -202,6 +202,8 @@ class TestDownloadBetaScreen(GraphicUnitTest):
         # do tests
         screen.update(name=screen.name, key="downloader")
 
+        firmware_path = os.path.join("mockdir", "krux_binaries", "maixpy_amigo")
+
         # do tests
         text = "\n".join(
             [
@@ -213,7 +215,7 @@ class TestDownloadBetaScreen(GraphicUnitTest):
                         ".com/odudex/krux_binaries/main/maixpy_amigo/kboot.kfpkg[/ref][/color]",
                     ]
                 ),
-                "to mockdir/krux_binaries/maixpy_amigo",
+                f"to {firmware_path}",
             ]
         )
         # default assertions

@@ -130,7 +130,7 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
             if percent == 1.00:
                 self.ids[f"{self.id}_info"].text = "\n".join(
                     [
-                        f"{self.downloader.destdir}/krux-{self.version}.zip downloaded",
+                        f"{self.downloader.destdir}/krux-{self.version}.zip.sig downloaded",
                     ]
                 )
 

@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.greetings_screen import GreetingsScreen
@@ -132,7 +132,9 @@ class TestAboutScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     @patch("src.app.screens.greetings_screen.GreetingsScreen.set_screen")
-    def test_change_to_main_screen(self, mock_set_screen, mock_get_running_app):
+    def test_update_change_screen_to_main_screen(
+        self, mock_set_screen, mock_get_running_app
+    ):
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
@@ -152,7 +154,7 @@ class TestAboutScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     @patch("src.app.screens.greetings_screen.GreetingsScreen.set_screen")
-    def test_change_to_check_permissions_screen(
+    def test_update_change_screen_to_check_permissions_screen(
         self, mock_set_screen, mock_get_running_app
     ):
         mock_get_running_app.config = MagicMock()
@@ -174,3 +176,167 @@ class TestAboutScreen(GraphicUnitTest):
         mock_set_screen.assert_called_once_with(
             name="CheckPermissionsScreen", direction="left"
         )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch("src.app.screens.greetings_screen.Color")
+    @patch("src.app.screens.greetings_screen.Rectangle")
+    def test_update_canvas(self, mock_rectangle, mock_color, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # Do the tests
+        screen.update(name="GreetingsScreen", key="canvas")
+
+        # patch assertions
+        mock_get_running_app.assert_called_once()
+        mock_color.assert_called_once_with(0, 0, 0)
+        mock_rectangle.assert_called_once_with(pos=(0, 0), size=(1600, 1200))
+
+    @patch("sys.platform", "linux")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch("src.app.screens.greetings_screen.partial")
+    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
+    def test_update_check_permissions_linux(
+        self, mock_schedule_once, mock_partial, mock_get_running_app
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # Do the tests
+        screen.update(name="GreetingsScreen", key="check_permissions")
+
+        # patch assertions
+        mock_get_running_app.assert_called_once()
+        mock_partial.assert_has_calls(
+            [
+                call(screen.update, name=screen.name, key="canvas"),
+                call(
+                    screen.update,
+                    name=screen.name,
+                    key="change_screen",
+                    value="CheckPermissionsScreen",
+                ),
+            ]
+        )
+        mock_schedule_once.assert_has_calls(
+            [call(mock_partial(), 0), call(mock_partial(), 2.1)]
+        )
+
+    @patch("sys.platform", "darwin")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch("src.app.screens.greetings_screen.partial")
+    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
+    def test_update_check_permissions_darwin(
+        self, mock_schedule_once, mock_partial, mock_get_running_app
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # Do the tests
+        screen.update(name="GreetingsScreen", key="check_permissions")
+
+        # patch assertions
+        mock_get_running_app.assert_called_once()
+        mock_partial.assert_has_calls(
+            [
+                call(screen.update, name=screen.name, key="canvas"),
+                call(
+                    screen.update,
+                    name=screen.name,
+                    key="change_screen",
+                    value="MainScreen",
+                ),
+            ]
+        )
+        mock_schedule_once.assert_has_calls(
+            [call(mock_partial(), 0), call(mock_partial(), 2.1)]
+        )
+
+    @patch("sys.platform", "win32")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch("src.app.screens.greetings_screen.partial")
+    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
+    def test_update_check_permissions_win32(
+        self, mock_schedule_once, mock_partial, mock_get_running_app
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # Do the tests
+        screen.update(name="GreetingsScreen", key="check_permissions")
+
+        # patch assertions
+        mock_get_running_app.assert_called_once()
+        mock_partial.assert_has_calls(
+            [
+                call(screen.update, name=screen.name, key="canvas"),
+                call(
+                    screen.update,
+                    name=screen.name,
+                    key="change_screen",
+                    value="MainScreen",
+                ),
+            ]
+        )
+        mock_schedule_once.assert_has_calls(
+            [call(mock_partial(), 0), call(mock_partial(), 2.1)]
+        )
+
+    @patch("sys.platform", "mockos")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch("src.app.screens.greetings_screen.partial")
+    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
+    def test_fail_update_check_permissions_wrong_os(
+        self, mock_schedule_once, mock_partial, mock_get_running_app
+    ):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # Do the tests
+        with self.assertRaises(RuntimeError) as exc_info:
+            screen.update(name="GreetingsScreen", key="check_permissions")
+
+        # default assertions
+        self.assertEqual(str(exc_info.exception), "Not implemented for mockos")
+
+        # patch assertions
+        mock_get_running_app.assert_called_once()
+        mock_partial.assert_called_once_with(
+            screen.update, name=screen.name, key="canvas"
+        )
+        mock_schedule_once.assert_not_called()

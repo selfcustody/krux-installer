@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
@@ -197,7 +198,11 @@ class TestAboutScreen(GraphicUnitTest):
         # patch assertions
         mock_get_running_app.assert_called_once()
         mock_color.assert_called_once_with(0, 0, 0)
-        mock_rectangle.assert_called_once_with(pos=(0, 0), size=(1600, 1200))
+
+        if sys.platform == ("linux", "win32"):
+            mock_rectangle.assert_called_once_with(pos=(0, 0), size=(800, 600))
+        elif sys.platform == "darwin":
+            mock_rectangle.assert_called_once_with(pos=(0, 0), size=(1600, 1200))
 
     @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

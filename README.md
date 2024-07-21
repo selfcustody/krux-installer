@@ -10,6 +10,23 @@
 Krux Installer is a GUI based tool to flash [Krux](https://github.com/selfcustody/krux)
 without typing any command in terminal for [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
 
+* [System setup](/#system-setup)
+  * [Linux](/#linux)
+  * [Windows](/#windows)
+  * [MacOS](/#macos)
+    * [Install brew package manager](/#install-brew-package-manager)
+    * [Install latest python](/#install-latest-python)
+    * [Ensure openssl have a correct link](/#ensure-openssl-have-a-correct-link)
+    * [Patch your zshrc](/#patch-your-zshrc)
+  * [Install poetry](/#install-poetry)
+* [Download sources](/#download-sources)
+* [Update code](/#update-code)
+* [Developing](/#developing)
+  * [Format code](/#format-code)
+  * [Lint](/#lint)
+  * [Test](/#test)
+  * [Build](/#build)
+  
 ## System setup
 
 Make sure you have python:
@@ -17,21 +34,25 @@ Make sure you have python:
 ```bash
 python --version
 ```
-## Linux
+### Linux
 
 Generally, all Linux come with python.
+
+### Windows
+
+Follow the instructions at [python.org](https://www.python.org/downloads/windows/)
 
 ### MacOS
 
 Before installing `krux-installer` source code, you will need:
 
-1. to install `brew` package manager:
+#### Install `brew` package manager:
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-2. Install latest `python`:
+#### Install latest `python`:
 
 ```bash
 brew install python
@@ -43,7 +64,7 @@ and add this line to your `~/.zshrc`:
 alias python=python3
 ```
 
-3. Ensure `openssl`:
+#### Ensure `openssl` have a correct link:
 
 Python's `ssl` module relies on OpenSSL for cryptographic operations. Ensure that OpenSSL
 is installed on your system and is compatible with the Python version you're using.
@@ -64,7 +85,7 @@ brew link --force openssl
 This ensures that the OpenSSL libraries are available in the expected
 locations that Python can find and use.
 
-4. Patch your `~/.zshrc` (or equivalent):
+#### Patch your zshrc:
 
 Library paths on MacOS involves verifying that the environment variables and system
 configurationsare correctyly set to find the necessary libraries, such as OpenSSL,
@@ -83,7 +104,7 @@ OPENSSL_FULL_VERSION=`openssl --version | awk ' { print $2}'`
 export DYLD_LIBRARY_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VERSION/$OPENSSL_FULL_VERSION/lib:$DYLD_LIBRARY_PATH"
 ```
 
-## Install poetry
+### Install poetry
 
 Make sure you have `poetry` installed:
 
@@ -94,7 +115,7 @@ python -m pipx install poetry
 If you have problems with installation, make sure to
 properly [configure its options](https://pipx.pypa.io/latest/installation/#installation-options).
 
-## Installation
+## Download sources
 
 Clone the repository
 ```bash
@@ -154,7 +175,7 @@ poetry run poe test --no-xvfb
 At the moment, you'll need to [patch some code on `kivy`](https://github.com/kivy/kivy/issues/8653#issuecomment-2028509695)
 to build the Graphical User Interface:
 
-**Linux**:
+**Linux & MacOS**:
 
 ```
 poetry run poe patch-nix
@@ -164,25 +185,6 @@ poetry run poe patch-nix
 
 ```
 poetry run poe patch-win
-```
-
-**MacOS**:
-
-
-Then install  `python`, and `openssl`
-modules with the `brew` package manager:
-
-``
-- Install latest python: ``
-find the `ssl` library (necessary for make https requests with `requests` module).
-
-Con
-
-
-To do this, you will need these lines 
-
-```
-poetry run poe patch-nix
 ```
 
 Then you can build `krux-installer` as standalone executable:

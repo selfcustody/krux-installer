@@ -104,6 +104,7 @@ class CheckInternetConnectionScreen(BaseScreen):
                 )
                 Clock.schedule_once(fn, 0)
                 self.set_screen(name="MainScreen", direction="left")
+
             except Exception as exc_info:
                 screen = self.manager.get_screen("ErrorScreen")
                 fn = partial(screen.update, name=self.name, key="error", value=exc_info)

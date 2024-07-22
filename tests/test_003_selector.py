@@ -73,50 +73,58 @@ class TestSelector(TestCase):
     @patch("src.utils.selector.requests")
     def test_fail_init_http_error_404(self, mock_requests):
         mock_response = MagicMock(status_code=404)
-        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
+            "Mocked 404"
+        )
         mock_requests.exceptions = requests.exceptions
         mock_requests.get.return_value = mock_response
 
         with self.assertRaises(RuntimeError) as exc_info:
             Selector()
 
-        self.assertEqual(str(exc_info.exception), "HTTP error 404: None")
+        self.assertEqual(str(exc_info.exception), "Mocked 404")
 
     @patch("src.utils.selector.requests")
     def test_fail_init_http_error_500(self, mock_requests):
         mock_response = MagicMock(status_code=500)
-        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError()
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
+            "Mocked 500"
+        )
         mock_requests.exceptions = requests.exceptions
         mock_requests.get.return_value = mock_response
 
         with self.assertRaises(RuntimeError) as exc_info:
             Selector()
 
-        self.assertEqual(str(exc_info.exception), "HTTP error 500: None")
+        self.assertEqual(str(exc_info.exception), "Mocked 500")
 
     @patch("src.utils.selector.requests")
     def test_fail_init_timeout(self, mock_requests):
         mock_response = MagicMock(status_code=404)
-        mock_response.raise_for_status.side_effect = requests.exceptions.Timeout
+        mock_response.raise_for_status.side_effect = requests.exceptions.Timeout(
+            "Mocked timeout"
+        )
         mock_requests.exceptions = requests.exceptions
         mock_requests.get.return_value = mock_response
 
         with self.assertRaises(RuntimeError) as exc_info:
             Selector()
 
-        self.assertEqual(str(exc_info.exception), "Timeout error: None")
+        self.assertEqual(str(exc_info.exception), "Mocked timeout")
 
     @patch("src.utils.selector.requests")
     def test_fail_init_http_connection_error(self, mock_requests):
         mock_response = MagicMock(status_code=404)
-        mock_response.raise_for_status.side_effect = requests.exceptions.ConnectionError
+        mock_response.raise_for_status.side_effect = (
+            requests.exceptions.ConnectionError("Mocked connection")
+        )
         mock_requests.exceptions = requests.exceptions
         mock_requests.get.return_value = mock_response
 
         with self.assertRaises(RuntimeError) as exc_info:
             Selector()
 
-        self.assertEqual(str(exc_info.exception), "Connection error: None")
+        self.assertEqual(str(exc_info.exception), "Mocked connection")
 
     @patch("src.utils.selector.requests")
     def test_set_get_device(self, mock_requests):

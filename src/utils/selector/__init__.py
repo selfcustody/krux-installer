@@ -121,15 +121,13 @@ class Selector(Trigger):
             response.raise_for_status()
 
         except requests.exceptions.Timeout as t_exc:
-            raise RuntimeError(f"Timeout error: {t_exc.__cause__ }") from t_exc
+            raise RuntimeError(t_exc) from t_exc
 
         except requests.exceptions.ConnectionError as c_exc:
-            raise RuntimeError(f"Connection error: {c_exc.__cause__}") from c_exc
+            raise RuntimeError(c_exc) from c_exc
 
         except requests.exceptions.HTTPError as h_exc:
-            raise RuntimeError(
-                f"HTTP error {response.status_code}: {h_exc.__cause__}"
-            ) from h_exc
+            raise RuntimeError(h_exc) from h_exc
 
         res = response.json()
         self.debug(f"releases::getter::response='{res}'")

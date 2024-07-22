@@ -21,6 +21,7 @@
 """
 error_screen.py
 """
+import traceback
 from functools import partial
 from typing import Text
 from kivy.clock import Clock
@@ -46,6 +47,7 @@ class ErrorScreen(BaseScreen):
             name="ErrorScreen",
             **kwargs,
         )
+        self.src_code = "https://github.com/selfcustody/krux-installer"
 
         # Build grid where buttons will be placed
         self.make_grid(wid=f"{self.id}_grid", rows=1)
@@ -99,23 +101,32 @@ class ErrorScreen(BaseScreen):
                 Rectangle(size=(Window.width, Window.height))
 
         elif key == "error":
-            self.error(str(value))
+            self.error(str(value.__context__))
+            stack = [msg for msg in str(value.__context__).split(":") if len(msg) < 80]
+
             self.ids[f"{self.id}_button"].text = "\n".join(
                 [
-                    f"[size=32sp][color=#ff0000]{str(value)}[/color][/size]",
+                    f"[size=18sp][color=#ff0000]{stack[0]}[/color][/size]",
+                    f"[size=16sp][color=#efcc00]{"\n".join(stack[1:])}[/color][/size]",
                     "",
-                    "Report issue at",
+                    "",
+                    "[size=16sp]Report issue at",
                     "".join(
                         [
-                            "[ref=https://github.com/selfcustody/krux-installer/issues/]",
-                            "https://github.com/selfcustody/krux-installer/issues",
+                            "[color=#00aabb]",
+                            f"[ref={self.src_code}/issues/]",
+                            f"{self.src_code}/issues",
                             "[/ref]",
+                            "[/color]",
                         ]
                     ),
+                    "[/size]",
                 ]
             )
         else:
-            raise ValueError(f"Invalid key: '{key}'")
+            exc_info = ValueError(f"Invalid key: '{key}'")
+            fn = partial(self.update, name=self.name, key="error", value=exc_info)
+            Clock.schedule_once(fn, 0)
 
     def on_enter(self):
         """Simple update your canvas"""

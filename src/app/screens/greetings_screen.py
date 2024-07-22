@@ -60,7 +60,11 @@ class GreetingsScreen(BaseScreen):
             raise ValueError(f"Invalid screen: {name}")
 
         if key == "change_screen":
-            if value is not None and value in ("MainScreen", "CheckPermissionsScreen"):
+            if value is not None and value in (
+                "MainScreen",
+                "CheckPermissionsScreen",
+                "CheckInternetConnectionScreen",
+            ):
                 self.set_screen(name=value, direction="left")
             else:
                 raise ValueError(f"Invalid value for '{key}': {value}")

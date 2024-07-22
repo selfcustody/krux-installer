@@ -160,6 +160,31 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
+    @patch("src.app.KruxInstallerApp.screen_manager")
+    @patch("src.app.partial")
+    @patch("src.app.Clock.schedule_once")
+    def test_on_greetings(self, mock_schedule_once, mock_partial, mock_screen_manager):
+        mock_screen_manager.get_screen = MagicMock()
+        app = KruxInstallerApp()
+        app.on_greetings()
+
+        mock_partial.assert_called_once_with(
+            mock_screen_manager.get_screen().update,
+            name="KruxInstallerApp",
+            key="check_permissions",
+        )
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
+    @patch("src.app.KruxInstallerApp.on_greetings")
+    def test_on_start(self, mock_on_greetings):
+        app = KruxInstallerApp()
+        app.on_start()
+        mock_on_greetings.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
     @patch("src.app.KruxInstallerApp.setup_screens")
     @patch("src.app.KruxInstallerApp.setup_screen_manager")
     def test_build(self, mock_setup_screen_manager, mock_setup_screens):

@@ -39,8 +39,8 @@ class BaseKruxInstaller(App, Trigger):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.screens = []
-        self.screen_manager = ScreenManager()
+        self._screens = []
+        self._screen_manager = ScreenManager()
 
         if "LOGLEVEL" in os.environ:
             Logger.setLevel(LOG_LEVELS[os.environ["LOGLEVEL"]])

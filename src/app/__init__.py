@@ -28,6 +28,9 @@ from kivy.core.window import Window
 from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.greetings_screen import GreetingsScreen
 from src.app.screens.check_permissions_screen import CheckPermissionsScreen
+from src.app.screens.check_internet_connection_screen import (
+    CheckInternetConnectionScreen,
+)
 from src.app.screens.main_screen import MainScreen
 from src.app.screens.select_device_screen import SelectDeviceScreen
 from src.app.screens.select_version_screen import SelectVersionScreen
@@ -48,7 +51,7 @@ from src.app.screens.warning_already_downloaded_screen import (
 )
 from src.app.screens.flash_screen import FlashScreen
 from src.app.screens.wipe_screen import WipeScreen
-from src.utils.selector import Selector
+from src.app.screens.error_screen import ErrorScreen
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -68,7 +71,6 @@ class KruxInstallerApp(ConfigKruxInstaller):
 
     def on_start(self):
         """When application starts, verify system and check latest firmware version"""
-        self.on_get_latest_version()
         self.on_greetings()
 
     def setup_screen_manager(self):
@@ -90,6 +92,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             self.screens.append(CheckPermissionsScreen())
 
         self.screens = self.screens + [
+            CheckInternetConnectionScreen(),
             MainScreen(),
             SelectDeviceScreen(),
             SelectVersionScreen(),
@@ -106,6 +109,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             WarningAlreadyDownloadedScreen(),
             FlashScreen(),
             WipeScreen(),
+            ErrorScreen(),
         ]
 
     def on_greetings(self):
@@ -120,17 +124,5 @@ class KruxInstallerApp(ConfigKruxInstaller):
 
         fn = partial(
             greetings_screen.update, name="KruxInstallerApp", key="check_permissions"
-        )
-        Clock.schedule_once(fn, 0)
-
-    def on_get_latest_version(self):
-        """Get the latest version of installer"""
-        selector = Selector()
-        main_screen = self.screen_manager.get_screen("MainScreen")
-        fn = partial(
-            main_screen.update,
-            name="KruxInstallerApp",
-            key="version",
-            value=selector.releases[0],
         )
         Clock.schedule_once(fn, 0)

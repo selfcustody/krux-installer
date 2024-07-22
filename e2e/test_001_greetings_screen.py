@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.greetings_screen import GreetingsScreen
@@ -226,20 +226,13 @@ class TestAboutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_running_app.assert_called_once()
-        mock_partial.assert_has_calls(
-            [
-                call(screen.update, name=screen.name, key="canvas"),
-                call(
-                    screen.update,
-                    name=screen.name,
-                    key="change_screen",
-                    value="CheckPermissionsScreen",
-                ),
-            ]
+        mock_partial.assert_called_once_with(
+            screen.update,
+            name=screen.name,
+            key="change_screen",
+            value="CheckPermissionsScreen",
         )
-        mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 2.1)]
-        )
+        mock_schedule_once.assert_called_once_with(mock_partial(), 2.1)
 
     @patch("sys.platform", "darwin")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -263,20 +256,13 @@ class TestAboutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_running_app.assert_called_once()
-        mock_partial.assert_has_calls(
-            [
-                call(screen.update, name=screen.name, key="canvas"),
-                call(
-                    screen.update,
-                    name=screen.name,
-                    key="change_screen",
-                    value="MainScreen",
-                ),
-            ]
+        mock_partial.assert_called_once_with(
+            screen.update,
+            name=screen.name,
+            key="change_screen",
+            value="CheckInternetConnectionScreen",
         )
-        mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 2.1)]
-        )
+        mock_schedule_once.assert_called_once_with(mock_partial(), 2.1)
 
     @patch("sys.platform", "win32")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -300,20 +286,13 @@ class TestAboutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_running_app.assert_called_once()
-        mock_partial.assert_has_calls(
-            [
-                call(screen.update, name=screen.name, key="canvas"),
-                call(
-                    screen.update,
-                    name=screen.name,
-                    key="change_screen",
-                    value="MainScreen",
-                ),
-            ]
+        mock_partial.assert_called_once_with(
+            screen.update,
+            name=screen.name,
+            key="change_screen",
+            value="CheckInternetConnectionScreen",
         )
-        mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 2.1)]
-        )
+        mock_schedule_once.assert_called_once_with(mock_partial(), 2.1)
 
     @patch("sys.platform", "mockos")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -341,7 +320,5 @@ class TestAboutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_running_app.assert_called_once()
-        mock_partial.assert_called_once_with(
-            screen.update, name=screen.name, key="canvas"
-        )
+        mock_partial.assert_not_called()
         mock_schedule_once.assert_not_called()

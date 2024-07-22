@@ -51,6 +51,7 @@ class BaseScreen(Screen, Trigger):
         self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
+        self._error_img = os.path.join(root_assets_path, "assets", "error.png")
 
         locale = App.get_running_app().config.get("locale", "lang")
         locale = locale.split(".")
@@ -80,6 +81,12 @@ class BaseScreen(Screen, Trigger):
         """Getter for done_img"""
         self.debug(f"getter::done_img={self._done_img}")
         return self._done_img
+
+    @property
+    def error_img(self) -> str:
+        """Getter for logo_img"""
+        self.debug(f"getter::error_img={self._logo_img}")
+        return self._error_img
 
     @property
     def locale(self) -> str:

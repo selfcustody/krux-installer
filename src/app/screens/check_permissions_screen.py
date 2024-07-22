@@ -149,7 +149,6 @@ class CheckPermissionsScreen(BaseScreen):
                 if self.group == group.gr_name:
                     self.debug(f"Found {group.gr_name}")
                     for user in group[3]:
-                        print(user)
                         if user == self.user:
                             self.debug(f"'{self.user}' already in group '{self.group}'")
                             self.in_dialout = True
@@ -192,7 +191,7 @@ class CheckPermissionsScreen(BaseScreen):
                     Clock.schedule_once(fn, 2.1)
 
             else:
-                self.set_screen(name="MainScreen", direction="left")
+                self.set_screen(name="CheckInternetConnectionScreen", direction="left")
 
         elif key == "make_on_permission_created":
 

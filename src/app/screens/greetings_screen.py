@@ -75,39 +75,30 @@ class GreetingsScreen(BaseScreen):
             # check platform and if is linux, go to CheckPermissionsScreen,
             # otherwise, go to MainScreen
 
-            partials = [(partial(self.update, name=self.name, key="canvas"), 0)]
-
             if sys.platform == "linux":
-                partials.append(
-                    (
-                        partial(
-                            self.update,
-                            name=self.name,
-                            key="change_screen",
-                            value="CheckPermissionsScreen",
-                        ),
-                        2.1,
-                    )
+                fn = partial(
+                    self.update,
+                    name=self.name,
+                    key="change_screen",
+                    value="CheckPermissionsScreen",
                 )
 
             elif sys.platform == "darwin" or sys.platform == "win32":
-                partials.append(
-                    (
-                        partial(
-                            self.update,
-                            name=self.name,
-                            key="change_screen",
-                            value="MainScreen",
-                        ),
-                        2.1,
-                    )
+                fn = partial(
+                    self.update,
+                    name=self.name,
+                    key="change_screen",
+                    value="CheckInternetConnectionScreen",
                 )
 
             else:
                 raise RuntimeError(f"Not implemented for {sys.platform}")
 
-            for fn in partials:
-                Clock.schedule_once(*fn)
+            Clock.schedule_once(fn, 2.1)
 
         else:
             raise ValueError(f"Invalid key: '{key}'")
+
+    def on_enter(self):
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)

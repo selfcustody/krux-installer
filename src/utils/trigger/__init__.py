@@ -49,6 +49,10 @@ class Trigger:
         """Logger with level 'warning'"""
         Logger.warning("%s: %s", mro(), msg)
 
+    def error(self, msg: str):
+        """Logger with level 'critical'"""
+        Logger.error("%s: %s", mro(), msg)
+
     def critical(self, msg: str):
         """Logger with level 'critical'"""
         Logger.critical("%s: %s", mro(), msg)

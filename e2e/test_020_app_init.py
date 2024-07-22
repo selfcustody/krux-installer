@@ -60,6 +60,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         allowed_screens = (
             "GreetingsScreen",
             "CheckPermissionsScreen",
+            "CheckInternetConnectionScreen",
             "MainScreen",
             "SelectDeviceScreen",
             "SelectVersionScreen",
@@ -76,6 +77,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "WarningAlreadyDownloadedScreen",
             "FlashScreen",
             "WipeScreen",
+            "ErrorScreen",
         )
         for screen in app.screens:
             self.assertIn(screen.name, allowed_screens)
@@ -94,6 +96,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         allowed_screens = (
             "GreetingsScreen",
+            "CheckInternetConnectionScreen",
             "MainScreen",
             "SelectDeviceScreen",
             "SelectVersionScreen",
@@ -110,6 +113,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "WarningAlreadyDownloadedScreen",
             "FlashScreen",
             "WipeScreen",
+            "ErrorScreen",
         )
         for screen in app.screens:
             self.assertIn(screen.name, allowed_screens)
@@ -128,6 +132,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         allowed_screens = (
             "GreetingsScreen",
+            "CheckInternetConnectionScreen",
             "MainScreen",
             "SelectDeviceScreen",
             "SelectVersionScreen",
@@ -144,6 +149,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "WarningAlreadyDownloadedScreen",
             "FlashScreen",
             "WipeScreen",
+            "ErrorScreen",
         )
         for screen in app.screens:
             self.assertIn(screen.name, allowed_screens)

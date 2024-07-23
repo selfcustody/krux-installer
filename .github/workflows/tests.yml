@@ -250,30 +250,33 @@ jobs:
           run: |
             poetry add pytest-xvfb
             poetry run poe build
+            mkdir -p release
+            chmod +x .ci/create-deb
+            .ci/create-deb --app-name "krux-installer" --out-dir ./release --version "0.0.2" --architeture x64 --maintainer-name "qlrd" --maintainer-email "qlrddev@gmail.com"
+            --description "A GUI based application to flash Krux firmware on K210 based devices" --binary ./dist/krux-installer
       
       - name: Build ${{ matrix.os }}
         if: ${{ runner.os == 'macOS' }}
         env:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
-        run: poetry run poe build
-
+        run: |
+          poetry run poe build
+          mkdir -p release
+          create-dmg --volname "krux-installer" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./release/krux-installer.dmg ./dist/krux-installer.app
+        
       - name: Build (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
         run: poetry run poe build
 
-      - name: Create DMG (macOS)
-        if: ${{ runner.os == 'macOS' }}
-        run: create-dmg --volname "krux-installer" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./dist/krux-installer.dmg ./dist/krux-installer.app
-        
       - name: Hash (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: qlrd/sha256sum-action@v2
         id: hash-linux
         with:
-          working-directory: ./dist
-          file: krux-installer
+          working-directory: ./release
+          file: krux-installer.deb
           ext: 'sha256.txt'
           
       - name: Hash (MacOS)
@@ -281,7 +284,7 @@ jobs:
         uses: qlrd/sha256sum-action@v2
         id: hash-macos
         with:
-          working-directory: ./dist
+          working-directory: ./release
           file: krux-installer.dmg
           ext: 'sha256.txt'
 
@@ -304,7 +307,7 @@ jobs:
             ${{ steps.hash-linux.outputs.hash-file }}
             
       - name: Upload artifacts (MacOS)
-        if: ${{ runner.os == 'macOS'}}
+        if: ${{ runner.os == 'macOS' }}
         uses: actions/upload-artifact@v4         
         with:
           name: ${{ matrix.os }}-KruxInstaller-v0.0.2

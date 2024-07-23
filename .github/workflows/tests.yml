@@ -96,10 +96,19 @@ jobs:
         run: pipx install poetry
 
       - uses: actions/setup-python@v5
+        if: ${{ matrix.os != 'macos-14' }}
         with:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
+          
+      - uses: actions/setup-python@v5
+        if: ${{ matrix.os == 'macos-14' }}
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
+          architeture: arm64
                  
       - name: Install project and its dependencies
         run: poetry install
@@ -192,10 +201,19 @@ jobs:
         run: pipx install poetry
 
       - uses: actions/setup-python@v5
+        if: ${{ matrix.os != 'macos-14' }}
         with:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
+          
+      - uses: actions/setup-python@v5
+        if: ${{ matrix.os == 'macos-14' }}
+        with:
+          python-version: '3.12'
+          cache: 'poetry'
+          cache-dependency-path: './poetry.lock'
+          architeture: arm64
 
       - name: Setup openssl (macOS)
         if: ${{ runner.os == 'macOS' }}

@@ -219,6 +219,7 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         id: setup-macos
         run: |
+          brew install create-dmg
           brew reinstall openssl@3
           brew unlink openssl@3 && brew link openssl@3
           OPENSSL_MAJOR_VERSION=`$(which openssl) -version | awk '{ print $2}' | cut -d . -f1` 

@@ -250,26 +250,34 @@ jobs:
           run: |
             poetry add pytest-xvfb
             poetry run poe build
-            mkdir -p release
-            chmod +x .ci/create-deb
-            .ci/create-deb --app-name "krux-installer" --out-dir ./release --version "0.0.2" --architeture x64 --maintainer-name "qlrd" --maintainer-email "qlrddev@gmail.com"
-            --description "A GUI based application to flash Krux firmware on K210 based devices" --binary ./dist/krux-installer
-      
-      - name: Build ${{ matrix.os }}
+
+      - name: Build dist (MacOS)
         if: ${{ runner.os == 'macOS' }}
         env:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
-        run: |
-          poetry run poe build
-          mkdir -p release
-          create-dmg --volname "krux-installer" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./release/krux-installer.dmg ./dist/krux-installer.app
+        run: poetry run poe build
         
-      - name: Build (Windows)
+      - name: Build dist (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
         run: poetry run poe build
 
+      - name: Build release deb (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          mkdir -p release
+          chmod +x .ci/create-deb
+          .ci/create-deb --app-name "krux-installer" --out-dir ./release --version "0.0.2" --architeture x64 --maintainer-name "qlrd" --maintainer-email "qlrddev@gmail.com" --description "A GUI based application to flash Krux firmware on K210 based devices" --binary ./dist/krux-installer
+      
+      - name: Build release dmg (MacOS)
+        if: ${{ runner.os == 'macOS' }}
+        env:
+          DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
+        run: |
+          mkdir -p release
+          create-dmg --volname "krux-installer" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./release/krux-installer.dmg ./dist/krux-installer.app 
+          
       - name: Hash (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: qlrd/sha256sum-action@v2

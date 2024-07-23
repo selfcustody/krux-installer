@@ -24,6 +24,7 @@ jobs:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
+          architecture: x64
       
       - name: Install poetry dependencies
         run: poetry install
@@ -55,6 +56,7 @@ jobs:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
+          architecture: x64
 
       - name: Install poetry dependencies
         run: poetry install
@@ -77,12 +79,21 @@ jobs:
 
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-12
-          - macos-13
-          - macos-14
+        include:
+          - os: ubuntu-latest
+            arch: x64
+            
+          - os: windows-latest
+            arch: x64
+            
+          - os: macos-12
+            arch: x64
+            
+          - os: macos-13
+            arch: x64
+            
+          - os: macos-14
+            arch: arm64
         
     runs-on: ${{ matrix.os }}
     
@@ -96,19 +107,11 @@ jobs:
         run: pipx install poetry
 
       - uses: actions/setup-python@v5
-        if: ${{ matrix.os != 'macos-14' }}
         with:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
-          
-      - uses: actions/setup-python@v5
-        if: ${{ matrix.os == 'macos-14' }}
-        with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: './poetry.lock'
-          architecture: arm64
+          architecture: ${{ matrix.arch }}
                  
       - name: Install project and its dependencies
         run: poetry install
@@ -158,6 +161,7 @@ jobs:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
+          architecture: x64
 
       - name: Install project and its dependencies
         run: poetry install
@@ -182,13 +186,22 @@ jobs:
     
     strategy:
       matrix:
-        os:
-          - ubuntu-latest
-          - windows-latest
-          - macos-12
-          - macos-13
-          - macos-14
-      
+        include:
+          - os: ubuntu-latest
+            arch: x64
+            
+          - os: windows-latest
+            arch: x64
+            
+          - os: macos-12
+            arch: x64
+            
+          - os: macos-13
+            arch: x64
+            
+          - os: macos-14
+            arch: arm64
+     
     runs-on: ${{ matrix.os }}
     
     steps:
@@ -201,21 +214,13 @@ jobs:
         run: pipx install poetry
 
       - uses: actions/setup-python@v5
-        if: ${{ matrix.os != 'macos-14' }}
         with:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
-          
-      - uses: actions/setup-python@v5
-        if: ${{ matrix.os == 'macos-14' }}
-        with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: './poetry.lock'
-          architecture: arm64
+          architecture: ${{ matrix.arch }}
 
-      - name: Setup openssl (macOS)
+      - name: Setup macOS
         if: ${{ runner.os == 'macOS' }}
         id: setup-macos
         run: |
@@ -225,7 +230,7 @@ jobs:
           OPENSSL_MAJOR_VERSION=`$(which openssl) -version | awk '{ print $2}' | cut -d . -f1` 
           OPENSSL_FULL_VERSION=`$(which openssl) -version | awk ' { print $2}'`
           OPENSSL_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VESION/${OPENSSL_FULL_VERSION}"
-          echo "openssl-path=${OPENSSL_PATH}/lib:${DYLD_LIBRARY_PATH}" >> $GITHUB_OUTPUT
+          echo "dyld-path=${OPENSSL_PATH}/lib:${DYLD_LIBRARY_PATH}" >> $GITHUB_OUTPUT
           
       - name: Install project and its dependencies
         run: poetry install
@@ -249,7 +254,7 @@ jobs:
       - name: Build ${{ matrix.os }}
         if: ${{ runner.os == 'macOS' }}
         env:
-          DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.openssl-path }}
+          DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
         run: poetry run poe build
 
       - name: Build (Windows)
@@ -272,7 +277,7 @@ jobs:
           ext: 'sha256.txt'
           
       - name: Hash (MacOS)
-        if: ${{ runner.os == 'Windows' }}
+        if: ${{ runner.os == 'macOS' }}
         uses: qlrd/sha256sum-action@v2
         id: hash-macos
         with:

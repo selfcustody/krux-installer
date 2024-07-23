@@ -108,7 +108,7 @@ jobs:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
-          architeture: arm64
+          architecture: arm64
                  
       - name: Install project and its dependencies
         run: poetry install
@@ -213,7 +213,7 @@ jobs:
           python-version: '3.12'
           cache: 'poetry'
           cache-dependency-path: './poetry.lock'
-          architeture: arm64
+          architecture: arm64
 
       - name: Setup openssl (macOS)
         if: ${{ runner.os == 'macOS' }}

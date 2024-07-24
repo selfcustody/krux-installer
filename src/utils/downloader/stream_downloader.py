@@ -106,7 +106,10 @@ class StreamDownloader(TriggerDownloader):
         for chunk in res.iter_content(chunk_size=self.chunk_size):
             self.downloaded_len += len(chunk)
             self.debug(f"download_file_stream::downloaded_len={self.downloaded_len}")
-            self.on_data(data=chunk)
+            if self.on_data is not None:
+                self.on_data(data=chunk)  # pylint: disable=not-callable
+            else:
+                raise RuntimeError("on_data cannot be empty")
 
         # Now you can close connection
         self.debug("downloaded_file_stream::closing_connection")

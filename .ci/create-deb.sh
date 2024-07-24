@@ -15,11 +15,13 @@ Options:
   -a, --app-name <appname>                 the application name
   -o, --outdir <outdir>                    the output directory
   -v, --version <version>                  the application version
+  -r, --revision <revision>                the application revision
   -A, --architecture <arch>                the application architecture
   -m, --maintainer-name <name>             the application maintainer name
   -e, --maintainer-email <email>           the application maintainer email
   -d, --description "<description>"        the application description
   -b, --binary                             the application binary
+  -i, --icon                               the application icon image
 
 Notes:
   all options, long and short accept --opt=value mode also
@@ -86,35 +88,40 @@ while :; do
     -a|-a=*|--app-name|--app-name=*) get_arg app_name "${opt}" "${arg}";;
     -o|-o=*|--output-dir|--output-dir=*) get_arg output_dir "${opt}" "${arg}";;
     -v|-v=*|--version|--version=*) get_arg version "${opt}" "${arg}";;
+    -r|-r=*|--revision|--revision=*) get_arg revision "${opt}" "${arg}";;
     -A|-A=*|--architecture|--architecture=*) get_arg architecture "${opt}" "${arg}";;
     -m|-m=*|--maintainer-name|--maintainer-name=*) get_arg maintainer_name "${opt}" "${arg}";;
     -e|-e=*|--maintainer-email|--maintainer-email=*) get_arg maintainer_email "${opt}" "${arg}";;
     -d|-d=*|--description|--description=*) get_arg description "${opt}" "${arg}";;
     -b|-b=*|--binary|--binary=*) get_arg binary "${opt}" "${arg}";;
+    -i|-i=*|--icon|--icon=*) get_arg binary "${opt}" "${arg}";;
     "") break;;
     *) echo "Invalid option: ${opt}";;
   esac
   shift "${shift_n}"
 done
 
-for key in app_name output_dir version architecture maintainer_name maintainer_email description binary; do
+
+for key in app_name output_dir version revision architecture maintainer_name maintainer_email description binary icon; do
   eval val='$'"${key}"
-  [ -n "${val}" ] && printf '%s\n' "${key}=${val}"
+  if [ -n "${val}" ]; then
+      printf '%s\n' "${key}=${val}"
+  elif [ -z "${val}"]; then
+      error_msg "${key} undefined"
+  fi
 done
 
-if [ -z "$app_name" ] || [ -z "$output_dir" ] || [ -z "$version" ] || [ -z "$architecture" ] || [ -z "$maintainer_name" ] || [ -z "$maintainer_email" ] || [ -z "$description" ] || [ -z "$binary" ]; then
-  error_msg 'one or more variables are undefined'
-  exit 1
-fi
-
-mkdir -v -p ${output_dir}/${app_name}-${version}
-mkdir -v -p ${output_dir}/${app_name}-${version}/DEBIAN
-mkdir -v -p ${output_dir}/${app_name}-${version}/usr/bin
-cp -v ${binary} ${output_dir}/${app_name}-${version}/usr/bin/${app_name}
+FULL_OUTPUT_PATH=${output_dir}/${app_name}_${version}-${revision}
+mkdir -v -p $FULL_OUTPUT_PATH
+mkdir -v -p $FULL_OUTPUT_PATH/DEBIAN
+mkdir -v -p $FULL_OUTPUT_PATH/usr/local/bin
+mkdir -v -p $FULL_OUPUT_PATH/usr/share/applications
+cp -v ${binary} $FULL_OUTPUT_PATH/usr/local/bin/${app_name}
+cp -v ${icon} $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.ico
 
 # create control file
-echo "[${app_name}] creating ${output_dir}/${app_name}-${version}/DEBIAN/control"
-cat <<EOF > ${output_dir}/${app_name}-${version}/DEBIAN/control
+echo "creating $FULL_OUTPUT_PATH/DEBIAN/control"
+cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/control
 Package: ${app_name}
 Version: ${version}
 Architecture: ${architecture}
@@ -123,19 +130,33 @@ Description: ${description}
 EOF
 chmod 0555 ${output_dir}/${app_name}-${version}/DEBIAN/control
 
+# create desktop entry
+echo "creating $FULL_OUTPUT_PATH/usr/share/applications/krux-installer.desktop"
+cat <<EOF > $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop
+[Desktop Entry]
+Encoding=UTF-8
+Version=${version}
+Type=Application
+Terminal=false
+Exec=/usr/local/bin/${app_name}
+Name=${app_name}
+Icon=/usr/share/applications/${app_name}.ico
+EOF
+chmod 0555 $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop
+
 # create postscript file
-echo "[${app_name}] creating ${output_dir}/${app_name}-${version}/DEBIAN/postint"
-cat <<EOF > ${output_dir}/${app_name}-${version}/DEBIAN/postinst
+echo "creating $FULL_OUTPUT_PATH/DEBIAN/postint"
+cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/postinst
 #!/bin/sh
 echo "WARN: Adding user \$(whoami) to 'dialout' group to enable flash procedure..."
 echo "WARN: You'll need to reboot your system to enable changes          "
 usermod -a -G dialout \$(whoami)
 EOF
-chmod 0755 ${output_dir}/${app_name}-${version}/DEBIAN/postinst
+chmod 0755 $FULL_OUTPUT_PATh/DEBIAN/postinst
 
-echo "[${app_name}] setting permissions for ${output_dir}/${app_name}-${version}/usr/bin/${app_name}"
-chmod +x ${output_dir}/${app_name}-${version}/usr/bin/${appname}
+echo "setting permissions for $FULL_OUTPUT_PATH/usr/local/bin/${app_name}"
+chmod +x ${output_dir}/${app_name}-${version}/usr/local/bin/${app_name}
 
 # build .deb
-echo "[${app_name}] running dpkg-deb --build"
-dpkg-deb --build ${output_dir}/${app_name}-${version}
+echo "running dpkg-deb --build --root-owner-group $FULL_OUTPUT_PATH"
+dpkg-deb --build --root-owner-group $FULL_OUTPUT_PATH

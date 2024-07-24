@@ -112,7 +112,6 @@ mkdir -v -p ${output_dir}/${app_name}-${version}/DEBIAN
 mkdir -v -p ${output_dir}/${app_name}-${version}/usr/bin
 cp -v ${binary} ${output_dir}/${app_name}-${version}/usr/bin/${app_name}
 
-
 # create control file
 echo "[${app_name}] creating ${output_dir}/${app_name}-${version}/DEBIAN/control"
 cat <<EOF > ${output_dir}/${app_name}-${version}/DEBIAN/control
@@ -127,15 +126,10 @@ chmod 0555 ${output_dir}/${app_name}-${version}/DEBIAN/control
 # create postscript file
 echo "[${app_name}] creating ${output_dir}/${app_name}-${version}/DEBIAN/postint"
 cat <<EOF > ${output_dir}/${app_name}-${version}/DEBIAN/postinst
-#!/bin/env bash
-
-set -e 
-echo "====================================================================================" 
-echo "[${app_name}] adding user \$(whoami) to 'dialout' group to enable flash procedure..."
-echo "===================================================================================="
-sudo usermod -a -G dialout \$(whoami)
-
-echo "[${app_name}] !!! WARNING: you will need to reboot your system to make changes available"
+#!/bin/sh
+echo "WARN: Adding user \$(whoami) to 'dialout' group to enable flash procedure..."
+echo "WARN: You'll need to reboot your system to enable changes          "
+usermod -a -G dialout \$(whoami)
 EOF
 chmod 0755 ${output_dir}/${app_name}-${version}/DEBIAN/postinst
 

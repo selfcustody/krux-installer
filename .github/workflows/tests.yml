@@ -85,10 +85,7 @@ jobs:
             
           - os: windows-latest
             arch: x64
-            
-          - os: macos-12
-            arch: x64
-            
+                        
           - os: macos-13
             arch: x64
             
@@ -122,13 +119,20 @@ jobs:
       - name: Install project and its dependencies
         run: poetry install
         
-      - name: Run tests (Linux)
+      - name: Run tests with coverage (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
         with:
           run: |
             poetry add pytest-xvfb
-            poetry run poe test
+            poetry run poe coverage
+            
+      - name: Upload coverage reports to Codecov with GitHub Action
+        uses: codecov/codecov-action@v4
+        if: ${{ runner.os == 'Linux' }}
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true
 
       - name: Run tests (MacOS)
         if: ${{ runner.os == 'macOS' }}
@@ -147,45 +151,6 @@ jobs:
       #    KIVY_GL_BACKEND: 'gl'
       #  run: poetry run poe test
   
-  coverage:
-
-    needs: pytest
-
-    runs-on: ubuntu-latest
-    
-    steps:
-     
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-          
-      - name: Install poetry
-        run: pipx install poetry
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: './poetry.lock'
-          architecture: x64
-
-      - name: Install project and its dependencies
-        run: poetry install
-
-      - name: Build coverage file
-        uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
-        with:
-          run: |
-            poetry add pytest-xvfb
-            poetry run poe coverage
-
-      
-      - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v4
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-  
   build:
 
     needs: coverage
@@ -197,9 +162,6 @@ jobs:
             arch: x64
             
           - os: windows-latest
-            arch: x64
-            
-          - os: macos-12
             arch: x64
             
           - os: macos-13
@@ -238,11 +200,10 @@ jobs:
         run: |
           NAME=`poetry run python -c 'from src.utils.constants import get_name; print(get_name())'`
           VERSION=`poetry run python -c 'from src.utils.constants import get_version; print(get_version())'`
-          DESCRIPTION=`poetry run python -c 'from src.utils.constants import get_description; print(get_description)'`
+          DESCRIPTION=`poetry run python -c 'from src.utils.constants import get_description; print(get_description())'`
           echo "app-name=$NAME" >> $GITHUB_OUTPUT
           echo "app-version=$VERSION" >> $GITHUB_OUTPUT
           echo "app-description='$DESCRIPTION'" >> $GITHUB_OUTPUT
-          echo "app-package=$NAME-$VERSION.deb"
 
       - name: Setup (MacOS)
         if: ${{ runner.os == 'macOS' }}
@@ -256,12 +217,11 @@ jobs:
           OPENSSL_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VESION/${OPENSSL_FULL_VERSION}"
           NAME=`poetry run python -c 'from src.utils.constants import get_name; print(get_name())'`
           VERSION=`poetry run python -c 'from src.utils.constants import get_version; print(get_version())'`
-          DESCRIPTION=`poetry run python -c 'from src.utils.constants import get_description; print(get_description)'`
+          DESCRIPTION=`poetry run python -c 'from src.utils.constants import get_description; print(get_description())'`
           echo "dyld-path=${OPENSSL_PATH}/lib:${DYLD_LIBRARY_PATH}" >> $GITHUB_OUTPUT
           echo "app-name=$NAME" >> $GITHUB_OUTPUT
           echo "app-version=$VERSION" >> $GITHUB_OUTPUT
           echo "app-description='$DESCRIPTION'" >> $GITHUB_OUTPUT
-          echo "app-package=$NAME-$VERSION.dmg"
           
       - name: Setup (Windows)
         if: ${{ runner.os == 'Windows' }}
@@ -314,11 +274,9 @@ jobs:
         
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}
-        env:
-          DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
         run: |
           mkdir -p ./release
-          create-dmg --volname "${{ steps.setup-macos.outputs.app-name }}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./release/${{ steps.setup-macos.outputs.app-package }} ./dist/krux-installer.app
+          create-dmg --volname "${{ steps.setup-macos.outputs.app-name }}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./release/${{ steps.setup-macos.outputs.app-name }}-${{ steps.setup-macos.outputs.app-version }}.dmg ./dist/krux-installer.app
           
       - name: Hash (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -326,7 +284,7 @@ jobs:
         id: hash-linux
         with:
           working-directory: ./release
-          file: ${{ steps.setup-linux.outputs.app-package }}
+          file: ${{ steps.setup-linux.outputs.app-name }}-${{ steps.setup-linux.outputs.app-version }}.deb
           ext: 'sha256.txt'
           
       - name: Hash (MacOS)
@@ -335,7 +293,7 @@ jobs:
         id: hash-macos
         with:
           working-directory: ./release
-          file: ${{ steps.setup-project.outputs.app-package }}
+          file: ${{ steps.setup-macos.outputs.app-name }}-${{ steps.setup-macos.outputs.app-version }}.dmg
           ext: 'sha256.txt'
 
       - name: Hash (Windows)
@@ -351,25 +309,25 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ matrix.os }}-${{ steps.setup-project.outputs.app-pacakge }}
+          name: ${{ runner.os }}-${{ matrix.arch }}-${{ steps.setup-linux.outputs.app-name }}-${{ steps.setup-linux.outputs.app-version }}
           path: |
-            release/${{ steps.setup-project.outputs.app-package }}
+            release/${{ steps.setup-linux.outputs.app-name }}-${{ steps.setup-linux.outputs.app-version }}.deb
             ${{ steps.hash-linux.outputs.hash-file }}
             
       - name: Upload artifacts (MacOS)
         if: ${{ runner.os == 'macOS' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ matrix.os }}-${{ steps.setup-project.outputs.app-package }}
+          name: ${{ runner.os }}-${{ matrix.arch }}-${{ steps.setup-macos.outputs.app-name }}-${{ steps.setup-macos.outputs.app-version }}
           path: |
-            release/${{ steps.setup-project.outputs.app-pacakge }}
+            release/${{ steps.setup-macos.outputs.app-name }}-${{ steps.setup-macos.outputs.app-version}}.dmg
             ${{ steps.hash-macos.outputs.hash-file }}
       
       - name: Upload artifacts (Windows)
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ matrix.os }}-${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}
+          name: ${{ runner.os }}-${{ matrix.arch }}-${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}
           path: |
             dist\krux-installer.exe
             ${{ steps.hash-win.outputs.hash-file }}

@@ -53,6 +53,7 @@ class Flasher(BaseFlasher):
         if not work, try custom port
         """
         for device in VALID_DEVICES:
+            # pylint: disable=unsupported-membership-test
             if device in self.firmware:
                 self.port = device
                 self.board = device

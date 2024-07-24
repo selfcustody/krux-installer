@@ -245,12 +245,9 @@ jobs:
           VER=`poetry run python -c 'from src.utils.constants import get_version; print(get_version())'`
           DESC=`poetry run python -c 'from src.utils.constants import get_description; print(get_description())'`
           REV=alpha-1
-          REL=$(pwd)/release
           ARCH=$(uname -m)
-          BIN=$(pwd)/dist/$NAME
-          ICO=$(pwd)/assets/icon.png
-          mkdir -p $REL
-          sh .ci/create-deb.sh --app-name $NAME --output-dir $REL --version $VER --revision $REV --architecture $ARCH --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description $DESC --binary $BIN --icon $ICO
+          mkdir -p ./release
+          sh .ci/create-deb.sh --app-name $NAME --output-dir ./release --version $VER --revision $REV --architecture $ARCH --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description $DESC --binary ./dist/$NAME --icon ./assets/icon.png
           echo "release-deb=$NAME_$VER-$REV_$ARCH.deb" >> $GITHUB_OUTPUT
         
       - name: Build release dmg (MacOS)
@@ -261,12 +258,9 @@ jobs:
           VER=`poetry run python -c 'from src.utils.constants import get_version; print(get_version())'`
           DESC=`poetry run python -c 'from src.utils.constants import get_description; print(get_description())'`
           REV=alpha-1
-          REL=$(pwd)/release
           ARCH=$(uname -m)
-          ICO=$(pwd)/assets/icon.icns
-          BIN=$(pwd)/dist/$NAME
           mkdir -p $REL
-          create-dmg --volname $NAME --volicon $ICO --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon $NAME.app 200 190 --app-drop-link 600 185 "$REL/$NAME_$VER-$REV_$ARCH.dmg" $BIN
+          create-dmg --volname $NAME --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "$NAME.app" 200 190 --app-drop-link 600 185 "./release/$NAME_$VER-$REV_$ARCH.dmg" ./dist/$NAME.app
           echo "release-dmg=$NAME_$VER-$REV_$ARCH.dmg" >> $GITHUB_OUTPUT
           
       - name: Hash (Linux)

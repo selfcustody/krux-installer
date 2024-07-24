@@ -13,7 +13,7 @@ usage(){
 Options:
   -h, --help                               this help info
   -a, --app-name <appname>                 the application name
-  -o, --outdir <outdir>                    the output directory
+  -o, --output-dir <outdir>                the output directory
   -v, --version <version>                  the application version
   -r, --revision <revision>                the application revision
   -A, --architecture <arch>                the application architecture
@@ -111,13 +111,16 @@ for key in app_name output_dir version revision architecture maintainer_name mai
   fi
 done
 
-FULL_OUTPUT_PATH=${output_dir}/${app_name}_${version}-${revision}
+FULL_OUTPUT_PATH=${output_dir}/${app_name}_${version}-${revision}_${architecture}
 mkdir -v -p $FULL_OUTPUT_PATH
 mkdir -v -p $FULL_OUTPUT_PATH/DEBIAN
 mkdir -v -p $FULL_OUTPUT_PATH/usr/local/bin
-mkdir -v -p $FULL_OUPUT_PATH/usr/share/applications
+mkdir -v -p $FULL_OUTPUT_PATH/usr/share/applications
+mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/
+mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/
+mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps
 cp -v ${binary} $FULL_OUTPUT_PATH/usr/local/bin/${app_name}
-cp -v ${icon} $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.ico
+convert ${icon} -resize 512x512 $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}.png
 
 # create control file
 echo "creating $FULL_OUTPUT_PATH/DEBIAN/control"
@@ -131,7 +134,7 @@ EOF
 chmod 0555 ${output_dir}/${app_name}-${version}/DEBIAN/control
 
 # create desktop entry
-echo "creating $FULL_OUTPUT_PATH/usr/share/applications/krux-installer.desktop"
+echo "creating $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop"
 cat <<EOF > $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop
 [Desktop Entry]
 Encoding=UTF-8
@@ -140,7 +143,7 @@ Type=Application
 Terminal=false
 Exec=/usr/local/bin/${app_name}
 Name=${app_name}
-Icon=/usr/share/applications/${app_name}.ico
+Icon=/usr/share/icons/highcolor/512x512/apps/${app_name}.png
 EOF
 chmod 0555 $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop
 

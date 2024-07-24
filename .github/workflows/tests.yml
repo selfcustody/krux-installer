@@ -220,6 +220,16 @@ jobs:
           cache-dependency-path: './poetry.lock'
           architecture: ${{ matrix.arch }}
 
+      - name: Setup project
+        id: setup-project
+        run: |
+          NAME=`poetry run python -c 'from src.utils.constants import get_name; print(get_name())'`
+          VERSION=`poetry run python -c 'from src.utils.constants import get_version; print(get_version())'`
+          DESCRIPTION=`poetry run python -c 'from src.utils.constants import get_description; print(get_description)'`
+          echo "app-name=$NAME" >> $GITHUB_OUTPUT
+          echo "app-version=$VERSION" >> $GITHUB_OUTPUT
+          echo "app-description='$DESCRIPTION'" >> $GITHUB_OUTPUT
+
       - name: Setup macOS
         if: ${{ runner.os == 'macOS' }}
         id: setup-macos
@@ -266,17 +276,16 @@ jobs:
       - name: Build release deb (Linux)
         if: ${{ runner.os == 'Linux' }}
         run: |
-          mkdir -p release
-          chmod +x .ci/create-deb
-          .ci/create-deb --app-name "krux-installer" --out-dir ./release --version "0.0.2" --architeture x64 --maintainer-name "qlrd" --maintainer-email "qlrddev@gmail.com" --description "A GUI based application to flash Krux firmware on K210 based devices" --binary ./dist/krux-installer
-      
+          mkdir -p ./release
+          sh .ci/create-deb.sh --app-name ${{ steps.setup-project.outputs.app-name }} --output-dir ./release --version ${{ steps.setup-project.outputs.app-version }} --architecture x64 --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description "${{ steps.setup-project.outputs.app-description }}" --binary ./dist/krux-installer
+        
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}
         env:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
         run: |
-          mkdir -p release
-          create-dmg --volname "krux-installer" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./release/krux-installer.dmg ./dist/krux-installer.app 
+          mkdir -p ./release
+          create-dmg --volname "${{ steps.setup-project.outputs.app-name }}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon krux-installer.app 200 190 --app-drop-link 600 185 ./release/${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}.dmg ./dist/krux-installer.app
           
       - name: Hash (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -284,7 +293,7 @@ jobs:
         id: hash-linux
         with:
           working-directory: ./release
-          file: krux-installer.deb
+          file: ${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}.deb
           ext: 'sha256.txt'
           
       - name: Hash (MacOS)
@@ -293,7 +302,7 @@ jobs:
         id: hash-macos
         with:
           working-directory: ./release
-          file: krux-installer.dmg
+          file: ${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}.dmg
           ext: 'sha256.txt'
 
       - name: Hash (Windows)
@@ -309,25 +318,25 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ matrix.os }}-KruxInstaller-v0.0.2
+          name: ${{ matrix.os }}-${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}
           path: |
-            dist/krux-installer
+            release/${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}.deb
             ${{ steps.hash-linux.outputs.hash-file }}
             
       - name: Upload artifacts (MacOS)
         if: ${{ runner.os == 'macOS' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ matrix.os }}-KruxInstaller-v0.0.2
+          name: ${{ matrix.os }}-${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}
           path: |
-            dist/krux-installer.dmg
+            release/${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}.dmg
             ${{ steps.hash-macos.outputs.hash-file }}
       
       - name: Upload artifacts (Windows)
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ matrix.os }}-KruxInstaller-v0.0.2
+          name: ${{ matrix.os }}-${{ steps.setup-project.outputs.app-name }}-${{ steps.setup-project.outputs.app-version }}
           path: |
             dist\krux-installer.exe
             ${{ steps.hash-win.outputs.hash-file }}

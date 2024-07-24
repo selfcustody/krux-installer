@@ -15,7 +15,6 @@ Options:
   -a, --app-name <appname>                 the application name
   -o, --output-dir <outdir>                the output directory
   -v, --version <version>                  the application version
-  -r, --revision <revision>                the application revision
   -A, --architecture <arch>                the application architecture
   -m, --maintainer-name <name>             the application maintainer name
   -e, --maintainer-email <email>           the application maintainer email
@@ -88,13 +87,12 @@ while :; do
     -a|-a=*|--app-name|--app-name=*) get_arg app_name "${opt}" "${arg}";;
     -o|-o=*|--output-dir|--output-dir=*) get_arg output_dir "${opt}" "${arg}";;
     -v|-v=*|--version|--version=*) get_arg version "${opt}" "${arg}";;
-    -r|-r=*|--revision|--revision=*) get_arg revision "${opt}" "${arg}";;
     -A|-A=*|--architecture|--architecture=*) get_arg architecture "${opt}" "${arg}";;
     -m|-m=*|--maintainer-name|--maintainer-name=*) get_arg maintainer_name "${opt}" "${arg}";;
     -e|-e=*|--maintainer-email|--maintainer-email=*) get_arg maintainer_email "${opt}" "${arg}";;
     -d|-d=*|--description|--description=*) get_arg description "${opt}" "${arg}";;
     -b|-b=*|--binary|--binary=*) get_arg binary "${opt}" "${arg}";;
-    -i|-i=*|--icon|--icon=*) get_arg binary "${opt}" "${arg}";;
+    -i|-i=*|--icon|--icon=*) get_arg icon "${opt}" "${arg}";;
     "") break;;
     *) echo "Invalid option: ${opt}";;
   esac
@@ -102,7 +100,13 @@ while :; do
 done
 
 
-for key in app_name output_dir version revision architecture maintainer_name maintainer_email description binary icon; do
+echo "================="
+echo "create-deb v0.0.1"
+echo "================="
+echo ""
+echo "Defined variables"
+echo "-----------------"
+for key in app_name output_dir version architecture maintainer_name maintainer_email description binary icon; do
   eval val='$'"${key}"
   if [ -n "${val}" ]; then
       printf '%s\n' "${key}=${val}"
@@ -111,7 +115,9 @@ for key in app_name output_dir version revision architecture maintainer_name mai
   fi
 done
 
-FULL_OUTPUT_PATH=${output_dir}/${app_name}_${version}-${revision}_${architecture}
+echo""
+
+FULL_OUTPUT_PATH=${output_dir}/${app_name}_${version}_${architecture}
 mkdir -v -p $FULL_OUTPUT_PATH
 mkdir -v -p $FULL_OUTPUT_PATH/DEBIAN
 mkdir -v -p $FULL_OUTPUT_PATH/usr/local/bin
@@ -120,10 +126,11 @@ mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/
 mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/
 mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps
 cp -v ${binary} $FULL_OUTPUT_PATH/usr/local/bin/${app_name}
-convert ${icon} -resize 512x512 $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}.png
+
+echo "converting ${icon} to $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}.png"
+magick convert  ${icon} -resize 512x512 $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}.png
 
 # create control file
-echo "creating $FULL_OUTPUT_PATH/DEBIAN/control"
 cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/control
 Package: ${app_name}
 Version: ${version}
@@ -131,10 +138,27 @@ Architecture: ${architecture}
 Maintainer: ${maintainer_name} <${maintainer_email}>
 Description: ${description}
 EOF
-chmod 0555 ${output_dir}/${app_name}-${version}/DEBIAN/control
+
+echo ""
+echo "Resulting $FULL_OUTPUT_PATH/DEBIAN/control"
+echo "----------------------------------------------------------------------"
+cat $FULL_OUTPUT_PATH/DEBIAN/control
+
+# create postscript file
+cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/postinst
+#!/bin/sh
+echo "WARN: Adding user \$(whoami) to 'dialout' group to enable flash procedure..."
+echo "WARN: You'll need to reboot your system to enable changes          "
+usermod -a -G dialout \$(whoami)
+EOF
+chmod 0755 $FULL_OUTPUT_PATH/DEBIAN/postinst
+
+echo ""
+echo "Resulting $FULL_OUTPUT_PATH/DEBIAN/postinst"
+echo "----------------------------------------------------------------------"
+cat $FULL_OUTPUT_PATH/DEBIAN/postinst
 
 # create desktop entry
-echo "creating $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop"
 cat <<EOF > $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop
 [Desktop Entry]
 Encoding=UTF-8
@@ -145,20 +169,15 @@ Exec=/usr/local/bin/${app_name}
 Name=${app_name}
 Icon=/usr/share/icons/highcolor/512x512/apps/${app_name}.png
 EOF
-chmod 0555 $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop
 
-# create postscript file
-echo "creating $FULL_OUTPUT_PATH/DEBIAN/postint"
-cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/postinst
-#!/bin/sh
-echo "WARN: Adding user \$(whoami) to 'dialout' group to enable flash procedure..."
-echo "WARN: You'll need to reboot your system to enable changes          "
-usermod -a -G dialout \$(whoami)
-EOF
-chmod 0755 $FULL_OUTPUT_PATh/DEBIAN/postinst
+echo ""
+echo "Resulting $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop"
+echo "-----------------------------------------------------------------------------------------------------"
+cat $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop
 
+echo ""
 echo "setting permissions for $FULL_OUTPUT_PATH/usr/local/bin/${app_name}"
-chmod +x ${output_dir}/${app_name}-${version}/usr/local/bin/${app_name}
+chmod +x $FULL_OUTPUT_PATH/usr/local/bin/${app_name}
 
 # build .deb
 echo "running dpkg-deb --build --root-owner-group $FULL_OUTPUT_PATH"

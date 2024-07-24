@@ -259,7 +259,7 @@ jobs:
           DESC=`poetry run python -c 'from src.utils.constants import get_description; print(get_description())'`
           REV=alpha-1
           ARCH=$(uname -m)
-          mkdir -p $REL
+          mkdir -p ./release
           create-dmg --volname $NAME --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "$NAME.app" 200 190 --app-drop-link 600 185 "./release/$NAME_$VER-$REV_$ARCH.dmg" ./dist/$NAME.app
           echo "release-dmg=$NAME_$VER-$REV_$ARCH.dmg" >> $GITHUB_OUTPUT
           

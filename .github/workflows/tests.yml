@@ -244,8 +244,9 @@ jobs:
           NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
           VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
           DESC="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
+          ARCH="amd64"
           mkdir -p ./release
-          sh .ci/create-deb.sh --app-name "${NAME}" --output-dir ./release --version $VER --architecture amd64 --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description "${DESC}" --binary "./dist/${NAME}" --icon ./assets/icon.png
+          sh .ci/create-deb.sh --app-name "${NAME}" --output-dir ./release --version $VER --architecture "${ARCH}" --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description "${DESC}" --binary "./dist/${NAME}" --icon ./assets/icon.png
           echo "release-deb=${NAME}_${VER}_${ARCH}.deb" >> $GITHUB_OUTPUT
         
       - name: Build release dmg (MacOS)

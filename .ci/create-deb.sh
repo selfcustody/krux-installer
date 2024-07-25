@@ -115,6 +115,11 @@ for key in app_name output_dir version architecture maintainer_name maintainer_e
   fi
 done
 
+# convert x86_64 to amd64
+if [ $architecture == "x86_64" ]; then
+  architecture="amd64"
+fi
+
 echo""
 
 FULL_OUTPUT_PATH=${output_dir}/${app_name}_${version}_${architecture}

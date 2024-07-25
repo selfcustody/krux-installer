@@ -29,6 +29,7 @@
 
 # Build directories
 ######################
+release/
 build/
 build-*/
 dist/

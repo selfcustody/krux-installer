@@ -194,6 +194,11 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Setup (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        id: setup-linux
+        run: apt-get install imagemagick
+          
       - name: Setup (MacOS)
         if: ${{ runner.os == 'macOS' }}
         id: setup-macos
@@ -241,9 +246,9 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         id: release-linux
         run: |
-          NAME=`poetry run python -c 'from src.utils.constants import get_name; print(get_name())'`
-          VER=`poetry run python -c 'from src.utils.constants import get_version; print(get_version())'`
-          DESC=`poetry run python -c 'from src.utils.constants import get_description; print(get_description())'`
+          NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
+          VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
+          DESC="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
           ARCH=$(uname -m)
           mkdir -p ./release
           sh .ci/create-deb.sh --app-name $NAME --output-dir ./release --version $VER --architecture $ARCH --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description $DESC --binary ./dist/$NAME --icon ./assets/icon.png
@@ -253,12 +258,11 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         id: release-macos
         run: |
-          NAME=`poetry run python -c 'from src.utils.constants import get_name; print(get_name())'`
-          VER=`poetry run python -c 'from src.utils.constants import get_version; print(get_version())'`
-          DESC=`poetry run python -c 'from src.utils.constants import get_description; print(get_description())'`
+          NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
+          VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
           ARCH=$(uname -m)
           mkdir -p ./release
-          create-dmg --volname "$NAME" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "$NAME.app" 200 190 --app-drop-link 600 185 ./release/$NAME_$VER_$ARCH.dmg ./dist/$NAME.app
+          create-dmg --volname $NAME --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "$NAME.app" 200 190 --app-drop-link 600 185 "./release/$NAME_$VER_$ARCH.dmg" ./dist/$NAME.app
           echo "release-dmg=$NAME_$VER_$ARCH.dmg" >> $GITHUB_OUTPUT
           
       - name: Hash (Linux)

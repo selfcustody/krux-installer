@@ -267,7 +267,7 @@ jobs:
         id: hash-linux
         with:
           working-directory: ./release
-          file: ${{ steps.release-linux.outputs.release-app }}
+          file: ${{ steps.release-linux.outputs.release-deb }}
           ext: 'sha256.txt'
           
       - name: Hash (MacOS)

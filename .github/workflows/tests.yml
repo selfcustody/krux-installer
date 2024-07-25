@@ -193,12 +193,7 @@ jobs:
         if: ${{ matrix.arch == 'arm64' }}
         with:
           python-version: '3.12'
-
-      - name: Setup (Linux)
-        if: ${{ runner.os == 'Linux' }}
-        id: setup-linux
-        run: sudo apt-get install imagemagick
-          
+         
       - name: Setup (MacOS)
         if: ${{ runner.os == 'macOS' }}
         id: setup-macos
@@ -251,8 +246,8 @@ jobs:
           DESC="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
           ARCH=$(uname -m)
           mkdir -p ./release
-          sh .ci/create-deb.sh --app-name $NAME --output-dir ./release --version $VER --architecture $ARCH --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description $DESC --binary ./dist/$NAME --icon ./assets/icon.png
-          echo "release-deb=$NAME_$VER_$ARCH.deb" >> $GITHUB_OUTPUT
+          sh .ci/create-deb.sh --app-name "${NAME}" --output-dir ./release --version $VER --architecture $ARCH --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description "${DESC}" --binary "./dist/${NAME}" --icon ./assets/icon.png
+          echo "release-deb=${NAME}_${VER}_${ARCH}.deb" >> $GITHUB_OUTPUT
         
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}
@@ -262,8 +257,8 @@ jobs:
           VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
           ARCH=$(uname -m)
           mkdir -p ./release
-          create-dmg --volname $NAME --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "$NAME.app" 200 190 --app-drop-link 600 185 "./release/$NAME_$VER_$ARCH.dmg" ./dist/$NAME.app
-          echo "release-dmg=$NAME_$VER_$ARCH.dmg" >> $GITHUB_OUTPUT
+          create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app
+          echo "release-dmg=${NAME}_${VER}_${ARCH}.dmg" >> $GITHUB_OUTPUT
           
       - name: Hash (Linux)
         if: ${{ runner.os == 'Linux' }}

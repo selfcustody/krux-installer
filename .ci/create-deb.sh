@@ -117,6 +117,9 @@ done
 
 # convert x86_64 to amd64
 if [ $architecture == "x86_64" ]; then
+  echo ""
+  echo "Replacing $architecture to amd64"
+  echo "--------------------------------"
   architecture="amd64"
 fi
 
@@ -131,9 +134,7 @@ mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/
 mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/
 mkdir -v -p $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps
 cp -v ${binary} $FULL_OUTPUT_PATH/usr/local/bin/${app_name}
-
-echo "converting ${icon} to $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}.png"
-magick convert  ${icon} -resize 512x512 $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}.png
+cp -v ${icon} $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}.png
 
 # create control file
 cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/control
@@ -153,7 +154,7 @@ cat $FULL_OUTPUT_PATH/DEBIAN/control
 cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/postinst
 #!/bin/sh
 echo "WARN: Adding user \$(whoami) to 'dialout' group to enable flash procedure..."
-echo "WARN: You'll need to reboot your system to enable changes          "
+echo "WARN: You'll need to reboot your system to enable changes"
 usermod -a -G dialout \$(whoami)
 EOF
 chmod 0755 $FULL_OUTPUT_PATH/DEBIAN/postinst

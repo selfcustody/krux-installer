@@ -32,7 +32,7 @@ class TestAboutScreen(GraphicUnitTest):
         self.assertEqual(button.id, "about_screen_button")
 
         title = "[b]krux-installer[/b]"
-        version = "v0.0.2"
+        version = "v0.0.2-alpha-1"
         source = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer]Check source code[/ref][/color]"
         issues = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer/issues]I found a bug![/ref][/color]"
 

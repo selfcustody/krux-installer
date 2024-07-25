@@ -18,7 +18,7 @@ Options:
   -A, --architecture <arch>                the application architecture
   -m, --maintainer-name <name>             the application maintainer name
   -e, --maintainer-email <email>           the application maintainer email
-  -d, --description "<description>"        the application description
+  -d, --description <description>          the application description
   -b, --binary                             the application binary
   -i, --icon                               the application icon image
 
@@ -153,9 +153,23 @@ cat $FULL_OUTPUT_PATH/DEBIAN/control
 # create postscript file
 cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/postinst
 #!/bin/sh
-echo "WARN: Adding user \$(whoami) to 'dialout' group to enable flash procedure..."
-echo "WARN: You'll need to reboot your system to enable changes"
-usermod -a -G dialout \$(whoami)
+
+echo ""
+echo "                                   -------------"
+echo "                                   !!!WARNING!!!"
+echo "                                   -------------"
+echo ""
+if [ -n "\$SUDO_USER" ] && [ "\$SUDO_USER" != "root" ]; then
+  echo "Adding user \$SUDO_USER to 'dialout' group to enable flash procedure..."
+  echo "You'll need to reboot your system to enable changes"
+  usermod -a -G dialout \$SUDO_USER
+elif [ -n "\$USER" ] && [ "\$USER" != "root"]; then
+  echo "Adding user \$USER to 'dialout' group to enable flash procedure..."
+  echo "You'll need to reboot your system to enable changes"
+  usermod -a -G dialout \$USER
+fi
+echo ""
+echo ""
 EOF
 chmod 0755 $FULL_OUTPUT_PATH/DEBIAN/postinst
 

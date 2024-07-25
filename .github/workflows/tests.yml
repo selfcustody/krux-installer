@@ -197,7 +197,7 @@ jobs:
       - name: Setup (Linux)
         if: ${{ runner.os == 'Linux' }}
         id: setup-linux
-        run: apt-get install imagemagick
+        run: sudo apt-get install imagemagick
           
       - name: Setup (MacOS)
         if: ${{ runner.os == 'macOS' }}

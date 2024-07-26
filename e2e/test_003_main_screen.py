@@ -12,11 +12,10 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_render_main_screen(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_render_main_screen(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -27,13 +26,15 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "MainScreen")
         self.assertEqual(screen.id, "main_screen")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_render_grid_layout(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_render_grid_layout(self, mock_get_locale):
+        mock_get_locale.config = MagicMock()
+        mock_get_locale.config.get = MagicMock(return_value="en-US")
         screen = MainScreen()
         self.render(screen)
 
@@ -43,14 +44,13 @@ class TestMainScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
 
         self.assertEqual(grid.id, "main_screen_grid")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_render_buttons(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_render_buttons(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -68,15 +68,14 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(buttons[1].id, "main_settings")
         self.assertEqual(buttons[0].id, "main_about")
 
+        mock_get_locale.assert_called_once()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_on_press_cant_flash_or_wipe(
-        self, mock_get_running_app, mock_set_background
-    ):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_on_press_cant_flash_or_wipe(self, mock_get_locale, mock_set_background):
         screen = MainScreen()
         self.render(screen)
 
@@ -98,21 +97,25 @@ class TestMainScreen(GraphicUnitTest):
                 calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
     @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.open_settings")
     def test_on_release_cant_flash_or_wipe(
-        self, mock_get_running_app, mock_manager, mock_set_screen, mock_set_background
+        self,
+        mock_open_settings,
+        mock_get_locale,
+        mock_manager,
+        mock_set_screen,
+        mock_set_background,
     ):
         mock_manager.get_screen = MagicMock()
-
-        mock_get_running_app.return_value = MagicMock(open_settings=MagicMock())
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = MainScreen()
         self.render(screen)
@@ -157,22 +160,14 @@ class TestMainScreen(GraphicUnitTest):
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_manager.get_screen.assert_has_calls(calls_manager)
-        mock_get_running_app.assert_has_calls(
-            [
-                call().config.get("locale", "lang"),
-                call().open_settings(),
-            ],
-            any_order=True,
-        )
-
-        mock_get_running_app.return_value.open_settings.assert_called_once()
+        mock_get_locale.assert_called_once()
+        mock_open_settings.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_version(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_version(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -187,8 +182,8 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(
             device_button.text, "Version: [color=#00AABB]select a new one[/color]"
         )
-        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
         self.assertTrue(flash_button.markup)
         self.assertTrue(wipe_button.markup)
 
@@ -205,18 +200,20 @@ class TestMainScreen(GraphicUnitTest):
             self.assertEqual(
                 device_button.text, f"Version: [color=#00AABB]{version}[/color]"
             )
-            self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
-            self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+            self.assertEqual(
+                flash_button.text, "[color=#333333]Update firmware[/color]"
+            )
+            self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
             self.assertTrue(flash_button.markup)
             self.assertTrue(wipe_button.markup)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_device(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_device(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -231,8 +228,8 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(
             device_button.text, "Device: [color=#00AABB]select a new one[/color]"
         )
-        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
         self.assertTrue(flash_button.markup)
         self.assertTrue(wipe_button.markup)
 
@@ -241,17 +238,18 @@ class TestMainScreen(GraphicUnitTest):
             self.assertEqual(
                 device_button.text, f"Device: [color=#00AABB]{device}[/color]"
             )
-            self.assertEqual(flash_button.text, "Flash")
-            self.assertEqual(wipe_button.text, "Wipe")
+            self.assertEqual(flash_button.text, "Update firmware")
+            self.assertEqual(wipe_button.text, "Wipe device")
             self.assertFalse(flash_button.markup)
             self.assertFalse(wipe_button.markup)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_fail_update_invalid_screen(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+        mock_get_locale.assert_called_once()
 
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_invalid_screen(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -262,14 +260,13 @@ class TestMainScreen(GraphicUnitTest):
             screen.update(name="MockedScreen", key="device", value="v24.03.0")
 
         self.assertEqual(str(exc_info.exception), "Invalid screen name: MockedScreen")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_fail_update_invalid_key(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_invalid_key(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -280,14 +277,13 @@ class TestMainScreen(GraphicUnitTest):
             screen.update(name="SelectDeviceScreen", key="mock", value="mock")
 
         self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_no_valid_device_but_valid_situation(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_no_valid_device_but_valid_situation(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -302,8 +298,8 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(
             device_button.text, "Device: [color=#00AABB]select a new one[/color]"
         )
-        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
         self.assertTrue(flash_button.markup)
         self.assertTrue(wipe_button.markup)
 
@@ -312,18 +308,17 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(
             device_button.text, "Device: [color=#00AABB]Mocked device[/color]"
         )
-        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
+        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
         self.assertTrue(flash_button.markup)
         self.assertTrue(wipe_button.markup)
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_locale(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_locale(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -333,14 +328,13 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="locale", value="en_US.UTF-8")
 
         self.assertEqual(screen.locale, "en_US.UTF-8")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_device_select_a_new_one(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_device_select_a_new_one(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -357,14 +351,13 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(
             device_button.text, "Device: [color=#00AABB]select a new one[/color]"
         )
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_flash_not_will_flash(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_flash_not_will_flash(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -377,15 +370,14 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
         self.assertTrue(flash_button.markup)
-        self.assertEqual(flash_button.text, "[color=#333333]Flash[/color]")
-        mock_get_running_app.assert_called_once()
+        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_flash_will_flash(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_flash_will_flash(self, mock_get_locale):
         screen = MainScreen()
         screen.will_flash = True
         self.render(screen)
@@ -399,14 +391,16 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
         self.assertFalse(flash_button.markup)
-        self.assertEqual(flash_button.text, "Flash")
-        mock_get_running_app.assert_called_once()
+        self.assertEqual(flash_button.text, "Update firmware")
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_flash_not_will_wipe(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_flash_not_will_wipe(self, mock_get_locale):
+        mock_get_locale.config = MagicMock()
+        mock_get_locale.config.get = MagicMock(return_value="en-US")
 
         screen = MainScreen()
         self.render(screen)
@@ -420,15 +414,14 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
 
         self.assertTrue(wipe_button.markup)
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe[/color]")
-        mock_get_running_app.assert_called_once()
+        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_flash_will_wipe(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_flash_will_wipe(self, mock_get_locale):
         screen = MainScreen()
         screen.will_wipe = True
         self.render(screen)
@@ -442,15 +435,14 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
 
         self.assertFalse(wipe_button.markup)
-        self.assertEqual(wipe_button.text, "Wipe")
-        mock_get_running_app.assert_called_once()
+        self.assertEqual(wipe_button.text, "Wipe device")
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_settings(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_settings(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -463,14 +455,13 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="settings", value=None)
 
         self.assertEqual(s_button.text, "Settings")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_about(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_about(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -483,17 +474,14 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="about", value=None)
 
         self.assertEqual(a_button.text, "About")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_on_press_can_flash_or_wipe(
-        self, mock_get_running_app, mock_set_background
-    ):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_on_press_can_flash_or_wipe(self, mock_get_locale, mock_set_background):
         screen = MainScreen()
         self.render(screen)
 
@@ -516,27 +504,29 @@ class TestMainScreen(GraphicUnitTest):
             calls.append(call(wid="main_wipe", rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
     @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.get_destdir_assets")
     @patch("src.app.screens.main_screen.re.findall", side_effect=[True])
     @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[False])
     def test_on_release_flash_to_download_stable_zip_screen(
         self,
         mock_isfile,
         mock_findall,
-        mock_get_running_app,
+        mock_get_destdir_assets,
+        mock_get_locale,
         mock_manager,
         mock_set_screen,
         mock_set_background,
     ):
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock()
 
         screen = MainScreen()
         screen.version = "v24.03.0"
@@ -552,13 +542,8 @@ class TestMainScreen(GraphicUnitTest):
         flash_action = getattr(screen, "on_release_main_flash")
         flash_action(flash_button)
 
-        mock_get_running_app.assert_has_calls(
-            [
-                call().config.get("locale", "lang"),
-                call().config.get("destdir", "assets"),
-            ],
-            any_order=True,
-        )
+        mock_get_locale.assert_called_once()
+        mock_get_destdir_assets.assert_called_once()
         mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(
             name="DownloadStableZipScreen", direction="left"
@@ -571,21 +556,23 @@ class TestMainScreen(GraphicUnitTest):
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
     @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.get_destdir_assets")
     @patch("src.app.screens.main_screen.re.findall", side_effect=[True])
     @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[True])
     def test_on_release_flash_to_warning_already_downloaded_zip_screen(
         self,
         mock_isfile,
         mock_findall,
-        mock_get_running_app,
+        mock_get_destdir_assets,
+        mock_get_locale,
         mock_manager,
         mock_set_screen,
         mock_set_background,
     ):
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock()
 
         screen = MainScreen()
         screen.version = "v24.03.0"
@@ -601,13 +588,8 @@ class TestMainScreen(GraphicUnitTest):
         flash_action = getattr(screen, "on_release_main_flash")
         flash_action(flash_button)
 
-        mock_get_running_app.assert_has_calls(
-            [
-                call().config.get("locale", "lang"),
-                call().config.get("destdir", "assets"),
-            ],
-            any_order=True,
-        )
+        mock_get_locale.assert_called_once()
+        mock_get_destdir_assets.assert_called_once()
         mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(
             name="WarningAlreadyDownloadedScreen", direction="left"
@@ -620,19 +602,19 @@ class TestMainScreen(GraphicUnitTest):
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
     @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.main_screen.re.findall", side_effect=[False, True])
     def test_on_release_flash_to_download_beta_screen(
         self,
         mock_findall,
-        mock_get_running_app,
+        mock_get_locale,
         mock_manager,
         mock_set_screen,
         mock_set_background,
     ):
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock()
 
         screen = MainScreen()
         screen.version = "odudex/krux_binaries"
@@ -648,11 +630,7 @@ class TestMainScreen(GraphicUnitTest):
         flash_action = getattr(screen, "on_release_main_flash")
         flash_action(flash_button)
 
-        mock_get_running_app.assert_has_calls(
-            [
-                call().config.get("locale", "lang"),
-            ]
-        )
+        mock_get_locale.assert_called_once()
         mock_findall.assert_has_calls(
             [
                 call("^v\\d+\\.\\d+\\.\\d$", "odudex/krux_binaries"),
@@ -668,16 +646,19 @@ class TestMainScreen(GraphicUnitTest):
     @patch("src.app.screens.main_screen.MainScreen.set_background")
     @patch("src.app.screens.main_screen.MainScreen.set_screen")
     @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.get_baudrate", return_value=1500000)
     def test_on_release_wipe(
-        self, mock_get_running_app, mock_manager, mock_set_screen, mock_set_background
+        self,
+        mock_get_baudrate,
+        mock_get_locale,
+        mock_manager,
+        mock_set_screen,
+        mock_set_background,
     ):
-
         mock_manager.get_screen = MagicMock()
-        mock_config = MagicMock()
-        attrs = {"get.return_value": "krux-v0.0.1.zip"}
-        mock_config.configure_mock(**attrs)
-        mock_get_running_app.return_value = mock_config
 
         screen = MainScreen()
         self.render(screen)
@@ -699,5 +680,7 @@ class TestMainScreen(GraphicUnitTest):
             calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 1)))
             calls_set_screen.append(call(name="WipeScreen", direction="left"))
 
+        mock_get_baudrate.assert_called()
+        mock_get_locale.assert_called_once()
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)

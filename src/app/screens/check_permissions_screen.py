@@ -51,6 +51,9 @@ class CheckPermissionsScreen(BaseScreen):
 
         # Build grid where buttons will be placed
         self.make_grid(wid=f"{self.id}_grid", rows=1)
+
+        # These variables will setup the inclusion
+        # in dialout group, if necessary
         self.bin = None
         self.bin_args = None
         self.group = None
@@ -67,16 +70,25 @@ class CheckPermissionsScreen(BaseScreen):
             self.debug(f"Calling Button::{instance.id}::on_release")
             self.set_background(wid=f"{instance.id}", rgba=(0, 0, 0, 1))
 
+            # If user isnt in the dialout group,
+            # but the configuration was done correctly
+            # create the command
             if self.on_permission_created:
-                cmd = (
-                    [self.bin] + [a for a in self.bin_args] + [self.group] + [self.user]
-                )
-                self.debug(f"cmd={cmd}")
-                sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
-                sudoer.exec(cmd=cmd, env={}, callback=self.on_permission_created)
+                try:
+                    cmd = (
+                        [self.bin]
+                        + [a for a in self.bin_args]
+                        + [self.group]
+                        + [self.user]
+                    )
+                    self.debug(f"cmd={cmd}")
+                    sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
+                    sudoer.exec(cmd=cmd, env={}, callback=self.on_permission_created)
+                except Exception as err:
+                    self.redirect_error(msg=str(err.__traceback__))
             else:
-                raise RuntimeError(
-                    f"Invalid on_permission_created: {self.on_permission_created}"
+                self.redirect_error(
+                    msg=f"Invalid on_permission_created: {self.on_permission_created}"
                 )
 
         self.make_button(
@@ -102,13 +114,22 @@ class CheckPermissionsScreen(BaseScreen):
         if name in ("ConfigKruxInstaller", "CheckPermissionsScreen"):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen: {name}")
+            self.redirect_error(msg=f"Invalid screen: '{name}'")
+            return
 
         if key == "locale":
-            self.locale = value
+            if value is None or value.strip() == "":
+                self.redirect_error(msg=f"Invalid locale: '{value}'")
+            else:
+                self.locale = value
 
         elif key == "check_user":
 
+            # Here's where the check process start
+            # first get the current user, then verify
+            # the linux distribution used and use the
+            # proper command to add the user in 'dialout' (
+            # group (in some distros, can be 'uucp')
             self.user = os.environ.get("USER")
             self.debug(f"Checking permissions for {self.user}")
 
@@ -119,24 +140,34 @@ class CheckPermissionsScreen(BaseScreen):
                 f"[size=32sp][color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color][/size]"
             )
 
-            if distro.id() == "debian" or distro.like() == "debian":
+            if distro.id() in ("ubuntu", "fedora", "linuxmint"):
                 self.bin = "/usr/bin/usermod"
                 self.bin_arg = ["-a", "-G"]
                 self.group = "dialout"
 
-            elif distro.id() in ("arch", "manjaro"):
+            elif distro.id() in ("arch", "manjaro", "slackware", "gentoo"):
                 self.bin = "/usr/bin/usermod"
                 self.bin_args = ["-a", "-G"]
                 self.group = "uucp"
 
+            elif distro.like() == "debian":
+                self.bin = "/usr/bin/usermod"
+                self.bin_args = ["-a", "-G"]
+                self.group = "dialout"
+
             else:
-                raise RuntimeError(f"Not implemented for '{distro.name(pretty=True)}'")
+                self.redirect_error(
+                    msg=f"Not implemented for '{distro.name(pretty=True)}'"
+                )
+                return
 
             fn = partial(self.update, name=self.name, key="check_group")
             Clock.schedule_once(fn, 2.1)
 
         elif key == "check_group":
 
+            # Here is where we check if the user belongs to group
+            # 'dialout' (in some distros, will be 'uucp')
             self.debug(f"Checking {self.group} permissions for {self.user}")
             check_msg = self.translate("Checking")
             perm_msg = self.translate("permissions for")
@@ -145,6 +176,7 @@ class CheckPermissionsScreen(BaseScreen):
                 f"[size=32sp][color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]"
             )
 
+            # loop throug all groups and check
             for group in grp.getgrall():
                 if self.group == group.gr_name:
                     self.debug(f"Found {group.gr_name}")
@@ -155,6 +187,9 @@ class CheckPermissionsScreen(BaseScreen):
 
             self.debug(f"in_dialout={self.in_dialout}")
 
+            # if not in group, warn user
+            # and then ask for click in screen
+            # to proceed with the operation
             if not self.in_dialout:
                 self.debug(f"Creating permission for {self.user}")
                 warn_msg = self.translate("WARNING")
@@ -169,7 +204,7 @@ class CheckPermissionsScreen(BaseScreen):
 
                 self.ids[f"{self.id}_button"].text = "\n".join(
                     [
-                        "[size=32sp][color=#efcc00]WARNING[/color][/size]",
+                        f"[size=32sp][color=#efcc00]{warn_msg}[/color][/size]",
                         "",
                         f'[size=16sp]{first_msg} "{distro.name(pretty=True)}"',
                         f"{access_msg}.",
@@ -195,6 +230,9 @@ class CheckPermissionsScreen(BaseScreen):
 
         elif key == "make_on_permission_created":
 
+            # When user is added to dialout group
+            # ask for user to reboot to apply the changes
+            # and the ability to flash take place
             def on_permission_created(output: str):
                 self.debug(f"output={output}")
                 logout_msg = self.translate("You may need to logout (or even reboot)")
@@ -221,10 +259,10 @@ class CheckPermissionsScreen(BaseScreen):
                 self.group = None
                 self.user = None
 
-            self.on_permission_created = on_permission_created
+            setattr(self, "on_permission_created", on_permission_created)
 
         else:
-            raise ValueError(f"Invalid key: '{key}'")
+            self.redirect_error(msg=f"Invalid key: '{key}'")
 
     def on_enter(self):
         """

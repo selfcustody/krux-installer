@@ -25,6 +25,7 @@ import os
 import typing
 from pathlib import Path
 from functools import partial
+from kivy.clock import Clock
 from kivy.app import App
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -52,11 +53,7 @@ class BaseScreen(Screen, Trigger):
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
         self._error_img = os.path.join(root_assets_path, "assets", "error.png")
-
-        locale = App.get_running_app().config.get("locale", "lang")
-        locale = locale.split(".")
-        locale = f"{locale[0].replace("-", "_")}.{locale[1]}"
-        self.locale = locale
+        self.locale = BaseScreen.get_locale()
 
     @property
     def logo_img(self) -> str:
@@ -223,12 +220,33 @@ class BaseScreen(Screen, Trigger):
         setattr(self, f"on_press_{wid}", on_press)
         setattr(self, f"on_release_{wid}", on_release)
 
+    def redirect_error(self, msg: str):
+        screen = self.manager.get_screen("ErrorScreen")
+        exception = RuntimeError(msg)
+        fn = partial(screen.update, name=self.name, key="error", value=exception)
+        Clock.schedule_once(fn, 0)
+        self.set_screen(name="ErrorScreen", direction="left")
+
     @staticmethod
-    def get_destdir_assets():
+    def get_destdir_assets() -> str:
         app = App.get_running_app()
         return app.config.get("destdir", "assets")
 
     @staticmethod
-    def get_baudrate():
+    def get_baudrate() -> int:
         app = App.get_running_app()
         return int(app.config.get("flash", "baudrate"))
+
+    @staticmethod
+    def get_locale() -> str:
+        app = App.get_running_app()
+        locale = app.config.get("locale", "lang")
+        locale = locale.split(".")
+        return f"{locale[0].replace("-", "_")}.{locale[1]}"
+
+    @staticmethod
+    def open_settings() -> str:
+        app = App.get_running_app()
+        locale = app.config.get("locale", "lang")
+        locale = locale.split(".")
+        return f"{locale[0].replace("-", "_")}.{locale[1]}"

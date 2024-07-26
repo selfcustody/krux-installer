@@ -1,4 +1,4 @@
-from unittest.mock import patch, call, MagicMock
+from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.unzip_stable_screen import (
@@ -13,8 +13,13 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_init(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_init(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -33,13 +38,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         )
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_invalid_name(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_fail_update_invalid_name(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -54,13 +63,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_key(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_fail_update_key(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -75,13 +88,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_locale(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_update_locale(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -95,13 +112,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_version(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_update_version(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -115,13 +136,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.version, "v0.0.1")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_device(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_update_device(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -135,13 +160,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.device, "mock")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_clear(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_update_clear(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -166,17 +195,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             mock_clear.assert_called_once()
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
     @patch(
-        "src.app.screens.unzip_stable_screen.UnzipStableScreen.get_destdir_assets",
-        return_value="mockdir",
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_update_flash_button(self, mock_get_destdir_assets, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_update_flash_button(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -190,7 +219,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         text = "\n".join(
             [
                 "Flash update with",
-                "[size=14sp][color=#efcc00]mockdir/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
+                "[size=14sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
             ]
         )
 
@@ -198,18 +227,17 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.ids[f"{screen.id}_flash_button"].text, text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
         mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
     @patch(
-        "src.app.screens.unzip_stable_screen.UnzipStableScreen.get_destdir_assets",
-        return_value="mockdir",
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_update_airgap_button(self, mock_get_destdir_assets, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_update_airgap_button(self, mock_get_locale, mock_get_destdir_assets):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -223,7 +251,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         text = "\n".join(
             [
                 "Airgap update with",
-                "[size=14sp][color=#efcc00]mockdir/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
+                "[size=14sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
             ]
         )
 
@@ -237,24 +265,20 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         )
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
         mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
     @patch(
-        "src.app.screens.unzip_stable_screen.UnzipStableScreen.get_destdir_assets",
-        return_value="mockdir",
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
     def test_on_press_flash_button(
-        self, mock_set_background, mock_get_destdir_assets, mock_get_running_app
+        self, mock_set_background, mock_get_destdir_assets, mock_get_locale
     ):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -270,8 +294,8 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action(button)
         text = "\n".join(
             [
-                "Unziping",
-                "[size=14sp][color=#efcc00]mockdir/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
+                "Extracting",
+                "[size=14sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
             ]
         )
 
@@ -279,27 +303,23 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(button.text, text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
         mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
         mock_set_background.assert_called_once_with(
             wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
     @patch(
-        "src.app.screens.unzip_stable_screen.UnzipStableScreen.get_destdir_assets",
-        return_value="mockdir",
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
     def test_on_press_airgap_button(
-        self, mock_set_background, mock_get_destdir_assets, mock_get_running_app
+        self, mock_set_background, mock_get_destdir_assets, mock_get_locale
     ):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -315,8 +335,8 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action(button)
         text = "\n".join(
             [
-                "Unziping",
-                "[size=14sp][color=#efcc00]mockdir/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
+                "Extracting",
+                "[size=14sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
             ]
         )
 
@@ -324,20 +344,20 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(button.text, text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
         mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
         mock_set_background.assert_called_once_with(
             wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
     @patch(
-        "src.app.screens.unzip_stable_screen.UnzipStableScreen.get_destdir_assets",
-        return_value="mockdir",
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.get_baudrate", return_value=1500000)
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
     @patch("src.app.screens.unzip_stable_screen.KbootUnzip")
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.manager")
@@ -348,13 +368,12 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_manager,
         mock_kboot_unzip,
         mock_set_background,
+        mock_get_baudrate,
         mock_get_destdir_assets,
-        mock_get_running_app,
+        mock_get_locale,
     ):
         mock_kboot_unzip.load = MagicMock()
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = UnzipStableScreen()
         self.render(screen)
@@ -371,8 +390,8 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action(button)
         text = "\n".join(
             [
-                "Unziped",
-                "[size=12sp][color=#efcc00]mockdir/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
+                "Extracted",
+                "[size=12sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
             ]
         )
 
@@ -380,12 +399,12 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(button.text, text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_baudrate.assert_called()
+        mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
         mock_get_destdir_assets.assert_called_once()
         mock_kboot_unzip.assert_called_once_with(
-            filename="mockdir/krux-v0.0.1.zip", device="mock", output="mockdir"
+            filename="mock/krux-v0.0.1.zip", device="mock", output="mock"
         )
         # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
@@ -393,10 +412,11 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_sleep.assert_called_once_with(2.1)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
     @patch(
-        "src.app.screens.unzip_stable_screen.UnzipStableScreen.get_destdir_assets",
-        return_value="mockdir",
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
     @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
@@ -409,12 +429,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_firmware_unzip,
         mock_set_background,
         mock_get_destdir_assets,
-        mock_get_running_app,
+        mock_get_locale,
     ):
         mock_firmware_unzip.load = MagicMock()
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = UnzipStableScreen()
         self.render(screen)
@@ -431,8 +449,8 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action(button)
         text = "\n".join(
             [
-                "Unziped",
-                "[size=12sp][color=#efcc00]mockdir/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
+                "Extracted",
+                "[size=12sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
             ]
         )
 
@@ -440,12 +458,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(button.text, text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
         mock_get_destdir_assets.assert_called_once()
+        mock_get_locale.assert_called()
         mock_firmware_unzip.assert_called_once_with(
-            filename="mockdir/krux-v0.0.1.zip", device="mock", output="mockdir"
+            filename="mock/krux-v0.0.1.zip", device="mock", output="mock"
         )
         # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))

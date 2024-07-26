@@ -20,11 +20,10 @@ class TestSelectVersionScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_render_select_version_screen(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_render_select_version_screen(self, mock_get_locale):
         screen = SelectVersionScreen()
         self.render(screen)
 
@@ -35,14 +34,13 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "SelectVersionScreen")
         self.assertEqual(screen.id, "select_version_screen")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_render_grid_layout(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_render_grid_layout(self, mock_get_locale):
         screen = SelectVersionScreen()
         self.render(screen)
 
@@ -52,15 +50,14 @@ class TestSelectVersionScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
 
         self.assertEqual(grid.id, "select_version_screen_grid")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("kivy.uix.gridlayout.GridLayout.clear_widgets")
-    def test_clear_grid(self, mock_clear_widgets, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    def test_clear_grid(self, mock_clear_widgets, mock_get_locale):
         screen = SelectVersionScreen()
         screen.clear()
         self.render(screen)
@@ -69,22 +66,21 @@ class TestSelectVersionScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         mock_clear_widgets.assert_called_once()
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.utils.selector.requests")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
-    def test_render_buttons(self, mock_manager, mock_get_running_app, mock_requests):
+    def test_render_buttons(self, mock_manager, mock_get_locale, mock_requests):
         # Configure mocks
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = MOCKED_FOUND_API
         mock_requests.get.return_value = mock_response
         mock_manager.get_screen = MagicMock()
-
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = SelectVersionScreen()
         screen.fetch_releases()
@@ -102,15 +98,17 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(buttons[1].id, "select_version_old")
         self.assertEqual(buttons[0].id, "select_version_back")
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.utils.selector.requests")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.set_background")
     def test_on_press(
-        self, mock_set_background, mock_manager, mock_get_running_app, mock_requests
+        self, mock_set_background, mock_manager, mock_get_locale, mock_requests
     ):
         # Configure mocks
         mock_response = MagicMock()
@@ -118,9 +116,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_response.json.return_value = MOCKED_FOUND_API
         mock_requests.get.return_value = mock_response
         mock_manager.get_screen = MagicMock()
-
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = SelectVersionScreen()
         screen.fetch_releases()
@@ -144,11 +139,13 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.utils.selector.requests")
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.set_background")
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.set_screen")
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
@@ -157,7 +154,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_manager,
         mock_set_screen,
         mock_set_background,
-        mock_get_running_app,
+        mock_get_locale,
         mock_requests,
     ):
         # Configure mocks
@@ -166,9 +163,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_response.json.return_value = MOCKED_FOUND_API
         mock_requests.get.return_value = mock_response
         mock_manager.get_screen = MagicMock()
-
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = SelectVersionScreen()
         screen.fetch_releases()
@@ -209,14 +203,16 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_set_background.assert_has_calls(calls_set_background)
         mock_manager.get_screen.assert_has_calls(calls_get_screen)
         mock_set_screen.assert_has_calls(calls_set_screen)
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.utils.selector.requests")
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     def test_update_locale_old_versions(
-        self, mock_get_running_app, mock_manager, mock_requests
+        self, mock_get_locale, mock_manager, mock_requests
     ):
         mock_response = MagicMock()
         mock_response.status_code = 200
@@ -224,9 +220,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_requests.get.return_value = mock_response
 
         mock_manager.get_screen = MagicMock()
-
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = SelectVersionScreen()
         screen.fetch_releases()
@@ -246,14 +239,13 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(button_back.text, "Voltar")
 
         mock_manager.get_screen.assert_called_once()
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_locale_name(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_locale_name(self, mock_get_locale):
         screen = SelectVersionScreen()
         self.render(screen)
 
@@ -264,14 +256,13 @@ class TestSelectVersionScreen(GraphicUnitTest):
             screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
         self.assertEqual(str(exc_info.exception), "Invalid screen name: Mock")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_locale_key(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_locale_key(self, mock_get_locale):
         screen = SelectVersionScreen()
         self.render(screen)
 
@@ -282,4 +273,4 @@ class TestSelectVersionScreen(GraphicUnitTest):
             screen.update(name="ConfigKruxInstaller", key="mock", value="pt_BR.UTF-8")
 
         self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()

@@ -35,20 +35,32 @@ for f in os.listdir(I18N_DIRNAME):
     i18n_file = os.path.join(I18N_DIRNAME, f)
     if os.path.isfile(i18n_file):
         if re.findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
-            locale = f.split(".json")
-            I18N_LOCALES.append({"name": locale[0], "file": i18n_file})
+            _locale = f.split(".json")
+            I18N_LOCALES.append({"name": _locale[0], "file": i18n_file})
 
 a_i18n = Ai18n()
 a_i18n.locales = [name for name, file in I18N_LOCALES]
 
-for locale in I18N_LOCALES:
-    name = locale["name"]
-    file = locale["file"]
-    with open(file, mode="r", encoding="utf-8") as f:
+for _locale in I18N_LOCALES:
+    _name = _locale["name"]
+    _file = _locale["file"]
+    with open(_file, mode="r", encoding="utf-8") as f:
         data = json.loads(f.read())
         for screen, value in data.items():
             for word, translation in value.items():
-                a_i18n.add(k=word, message=translation, module=screen, locale=name)
+                a_i18n.add(k=word, message=translation, module=screen, locale=_name)
 
 
-T = a_i18n.translate
+# pylint: disable=invalid-name
+def T(msg: str, locale: str, module: str):
+    """Check if a translation exist and if exist, tranlsate it"""
+    found = False
+    for loc in I18N_LOCALES:
+        name = loc["name"]
+        if name == locale:
+            found = True
+
+    if not found:
+        raise ValueError(f"Locale '{locale}' not found in translations")
+
+    return a_i18n.translate(msg, locale=locale, module=module)

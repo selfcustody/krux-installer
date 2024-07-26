@@ -229,7 +229,7 @@ class MainScreen(BaseScreen):
 
                 elif instance.id == "main_settings":
                     self.set_background(wid="main_settings", rgba=(0, 0, 0, 1))
-                    App.get_running_app().open_settings()
+                    MainScreen.open_settings()
 
                 elif instance.id == "main_about":
                     self.set_background(wid="main_about", rgba=(0, 0, 0, 1))

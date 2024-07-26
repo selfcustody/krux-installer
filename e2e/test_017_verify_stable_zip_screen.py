@@ -13,8 +13,10 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_init(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_init(self, mock_get_locale):
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -34,17 +36,15 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         )
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.verify_stable_zip_screen.Sha256Verifyer")
     @patch("src.app.screens.verify_stable_zip_screen.Sha256CheckVerifyer")
-    def test_verify_sha256(
-        self, mock_check_verifyer, mock_verifyer, mock_get_running_app
-    ):
+    def test_verify_sha256(self, mock_check_verifyer, mock_verifyer, mock_get_locale):
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -54,17 +54,16 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         screen.verify_sha256(assets_dir="mockdir", version="v0.0.1")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
-
+        mock_get_locale.assert_called()
         mock_verifyer.assert_called_once_with(filename="mockdir/krux-v0.0.1.zip")
         mock_check_verifyer.assert_called_once_with(
             filename="mockdir/krux-v0.0.1.zip.sha256.txt"
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.verify_stable_zip_screen.SigVerifyer")
     @patch("src.app.screens.verify_stable_zip_screen.PemCheckVerifyer")
     @patch("src.app.screens.verify_stable_zip_screen.SigCheckVerifyer")
@@ -73,7 +72,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         mock_sig_check_verifyer,
         mock_pem_check_verifyer,
         mock_sig_verifyer,
-        mock_get_running_app,
+        mock_get_locale,
     ):
         screen = VerifyStableZipScreen()
         self.render(screen)
@@ -84,9 +83,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         screen.verify_signature(assets_dir="mockdir", version="v0.0.1")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
         mock_sig_check_verifyer.assert_called_once_with(
             filename="mockdir/krux-v0.0.1.zip.sig"
         )
@@ -101,8 +98,10 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_on_pre_enter(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_on_pre_enter(self, mock_get_locale):
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -122,12 +121,12 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         )
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.manager")
     @patch(
         "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.get_destdir_assets"
@@ -144,7 +143,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         mock_verify_sha256,
         mock_get_destdir_assets,
         mock_manager,
-        mock_get_running_app,
+        mock_get_locale,
     ):
         sha_text = "\n".join(
             [
@@ -194,9 +193,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         self.assertEqual(screen.ids["verify_stable_zip_screen_button"].text, full_text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
         mock_get_destdir_assets.assert_called_once()
         mock_manager.get_screen.assert_called_once_with("MainScreen")
         mock_verify_sha256.assert_called_once_with(
@@ -207,8 +204,10 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_invalid_name(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_invalid_name(self, mock_get_locale):
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -223,13 +222,13 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_key(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_key(self, mock_get_locale):
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -244,41 +243,40 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_locale(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_locale(self, mock_get_locale):
         screen = VerifyStableZipScreen()
+        old_loc = screen.locale
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
         # do tests
-        screen.update(name="ConfigKruxInstaller", key="locale", value="en_US.UTF-8")
+        screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
 
         # default assertions
-        self.assertEqual(screen.locale, "en_US.UTF-8")
+        self.assertEqual(screen.locale, "pt_BR.UTF-8")
+        self.assertFalse(screen.locale == old_loc)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch(
         "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_background"
     )
     def test_on_press_verify_stable_zip_screen_button(
-        self, mock_set_background, mock_get_running_app
+        self, mock_set_background, mock_get_locale
     ):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -292,15 +290,15 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         action(button)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
         mock_set_background.assert_called_once_with(
             wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch(
         "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_background"
     )
@@ -315,11 +313,9 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         mock_partial,
         mock_manager,
         mock_set_background,
-        mock_get_running_app,
+        mock_get_locale,
     ):
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
         screen = VerifyStableZipScreen()
         screen.success = True
@@ -335,9 +331,8 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         action(button)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
+
         # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_manager.get_screen.assert_has_calls(
@@ -383,7 +378,9 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch(
         "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_background"
     )
@@ -392,11 +389,8 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         self,
         mock_set_screen,
         mock_set_background,
-        mock_get_running_app,
+        mock_get_locale,
     ):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
         screen = VerifyStableZipScreen()
         screen.success = False
         self.render(screen)
@@ -411,9 +405,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         action(button)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
         # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")

@@ -13,8 +13,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_init(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_init(self, mock_get_locale):
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
 
@@ -33,13 +35,13 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(stack.children[0].id, f"{screen.id}_proceed_button")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_invalid_name(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_invalid_name(self, mock_get_locale):
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
 
@@ -54,13 +56,13 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_key(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_fail_update_key(self, mock_get_locale):
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
 
@@ -75,13 +77,13 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_locale(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_locale(self, mock_get_locale):
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
 
@@ -95,16 +97,16 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_version(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_version(self, mock_get_locale):
         attrs = {"get.side_effect": ["en-US.UTF8", "mockdir"]}
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.configure_mock(**attrs)
+        mock_get_locale.config = MagicMock()
+        mock_get_locale.config.configure_mock(**attrs)
 
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
@@ -152,19 +154,18 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.ids[f"{screen.id}_label"].text, label_text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")],
-            any_order=True,
-        )
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch(
         "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
     )
-    def test_on_press_donwload_button(self, mock_set_background, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+    def test_on_press_donwload_button(self, mock_set_background, mock_get_locale):
+        mock_get_locale.config = MagicMock()
+        mock_get_locale.config.get = MagicMock(return_value="en-US")
 
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
@@ -179,16 +180,18 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_set_background.assert_called_once_with(
             wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
         )
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch(
         "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
     )
-    def test_on_press_proceed_button(self, mock_set_background, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+    def test_on_press_proceed_button(self, mock_set_background, mock_get_locale):
+        mock_get_locale.config = MagicMock()
+        mock_get_locale.config.get = MagicMock(return_value="en-US")
 
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
@@ -203,10 +206,12 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_set_background.assert_called_once_with(
             wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
         )
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch(
         "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
     )
@@ -225,12 +230,12 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_partial,
         mock_manager,
         mock_set_background,
-        mock_get_running_app,
+        mock_get_locale,
     ):
 
         mock_manager.get_screen = MagicMock()
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+        mock_get_locale.config = MagicMock()
+        mock_get_locale.config.get = MagicMock(return_value="en-US")
 
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
@@ -243,11 +248,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action(button)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")],
-            any_order=True,
-        )
-
+        mock_get_locale.assert_called()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_manager.get_screen.assert_has_calls(
             [call("MainScreen"), call("DownloadStableZipScreen")]
@@ -271,7 +272,9 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch(
         "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
     )
@@ -279,11 +282,11 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_screen"
     )
     def test_on_release_proceed(
-        self, mock_set_screen, mock_set_background, mock_get_running_app
+        self, mock_set_screen, mock_set_background, mock_get_locale
     ):
 
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+        mock_get_locale.config = MagicMock()
+        mock_get_locale.config.get = MagicMock(return_value="en-US")
 
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
@@ -296,10 +299,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action(button)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")],
-            any_order=True,
-        )
+        mock_get_locale.assert_called()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(
             name="VerifyStableZipScreen", direction="right"

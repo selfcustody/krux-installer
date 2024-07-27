@@ -51,6 +51,8 @@ coverage = ["coverage-unit", "coverage-e2e"]
 patch-nix = "sh .ci/patch-pyinstaller-kivy-hook.sh"
 patch-win = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1"
 
+clean-mac = "find . -name '.DS_Store' -delete"
+
 build = "python .ci/build.py"
 
 lint.sequence = [

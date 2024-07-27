@@ -27,73 +27,73 @@ from os import listdir
 from os.path import join, isfile
 from pathlib import Path
 from platform import system
-import PyInstaller.__main__
+from PyInstaller import __main__ as pyinstaller
 
-SYSTEM = system()
-# build executable for following systems
-if SYSTEM not in ("Linux", "Windows", "Darwin"):
-    raise OSError(f"OS '{system()}' not implemented")
+if __name__ == "__main__":
+    SYSTEM = system()
 
-# Get root path to properly setup
-ROOT_PATH = Path(__file__).parent.parent.absolute()
-PYNAME = "krux-installer"
-PYFILE = f"{PYNAME}.py"
-KFILE = str(ROOT_PATH / PYFILE)
-ASSETS = str(ROOT_PATH / "assets")
-ICON = join(ASSETS, "icon.png")
-I18NS = str(ROOT_PATH / "src" / "i18n")
+    # build executable for following systems
+    if SYSTEM not in ("Linux", "Windows", "Darwin"):
+        raise OSError(f"OS '{system()}' not implemented")
 
-BUILDER_ARGS = []
+    # Get root path to properly setup
+    DIR = Path(__file__).parents
+    ROOT_PATH = Path(__file__).parent.parent.absolute()
+    PYNAME = "krux-installer"
+    PYFILE = f"{PYNAME}.py"
+    KFILE = str(ROOT_PATH / PYFILE)
+    ASSETS = str(ROOT_PATH / "assets")
+    ICON = join(ASSETS, "icon.png")
+    I18NS = str(ROOT_PATH / "src" / "i18n")
 
-# Necessary for get version and
-# another infos in application
-BUILDER_ARGS.append("--add-data=pyproject.toml:.")
-
-# For darwin system, will be necessary
-# to add a hidden import for ssl
-# (necessary for request module)
-if SYSTEM in ("Darwin"):
-    BUILDER_ARGS.append("--hidden-import=ssl")
-
-# some assets 
-for f in listdir(ASSETS):
-    img_abs = join(ASSETS, f)
-    if isfile(img_abs):
-        BUILDER_ARGS.append(f"--add-data={img_abs}:assets")
-        
-# Add i18n translations
-for f in listdir(I18NS):
-    i18n_abs = join(I18NS, f)
-    i18n_rel = join("src", "i18n")
-    if isfile(i18n_abs):
-        if findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
-            BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
+    BUILDER_ARGS = [ f"{PYNAME}.py" ]
 
 
-# The application has window
-BUILDER_ARGS.append("--windowed")
+    # The application has window
+    BUILDER_ARGS.append("--windowed")
 
-# Tha application is a GUI
-BUILDER_ARGS.append("--onefile")
-
-# Some important infos
-BUILDER_ARGS.append(f"--name={PYNAME}")
-BUILDER_ARGS.append(f"--icon={ICON}")
-
-# Specifics about operational system
-# on how will behave as file or bundled app
-if SYSTEM in ("Windows", "Darwin"):
-    BUILDER_ARGS.append("--noconsole")
-    
-elif SYSTEM in ("Linux"):
+    # Tha application is a GUI
     BUILDER_ARGS.append("--onefile")
 
+    # Some important infos
+    BUILDER_ARGS.append(f"--name={PYNAME}")
+    BUILDER_ARGS.append(f"--icon={ICON}")
 
-# Add which python file will be bundled
-BUILDER_ARGS.append(PYFILE)
+    # Specifics about operational system
+    # on how will behave as file or bundled app
+    if SYSTEM in ("Windows", "Darwin"):
+        BUILDER_ARGS.append("--noconsole")
+    
+    elif SYSTEM in ("Linux"):
+        BUILDER_ARGS.append("--onefile")
+    
+    # For darwin system, will be necessary
+    # to add a hidden import for ssl
+    # (necessary for request module)
+    if SYSTEM in ("Darwin"):
+        BUILDER_ARGS.append("--hidden-import=ssl")
 
-print("RUN pyinstaller " + " \\\n ".join(BUILDER_ARGS))
-print()
+    # Necessary for get version and
+    # another infos in application
+    BUILDER_ARGS.append("--add-data=pyproject.toml:.")
+    
+    # some assets 
+    for f in listdir(ASSETS):
+        img_abs = join(ASSETS, f)
+        if isfile(img_abs):
+            if img_abs.endswith("png") or img_abs.endswith("gif"):
+                BUILDER_ARGS.append(f"--add-data={img_abs}:assets")                
+        
+    # Add i18n translations
+    for f in listdir(I18NS):
+        i18n_abs = join(I18NS, f)
+        i18n_rel = join("src", "i18n")
+        if isfile(i18n_abs):
+            if findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
+                BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
 
-# Now build
-PyInstaller.__main__.run(BUILDER_ARGS)
+    print("pyinstaller " + " \\\n ".join(BUILDER_ARGS))
+    print()
+
+    # Now build
+    pyinstaller.run(BUILDER_ARGS)

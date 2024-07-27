@@ -201,10 +201,11 @@ jobs:
           brew install create-dmg
           brew reinstall openssl@3
           brew unlink openssl@3 && brew link openssl@3
-          OPENSSL_MAJOR_VERSION=`$(which openssl) -version | awk '{ print $2}' | cut -d . -f1` 
-          OPENSSL_FULL_VERSION=`$(which openssl) -version | awk ' { print $2}'`
-          OPENSSL_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VESION/${OPENSSL_FULL_VERSION}"
-          echo "dyld-path=${OPENSSL_PATH}/lib:${DYLD_LIBRARY_PATH}" >> $GITHUB_OUTPUT
+          #OPENSSL_MAJOR_VERSION=`$(which openssl) -version | awk '{ print $2}' | cut -d . -f1` 
+          OPENSSL_FULL_VERSION=`$(which openssl) -version | awk '{ print $2}'`
+          OPENSSL_PATH="/opt/homebrew/Cellar/openssl@3/${OPENSSL_FULL_VERSION}"
+          # check OPENSSL PATH
+          echo "dyld-path=${OPENSSL_PATH}/lib" >> $GITHUB_OUTPUT
          
       - name: Install project and its dependencies
         run: poetry install
@@ -229,7 +230,9 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         env:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
-        run: poetry run poe build
+        run: |
+          poetry run poe clean-mac
+          poetry run poe build
         
       - name: Build dist (Windows)
         if: ${{ runner.os == 'Windows' }}

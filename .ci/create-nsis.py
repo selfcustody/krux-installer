@@ -26,7 +26,10 @@ parser.add_argument("-i", "--icon", help="The icon path of your application")
 parser.add_argument("-I", "--asset", action="append", help="The name of asset and the path in form of name:path")
 
 def escape(message: str) -> str:
-    return message.replace("/", "\\")
+    if platform.system() == "Windows":
+        return message.replace("/", "\\")
+    else:
+        return message
 
 def make_headers(args: Namespace) -> str:
     return "\n".join([
@@ -39,13 +42,13 @@ def make_headers(args: Namespace) -> str:
 
 def make_defines(args: Namespace) -> str:
     version = args.app_version.split(".")
-    install_size = os.path.getsize(args.binary)
-    install_size += os.path.getsize(args.icon)
-    install_size += os.path.getsize(args.license)
-
     binary = escape(args.binary)
     license = escape(args.license)
     icon = escape(args.icon)
+    install_size = os.path.getsize(binary)
+    install_size += os.path.getsize(icon)
+    install_size += os.path.getsize(license)
+
     text = [
         ";--------------------------------",
         "; Custom define",
@@ -69,12 +72,7 @@ def make_defines(args: Namespace) -> str:
             _asset = asset.split(":")
             _asset_name = _asset[0]
             _asset_rev = escape(_asset[1])
-
-            if platform.system() == "Windows":
-                install_size += os.path.getsize(_asset_rev)
-            else:
-                install_size += os.path.getsize(_asset[1])
-            
+            install_size += os.path.getsize(_asset_rev)
             text.append(f"!define APP_ASSET_{_asset_name.upper()} \"{_asset_rev}\"")
 
     text.append(f"!define APP_INSTALL_SIZE {install_size}")

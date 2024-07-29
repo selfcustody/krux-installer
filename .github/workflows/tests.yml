@@ -272,31 +272,32 @@ jobs:
           $name = poetry run python -c 'from src.utils.constants import get_name; print(get_name())'
           $version = poetry run python -c 'from src.utils.constants import get_version; print(get_version())'
           $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
-          poetry run python .ci/create-nsis.py \
-            --app-name "$name" \
-            --app-binary ./dist/krux-installer.exe \
-            --app-organization-name selfcustody \
-            --app-version $version \
-            --app-description "\"$description\"" \
-            --app-license-path ./LICENSE \
-            --app-help-url https://t.me/SC_Krux \
-            --app-update-url https://github.com/selfcustody/krux/releases \
-            --app-about-url https://selfcustody.github.io/krux \
-            --app-icon-path ./asseets/icon.ico \
-            --app-add-asset done ./assets/done.png \
-            --app-add-asset error ./assets/error.png \
-            --app-add-asset load ./assets/load.gif \
-            --app-add-asset logo ./assets/logo.png \
-            --app-add-asset icon ./assets/icon.png \
-            --app-add-asset warn ./assets/warning.png \
-            --app-add-asset done ./assets/done.png \
-            --app-add-asset en_US ./src/i18n/af_AZ.UTF-8.json \
-            --app-add-asset en_US ./src/i18n/en_US.UTF-8.json \
-            --app-add-asset en_US ./src/i18n/es_ES.UTF-8.json \
-            --app-add-asset en_US ./src/i18n/fr_FR.UTF-8.json \
-            --app-add-asset en_US ./src/i18n/it_IT.UTF-8.json \
-            --app-add-asset en_US ./src/i18n/pt_BR.UTF-8.json \
-            --app-add-asset en_US ./src/i18n/ru_RU.UTF-8.json | OutFile -FilePath ".\release\$name.nsi" -Encoding utf8
+          $params = @()
+          $params += "--name \"$name\""
+          $params += "--binary ./dist/krux-installer.exe"
+          $params += "--organization selfcustody"
+          $params += "--app-version $version"
+          $params += "--description "\"$description\""
+          $params += "--license-path ./LICENSE"
+          $params += "--help-url \"https:\/\/t.me\/SC_Krux\"" 
+          $params += "--update-url \"https:\/\/github.com\/selfcustody\/krux\/releases\""
+          $params += "--about-url \"https:\/\/selfcustody.github.io\/krux\""
+          $params += "--icon .\asseets\icon.ico"
+          $params += "--asset done .\assets\done.png"
+          $params += "--asset error .\assets\error.png"
+          $params += "--asset load .\assets\load.gif"
+          $params += "--asset logo .\assets\logo.png"
+          $params += "--asset icon .\assets\icon.png"
+          $params += "--asset warn .\assets\warning.png"
+          $params += "--asset done .\assets\done.png"
+          $params += "--asset en_US .\src\i18n\af_AZ.UTF-8.json"
+          $params += "--asset en_US .\src\i18n\en_US.UTF-8.json"
+          $params += "--asset en_US .\src\i18n\es_ES.UTF-8.json"
+          $params += "--asset en_US .\src\i18n\fr_FR.UTF-8.json"
+          $params += "--asset en_US .\src\i18n\it_IT.UTF-8.json"
+          $params += "--asset en_US .\src\i18n\pt_BR.UTF-8.json"
+          $params += "--asset en_US .\src\i18n\ru_RU.UTF-8.json"
+          & poetry run python @params | OutFile -FilePath ".\release\$name.nsi" -Encoding utf8
           makensis.exe ".\release\$name.nsi"
           echo "release-win=$name Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
             

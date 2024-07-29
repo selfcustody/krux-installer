@@ -11,17 +11,17 @@ parser = ArgumentParser(
     usage="create-nsis [...options] | Out-File -FilePath <path> -Encoding utf8 "
 )
 
-parser.add_argument("-a", "--app-name", help="The name of your app")
-parser.add_argument("-b", "--app-binary", help="The path of your app")
-parser.add_argument("-o", "--app-organization-name", help="The name of your organization")
-parser.add_argument("-d", "--app-description", help="The application description")
+parser.add_argument("-a", "--name", help="The name of your app")
+parser.add_argument("-b", "--binary", help="The path of your app")
+parser.add_argument("-o", "--organization", help="The name of your organization")
+parser.add_argument("-d", "--description", help="The application description")
 parser.add_argument("-V", "--app-version", help="The version of your application o x.y.z form")
-parser.add_argument("-l", "--app-license-path", help="The path of your application license")
-parser.add_argument("-H", "--app-help-url", help="The application help URL")
-parser.add_argument("-u", "--app-update-url", help="The application update url")
-parser.add_argument("-A", "--app-about-url", help="The application about URL")
-parser.add_argument("-i", "--app-icon-path", help="The icon path of your application")
-parser.add_argument("-I", "--app-add-asset", help="the name of asset and the path to be added. Example: -I <name> <path>. Can be used multiple times", action="append", nargs=2, metavar=("name", "path"))
+parser.add_argument("-l", "--license-path", help="The path of your application license")
+parser.add_argument("-H", "--help-url", help="The application help URL")
+parser.add_argument("-u", "--update-url", help="The application update url")
+parser.add_argument("-A", "--about-url", help="The application about URL")
+parser.add_argument("-i", "--icon", help="The icon path of your application")
+parser.add_argument("-I", "--asset", help="The name of asset and the path to be added. Can be used multiple times", action="append", nargs=2, metavar=("name", "path"))
 
 def make_headers(args: Namespace) -> str:
     return "\n".join([

@@ -273,7 +273,7 @@ jobs:
           $name = poetry run python -c 'from src.utils.constants import get_name; print(get_name())'
           $version = poetry run python -c 'from src.utils.constants import get_version; print(get_version())'
           $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
-          poetry run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d '$description' -l .\LICENSE -H 'https:\/\/t.me\/SC_Krux' -u 'https:\/\/github.com\/selfcustody\/krux\/releases' -a 'https:\/\/selfcustody.github.io\/krux' -i .\assets\icon.ico -O .
+          poetry run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d '$description' -l .\LICENSE -H 'https://t.me/SC_Krux' -u 'https://github.com/selfcustody/krux/releases' -a 'https://selfcustody.github.io/krux' -i .\assets\icon.ico -O .
           Get-Content -Path \.krux-installer.nsi
           makensis.exe .\krux-installer.nsi
           Move-Item -Path ".\krux-installer Setup.exe" -Destination ".\release\krux-installer_v$version Setup.exe"

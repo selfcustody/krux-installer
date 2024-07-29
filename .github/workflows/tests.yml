@@ -274,7 +274,7 @@ jobs:
           $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
           $params = @()
           $params += "-a '$name'"
-          $params += "-b .\dist\krux-installer.exe"
+          $params += "-b '.\dist\$name.exe'"
           $params += "-o selfcustody"
           $params += "-V $version"
           $params += "-d '$description'"

@@ -45,9 +45,9 @@ def make_defines(args: Namespace) -> str:
     binary = escape(args.binary)
     license = escape(args.license)
     icon = escape(args.icon)
-    install_size = os.path.getsize(binary)
-    install_size += os.path.getsize(icon)
-    install_size += os.path.getsize(license)
+    install_size = os.path.getsize(args.binary)
+    install_size += os.path.getsize(args.icon)
+    install_size += os.path.getsize(args.license)
 
     text = [
         ";--------------------------------",

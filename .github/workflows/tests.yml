@@ -251,7 +251,6 @@ jobs:
           sh .ci/create-deb.sh --app-name "${NAME}" --output-dir ./release --version $VER --architecture amd64 --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description "${DESC}" --binary "./dist/${NAME}" --icon ./assets/icon.png
           echo "release-deb=${NAME}_${VER}_amd64.deb" >> $GITHUB_OUTPUT
       
-        
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}
         id: release-macos
@@ -262,6 +261,44 @@ jobs:
           mkdir -p ./release
           create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
           echo "release-dmg=${NAME}_${VER}_${ARCH}.dmg" >> $GITHUB_OUTPUT
+
+      - name: Build release NSIS (Windows)
+        if: ${{ runner.os == "Windows" }}
+        shell: pwsh
+        run: |
+          choco --yes install nsis 
+          New-Item ".\release" -Type Directory
+          $name = poetry run python -c 'from src.utils.constants import get_name; print(get_name())'
+          $version = poetry run python -c 'from src.utils.constants import get_version; print(get_version())'
+          $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
+          poetry run python .ci/create-nsis.py \
+            --app-name "$name" \
+            --app-binary ./dist/krux-installer.exe \
+            --app-organization-name selfcustody \
+            --app-version $version \
+            --app-description "\"$description\"" \
+            --app-license-path ./LICENSE \
+            --app-help-url https://t.me/SC_Krux \
+            --app-update-url https://github.com/selfcustody/krux/releases \
+            --app-about-url https://selfcustody.github.io/krux \
+            --app-icon-path ./asseets/icon.ico \
+            --app-add-asset done ./assets/done.png \
+            --app-add-asset error ./assets/error.png \
+            --app-add-asset load ./assets/load.gif \
+            --app-add-asset logo ./assets/logo.png \
+            --app-add-asset icon ./assets/icon.png \
+            --app-add-asset warn ./assets/warning.png \
+            --app-add-asset done ./assets/done.png \
+            --app-add-asset en_US ./src/i18n/af_AZ.UTF-8.json \
+            --app-add-asset en_US ./src/i18n/en_US.UTF-8.json \
+            --app-add-asset en_US ./src/i18n/es_ES.UTF-8.json \
+            --app-add-asset en_US ./src/i18n/fr_FR.UTF-8.json \
+            --app-add-asset en_US ./src/i18n/it_IT.UTF-8.json \
+            --app-add-asset en_US ./src/i18n/pt_BR.UTF-8.json \
+            --app-add-asset en_US ./src/i18n/ru_RU.UTF-8.json | OutFile -FilePath ".\release\$name.nsi"
+          makensis.exe ".\release\$name.nsi"
+            
+
           
       - name: Hash (Linux)
         if: ${{ runner.os == 'Linux' }}

@@ -238,9 +238,7 @@ jobs:
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
-        run: |
-          poetry run poe build
-          Get-ChildItem -Path .\dist\
+        run: poetry run poe build
           
       - name: Build release deb amd64 (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -269,13 +267,13 @@ jobs:
         id: release-windows
         shell: pwsh
         run: |
+          Get-ChildItem -Path .\dist\
           choco --yes install nsis 
           New-Item ".\release" -Type Directory
           $name = poetry run python -c 'from src.utils.constants import get_name; print(get_name())'
-          $binary = '.\dist\$name.exe'
           $version = poetry run python -c 'from src.utils.constants import get_version; print(get_version())'
           $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
-          poetry run python .ci/create-nsis.py -a $name -b $binary -o selfcustody -V $version -d '$description' -l .\LICENSE -H 'https:\/\/t.me\/SC_Krux' -u 'https:\/\/github.com\/selfcustody\/krux\/releases' -a 'https:\/\/selfcustody.github.io\/krux' -i .\assets\icon.ico |  Out-File -FilePath ".\$name.nsi" -Encoding utf8
+          poetry run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d '$description' -l .\LICENSE -H 'https:\/\/t.me\/SC_Krux' -u 'https:\/\/github.com\/selfcustody\/krux\/releases' -a 'https:\/\/selfcustody.github.io\/krux' -i .\assets\icon.ico |  Out-File -FilePath ".\$name.nsi" -Encoding utf8
           Get-Content -Path ".\$name.nsi"
           makensis.exe ".\$name.nsi"
           Move-Item -Path ".\$name Setup.exe" -Destination ".\release\$name Setup.exe"

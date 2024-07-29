@@ -52,7 +52,7 @@ def make_defines(args: Namespace) -> str:
         "; Custom define",
         f"!define APP_NAME {args.name}",
         f"!define ORG_NAME {args.organization}",
-	    f"!define APP_DESC {args.description}",
+	    f"!define APP_DESC \"{args.description}\"",
 	    f"!define APP_BINARY \"{binary}\"",
 	    f"!define APP_VERSION_MAJOR {version[0]}",
 	    f"!define APP_VERSION_MINOR {version[1]}",

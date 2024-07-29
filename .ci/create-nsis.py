@@ -19,9 +19,6 @@ parser.add_argument("-o", "--organization", help="The name of your organization"
 parser.add_argument("-d", "--description", help="The application description")
 parser.add_argument("-V", "--app-version", help="The version of your application o x.y.z form")
 parser.add_argument("-l", "--license", help="The path of your application license")
-parser.add_argument("-H", "--help-url", help="The application help URL")
-parser.add_argument("-u", "--update-url", help="The application update url")
-parser.add_argument("-A", "--about-url", help="The application about URL")
 parser.add_argument("-i", "--icon", help="The icon path of your application")
 parser.add_argument("-I", "--asset", action="append", help="The name of asset and the path in form of name:path")
 parser.add_argument("-O", "--output", help="The folder where the the NSIS script will be put")
@@ -61,9 +58,6 @@ def make_defines(args: Namespace) -> str:
 	    f"!define APP_VERSION_MINOR {version[1]}",
 	    f"!define APP_VERSION_BUILD {version[2]}",
 	    f"!define APP_SLUG \"{args.name} v{args.app_version}\"",
-        f"!define APP_HELP_URL \"{args.help_url}\"",
-        f"!define APP_UPDATE_URL \"{args.help_url}\"",
-        f"!define APP_ABOUT_URL \"{args.about_url}\"",
         f"!define APP_LICENSE \"{license}\"",
         f"!define APP_ICON \"{icon}\"",
     ]
@@ -219,9 +213,6 @@ def make_install_section(args: Namespace) -> str:
         "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"InstallLocation\" \"$\\\"$INSTDIR$\\\"\"",
         "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"DisplayIcon\" \"$\\\"$INSTDIR\\${APP_ICON}$\\\"\"",
         "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"Publisher\" \"$\\\"${ORG_NAME}$\\\"\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"HelpLink\" \"$\\\"${APP_HELP_URL}$\\\"\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"URLUpdateInfo\" \"$\\\"${APP_UPDATE_URL}$\\\"\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"URLInfoAbout\" \"$\\\"${APP_ABOUT_URL}$\\\"\"",
         "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"DisplayVersion\" \"$\\\"${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_BUILD}$\\\"\"",
         "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"VersionMajor\" ${APP_VERSION_MAJOR}",
         "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"VersionMinor\" ${APP_VERSION_MINOR}",

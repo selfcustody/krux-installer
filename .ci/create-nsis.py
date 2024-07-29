@@ -2,6 +2,8 @@
 # https://github.com/Thiagojm/NSIS-Script-Maker-for-Windows-/blob/main/nsis_template.txt
 # https://gist.github.com/mattiasghodsian/a30f50568792939e35e93e6bc2084c2a
 import os
+import re
+import platform
 from argparse import ArgumentParser, Namespace
 from sys import set_coroutine_origin_tracking_depth
 
@@ -16,45 +18,66 @@ parser.add_argument("-b", "--binary", help="The path of your app")
 parser.add_argument("-o", "--organization", help="The name of your organization")
 parser.add_argument("-d", "--description", help="The application description")
 parser.add_argument("-V", "--app-version", help="The version of your application o x.y.z form")
-parser.add_argument("-l", "--license-path", help="The path of your application license")
+parser.add_argument("-l", "--license", help="The path of your application license")
 parser.add_argument("-H", "--help-url", help="The application help URL")
 parser.add_argument("-u", "--update-url", help="The application update url")
 parser.add_argument("-A", "--about-url", help="The application about URL")
 parser.add_argument("-i", "--icon", help="The icon path of your application")
-parser.add_argument("-I", "--asset", help="The name of asset and the path to be added. Can be used multiple times", action="append", nargs=2, metavar=("name", "path"))
+parser.add_argument("-I", "--asset", action="append", help="The name of asset and the path in form of name:path")
+
+def escape(message: str) -> str:
+    return message.replace("/", "\\")
 
 def make_headers(args: Namespace) -> str:
     return "\n".join([
+        ";--------------------------------",
+        "; Main header",
         "!include \"MUI2.nsh\"",
         "",
+        ""
     ])
 
 def make_defines(args: Namespace) -> str:
     version = args.app_version.split(".")
-    install_size = os.path.getsize(args.app_binary)
+    install_size = os.path.getsize(args.binary)
+    install_size += os.path.getsize(args.icon)
+    install_size += os.path.getsize(args.license)
+
+    binary = escape(args.binary)
+    license = escape(args.license)
+    icon = escape(args.icon)
     text = [
         ";--------------------------------",
         "; Custom define",
-        f"!define APP_NAME {args.app_name}",
-        f"!define ORG_NAME {args.app_organization_name}",
-	    f"!define APP_DESC {args.app_description}",
-	    f"!define APP_BINARY {args.app_binary}",
+        f"!define APP_NAME {args.name}",
+        f"!define ORG_NAME {args.organization}",
+	    f"!define APP_DESC {args.description}",
+	    f"!define APP_BINARY \"{binary}\"",
 	    f"!define APP_VERSION_MAJOR {version[0]}",
 	    f"!define APP_VERSION_MINOR {version[1]}",
 	    f"!define APP_VERSION_BUILD {version[2]}",
-	    f"!define APP_SLUG \"{args.app_name} v{args.app_version}\"",
-        f"!define APP_HELP_URL \"{args.app_help_url}\"",
-        f"!define APP_UPDATE_URL \"{args.app_help_url}\"",
-        f"!define APP_ABOUT_URL \"{args.app_about_url}\"",
-        f"!define APP_INSTALL_SIZE {install_size}",
-        f"!define APP_LICENSE \"{args.app_license_path}\"",
-        f"!define APP_ICON \"{args.app_icon_path}\"",
+	    f"!define APP_SLUG \"{args.name} v{args.app_version}\"",
+        f"!define APP_HELP_URL \"{args.help_url}\"",
+        f"!define APP_UPDATE_URL \"{args.help_url}\"",
+        f"!define APP_ABOUT_URL \"{args.about_url}\"",
+        f"!define APP_LICENSE \"{license}\"",
+        f"!define APP_ICON \"{icon}\"",
     ]
 
-    for asset in args.app_add_asset:
-        asset_rev = asset[1].replace("/", "\\")
-        text.append(f"!define APP_ASSET_{asset[0].upper()} \"{asset_rev}\"")
+    if args.asset is not None and len(args.asset) > 0:
+        for asset in args.asset:
+            _asset = asset.split(":")
+            _asset_name = _asset[0]
+            _asset_rev = escape(_asset[1])
 
+            if platform.system() == "Windows":
+                install_size += os.path.getsize(_asset_rev)
+            else:
+                install_size += os.path.getsize(_asset[1])
+            
+            text.append(f"!define APP_ASSET_{_asset_name.upper()} \"{_asset_rev}\"")
+
+    text.append(f"!define APP_INSTALL_SIZE {install_size}")
     text.append("")
     text.append("")
     return "\n".join(text)
@@ -163,12 +186,15 @@ def make_install_section(args: Namespace) -> str:
         "",
         "\t; Files added here should be removed by the uninstaller (see section 'uninstall')",
         "\tFile /r \"${APP_BINARY}\"",
-        ""
     ])
 
     _text = []
-    for asset in args.app_add_asset:
-        _text.append("\tFile /r \"${APP_ASSET_" +asset[0].upper() + "}\"")
+    
+    if args.asset is not None and len(args.asset) > 0:
+        for asset in args.asset:
+            _asset = asset.split(":")
+            _asset_name = _asset[0].upper()
+            _text.append("\tFile /r \"${APP_ASSET_" +_asset_name + "}\"")
 
     text += "\n".join(_text)
 
@@ -259,7 +285,6 @@ def make_uninstaller(args: Namespace) -> str:
     ])
 
 args = parser.parse_args()
-args.app_icon_path = args.app_icon_path.replace("/", "\\")
 script = make_headers(args)
 script += make_defines(args)
 script += make_general(args)

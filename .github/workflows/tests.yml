@@ -297,7 +297,7 @@ jobs:
           $params += "-I it_IT .\src\i18n\it_IT.UTF-8.json"
           $params += "-I pt_BR .\src\i18n\pt_BR.UTF-8.json"
           $params += "-I ru_RU .\src\i18n\ru_RU.UTF-8.json"
-          & poetry run python @params | OutFile -FilePath ".\release\$name.nsi" -Encoding utf8
+          & poetry run python @params | Out-File -FilePath ".\release\$name.nsi" -Encoding utf8
           makensis.exe ".\release\$name.nsi"
           echo "release-win=$name Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
             

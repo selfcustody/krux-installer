@@ -24,6 +24,7 @@ parser.add_argument("-u", "--update-url", help="The application update url")
 parser.add_argument("-A", "--about-url", help="The application about URL")
 parser.add_argument("-i", "--icon", help="The icon path of your application")
 parser.add_argument("-I", "--asset", action="append", help="The name of asset and the path in form of name:path")
+parser.add_argument("-O", "--output", help="The folder where the the NSIS script will be put")
 
 def escape(message: str) -> str:
     if platform.system() == "Windows":
@@ -292,4 +293,23 @@ script += make_on_init(args)
 script += make_pages(args)
 script += make_install_section(args)
 script += make_uninstaller(args)
-print(script)
+
+try:
+    file = os.path.join(args.output, f"{args.name}.nsi")
+    
+    with open(file, mode="w", encoding="utf-8") as nsis_script:
+        nsis_script.write(make_headers(args))
+        nsis_script.write(make_defines(args))
+        nsis_script.write(make_general(args))
+        nsis_script.write(make_ui(args))
+        nsis_script.write(make_macro_verify_user_is_admin(args))
+        nsis_script.write(make_on_init(args))
+        nsis_script.write(make_pages(args))
+        nsis_script.write(make_install_section(args))
+        nsis_script.write(make_uninstaller(args))
+        
+    print(f"{file} created")
+
+except Exception as err:
+    print(err)
+    

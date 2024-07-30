@@ -198,7 +198,7 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         id: setup-linux
         run: |
-          apt-get install rpm
+          sudo apt-get install rpm
           mkdir -p ./release
           NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
           VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"

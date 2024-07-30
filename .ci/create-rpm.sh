@@ -156,28 +156,29 @@ ${description}
 %prep
 %setup -q
 
+%files
+%{_bindir}/%{name}
+%{_datarootdir}/applications/%{name}.desktop
+%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png"
+
 %install
-rm -rf \$RPM_BUILD_ROOT
 mkdir -p \$RPM_BUILD_ROOT/%{_bindir}
+mkdir -p \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}
 mkdir -p \$RPM_BUILD_ROOT/%{_datarootdir}/icons/highcolor/512x512/apps
+mkdir -p \$RPM_BUILD_ROOT/%{_datadir}/doc/%{name}
 cp %{name} \$RPM_BUILD_ROOT/%{_bindir}
 cp %{name}.png \$RPM_BUILD_ROOT/%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png
-rm -v %{_datarootdir}/applications/%{name}.desktop
-echo "Creating %{_datarootdir}/applications/%{name}.desktop"
-echo "[Desktop Entry]" > %{_datarootdir}/applications/%{name}.desktop
-echo "Encoding=UTF-8" >> %{_datarootdir}/applications/%{name}.desktop
-echo "Version=%{version}" >> %{_datarootdir}/applications/%{name}.desktop
-echo "Type=Application" >> %{_datarootdir}/applications/%{name}.desktop
-echo "Terminal=false" >> %{_datarootdir}/applications/%{name}.desktop
-echo "Exec=/%{_bindir}/%{name}" >> %{_datarootdir}/applications/%{name}.desktop
-echo "Name=%{name}" %{_datarootdir}/applications/%{name}.desktop
-echo "Icon=%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png" %{_datarootdir}/applications/%{name}.desktop
+echo "[Desktop Entry]" > \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+echo "Encoding=UTF-8" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+echo "Version=%{version}" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+echo "Type=Application" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+echo "Terminal=false" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+echo "Exec=/%{_bindir}/%{name}" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+echo "Name=%{name}" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+echo "Icon=%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
 
 %clean
 rm -rf \$RPM_BUILD_ROOT
-
-%files
-%{_bindir}/%{name}
 
 %changelog
 * $(LC_ALL=en_US.utf8 date +'%a %b %d %Y') ${maintainer_name} <${maintainer_email}> - ${version}-1

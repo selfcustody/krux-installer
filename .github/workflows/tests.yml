@@ -280,7 +280,7 @@ jobs:
           VERSION: ${{ steps.setup-linux.outputs.version }}
           DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
         run: |
-          RPM_VERSION=${VERSION/-/_}
+          RPM_VERSION=$(sed -e 's/-/_/g' <<< $VERSION)
           sh .ci/create-rpm.sh \
             -a "${NAME}" \
             -o ./release \

@@ -1,3 +1,9 @@
+# 0.0.2-alpha-1
+
+- Major updates dependencies:
+  - code refactoration from `nodejs` to `python`;
+  - build project from `electron` to `kivy`
+
 # 0.0.1
 
 - Major updates dependencies:

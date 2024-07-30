@@ -193,7 +193,20 @@ jobs:
         if: ${{ matrix.arch == 'arm64' }}
         with:
           python-version: '3.12'
-         
+
+      - name: Setup (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        id: setup-linux
+        run: |
+          apt-get install rpm
+          mkdir -p ./release
+          NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
+          VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
+          DESC="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
+          echo "name=${NAME}" >> $GITHUB_OUTPUT
+          echo "version=${VER}" >> $GITHUB_OUTPUT
+          echo "description=${DESC}" >> $GITHUB_OUTPUT
+      
       - name: Setup (MacOS)
         if: ${{ runner.os == 'macOS' }}
         id: setup-macos
@@ -204,7 +217,6 @@ jobs:
           #OPENSSL_MAJOR_VERSION=`$(which openssl) -version | awk '{ print $2}' | cut -d . -f1` 
           OPENSSL_FULL_VERSION=`$(which openssl) -version | awk '{ print $2}'`
           OPENSSL_PATH="/opt/homebrew/Cellar/openssl@3/${OPENSSL_FULL_VERSION}"
-          # check OPENSSL PATH
           echo "dyld-path=${OPENSSL_PATH}/lib" >> $GITHUB_OUTPUT
          
       - name: Install project and its dependencies
@@ -240,16 +252,44 @@ jobs:
           KIVY_GL_BACKEND: 'angle_sdl2'
         run: poetry run poe build
           
-      - name: Build release deb amd64 (Linux)
+      - name: Build release deb (Linux)
         if: ${{ runner.os == 'Linux' }}
-        id: release-linux
+        id: release-deb
+        env:
+          NAME: ${{ steps.setup-linux.outputs.name }}
+          VERSION: ${{ steps.setup-linux.outputs.version }}
+          DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
         run: |
-          mkdir -p ./release
-          NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
-          VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
-          DESC="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
-          sh .ci/create-deb.sh --app-name "${NAME}" --output-dir ./release --version $VER --architecture amd64 --maintainer-name qlrd --maintainer-email qlrddev@gmail.com --description "${DESC}" --binary "./dist/${NAME}" --icon ./assets/icon.png
-          echo "release-deb=${NAME}_${VER}_amd64.deb" >> $GITHUB_OUTPUT
+          sh .ci/create-deb.sh \
+            -a "${NAME}" \
+            -o ./release \
+            -v $VERSION \
+            -A amd64 \
+            -m qlrd \
+            -e qlrddev@gmail.com \
+            -d "${DESCRIPTION}" \
+            -b "./dist/${NAME}" \
+            -i ./assets/icon.png        
+          echo "pkg=${NAME}_${VER}_amd64.deb" >> $GITHUB_OUTPUT
+  
+      - name: Build release rpm (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        id: release-rpm
+        env:
+          NAME: ${{ steps.setup-linux.outputs.name }}
+          VERSION: ${{ steps.setup-linux.outputs.version }}
+          DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
+        run: |
+          sh .ci/create-rpm.sh \
+            -a "${NAME}" \
+            -o ./release \
+            -v $VERSION \
+            -m qlrd \
+            -e qlrddev@gmail.com \
+            -d "${DESCRIPTION}" \
+            -b "./dist/${NAME}" \
+            -i ./assets/icon.png
+          echo "pkg=${NAME}-${VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
       
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}
@@ -279,13 +319,22 @@ jobs:
           Move-Item -Path ".\krux-installer Setup.exe" -Destination ".\release\krux-installer_v$version Setup.exe"
           echo "release-nsis=krux-installer_v$version Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
             
-      - name: Hash (Linux)
+      - name: Hash (Linux deb)
         if: ${{ runner.os == 'Linux' }}
         uses: qlrd/sha256sum-action@v2
-        id: hash-linux
+        id: hash-deb
         with:
           working-directory: ./release
-          file: ${{ steps.release-linux.outputs.release-deb }}
+          file: ${{ steps.release-deb.outputs.pkg }}
+          ext: 'sha256.txt'
+          
+      - name: Hash (Linux rpm)
+        if: ${{ runner.os == 'Linux' }}
+        uses: qlrd/sha256sum-action@v2
+        id: hash-rpm
+        with:
+          working-directory: ./release
+          file: ${{ steps.release-rpm.outputs.pkg }}
           ext: 'sha256.txt'
           
       - name: Hash (MacOS)
@@ -306,14 +355,23 @@ jobs:
           file: ${{ steps.release-windows.outputs.release-nsis }}
           ext: 'sha256.txt'
 
-      - name: Upload artifacts (Linux)
+      - name: Upload artifact deb (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ steps.release-linux.outputs.release-deb }}
+          name: ${{ steps.release-deb.outputs.pkg }}
           path: |
-            ./release/${{ steps.build-linux.outputs.release-deb }}
-            ${{ steps.hash-linux.outputs.hash-file }}
+            ./release/${{ steps.release-deb.outputs.rpm }}
+            ${{ steps.hash-deb.outputs.hash-file }}
+      
+      - name: Upload artifact rpm (Linux)
+        if: ${{ runner.os == 'Linux' }}
+        uses: actions/upload-artifact@v4         
+        with:
+          name: ${{ steps.release-rpm.outputs.rpm }}
+          path: |
+            ./release/${{ steps.release-rpm.outputs.pkg }}
+            ${{ steps.hash-rpm.outputs.hash-file }}
             
       - name: Upload artifacts (MacOS)
         if: ${{ runner.os == 'macOS' }}

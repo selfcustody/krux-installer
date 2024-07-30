@@ -289,6 +289,7 @@ jobs:
             -m qlrd \
             -e qlrddev@gmail.com \
             -d "${DESCRIPTION}" \
+            -c ./CHANGELOG.md \
             -b "./dist/${NAME}" \
             -i ./assets/icon.png
           tree ./release

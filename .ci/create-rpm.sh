@@ -122,6 +122,7 @@ RELEASE=1
 RPM_NAME=${name}-${version}-${RELEASE}
 BUILD_PATH=${output_dir}/rpmbuild
 TAR_PATH=${output_dir}/$RPM_NAME
+CHANGELOG=$(cat $changelog)
 
 mkdir -v -p $RPM_NAME
 mkdir -v -p $BUILD_PATH/
@@ -148,7 +149,6 @@ BuildArch:      %{_arch}
 License:        MIT
 URL:            https://github.com/selfcustody/krux-installer
 Source0:        %{name}-%{version}-%{release}.tar.gz
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 ${description}
@@ -181,7 +181,7 @@ rm -rf \$RPM_BUILD_ROOT
 
 %changelog
 * $(LC_ALL=en_US.utf8 date +'%a %b %d %Y') ${maintainer_name} <${maintainer_email}> - ${version}-1
-$(cat $changelog)
+${CHANGELOG}
 
 %post
 echo ""

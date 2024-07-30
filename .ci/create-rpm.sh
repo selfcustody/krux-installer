@@ -118,7 +118,8 @@ done
 echo""
 
 # follow https://www.redhat.com/sysadmin/create-rpm-package
-RPM_NAME=${name}-${version}
+RELEASE=1
+RPM_NAME=${name}-${version}-${RELEASE}
 BUILD_PATH=${output_dir}/rpmbuild
 TAR_PATH=${output_dir}/$RPM_NAME
 
@@ -140,12 +141,14 @@ mv $RPM_NAME.tar.gz $BUILD_PATH/SOURCES
 cat <<EOF > $BUILD_PATH/SPECS/${name}.spec
 Name:           ${name}
 Version:        ${version}
-Release:        1%{?dist}
+Release:        ${RELEASE}%{?dist}
 Summary:        ${description}
+Group:          application
 BuildArch:      %{_arch}
 License:        MIT
 URL:            https://github.com/selfcustody/krux-installer
-Source0:        https://github.com/selfcustody/%{name}/releases/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{name}-%{version}-%{release}.tar.gz
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 %description
 ${description}

@@ -198,14 +198,14 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         id: setup-linux
         run: |
-          apt-get install rpm
+          sudo apt-get install rpm
           mkdir -p ./release
           NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
-          VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
-          DESC="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
+          VERSION="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
+          DESCRIPTION="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
           echo "name=${NAME}" >> $GITHUB_OUTPUT
-          echo "version=${VER}" >> $GITHUB_OUTPUT
-          echo "description=${DESC}" >> $GITHUB_OUTPUT
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "description=${DESCRIPTION}" >> $GITHUB_OUTPUT
       
       - name: Setup (MacOS)
         if: ${{ runner.os == 'macOS' }}

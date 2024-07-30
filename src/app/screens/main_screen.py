@@ -35,7 +35,10 @@ from src.i18n import T
 
 
 class MainScreen(BaseScreen):
-    """Main screen is the 'Home' page"""
+    """Main screen is the 'Home' page
+
+    .. versionadded:: 0.0.2-alpha-1
+    """
 
     def __init__(self, **kwargs):
         super().__init__(wid="main_screen", name="MainScreen", **kwargs)
@@ -308,7 +311,7 @@ class MainScreen(BaseScreen):
         ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(msg=f"Invalid screen name: {name}")
 
         # Check locale
         if key == "locale":
@@ -380,4 +383,4 @@ class MainScreen(BaseScreen):
             self.ids["main_about"].text = self.translate("About")
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(msg=f'Invalid key: "{key}"')

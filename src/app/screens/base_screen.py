@@ -227,6 +227,12 @@ class BaseScreen(Screen, Trigger):
         Clock.schedule_once(fn, 0)
         self.set_screen(name="ErrorScreen", direction="left")
 
+    def redirect_exception(self, exception: Exception):
+        screen = self.manager.get_screen("ErrorScreen")
+        fn = partial(screen.update, name=self.name, key="error", value=exception)
+        Clock.schedule_once(fn, 0)
+        self.set_screen(name="ErrorScreen", direction="left")
+
     @staticmethod
     def get_destdir_assets() -> str:
         app = App.get_running_app()

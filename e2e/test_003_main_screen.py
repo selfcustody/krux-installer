@@ -249,35 +249,35 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_fail_update_invalid_screen(self, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_invalid_screen(self, mock_redirect_error, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        screen.update(name="MockedScreen", key="device", value="v24.03.0")
 
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="MockedScreen", key="device", value="v24.03.0")
-
-        self.assertEqual(str(exc_info.exception), "Invalid screen name: MockedScreen")
         mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with(
+            msg="Invalid screen name: MockedScreen"
+        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_fail_update_invalid_key(self, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_invalid_key(self, mock_redirect_error, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="SelectDeviceScreen", key="mock", value="mock")
-
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
+        screen.update(name="SelectDeviceScreen", key="mock", value="mock")
         mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with(msg='Invalid key: "mock"')
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

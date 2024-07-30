@@ -81,9 +81,10 @@ class CheckInternetConnectionScreen(BaseScreen):
         if name in ("ConfigKruxInstaller", "CheckInternetConnectionScreen"):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen: {name}")
+            self.redirect_error(f"Invalid screen: {name}")
 
         if key == "locale":
+            # Setup
             self.locale = value
 
         elif key == "canvas":
@@ -105,14 +106,11 @@ class CheckInternetConnectionScreen(BaseScreen):
                 Clock.schedule_once(fn, 0)
                 self.set_screen(name="MainScreen", direction="left")
 
-            except Exception as exc_info:
-                screen = self.manager.get_screen("ErrorScreen")
-                fn = partial(screen.update, name=self.name, key="error", value=exc_info)
-                Clock.schedule_once(fn, 0)
-                self.set_screen(name="ErrorScreen", direction="left")
+            except Exception as exc:
+                self.redirect_exception(exception=exc)
 
         else:
-            raise ValueError(f"Invalid key: '{key}'")
+            self.redirect_error(f"Invalid key: '{key}'")
 
     def on_enter(self):
         """Simple update your canvas"""

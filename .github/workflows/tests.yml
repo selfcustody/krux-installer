@@ -293,7 +293,7 @@ jobs:
             -b "./dist/${NAME}" \
             -i ./assets/icon.png
           tree ./release
-          rpmbuild --define "_topdir $(pwd)/release/rpmbuild" ./release/rpmbuild/SPECS/$NAME.spec
+          rpmbuild -vv --define "_topdir $(pwd)/release/rpmbuild" ./release/rpmbuild/SPECS/$NAME.spec
           
           echo "pkg=${NAME}-${VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
       

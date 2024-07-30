@@ -198,7 +198,7 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         id: setup-linux
         run: |
-          sudo apt-get install rpm
+          sudo apt-get install tree rpm
           mkdir -p ./release
           NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
           VERSION="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
@@ -269,7 +269,8 @@ jobs:
             -e qlrddev@gmail.com \
             -d "${DESCRIPTION}" \
             -b "./dist/${NAME}" \
-            -i ./assets/icon.png        
+            -i ./assets/icon.png
+          tree ./release    
           echo "pkg=${NAME}_${VERSION}_amd64.deb" >> $GITHUB_OUTPUT
   
       - name: Build release rpm (Linux)
@@ -290,7 +291,9 @@ jobs:
             -d "${DESCRIPTION}" \
             -b "./dist/${NAME}" \
             -i ./assets/icon.png
+          tree ./release
           rpmbuild ./release/rpmbuild/SPECS/$NAME.spec
+          
           echo "pkg=${NAME}-${VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
       
       - name: Build release dmg (MacOS)

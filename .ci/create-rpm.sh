@@ -118,7 +118,7 @@ done
 echo""
 
 # follow https://www.redhat.com/sysadmin/create-rpm-package
-RPM_NAME=${name}-${version}-${release}
+RPM_NAME=${name}-${version}
 BUILD_PATH=${output_dir}/rpmbuild
 TAR_PATH=${output_dir}/$RPM_NAME
 
@@ -218,3 +218,7 @@ fi
 echo ""
 echo ""
 EOF
+
+echo "Resulting $BUILD_PATH/SPECS/${name}.spec"
+echo "---------------------------------------------------"
+cat $BUILD_PATH/SPECS/${name}.spec

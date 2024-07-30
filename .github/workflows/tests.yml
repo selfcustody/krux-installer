@@ -198,7 +198,7 @@ jobs:
         if: ${{ runner.os == 'Linux' }}
         id: setup-linux
         run: |
-          sudo apt-get install rpm
+          apt-get install rpm
           mkdir -p ./release
           NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
           VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
@@ -270,7 +270,7 @@ jobs:
             -d "${DESCRIPTION}" \
             -b "./dist/${NAME}" \
             -i ./assets/icon.png        
-          echo "pkg=${NAME}_${VER}_amd64.deb" >> $GITHUB_OUTPUT
+          echo "pkg=${NAME}_${VERSION}_amd64.deb" >> $GITHUB_OUTPUT
   
       - name: Build release rpm (Linux)
         if: ${{ runner.os == 'Linux' }}

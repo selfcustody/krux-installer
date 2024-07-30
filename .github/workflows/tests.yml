@@ -280,10 +280,11 @@ jobs:
           VERSION: ${{ steps.setup-linux.outputs.version }}
           DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
         run: |
+          RPM_VERSION=${VERSION/-/_}
           sh .ci/create-rpm.sh \
             -a "${NAME}" \
             -o ./release \
-            -v $VERSION \
+            -v $RPM_VERSION \
             -m qlrd \
             -e qlrddev@gmail.com \
             -d "${DESCRIPTION}" \

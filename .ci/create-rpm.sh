@@ -119,7 +119,7 @@ echo""
 
 # follow https://www.redhat.com/sysadmin/create-rpm-package
 RELEASE=1
-RPM_NAME=${name}-${version}-${RELEASE}
+RPM_NAME=${name}-${version}
 BUILD_PATH=${output_dir}/rpmbuild
 TAR_PATH=${output_dir}/$RPM_NAME
 CHANGELOG=$(cat $changelog)
@@ -148,7 +148,7 @@ Group:          application
 BuildArch:      %{_arch}
 License:        MIT
 URL:            https://github.com/selfcustody/krux-installer
-Source0:        %{name}-%{version}-%{release}.tar.gz
+Source0:        %{name}-%{version}.tar.gz
 
 %description
 ${description}

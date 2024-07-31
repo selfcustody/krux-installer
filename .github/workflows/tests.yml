@@ -331,7 +331,7 @@ jobs:
             
       - name: Hash (Linux deb)
         if: ${{ runner.os == 'Linux' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-deb
         with:
           working-directory: ${{ steps.release-deb.outputs.build-path }}
@@ -340,7 +340,7 @@ jobs:
           
       - name: Hash (Linux rpm)
         if: ${{ runner.os == 'Linux' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-rpm
         with:
           working-directory: ${{ steps.release-rpm.outputs.build-path }}
@@ -349,7 +349,7 @@ jobs:
           
       - name: Hash (MacOS)
         if: ${{ runner.os == 'macOS' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-macos
         with:
           working-directory: ${{ steps.release-macos.outputs.build-path }}
@@ -358,7 +358,7 @@ jobs:
 
       - name: Hash (Windows)
         if: ${{ runner.os == 'Windows' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-win
         with:
           working-directory: ${{ steps.release-windows.outputs.build-path }}

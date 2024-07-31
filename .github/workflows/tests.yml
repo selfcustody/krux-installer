@@ -325,7 +325,8 @@ jobs:
           poetry run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\LICENSE -i .\assets\icon.ico -O .
           Get-Content -Path .\krux-installer.nsi
           makensis.exe .\krux-installer.nsi
-          echo "build-path=$pwd" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          Move-Item -Path ".\krux-installer Setup.exe" -Destination ".\release\krux-installer_v$version Setup.exe"
+          echo "build-path=$pwd\release" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
           echo "pkg=krux-installer_v$version Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
             
       - name: Hash (Linux deb)

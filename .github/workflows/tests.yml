@@ -294,7 +294,7 @@ jobs:
             -i ./assets/icon.png
           tree ./release
           rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.spec
-          mv $HOME/rpmbuild/RPMS/x86_64/${NAME}-${RPM_VERSION}-1.x86_64.rpm ./release
+          cp $HOME/rpmbuild/RPMS/x86_64/${NAME}-${RPM_VERSION}-1.x86_64.rpm ./release/${NAME}-${RPM_VERSION}-1.x86_64.rpm
           echo "pkg=${NAME}-${RPM_VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
       
       - name: Build release dmg (MacOS)
@@ -367,7 +367,7 @@ jobs:
         with:
           name: ${{ steps.release-deb.outputs.pkg }}
           path: |
-            ./release/${{ steps.release-deb.outputs.rpm }}
+            ./release/${{ steps.release-deb.outputs.pkg }}
             ${{ steps.hash-deb.outputs.hash-file }}
       
       - name: Upload artifact rpm (Linux)

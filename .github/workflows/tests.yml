@@ -284,18 +284,18 @@ jobs:
           RPM_VERSION=$(sed -e 's/-/_/g' <<< $VERSION)
           sh .ci/create-rpm.sh \
             -a "${NAME}" \
-            -o ./release \
             -v $RPM_VERSION \
             -m qlrd \
             -e qlrddev@gmail.com \
             -d "${DESCRIPTION}" \
             -c ./CHANGELOG.md \
+            -r ./README.md \
             -b "./dist/${NAME}" \
             -i ./assets/icon.png
           tree ./release
-          rpmbuild -vv -bb --define "_topdir $(pwd)/release/rpmbuild" ./release/rpmbuild/SPECS/$NAME.spec
-          
-          echo "pkg=${NAME}-${VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
+          rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.spec
+          mv $HOME/rpmbuild/RPMS/x86_64/${NAME}-${RPM_VERSION}-1.x86_64.rpm ./release
+          echo "pkg=${NAME}-${RPM_VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
       
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}

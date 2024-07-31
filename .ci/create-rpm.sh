@@ -13,11 +13,11 @@ usage(){
 Options:
   -h, --help                               this help info
   -a, --name <name>                        the application name
-  -o, --output-dir <outdir>                the output directory
   -v, --version <version>                  the application version
   -m, --maintainer-name <name>             the application maintainer name
   -e, --maintainer-email <email>           the application maintainer email
   -d, --description <description>          the application description
+  -r, --readme <readme>                    the application readme path
   -c, --changelog <changelog>              the application changelog path
   -b, --binary                             the application binary
   -i, --icon                               the application icon image
@@ -85,12 +85,12 @@ while :; do
   esac
   case "${opt}" in
     -a|-a=*|--name|--name=*) get_arg name "${opt}" "${arg}";;
-    -o|-o=*|--output-dir|--output-dir=*) get_arg output_dir "${opt}" "${arg}";;
     -v|-v=*|--version|--version=*) get_arg version "${opt}" "${arg}";;
     -m|-m=*|--maintainer-name|--maintainer-name=*) get_arg maintainer_name "${opt}" "${arg}";;
     -e|-e=*|--maintainer-email|--maintainer-email=*) get_arg maintainer_email "${opt}" "${arg}";;
     -d|-d=*|--description|--description=*) get_arg description "${opt}" "${arg}";;
     -c|-c=*|--changelog|--changelog=*) get_arg changelog "${opt}" "${arg}";;
+    -r|-r=*|--readme|--readme=*) get_arg readme "${opt}" "${arg}";;
     -b|-b=*|--binary|--binary=*) get_arg binary "${opt}" "${arg}";;
     -i|-i=*|--icon|--icon=*) get_arg icon "${opt}" "${arg}";;
     "") break;;
@@ -106,7 +106,7 @@ echo "================="
 echo ""
 echo "Defined variables"
 echo "-----------------"
-for key in name output_dir version maintainer_name maintainer_email description binary icon; do
+for key in name version maintainer_name maintainer_email description binary icon changelog readme; do
   eval val='$'"${key}"
   if [ -n "${val}" ]; then
       printf '%s\n' "${key}=${val}"
@@ -120,8 +120,8 @@ echo""
 # follow https://www.redhat.com/sysadmin/create-rpm-package
 RELEASE=1
 RPM_NAME=${name}-${version}
-BUILD_PATH=${output_dir}/rpmbuild
-TAR_PATH=${output_dir}/$RPM_NAME
+BUILD_PATH=$HOME/rpmbuild
+TAR_PATH=$BUILD_PATH/$RPM_NAME
 CHANGELOG=$(cat $changelog)
 
 mkdir -v -p $RPM_NAME
@@ -135,6 +135,7 @@ mkdir -v -p $BUILD_PATH/SRPMS
 # Place the script in the designated directory
 cp -v $binary $RPM_NAME
 cp -v $icon $RPM_NAME/${name}.png
+cp -v $readme $RPM_NAME/README
 tar -v --create --file $RPM_NAME.tar.gz $RPM_NAME
 mv $RPM_NAME.tar.gz $BUILD_PATH/SOURCES
 
@@ -158,27 +159,30 @@ ${description}
 
 %files
 %{_bindir}/%{name}
+%{_datadir}/doc/%{name}/README
 %{_datarootdir}/applications/%{name}.desktop
-%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png"
+%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png
 
 %install
-mkdir -p \$RPM_BUILD_ROOT/%{_bindir}
-mkdir -p \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}
-mkdir -p \$RPM_BUILD_ROOT/%{_datarootdir}/icons/highcolor/512x512/apps
-mkdir -p \$RPM_BUILD_ROOT/%{_datadir}/doc/%{name}
-cp %{name} \$RPM_BUILD_ROOT/%{_bindir}
-cp %{name}.png \$RPM_BUILD_ROOT/%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png
-echo "[Desktop Entry]" > \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
-echo "Encoding=UTF-8" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
-echo "Version=%{version}" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
-echo "Type=Application" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
-echo "Terminal=false" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
-echo "Exec=/%{_bindir}/%{name}" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
-echo "Name=%{name}" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
-echo "Icon=%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png" >> \$RPM_BUILD_ROOT/%{_datarootdir}/applications/%{name}.desktop
+mkdir -p %{buildroot}
+mkdir -p %{buildroot}%{_bindir}
+mkdir -p %{buildroot}%{_datadir}/doc/%{name}
+mkdir -p %{buildroot}%{_datarootdir}/applications/%{name}
+mkdir -p %{buildroot}%{_datarootdir}/icons/highcolor/512x512/apps
+cp %{name} %{buildroot}%{_bindir}
+cp README %{buildroot}%{_datadir}/doc/%{name}/README
+cp %{name}.png %{buildroot}%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png
+echo "[Desktop Entry]" > %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Encoding=UTF-8" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Version=%{version}" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Type=Application" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Terminal=false" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Exec=%{_bindir}/%{name}" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Name=%{name}" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Icon=%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %clean
-rm -rf \$RPM_BUILD_ROOT
+rm -rf %{buildroot}
 
 %changelog
 * $(LC_ALL=en_US.utf8 date +'%a %b %d %Y') ${maintainer_name} <${maintainer_email}> - ${version}-1

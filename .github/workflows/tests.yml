@@ -270,7 +270,8 @@ jobs:
             -d "${DESCRIPTION}" \
             -b "./dist/${NAME}" \
             -i ./assets/icon.png
-          tree ./release    
+          tree ./release
+          echo "build-path=$(pwd)/release" >> $GITHUB_OUTPUT
           echo "pkg=${NAME}_${VERSION}_amd64.deb" >> $GITHUB_OUTPUT
   
       - name: Build release rpm (Linux)
@@ -284,18 +285,19 @@ jobs:
           RPM_VERSION=$(sed -e 's/-/_/g' <<< $VERSION)
           sh .ci/create-rpm.sh \
             -a "${NAME}" \
-            -o ./release \
             -v $RPM_VERSION \
             -m qlrd \
             -e qlrddev@gmail.com \
             -d "${DESCRIPTION}" \
             -c ./CHANGELOG.md \
+            -r ./README.md \
             -b "./dist/${NAME}" \
             -i ./assets/icon.png
           tree ./release
-          rpmbuild -vv -bb --define "_topdir $(pwd)/release/rpmbuild" ./release/rpmbuild/SPECS/$NAME.spec
-          
-          echo "pkg=${NAME}-${VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
+          rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.spec
+          cp $HOME/rpmbuild/RPMS/x86_64/${NAME}-${RPM_VERSION}-1.x86_64.rpm ./release/${NAME}-${RPM_VERSION}-1.x86_64.rpm4
+          echo "build-path=${HOME}/rpmbuild/RPMS/x86_64" >> $GITHUB_OUTPUT
+          echo "pkg=${NAME}-${RPM_VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
       
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}
@@ -306,7 +308,8 @@ jobs:
           ARCH="$(uname -m)"
           mkdir -p ./release
           create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
-          echo "release-dmg=${NAME}_${VER}_${ARCH}.dmg" >> $GITHUB_OUTPUT
+          echo "build-path=$(pwd)/release" >> $GITHUB_OUTPUT
+          echo "pkg=${NAME}_${VER}_${ARCH}.dmg" >> $GITHUB_OUTPUT
 
       - name: Build release NSIS (Windows)
         if: ${{ runner.os == 'Windows' }}
@@ -323,42 +326,43 @@ jobs:
           Get-Content -Path .\krux-installer.nsi
           makensis.exe .\krux-installer.nsi
           Move-Item -Path ".\krux-installer Setup.exe" -Destination ".\release\krux-installer_v$version Setup.exe"
-          echo "release-nsis=krux-installer_v$version Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "build-path=$pwd\release" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          echo "pkg=krux-installer_v$version Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
             
       - name: Hash (Linux deb)
         if: ${{ runner.os == 'Linux' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-deb
         with:
-          working-directory: ./release
+          working-directory: ${{ steps.release-deb.outputs.build-path }}
           file: ${{ steps.release-deb.outputs.pkg }}
           ext: 'sha256.txt'
           
       - name: Hash (Linux rpm)
         if: ${{ runner.os == 'Linux' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-rpm
         with:
-          working-directory: ./release
+          working-directory: ${{ steps.release-rpm.outputs.build-path }}
           file: ${{ steps.release-rpm.outputs.pkg }}
           ext: 'sha256.txt'
           
       - name: Hash (MacOS)
         if: ${{ runner.os == 'macOS' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-macos
         with:
-          working-directory: ./release
-          file: ${{ steps.release-macos.outputs.release-dmg }}
+          working-directory: ${{ steps.release-macos.outputs.build-path }}
+          file: ${{ steps.release-macos.outputs.pkg }}
           ext: 'sha256.txt'
 
       - name: Hash (Windows)
         if: ${{ runner.os == 'Windows' }}
-        uses: qlrd/sha256sum-action@v2
+        uses: qlrd/sha256sum-action@v3
         id: hash-win
         with:
-          working-directory: .\release
-          file: ${{ steps.release-windows.outputs.release-nsis }}
+          working-directory: ${{ steps.release-windows.outputs.build-path }}
+          file: ${{ steps.release-windows.outputs.pkg }}
           ext: 'sha256.txt'
 
       - name: Upload artifact deb (Linux)
@@ -367,32 +371,32 @@ jobs:
         with:
           name: ${{ steps.release-deb.outputs.pkg }}
           path: |
-            ./release/${{ steps.release-deb.outputs.rpm }}
-            ${{ steps.hash-deb.outputs.hash-file }}
+            ${{ steps.release-deb.outputs.build-path}}/${{ steps.release-deb.outputs.pkg }}
+            ${{ steps.release-deb.outputs.build-path}}/${{ steps.release-deb.outputs.pkg }}.sha256.txt
       
       - name: Upload artifact rpm (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ steps.release-rpm.outputs.rpm }}
+          name: ${{ steps.release-rpm.outputs.pkg }}
           path: |
-            ./release/${{ steps.release-rpm.outputs.pkg }}
-            ${{ steps.hash-rpm.outputs.hash-file }}
+            ${{ steps.release-rpm.outputs.build-path}}/${{ steps.release-rpm.outputs.pkg }}
+            ${{ steps.release-rpm.outputs.build-path}}/${{ steps.release-rpm.outputs.pkg }}.sha256.txt
             
       - name: Upload artifacts (MacOS)
         if: ${{ runner.os == 'macOS' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ steps.release-macos.outputs.release-dmg }}
+          name: ${{ steps.release-macos.outputs.pkg }}
           path: |
-            ./release/${{ steps.release-macos.outputs.release-dmg }}
-            ${{ steps.hash-macos.outputs.hash-file }}
+            ${{ steps.release-macos.outputs.build-path}}/${{ steps.release-macos.outputs.pkg }}
+            ${{ steps.release-macos.outputs.build-path}}/${{ steps.release-macos.outputs.pkg }}.sha256.txt
       
       - name: Upload artifacts (Windows)
         if: ${{ runner.os == 'Windows' }}
         uses: actions/upload-artifact@v4         
         with:
-          name: ${{ steps.release-windows.outputs.release-nsis }}
+          name: ${{ steps.release-windows.outputs.pkg }}
           path: |
-            .\release\${{ steps.release-windows.outputs.release-nsis }}
-            ${{ steps.hash-win.outputs.hash-file }}
+            ${{ steps.release-windows.outputs.build-path}}/${{ steps.release-windows.outputs.pkg }}
+            ${{ steps.release-windows.outputs.build-path}}/${{ steps.release-windows.outputs.pkg }}.sha256.txt

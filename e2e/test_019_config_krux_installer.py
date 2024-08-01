@@ -1,4 +1,5 @@
 import os
+import sys
 import json
 from unittest.mock import patch, MagicMock, call, mock_open
 from kivy.base import EventLoop
@@ -405,13 +406,13 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 "section": "locale",
                 "key": "lang",
                 "options": [
-                    "af_ZA.UTF-8",
-                    "en_US.UTF-8",
-                    "es_ES.UTF-8",
-                    "fr_FR.UTF-8",
-                    "it_IT.UTF-8",
-                    "pt_BR.UTF-8",
-                    "ru_RU.UTF-8",
+                    f"af_ZA{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"en_US{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"es_ES{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"fr_FR{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"it_IT{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"pt_BR{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"ru_RU{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
                 ],
             },
         ]

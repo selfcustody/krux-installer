@@ -22,6 +22,7 @@
 base_screen.py
 """
 import os
+import sys
 import typing
 from pathlib import Path
 from functools import partial
@@ -247,12 +248,18 @@ class BaseScreen(Screen, Trigger):
     def get_locale() -> str:
         app = App.get_running_app()
         locale = app.config.get("locale", "lang")
-        locale = locale.split(".")
-        return f"{locale[0].replace("-", "_")}.{locale[1]}"
+
+        if sys.platform in ("linux", "darwin"):
+            locale = locale.split(".")
+            return f"{locale[0].replace("-", "_")}.{locale[1]}"
+
+        elif sys.platform == "win32":
+            return f"{locale}.UTF-8"
+
+        else:
+            raise RuntimeError(f"Not implemented for '{sys.platform}'")
 
     @staticmethod
-    def open_settings() -> str:
+    def open_settings():
         app = App.get_running_app()
-        locale = app.config.get("locale", "lang")
-        locale = locale.split(".")
-        return f"{locale[0].replace("-", "_")}.{locale[1]}"
+        app.open_settings()

@@ -590,7 +590,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 app.screen_manager.get_screen().update,
                 name="ConfigKruxInstaller",
                 key="locale",
-                value="mock",
+                value="mock.UTF-8",
             ),
             call(
                 app.screen_manager.get_screen().update,
@@ -632,37 +632,37 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 app.screen_manager.get_screen().update,
                 name="ConfigKruxInstaller",
                 key="locale",
-                value="mock",
+                value="mock.UTF-8",
             ),
             call(
                 app.screen_manager.get_screen().update,
                 name="ConfigKruxInstaller",
                 key="locale",
-                value="mock",
+                value="mock.UTF-8",
             ),
             call(
                 app.screen_manager.get_screen().update,
                 name="ConfigKruxInstaller",
                 key="locale",
-                value="mock",
+                value="mock.UTF-8",
             ),
             call(
                 app.screen_manager.get_screen().update,
                 name="ConfigKruxInstaller",
                 key="locale",
-                value="mock",
+                value="mock.UTF-8",
             ),
             call(
                 app.screen_manager.get_screen().update,
                 name="ConfigKruxInstaller",
                 key="locale",
-                value="mock",
+                value="mock.UTF-8",
             ),
             call(
                 app.screen_manager.get_screen().update,
                 name="ConfigKruxInstaller",
                 key="locale",
-                value="mock",
+                value="mock.UTF-8",
             ),
         ]
 

@@ -36,6 +36,19 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
     """BaseKruxInstller is the base for Appliction"""
 
     @staticmethod
+    def make_lang_code(lang: str) -> str:
+        """Properly say which language will be used based on system"""
+        if sys.platform in ("linux", "darwin"):
+            return f"{lang}.UTF-8"
+
+        if sys.platform == "win32":
+            return lang
+
+        raise OSError(
+            f"Couldn 't possible to setup locale: OS '{sys.platform}' not implemented"
+        )
+
+    @staticmethod
     def get_system_lang():
         """Get operational system LANG"""
         if sys.platform in ("linux", "darwin"):
@@ -140,13 +153,13 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 "section": "locale",
                 "key": "lang",
                 "options": [
-                    "af_ZA.UTF-8",
-                    "en_US.UTF-8",
-                    "es_ES.UTF-8",
-                    "fr_FR.UTF-8",
-                    "it_IT.UTF-8",
-                    "pt_BR.UTF-8",
-                    "ru_RU.UTF-8",
+                    ConfigKruxInstaller.make_lang_code("af_ZA"),
+                    ConfigKruxInstaller.make_lang_code("en_US"),
+                    ConfigKruxInstaller.make_lang_code("es_ES"),
+                    ConfigKruxInstaller.make_lang_code("fr_FR"),
+                    ConfigKruxInstaller.make_lang_code("it_IT"),
+                    ConfigKruxInstaller.make_lang_code("pt_BR"),
+                    ConfigKruxInstaller.make_lang_code("ru_RU"),
                 ],
             },
         ]
@@ -166,6 +179,9 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
             verify = self.screen_manager.get_screen("VerifyStableZipScreen")
             unzip = self.screen_manager.get_screen("UnzipStableScreen")
+
+            if sys.platform == "win32":
+                value = f"{value}.UTF-8"
 
             partials = [
                 partial(

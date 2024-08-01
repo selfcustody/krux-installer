@@ -305,18 +305,15 @@ class TestAboutScreen(GraphicUnitTest):
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
-        screen = GreetingsScreen()
-        self.render(screen)
-
         # get your Window instance safely
         EventLoop.ensure_window()
 
         # Do the tests
         with self.assertRaises(RuntimeError) as exc_info:
-            screen.update(name="GreetingsScreen", key="check_permissions")
+            GreetingsScreen()
 
         # default assertions
-        self.assertEqual(str(exc_info.exception), "Not implemented for mockos")
+        self.assertEqual(str(exc_info.exception), "Not implemented for 'mockos'")
 
         # patch assertions
         mock_get_running_app.assert_called_once()

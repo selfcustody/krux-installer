@@ -92,7 +92,7 @@ class SelectOldVersionScreen(BaseScreen):
 
         self.make_button(
             row=len(old_versions) + 1,
-            id=f"select_old_version_back",
+            id="select_old_version_back",
             root_widget="select_old_version_screen_grid",
             text=self.translate("Back"),
             markup=False,
@@ -107,13 +107,22 @@ class SelectOldVersionScreen(BaseScreen):
         value = kwargs.get("value")
 
         # Check if update to screen
-        if name in ("ConfigKruxInstaller"):
+        if name in ("ConfigKruxInstaller", "SelectOldVersionScreen"):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
 
         # Check locale
         if key == "locale":
-            self.locale = value
-            if "select_old_version_back" in self.ids:
-                self.ids["select_old_version_back"].text = self.translate("Back")
+            if value is not None:
+                self.locale = value
+
+                if "select_old_version_back" in self.ids:
+                    self.ids["select_old_version_back"].text = self.translate("Back")
+
+                else:
+                    self.redirect_error(f"'select_old_version_back' isnt in {self.ids}")
+
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")

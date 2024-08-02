@@ -245,32 +245,32 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_fail_update_locale_name(self, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_locale_name(self, mock_redirect_error, mock_get_locale):
         screen = SelectVersionScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
+        screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
-        self.assertEqual(str(exc_info.exception), "Invalid screen name: Mock")
         mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with("Invalid screen name: Mock")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_fail_update_locale_key(self, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_locale_key(self, mock_redirect_error, mock_get_locale):
         screen = SelectVersionScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="ConfigKruxInstaller", key="mock", value="pt_BR.UTF-8")
+        screen.update(name="ConfigKruxInstaller", key="mock", value="pt_BR.UTF-8")
 
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
         mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')

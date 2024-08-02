@@ -50,86 +50,95 @@ class SelectVersionScreen(BaseScreen):
 
     def fetch_releases(self):
         """Build a set of buttons to select version"""
-        selector = Selector()
+        try:
+            selector = Selector()
 
-        buttons = [
-            ("select_version_latest", selector.releases[0], False),
-            ("select_version_beta", selector.releases[-1], False),
-            ("select_version_old", self.translate("Old versions"), False),
-            ("select_version_back", self.translate("Back"), False),
-        ]
+            buttons = [
+                ("select_version_latest", selector.releases[0], False),
+                ("select_version_beta", selector.releases[-1], False),
+                ("select_version_old", self.translate("Old versions"), False),
+                ("select_version_back", self.translate("Back"), False),
+            ]
 
-        # Push other releases to SelectOldVersionScreen
-
-        select_old_version_screen = self.manager.get_screen("SelectOldVersionScreen")
-        select_old_version_screen.fetch_releases(old_versions=selector.releases[1:-1])
-        # START of buttons
-        for row, _tuple in enumerate(buttons):
-
-            # START of on_press buttons
-            def _press(instance):
-                self.debug(f"Calling Button::{instance.id}::on_press")
-                self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-
-            # START of on_release_buttons
-            def _release(instance):
-                self.debug(f"Calling Button::{instance.id}::on_release")
-                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-
-                if instance.id == "select_version_latest":
-                    version = self.ids[instance.id].text
-                    self.debug(f"on_release::{instance.id} = {version}")
-                    main_screen = self.manager.get_screen("MainScreen")
-                    fn_version = partial(
-                        main_screen.update, name=self.name, key="version", value=version
-                    )
-                    fn_device = partial(
-                        main_screen.update,
-                        name=self.name,
-                        key="device",
-                        value="select a new one",
-                    )
-                    Clock.schedule_once(fn_version, 0)
-                    Clock.schedule_once(fn_device, 0)
-                    self.set_screen(name="MainScreen", direction="right")
-
-                if instance.id == "select_version_beta":
-                    version = self.ids[instance.id].text
-                    main_screen = self.manager.get_screen("MainScreen")
-                    fn_version = partial(
-                        main_screen.update,
-                        name=self.name,
-                        key="version",
-                        value="odudex/krux_binaries",
-                    )
-                    fn_device = partial(
-                        main_screen.update,
-                        name=self.name,
-                        key="device",
-                        value="select a new one",
-                    )
-                    Clock.schedule_once(fn_version, 0)
-                    Clock.schedule_once(fn_device, 0)
-                    self.debug(f"on_release::{instance.id} = {version}")
-                    self.set_screen(name="WarningBetaScreen", direction="left")
-
-                if instance.id == "select_version_old":
-                    self.set_screen(name="SelectOldVersionScreen", direction="left")
-
-                if instance.id == "select_version_back":
-                    self.set_screen(name="MainScreen", direction="right")
-
-            # END of on_release buttons
-
-            self.make_button(
-                row=row,
-                id=_tuple[0],
-                root_widget="select_version_screen_grid",
-                text=_tuple[1],
-                markup=_tuple[2],
-                on_press=_press,
-                on_release=_release,
+            # Push other releases to SelectOldVersionScreen
+            select_old_version_screen = self.manager.get_screen(
+                "SelectOldVersionScreen"
             )
+            select_old_version_screen.fetch_releases(
+                old_versions=selector.releases[1:-1]
+            )
+            # START of buttons
+            for row, _tuple in enumerate(buttons):
+
+                # START of on_press buttons
+                def _press(instance):
+                    self.debug(f"Calling Button::{instance.id}::on_press")
+                    self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+
+                # START of on_release_buttons
+                def _release(instance):
+                    self.debug(f"Calling Button::{instance.id}::on_release")
+                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+
+                    if instance.id == "select_version_latest":
+                        version = self.ids[instance.id].text
+                        self.debug(f"on_release::{instance.id} = {version}")
+                        main_screen = self.manager.get_screen("MainScreen")
+                        fn_version = partial(
+                            main_screen.update,
+                            name=self.name,
+                            key="version",
+                            value=version,
+                        )
+                        fn_device = partial(
+                            main_screen.update,
+                            name=self.name,
+                            key="device",
+                            value="select a new one",
+                        )
+                        Clock.schedule_once(fn_version, 0)
+                        Clock.schedule_once(fn_device, 0)
+                        self.set_screen(name="MainScreen", direction="right")
+
+                    if instance.id == "select_version_beta":
+                        version = self.ids[instance.id].text
+                        main_screen = self.manager.get_screen("MainScreen")
+                        fn_version = partial(
+                            main_screen.update,
+                            name=self.name,
+                            key="version",
+                            value="odudex/krux_binaries",
+                        )
+                        fn_device = partial(
+                            main_screen.update,
+                            name=self.name,
+                            key="device",
+                            value="select a new one",
+                        )
+                        Clock.schedule_once(fn_version, 0)
+                        Clock.schedule_once(fn_device, 0)
+                        self.debug(f"on_release::{instance.id} = {version}")
+                        self.set_screen(name="WarningBetaScreen", direction="left")
+
+                    if instance.id == "select_version_old":
+                        self.set_screen(name="SelectOldVersionScreen", direction="left")
+
+                    if instance.id == "select_version_back":
+                        self.set_screen(name="MainScreen", direction="right")
+
+                # END of on_release buttons
+                self.make_button(
+                    row=row,
+                    id=_tuple[0],
+                    root_widget="select_version_screen_grid",
+                    text=_tuple[1],
+                    markup=_tuple[2],
+                    on_press=_press,
+                    on_release=_release,
+                )
+
+        except Exception as exc:
+            self.redirect_exception(exception=exc)
 
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""

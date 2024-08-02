@@ -71,6 +71,8 @@ class ErrorScreen(BaseScreen):
             on_press=_press,
             on_release=_release,
         )
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)
 
     def update(self, *args, **kwargs):
         """
@@ -85,6 +87,9 @@ class ErrorScreen(BaseScreen):
         if name in (
             "ConfigKruxInstaller",
             "CheckInternetConnectionScreen",
+            "SelectDeviceScreen",
+            "SelectVersionScreen",
+            "SelectOldVersionScreen",
             "ErrorScreen",
         ):
             self.debug(f"Updating {self.name} from {name}...")

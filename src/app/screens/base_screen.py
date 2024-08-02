@@ -222,16 +222,19 @@ class BaseScreen(Screen, Trigger):
         setattr(self, f"on_release_{wid}", on_release)
 
     def redirect_error(self, msg: str):
-        screen = self.manager.get_screen("ErrorScreen")
         exception = RuntimeError(msg)
-        fn = partial(screen.update, name=self.name, key="error", value=exception)
-        Clock.schedule_once(fn, 0)
-        self.set_screen(name="ErrorScreen", direction="left")
+        self.redirect_exception(exception=exception)
 
     def redirect_exception(self, exception: Exception):
         screen = self.manager.get_screen("ErrorScreen")
-        fn = partial(screen.update, name=self.name, key="error", value=exception)
-        Clock.schedule_once(fn, 0)
+        fns = [
+            partial(screen.update, name=self.name, key="error", value=exception),
+            partial(screen.update, name=self.name, key="canvas"),
+        ]
+
+        for fn in fns:
+            Clock.schedule_once(fn, 0)
+
         self.set_screen(name="ErrorScreen", direction="left")
 
     @staticmethod

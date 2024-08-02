@@ -52,8 +52,6 @@ if __name__ == "__main__":
     # The application has window
     BUILDER_ARGS.append("--windowed")
 
-    # Tha application is a GUI
-    BUILDER_ARGS.append("--onefile")
 
     # Some important infos
     BUILDER_ARGS.append(f"--name={PYNAME}")
@@ -61,16 +59,25 @@ if __name__ == "__main__":
 
     # Specifics about operational system
     # on how will behave as file or bundled app
-    if SYSTEM in ("Windows", "Darwin"):
-        BUILDER_ARGS.append("--noconsole")
-    
-    elif SYSTEM in ("Linux"):
+    if SYSTEM == "Linux":
+        # Tha application is a GUI
         BUILDER_ARGS.append("--onefile")
     
-    # For darwin system, will be necessary
-    # to add a hidden import for ssl
-    # (necessary for request module)
-    if SYSTEM in ("Darwin"):
+    elif SYSTEM == "Windows":
+        # Tha application is a GUI with a hidden console
+        # to keep `sys` module enabled (necessary for Kboot)
+        BUILDER_ARGS.append("--onefile")
+        BUILDER_ARGS.append("--console")
+        BUILDER_ARGS.append("--hide-console=hide-early")
+        
+    elif SYSTEM == "Darwin":
+        # Tha application is a GUI in a bundled .app
+        BUILDER_ARGS.append("--onefile")
+        BUILDER_ARGS.append("--noconsole")
+        
+        # For darwin system, will be necessary
+        # to add a hidden import for ssl
+        # (necessary for request module)
         BUILDER_ARGS.append("--hidden-import=ssl")
 
     # Necessary for get version and

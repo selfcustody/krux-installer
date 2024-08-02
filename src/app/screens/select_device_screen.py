@@ -76,24 +76,35 @@ class SelectDeviceScreen(BaseScreen):
 
     def update(self, *args, **kwargs):
         """Update buttons according the valid devices for each version"""
+        name = kwargs.get("name")
         key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        # Check if update to screen
+        if name in ("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen"):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            self.redirect_error(f"Invalid screen name: {name}")
+
         if key == "version":
             self.debug(
                 f"Updating buttons to fit {kwargs.get("key")} = {kwargs.get("version")}"
             )
-            version = kwargs.get("value")
-            self.enabled_devices = []
-            enabled_devices = VALID_DEVICES_VERSIONS[version]
 
-            for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
-                if not device in enabled_devices:
-                    self.ids[f"select_device_{device}"].markup = True
-                    self.ids[f"select_device_{device}"].text = (
-                        f"[color=#333333]{device}[/color]"
-                    )
-                else:
-                    self.enabled_devices.append(f"select_device_{device}")
-                    self.ids[f"select_device_{device}"].markup = False
-                    self.ids[f"select_device_{device}"].text = device
+            if value is not None:
+                self.enabled_devices = []
+
+                for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
+                    if device not in VALID_DEVICES_VERSIONS[value]:
+                        self.ids[f"select_device_{device}"].markup = True
+                        self.ids[f"select_device_{device}"].text = (
+                            f"[color=#333333]{device}[/color]"
+                        )
+                    else:
+                        self.enabled_devices.append(f"select_device_{device}")
+                        self.ids[f"select_device_{device}"].markup = False
+                        self.ids[f"select_device_{device}"].text = device
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
         else:
-            raise ValueError(f"Invalid key: {key}")
+            self.redirect_error(f"Invalid key: {key}")

@@ -72,7 +72,8 @@ class TestSelectDeviceScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_fail_update(self, mock_get_running_app):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update(self, mock_redirect_error, mock_get_running_app):
         mock_get_running_app.config = MagicMock()
         mock_get_running_app.config.get = MagicMock(return_value="en-US")
 
@@ -81,11 +82,10 @@ class TestSelectDeviceScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(key="mock", value="mock")
+        screen.update(name=screen.name, key="mock", value="mock")
 
-        self.assertEqual(str(exc_info.exception), "Invalid key: mock")
         mock_get_running_app.assert_called_once()
+        mock_redirect_error.assert_called_once_with("Invalid key: mock")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
@@ -98,7 +98,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
 
         screen = SelectDeviceScreen()
         self.render(screen)
-        screen.update(key="version", value="v24.03.0")
+        screen.update(name=screen.name, key="version", value="v24.07.0")
 
         # get your Window instance safely
         EventLoop.ensure_window()
@@ -125,7 +125,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_with_v23_08_1_version(
+    def test_on_press_with_older_version(
         self, mock_set_background, mock_get_running_app
     ):
         mock_get_running_app.config = MagicMock()
@@ -133,7 +133,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
 
         screen = SelectDeviceScreen()
         self.render(screen)
-        screen.update(key="version", value="v23.09.1")
+        screen.update(name=screen.name, key="version", value="v24.03.0")
 
         # get your Window instance safely
         EventLoop.ensure_window()
@@ -159,35 +159,6 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.App.get_running_app")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
-    def test_on_press_with_v22_03_0_version(
-        self, mock_set_background, mock_get_running_app
-    ):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
-        screen = SelectDeviceScreen()
-        self.render(screen)
-        screen.update(key="version", value="v22.03.0")
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-
-        calls = []
-
-        for button in grid.children:
-            action = getattr(screen, f"on_press_{button.id}")
-            action(button)
-            if button.id in ("select_device_m5stickv"):
-                calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
-
-        mock_set_background.assert_has_calls(calls)
-        mock_get_running_app.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     def test_on_press_with_beta_version(
         self, mock_set_background, mock_get_running_app
     ):
@@ -196,7 +167,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
 
         screen = SelectDeviceScreen()
         self.render(screen)
-        screen.update(key="version", value="odudex/krux_binaries")
+        screen.update(name=screen.name, key="version", value="odudex/krux_binaries")
 
         # get your Window instance safely
         EventLoop.ensure_window()

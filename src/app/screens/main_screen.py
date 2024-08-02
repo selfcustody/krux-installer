@@ -116,7 +116,10 @@ class MainScreen(BaseScreen):
                 if instance.id == "main_select_device":
                     select_device = self.manager.get_screen("SelectDeviceScreen")
                     fn = partial(
-                        select_device.update, key="version", value=self.version
+                        select_device.update,
+                        name=self.name,
+                        key="version",
+                        value=self.version,
                     )
                     Clock.schedule_once(fn, 0)
                     self.set_background(wid="main_select_device", rgba=(0, 0, 0, 1))

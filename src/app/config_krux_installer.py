@@ -179,6 +179,7 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
             verify = self.screen_manager.get_screen("VerifyStableZipScreen")
             unzip = self.screen_manager.get_screen("UnzipStableScreen")
+            about = self.screen_manager.get_screen("AboutScreen")
 
             if sys.platform == "win32":
                 value = f"{value}.UTF-8"
@@ -234,6 +235,9 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 ),
                 partial(
                     unzip.update, name="ConfigKruxInstaller", key="locale", value=value
+                ),
+                partial(
+                    about.update, name="ConfigKruxInstaller", key="locale", value=value
                 ),
             ]
 

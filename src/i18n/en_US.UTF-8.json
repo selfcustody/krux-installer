@@ -59,5 +59,9 @@
     "Airgap update with": "Airgap update with",
     "Unziping": "Extracting",
     "Unziped": "Extracted"
+  },
+  "about_screen": {
+    "Check source code": "Check source code",
+    "I found a bug": "I found a bug"
   }
 }

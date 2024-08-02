@@ -36,6 +36,33 @@ class TestAboutScreen(GraphicUnitTest):
         source = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer]Check source code[/ref][/color]"
         issues = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer/issues]I found a bug![/ref][/color]"
 
+        "\n".join([title, version, "", source, "", issues])
+
+        self.assertEqual(button.text, "")
+        mock_get_running_app.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.App.get_running_app")
+    def test_update_locale(self, mock_get_running_app):
+        mock_get_running_app.config = MagicMock()
+        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+
+        screen = AboutScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[0]
+
+        screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
+
+        title = "[b]krux-installer[/b]"
+        version = "v0.0.2-alpha-1"
+        source = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer]Verifique o código-fonte[/ref][/color]"
+        issues = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer/issues]Eu encontrei um bug![/ref][/color]"
+
         self.assertEqual(
             button.text, "\n".join([title, version, "", source, "", issues])
         )

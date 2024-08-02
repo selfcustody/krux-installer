@@ -59,5 +59,9 @@
     "Airgap update with": "Programar de forma airgap com",
     "Unziping": "Descomprimindo",
     "Unziped": "Descomprimido"
+  },
+  "about_screen": {
+    "Check source code": "Verifique o código-fonte",
+    "I found a bug": "Eu encontrei um bug"
   }
 }

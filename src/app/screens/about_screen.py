@@ -23,7 +23,7 @@ about_screen.py
 """
 import webbrowser
 from src.utils.constants import get_name, get_version
-from .base_screen import BaseScreen
+from src.app.screens.base_screen import BaseScreen
 
 
 class AboutScreen(BaseScreen):
@@ -43,18 +43,11 @@ class AboutScreen(BaseScreen):
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
             self.set_screen(name="MainScreen", direction="right")
 
-        title = f"[b]{get_name()}[/b]"
-        version = f"v{get_version()}"
-        source = f"[color=#00AABB][ref={self.src_code}]Check source code[/ref][/color]"
-        issues = (
-            f"[color=#00AABB][ref={self.src_code}/issues]I found a bug![/ref][/color]"
-        )
-
         self.make_button(
             row=0,
-            id=f"about_screen_button",
+            id="about_screen_button",
             root_widget="about_screen_grid",
-            text="\n".join([title, version, "", source, "", issues]),
+            text="",
             markup=True,
             on_press=_on_press,
             on_release=_on_release,
@@ -68,5 +61,57 @@ class AboutScreen(BaseScreen):
         self.ids["about_screen_button"].halign = "center"
         self.ids["about_screen_button"].valign = "center"
 
-        setattr(self, f"on_ref_press_about_screen_button", _on_ref_press)
+        setattr(self, "on_ref_press_about_screen_button", _on_ref_press)
         self.ids["about_screen_button"].bind(on_ref_press=_on_ref_press)
+
+    def update(self, *args, **kwargs):
+        """Update buttons from selected device/versions on related screens"""
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+
+        # Check if update to screen
+        if name in (
+            "KruxInstallerApp",
+            "ConfigKruxInstaller",
+        ):
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            self.redirect_error(msg=f"Invalid screen name: {name}")
+
+        # Check locale
+        if key == "locale":
+            if value is not None:
+                self.locale = value
+                title = f"[b]{get_name()}[/b]"
+                version = f"v{get_version()}"
+
+                source = "".join(
+                    [
+                        "[color=#00AABB]",
+                        f"[ref={self.src_code}]",
+                        self.translate("Check source code"),
+                        "[/ref]",
+                        "[/color]",
+                    ]
+                )
+
+                issues = "".join(
+                    [
+                        "[color=#00AABB]",
+                        f"[ref={self.src_code}/issues]",
+                        f"{self.translate("I found a bug")}!",
+                        "[/ref]",
+                        "[/color]",
+                    ]
+                )
+
+                if f"{self.id}_button" in self.ids:
+                    self.ids[f"{self.id}_button"].text = "\n".join(
+                        [title, version, "", source, "", issues]
+                    )
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+
+        else:
+            self.redirect_error(msg=f'Invalid key: "{key}"')

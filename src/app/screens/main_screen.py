@@ -322,6 +322,7 @@ class MainScreen(BaseScreen):
 
         # Check if update to given key
         elif key == "version":
+
             self.version = value
             self.ids["main_select_version"].text = (
                 f"{self.translate("Version")}: [color=#00AABB]{value}[/color]"

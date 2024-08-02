@@ -111,7 +111,6 @@ class SelectOldVersionScreen(BaseScreen):
             self.debug(f"Updating {self.name} from {name}...")
         else:
             self.redirect_error(f"Invalid screen name: {name}")
-            return
 
         # Check locale
         if key == "locale":
@@ -121,8 +120,8 @@ class SelectOldVersionScreen(BaseScreen):
                 if "select_old_version_back" in self.ids:
                     self.ids["select_old_version_back"].text = self.translate("Back")
 
-                else:
-                    self.redirect_error(f"'select_old_version_back' isnt in {self.ids}")
-
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+
+        else:
+            self.redirect_error(msg=f'Invalid key: "{key}"')

@@ -59,5 +59,9 @@
     "Airgap update with": "Программирование \nAirgap с помощью",
     "Unziping": "Декомпрессия",
     "Unziped": "Неупакованный"
+  },
+  "about_screen": {
+    "Check source code": "Проверка исходного кода",
+    "I found a bug": "Я нашел ошибку"
   }
 }

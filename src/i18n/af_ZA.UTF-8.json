@@ -13,6 +13,9 @@
     "and back in for the new group to take effect": "en terug vir die nuwe groep om in werking te tree",
     "Do not worry, this message won't appear again": "Moenie bekommerd wees nie, hierdie boodskap sal nie weer verskyn nie"
   }, 
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Kontroleer jou internetverbinding"
+  },
   "main_screen": {
     "Version": "Weergawe",
     "Device": "Toestel",

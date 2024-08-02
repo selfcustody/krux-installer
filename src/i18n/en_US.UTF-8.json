@@ -12,7 +12,10 @@
     "You may need to logout (or even reboot)": "You may need to logout (or even reboot)",
     "and back in for the new group to take effect": "and back in for the new group to take effect",
     "Do not worry, this message won't appear again": "Do not worry, this message won't appear again"
-  }, 
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Checking your internet connection"
+  },
   "main_screen": {
     "Version": "Version",
     "Device": "Device",

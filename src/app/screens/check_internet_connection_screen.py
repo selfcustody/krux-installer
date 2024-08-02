@@ -30,7 +30,6 @@ from kivy.app import App
 from kivy.cache import Cache
 from src.app.screens.base_screen import BaseScreen
 from src.utils.selector import Selector
-from src.i18n import T
 
 
 class CheckInternetConnectionScreen(BaseScreen):
@@ -62,7 +61,15 @@ class CheckInternetConnectionScreen(BaseScreen):
             row=0,
             id=f"{self.id}_button",
             root_widget=f"{self.id}_grid",
-            text="[size=32sp][color=#efcc00]Checking your internet connection[/color][/size]",
+            text="".join(
+                [
+                    "[size=32sp]",
+                    "[color=#efcc00]",
+                    self.translate("Checking your internet connection"),
+                    "[/color]",
+                    "[/size]",
+                ]
+            ),
             markup=True,
             on_press=_press,
             on_release=_release,

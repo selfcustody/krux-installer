@@ -12,7 +12,10 @@
     "You may need to logout (or even reboot)": "Es posible que deba cerrar la sesión (o incluso reiniciar)",
     "and back in for the new group to take effect": "y volver de nuevo para que el nuevo grupo entre en vigor",
     "Do not worry, this message won't appear again": "No te preocupes, este mensaje no volverá a aparecer"
-  }, 
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Comprobando tu conexión a Internet"
+  },
   "main_screen": {
     "Version": "Versión",
     "Device": "Dispositivo",

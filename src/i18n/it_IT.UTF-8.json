@@ -13,6 +13,9 @@
     "and back in for the new group to take effect": "e tornare di nuovo per l'entrata in vigore del nuovo gruppo",
     "Do not worry, this message won't appear again": "Non preoccuparti, questo messaggio non apparirà più"
   }, 
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Controllare la tua connessione Internet"
+  },
   "main_screen": {
     "Version": "Versione",
     "Device": "Dispositivo",

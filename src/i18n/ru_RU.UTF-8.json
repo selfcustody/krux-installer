@@ -13,6 +13,9 @@
     "and back in for the new group to take effect": "и возвращайтесь снова, чтобы новая группа вступила в силу",
     "Do not worry, this message won't appear again": "Не волнуйтесь, это сообщение больше не появится"
   }, 
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Проверка подключения к Интернету"
+  },
   "main_screen": {
     "Version": "Версия",
     "Device": "Устройство",

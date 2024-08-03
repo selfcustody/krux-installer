@@ -61,16 +61,20 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         # This is a function that will be called
         # when a bunch of data are streamed from github
         def on_progress(data: bytes):
-            fn = partial(
-                self.update,
-                name=self.name,
-                key="progress",
-                value={
-                    "downloaded_len": self.downloader.downloaded_len,
-                    "content_len": self.downloader.content_len,
-                },
-            )
-            Clock.schedule_once(fn, 0)
+            if self.downloader is not None:
+                fn = partial(
+                    self.update,
+                    name=self.name,
+                    key="progress",
+                    value={
+                        "downloaded_len": self.downloader.downloaded_len,
+                        "content_len": self.downloader.content_len,
+                    },
+                )
+                Clock.schedule_once(fn, 0)
+
+            else:
+                self.redirect_error(f"Invalid downloader: {self.downloader}")
 
         # Now define the functions as staticmethods of class
         self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
@@ -97,10 +101,14 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
 
         if key == "locale":
-            self.locale = value
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "canvas":
             # prepare background
@@ -109,48 +117,64 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 Rectangle(size=(Window.width, Window.height))
 
         elif key == "version":
-            self.version = value
-            self.downloader = ZipDownloader(
-                version=self.version,
-                destdir=App.get_running_app().config.get("destdir", "assets"),
-            )
+            if value is not None:
+                self.version = value
+                self.downloader = ZipDownloader(
+                    version=self.version,
+                    destdir=App.get_running_app().config.get("destdir", "assets"),
+                )
 
-            self.ids[f"{self.id}_info"].text = "\n".join(
-                [
-                    "Downloading",
-                    f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    "",
-                    f"to {self.downloader.destdir}/krux-{self.version}.zip",
-                ]
-            )
+                if self.downloader is not None:
+                    url = getattr(self.downloader, "url")
+                    destdir = getattr(self.downloader, "destdir")
+                    self.ids[f"{self.id}_info"].text = "\n".join(
+                        [
+                            "Downloading",
+                            f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
+                            "",
+                            f"to {destdir}/krux-{self.version}.zip",
+                        ]
+                    )
+
+                else:
+                    self.redirect_error("Invalid downloader")
+
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "progress":
-            # calculate percentage of download
-            lens = [value["downloaded_len"], value["content_len"]]
-            percent = lens[0] / lens[1]
+            if value is not None:
+                # calculate percentage of download
+                lens = [value["downloaded_len"], value["content_len"]]
+                percent = lens[0] / lens[1]
 
-            # Format bytes (one liner) in MB
-            # https://stackoverflow.com/questions/
-            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-            downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-            self.ids[f"{self.id}_progress"].text = "\n".join(
-                [
-                    f"[size=100sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                    "",
-                    f"[size=16sp]{downs[0]} of {downs[1]} MB[/size]",
-                ]
-            )
-
-            if percent == 1.00:
-                self.ids[f"{self.id}_info"].text = "\n".join(
+                # Format bytes (one liner) in MB
+                # https://stackoverflow.com/questions/
+                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+                downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
+                self.ids[f"{self.id}_progress"].text = "\n".join(
                     [
-                        f"{self.downloader.destdir}/krux-{self.version}.zip downloaded",
+                        f"[size=100sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                        "",
+                        f"[size=16sp]{downs[0]} of {downs[1]} MB[/size]",
                     ]
                 )
 
-                # When finish, change the label, wait some seconds
+                # When finish, change the label
                 # and then change screen
-                self.trigger()
+                if percent == 1.00:
+                    if self.downloader is not None:
+                        destdir = getattr(self.downloader, "destdir")
+                        self.ids[f"{self.id}_info"].text = "\n".join(
+                            [
+                                f"{destdir}/krux-{self.version}.zip downloaded",
+                            ]
+                        )
+
+                        self.trigger()
+
+                    else:
+                        self.redirect_error(f"Invalid downloader: {self.downloader}")
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')

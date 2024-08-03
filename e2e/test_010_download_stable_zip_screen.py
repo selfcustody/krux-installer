@@ -37,8 +37,9 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_invalid_name(self, mock_get_running_app):
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_invalid_name(self, mock_redirect_error, mock_get_locale):
         screen = DownloadStableZipScreen()
         self.render(screen)
 
@@ -46,20 +47,16 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="MockScreen")
-
-        # default assertions
-        self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
+        screen.update(name="MockScreen")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_key(self, mock_get_running_app):
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
         screen = DownloadStableZipScreen()
         self.render(screen)
 
@@ -67,16 +64,11 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="ConfigKruxInstaller", key="mock")
-
-        # default assertions
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
+        screen.update(name="ConfigKruxInstaller", key="mock")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")

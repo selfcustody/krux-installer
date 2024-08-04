@@ -30,15 +30,22 @@ def escape(message: str) -> str:
         return message
 
 def make_headers(args: Namespace) -> str:
+    print("* make headers")
     return "\n".join([
         ";--------------------------------",
+        "!define MULTIUSER_EXECUTIONLEVEL Highest",
+        "!define MULTIUSER_MUI",
+        "",
+        ";---------------------------------",
         "; Main header",
+        "!include \"MultiUser.nsh\"",
         "!include \"MUI2.nsh\"",
         "",
         ""
     ])
 
 def make_defines(args: Namespace) -> str:
+    print("* make defines")
     version = args.app_version.split(".")
     binary = escape(args.binary)
     license = escape(args.license)
@@ -67,15 +74,14 @@ def make_defines(args: Namespace) -> str:
             _asset = asset.split(":")
             _asset_name = _asset[0]
             _asset_rev = escape(_asset[1])
-            install_size += os.path.getsize(_asset_rev)
             text.append(f"!define APP_ASSET_{_asset_name.upper()} \"{_asset_rev}\"")
 
-    text.append(f"!define APP_INSTALL_SIZE {install_size}")
     text.append("")
     text.append("")
     return "\n".join(text)
 
 def make_general(args: Namespace) -> str:
+    print("* make general")
     return "\n".join([
         ";--------------------------------",
         "; General",
@@ -92,6 +98,7 @@ def make_general(args: Namespace) -> str:
     ])
 
 def make_ui(args: Namespace) -> str:
+    print("* make UI")
     return "\n".join([
         ";--------------------------------",
         "; UI",
@@ -106,10 +113,16 @@ def make_ui(args: Namespace) -> str:
     ])
 
 def make_pages(args: Namespace) -> str:
+    print("* make pages")
     return "\n".join([
         ";--------------------------------",
         "; Pages",
+        "!define MUI_FINISHPAGE_SHOWREADME \"\"",
+        "!define MUI_FINISHPAGE_SHOWREADME_NOTCHECKED",
+        "!define MUI_FINISHPAGE_SHOWREADME_TEXT \"Create Desktop/Menu entry shortcuts\"",
+        "!define MUI_FINISHPAGE_SHOWREADME_FUNCTION finishpageaction",
         "!insertmacro MUI_PAGE_WELCOME",
+        "!insertmacro MULTIUSER_PAGE_INSTALLMODE",
         "!insertmacro MUI_PAGE_LICENSE \"LICENSE\"",
         "!insertmacro MUI_PAGE_COMPONENTS",
         "!insertmacro MUI_PAGE_DIRECTORY",
@@ -136,6 +149,7 @@ def make_pages(args: Namespace) -> str:
     ])
 
 def make_macro_verify_user_is_admin(args: Namespace) -> str:
+    print("* make macro VerifyUserIsAdmin")
     return "\n".join([
         ";--------------------------------",
         "; Macro verify user is admin",
@@ -156,23 +170,43 @@ def make_macro_verify_user_is_admin(args: Namespace) -> str:
     ])
 
 def make_on_init(args: Namespace) -> str:
+    print("* make function onInit")
     return "\n".join([
         ";--------------------------------",
         "; function on init",
         "function .onInit",
         "\tsetShellVarContext all",
         "\t!insertmacro VerifyUserIsAdmin",
+        "\t!insertmacro MULTIUSER_INIT",
         "functionEnd",
         "",
         ""
     ])
 
+def make_finish_page_action(args: Namespace) -> str:
+    print("* make function finishpageaction")
+    return "\n".join([
+        ";--------------------------------",
+        "; function finishpageaction",
+        "function finishpageaction",
+        "\t; Start Menu",
+        "\tCreateDirectory \"$SMPROGRAMS\\${APP_NAME}\"",
+        "\tCreateShortCut  \"$SMPROGRAMS\\${APP_NAME}.lnk\" \"$INSTDIR\\${APP_NAME}.exe\"",
+        "",
+        "\t; Desktop shortcut",
+        "\tCreateShortCut  \"$DESKTOP\\${APP_NAME}.lnk\" \"$INSTDIR\\${APP_NAME}.exe\"",
+        "functionEnd",
+        "",
+        "",
+    ])
+
 def make_install_section(args: Namespace) -> str:
+    print("* make install section")
     text = ""
     text += "\n".join([
         ";--------------------------------",
         "; Section - Install App",
-        "Section \"install\"",
+        "Section \"install\" SEC_01",
         #"\tSection \"-hidden install\"",
         "\tSectionIn RO",
         "\tSetOutPath \"$INSTDIR\"",
@@ -192,38 +226,33 @@ def make_install_section(args: Namespace) -> str:
     text += "\n".join(_text)
 
     text += "\n".join([
-        "",
-        "",
-        "\t; Start Menu",
-        "\tCreateDirectory \"$SMPROGRAMS\\${APP_NAME}\"",
-        "\tCreateShortCut \"$SMPROGRAMS\\${ORG_NAME}\\${APP_NAME}.lnk\" \"$INSTDIR\\${APP_NAME}.exe\" \"\" \"$INSTDIR\\${APP_ICON}\"",
-        "",
-        ""
-    ])
-
-    text += "\n".join([
         "\t; Uninstaller - See function un.onInit and section 'uninstall' for configuration",
         "\tWriteUninstaller \"$INSTDIR\\uninstall.exe\"",
         "",
         "\t; Registry information for add/remove programs",
         "\tWriteRegStr HKCU \"Software\\${APP_NAME}\" \"\" $INSTDIR",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"DisplayName\" \"${ORG_NAME} - ${APP_NAME} - ${APP_DESC}\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"UninstallString\" \"$\\\"$INSTDIR\\uninstall.exe$\\\"\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"QuietUninstallString\" \"$\\\"$INSTDIR\\uninstall.exe$\\\" /S\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"InstallLocation\" \"$\\\"$INSTDIR$\\\"\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"DisplayIcon\" \"$\\\"$INSTDIR\\${APP_ICON}$\\\"\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"Publisher\" \"$\\\"${ORG_NAME}$\\\"\"",
-        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"DisplayVersion\" \"$\\\"${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_BUILD}$\\\"\"",
-        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"VersionMajor\" ${APP_VERSION_MAJOR}",
-        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"VersionMinor\" ${APP_VERSION_MINOR}",
-        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"VersionMinor\" ${APP_VERSION_MINOR}",
+        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"DisplayName\" \"${APP_NAME} - ${APP_DESC}\"",
+        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"UninstallString\" \"$\\\"$INSTDIR\\uninstall.exe$\\\"\"",
+        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"QuietUninstallString\" \"$\\\"$INSTDIR\\uninstall.exe$\\\" /S\"",
+        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"InstallLocation\" \"$\\\"$INSTDIR$\\\"\"",
+        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"DisplayIcon\" \"$\\\"$INSTDIR\\${APP_ICON}$\\\"\"",
+        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"Publisher\" \"$\\\"${ORG_NAME}$\\\"\"",
+        "\tWriteRegStr HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"DisplayVersion\" \"$\\\"${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_BUILD}$\\\"\"",
+        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"VersionMajor\" ${APP_VERSION_MAJOR}",
+        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"VersionMinor\" ${APP_VERSION_MINOR}",
+        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"VersionMinor\" ${APP_VERSION_MINOR}",
         "",
         "\t; There is no option for modifying or repairing the install",
-        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"NoModify\" 1",
-        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"NoRepair\" 1",
+        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"NoModify\" 1",
+        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"NoRepair\" 1",
         "",
-        "\t; Set the INSTALLSIZE constant (!defined at the top of this script) so Add/Remove Programs can accurately report the size",
-        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\" \"EstimatedSize\" ${APP_INSTALL_SIZE}",
+        "\t; Write MULTIUSER_INSTALLMODE_DEFAULT_REGISTRY_VALUENAME so the correct context can be detected in the uninstaller.",
+        "\tWriteRegStr ShCtx \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" $MultiUser.InstallMode 1",
+        "",
+        "\t; Obtain the size of the files, in kilobytes, in section SEC_01",
+        "\tSectionGetSize \"${SEC_01}\" $0",
+        "\tWriteRegDWORD HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${APP_NAME}\" \"EstimatedSize\" $0",
+        "",
         "\tWriteUninstaller \"$INSTDIR\\Uninstall.exe\"",
         "SectionEnd",
         "",
@@ -234,6 +263,7 @@ def make_install_section(args: Namespace) -> str:
     return text
 
 def make_uninstaller(args: Namespace) -> str:
+    print("* make uninstaller section")
     return "\n".join([
         ";--------------------------------",
         "; Uninstaller",
@@ -244,26 +274,23 @@ def make_uninstaller(args: Namespace) -> str:
         "\t\tAbort",
         "\tnext:",
         "\t!insertmacro VerifyUserIsAdmin",
+        "\t!insertmacro MULTIUSER_UNINIT",
         "functionEnd",
         "",
         ";--------------------------------",
         "; Uninstall section",
         "Section \"uninstall\"",
         "",
-        "\t; Remove Start Menu launcher",
-        "\tDelete \"$SMPROGRAMS\\${ORG_NAME}\\${APP_NAME}.lnk\"",
         "",
-        "\t; Try to remove the Start Menu folder - this will only happen if it is empty",
-        "\tRmDir \"$SMPROGRAMS\\${ORG_NAME}\"",
+        "\t; Delete menu  entries",
+        "\tDelete \"$SMPROGRAMS\\${APP_NAME}.lnk\"",
+        "\tRmDir /r \"$SMPROGRAMS\\${APP_NAME}\"",
         "",
-        "\t; Remove Desktop Shortcut",
-        "\tDelete \"DESKTOP\\${APP_NAME}.lnk\"",
+        "\t; Delete desktop shortcut",
+        "\tDelete \"$DESKTOP\\${APP_NAME}.lnk\"",
         "",
         "\t; Remove files",
         "\tDelete $INSTDIR\\*",
-        "\tRmDir /r $INSTDIR\\",
-        "",
-        "\t; Always delete uninstaller as the last action",
         "\tDelete $INSTDIR\\uninstall.exe",
         "",
         "\t; Try to remove the install directory - this will only happen if it is empty",
@@ -275,15 +302,6 @@ def make_uninstaller(args: Namespace) -> str:
     ])
 
 args = parser.parse_args()
-script = make_headers(args)
-script += make_defines(args)
-script += make_general(args)
-script += make_ui(args)
-script += make_macro_verify_user_is_admin(args)
-script += make_on_init(args)
-script += make_pages(args)
-script += make_install_section(args)
-script += make_uninstaller(args)
 
 try:
     file = os.path.join(args.output, f"{args.name}.nsi")
@@ -294,6 +312,7 @@ try:
         nsis_script.write(make_general(args))
         nsis_script.write(make_ui(args))
         nsis_script.write(make_macro_verify_user_is_admin(args))
+        nsis_script.write(make_finish_page_action(args))
         nsis_script.write(make_on_init(args))
         nsis_script.write(make_pages(args))
         nsis_script.write(make_install_section(args))
@@ -303,4 +322,3 @@ try:
 
 except Exception as err:
     print(err)
-    

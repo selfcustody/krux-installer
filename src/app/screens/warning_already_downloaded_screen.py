@@ -46,9 +46,6 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         )
 
         self.make_grid(wid=f"{self.id}_grid", rows=2)
-        with self.canvas.before:
-            Color(0, 0, 0, 1)
-            Rectangle(size=(Window.width, Window.height))
 
         warning = Label(
             text="",

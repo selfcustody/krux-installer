@@ -212,7 +212,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called()
         mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
-        
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
@@ -267,7 +267,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         mock_schedule_once,
         mock_partial,
         mock_manager,
-        mock_get_locale
+        mock_get_locale,
     ):
         screen = VerifyStableZipScreen()
         self.render(screen)
@@ -327,11 +327,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_screen")
-    def test_on_press_back(
-        self,
-        mock_set_screen,
-        mock_get_locale
-    ):
+    def test_on_press_back(self, mock_set_screen, mock_get_locale):
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -345,7 +341,4 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called()
-        mock_set_screen.assert_called_once_with(
-            name="MainScreen", direction="right"
-        )
-
+        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")

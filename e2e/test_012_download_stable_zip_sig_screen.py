@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -140,8 +141,17 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
-        fontsize_g = window.size[0] // 16
-        fontsize_mp = window.size[0] // 48
+
+        fontsize_g = 0
+        fontsize_mp = 0
+
+        if sys.platform in ("linux", "win32"):
+            fontsize_g = window.size[0] // 16
+            fontsize_mp = window.size[0] // 48
+
+        if sys.platform == "darwin":
+            fontsize_g = window.size[0] // 32
+            fontsize_mp = window.size[0] // 128
 
         # do tests
 
@@ -229,8 +239,17 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
-        fontsize_g = window.size[0] // 16
-        fontsize_mp = window.size[0] // 48
+
+        fontsize_g = 0
+        fontsize_mp = 0
+
+        if sys.platform in ("linux", "win32"):
+            fontsize_g = window.size[0] // 16
+            fontsize_mp = window.size[0] // 48
+
+        if sys.platform == "darwin":
+            fontsize_g = window.size[0] // 32
+            fontsize_mp = window.size[0] // 128
 
         # do tests
         with patch.object(screen, "trigger") as mock_trigger, patch.object(

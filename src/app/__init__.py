@@ -153,8 +153,3 @@ class KruxInstallerApp(ConfigKruxInstaller):
             greetings_screen.update, name="KruxInstallerApp", key="check_permissions"
         )
         Clock.schedule_once(fn, 0)
-
-    def _register_font(self, **kwargs):
-        """
-        Register a font located at :path:`fonts`
-        """

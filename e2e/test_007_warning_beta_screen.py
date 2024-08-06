@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -23,9 +24,20 @@ class TestSelectVersionScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
-        fontsize_mm = window.size[0] // 24
-        fontsize_m = window.size[0] // 32
-        fontsize_mp = window.size[0] // 48
+
+        fontsize_mm = 0
+        fontsize_m = 0
+        fontsize_mp = 0
+
+        if sys.platform in ("linux", "win32"):
+            fontsize_mm = window.size[0] // 24
+            fontsize_m = window.size[0] // 32
+            fontsize_mp = window.size[0] // 48
+
+        if sys.platform == "darwin":
+            fontsize_mm = window.size[0] // 48
+            fontsize_m = window.size[0] // 64
+            fontsize_mp = window.size[0] // 128
 
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "WarningBetaScreen")
@@ -107,9 +119,20 @@ class TestSelectVersionScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
-        fontsize_mm = window.size[0] // 24
-        fontsize_m = window.size[0] // 32
-        fontsize_mp = window.size[0] // 48
+
+        fontsize_mm = 0
+        fontsize_m = 0
+        fontsize_mp = 0
+
+        if sys.platform in ("linux", "win32"):
+            fontsize_mm = window.size[0] // 24
+            fontsize_m = window.size[0] // 32
+            fontsize_mp = window.size[0] // 48
+
+        if sys.platform == "darwin":
+            fontsize_mm = window.size[0] // 48
+            fontsize_m = window.size[0] // 64
+            fontsize_mp = window.size[0] // 128
 
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
         text = [

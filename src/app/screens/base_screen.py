@@ -49,8 +49,9 @@ class BaseScreen(Screen, Trigger):
         self.id = wid
         self.name = name
 
+        # Check if this is a Pyinstaller bundle
+        # and set the correct path to find some assets
         if getattr(sys, "frozen", False):
-            # this is a Pyinstaller bundle
             root_assets_path = getattr(sys, "_MEIPASS")
         else:
             root_assets_path = Path(__file__).parent.parent.parent.parent
@@ -60,16 +61,29 @@ class BaseScreen(Screen, Trigger):
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
         self._error_img = os.path.join(root_assets_path, "assets", "error.png")
+
         self.locale = BaseScreen.get_locale()
 
-        self.SIZE_XG = Window.size[0] // 4
-        self.SIZE_GG = Window.size[0] // 8
-        self.SIZE_G = Window.size[0] // 16
-        self.SIZE_MM = Window.size[0] // 24
-        self.SIZE_M = Window.size[0] // 32
-        self.SIZE_MP = Window.size[0] // 48
-        self.SIZE_P = Window.size[0] // 64
-        self.SIZE_PP = Window.size[0] // 128
+        # Setup the correct font size
+        if sys.platform in ("linux", "win32"):
+            self.SIZE_XG = Window.size[0] // 4
+            self.SIZE_GG = Window.size[0] // 8
+            self.SIZE_G = Window.size[0] // 16
+            self.SIZE_MM = Window.size[0] // 24
+            self.SIZE_M = Window.size[0] // 32
+            self.SIZE_MP = Window.size[0] // 48
+            self.SIZE_P = Window.size[0] // 64
+            self.SIZE_PP = Window.size[0] // 128
+
+        elif sys.platform == "darwin":
+            self.SIZE_XG = Window.size[0] // 16
+            self.SIZE_GG = Window.size[0] // 24
+            self.SIZE_G = Window.size[0] // 32
+            self.SIZE_MM = Window.size[0] // 48
+            self.SIZE_M = Window.size[0] // 64
+            self.SIZE_MP = Window.size[0] // 128
+            self.SIZE_P = Window.size[0] // 192
+            self.SIZE_PP = Window.size[0] // 256
 
     @property
     def logo_img(self) -> str:

@@ -106,6 +106,7 @@ class TestFlashScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
 
         # patch assertions
         mock_get_running_app.assert_has_calls(
@@ -118,9 +119,7 @@ class TestFlashScreen(GraphicUnitTest):
         args, kwargs = mock_rectangle.call_args_list[-1]
         self.assertTrue("size" in kwargs)
         self.assertEqual(len(args), 0)
-        self.assertIn(kwargs["size"][0], (640, 1280))
-        self.assertIn(kwargs["size"][1], (800, 1600))
-        # mock_rectangle.assert_called_once_with(size=(1280, 1600))
+        mock_rectangle.assert_called_once_with(size=window.size)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")

@@ -52,7 +52,7 @@ class WarningBetaScreen(BaseScreen):
             f"[size={self.SIZE_MP}sp]{just_try}[/size]",
             "",
             "",
-            f"[size={self.SIZE_MM}]",
+            f"[size={self.SIZE_MM}sp]",
             "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
             "[/size]",
         ]
@@ -113,7 +113,7 @@ class WarningBetaScreen(BaseScreen):
                 f"[size={self.SIZE_MP}sp]{just_try}[/size]",
                 "",
                 "",
-                f"[size={self.SIZE_MM}]",
+                f"[size={self.SIZE_MM}sp]",
                 "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
                 "[/size]",
             ]

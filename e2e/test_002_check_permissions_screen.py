@@ -125,10 +125,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = "[size=32sp][color=#efcc00]Setup mockeduser for Ubuntu[/color][/size]"
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Ubuntu[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -168,10 +169,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = "[size=32sp][color=#efcc00]Setup mockeduser for Fedora[/color][/size]"
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Fedora[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -211,10 +213,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = "[size=32sp][color=#efcc00]Setup mockeduser for Mint[/color][/size]"
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Mint[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -256,10 +259,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = "[size=32sp][color=#efcc00]Setup mockeduser for Mockos[/color][/size]"
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Mockos[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -299,12 +303,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = (
-            "[size=32sp][color=#efcc00]Setup mockeduser for ArchLinux[/color][/size]"
-        )
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for ArchLinux[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -344,12 +347,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = (
-            "[size=32sp][color=#efcc00]Setup mockeduser for Manjaro[/color][/size]"
-        )
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Manjaro[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -391,12 +393,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = (
-            "[size=32sp][color=#efcc00]Setup mockeduser for Slackware[/color][/size]"
-        )
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Slackware[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -436,10 +437,11 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize = window.size[0] // 24
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = "[size=32sp][color=#efcc00]Setup mockeduser for Gentoo[/color][/size]"
+        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Gentoo[/color][/size]"
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -513,14 +515,16 @@ class TestAboutScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize_g = window.size[0] // 16
+        fontsize_m = window.size[0] // 32
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="make_on_permission_created")
         text = "\n".join(
             [
-                "[size=32sp][color=#efcc00]mocked command[/color][/size]",
+                f"[size={fontsize_g}sp][color=#efcc00]mocked command[/color][/size]",
                 "",
-                "[size=16sp]You may need to logout (or even reboot)",
+                f"[size={fontsize_m}sp]You may need to logout (or even reboot)",
                 "and back in for the new group to take effect.",
                 "",
                 "Do not worry, this message won't appear again.[/size]",

@@ -137,7 +137,7 @@ class CheckPermissionsScreen(BaseScreen):
             for_msg = self.translate("for")
 
             self.ids[f"{self.id}_button"].text = (
-                f"[size={self.SIZE_G}sp][color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color][/size]"
+                f"[size={self.SIZE_MM}sp][color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color][/size]"
             )
 
             if distro.id() in ("ubuntu", "fedora", "linuxmint"):

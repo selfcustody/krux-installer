@@ -23,6 +23,9 @@ class TestSelectVersionScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize_mm = window.size[0] // 24
+        fontsize_m = window.size[0] // 32
+        fontsize_mp = window.size[0] // 48
 
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "WarningBetaScreen")
@@ -31,12 +34,17 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(button.id, "warning_beta_screen_warn")
 
         text = [
-            "[size=32sp][color=#efcc00][b]WARNING[/b][/color][/size]",
+            f"[size={fontsize_mm}sp][color=#efcc00][b]WARNING[/b][/color][/size]",
             "",
-            "[size=20sp][color=#efcc00]This is our test repository[/color][/size]",
+            f"[size={fontsize_m}sp][color=#efcc00]This is our test repository[/color][/size]",
             "",
-            "[size=16sp]These are unsigned binaries for the latest and most experimental features[/size]",
-            "[size=16sp]and it's just for trying new things and providing feedback.[/size]",
+            f"[size={fontsize_mp}sp]These are unsigned binaries for the latest and most experimental features[/size]",
+            f"[size={fontsize_mp}sp]and it's just for trying new things and providing feedback.[/size]",
+            "",
+            "",
+            f"[size={fontsize_mm}sp]",
+            "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
+            "[/size]",
         ]
         self.assertEqual(button.text, "\n".join(text))
         mock_get_locale.assert_called_once()
@@ -99,15 +107,23 @@ class TestSelectVersionScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
+        fontsize_mm = window.size[0] // 24
+        fontsize_m = window.size[0] // 32
+        fontsize_mp = window.size[0] // 48
 
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
         text = [
-            "[size=32sp][color=#efcc00][b]ADVERTÊNCIA[/b][/color][/size]",
+            f"[size={fontsize_mm}sp][color=#efcc00][b]ADVERTÊNCIA[/b][/color][/size]",
             "",
-            "[size=20sp][color=#efcc00]Este é nosso repositório de testes[/color][/size]",
+            f"[size={fontsize_m}sp][color=#efcc00]Este é nosso repositório de testes[/color][/size]",
             "",
-            "[size=16sp]Estes são binários não assinados das últimas e mais experimentais características[/size]",
-            "[size=16sp]e serve apenas para experimentar coisas novas e fornecer opiniões.[/size]",
+            f"[size={fontsize_mp}sp]Estes são binários não assinados das últimas e mais experimentais características[/size]",
+            f"[size={fontsize_mp}sp]e serve apenas para experimentar coisas novas e fornecer opiniões.[/size]",
+            "",
+            "",
+            f"[size={fontsize_mm}sp]",
+            "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
+            "[/size]",
         ]
 
         self.assertEqual(button.text, "\n".join(text))

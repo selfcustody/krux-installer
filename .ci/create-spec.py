@@ -91,10 +91,10 @@ if __name__ == "__main__":
     
     # some assets 
     for f in listdir(ASSETS):
-        img_abs = join(ASSETS, f)
-        if isfile(img_abs):
-            if img_abs.endswith("png") or img_abs.endswith("gif"):
-                BUILDER_ARGS.append(f"--add-data={img_abs}:assets")                
+        asset = join(ASSETS, f)
+        if isfile(asset):
+            if asset.endswith("png") or asset.endswith("gif")or asset.endswith("ttf"):
+                BUILDER_ARGS.append(f"--add-data={asset}:assets")                
         
     # Add i18n translations
     for f in listdir(I18NS):

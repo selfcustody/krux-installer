@@ -137,7 +137,7 @@ class CheckPermissionsScreen(BaseScreen):
             for_msg = self.translate("for")
 
             self.ids[f"{self.id}_button"].text = (
-                f"[size=32sp][color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color][/size]"
+                f"[size={self.SIZE_G}sp][color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color][/size]"
             )
 
             if distro.id() in ("ubuntu", "fedora", "linuxmint"):
@@ -173,7 +173,7 @@ class CheckPermissionsScreen(BaseScreen):
             perm_msg = self.translate("permissions for")
 
             self.ids[f"{self.id}_button"].text = (
-                f"[size=32sp][color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]"
+                f"[size={self.SIZE_G}sp][color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]"
             )
 
             # loop throug all groups and check
@@ -204,9 +204,9 @@ class CheckPermissionsScreen(BaseScreen):
 
                 self.ids[f"{self.id}_button"].text = "\n".join(
                     [
-                        f"[size=32sp][color=#efcc00]{warn_msg}[/color][/size]",
+                        f"[size={self.SIZE_G}sp][color=#efcc00]{warn_msg}[/color][/size]",
                         "",
-                        f'[size=16sp]{first_msg} "{distro.name(pretty=True)}"',
+                        f'[size={self.SIZE_M}sp]{first_msg} "{distro.name(pretty=True)}"',
                         f"{access_msg}.",
                         proceed_msg,
                         f"{exec_msg}:",
@@ -245,9 +245,9 @@ class CheckPermissionsScreen(BaseScreen):
 
                 self.ids[f"{self.id}_button"].text = "\n".join(
                     [
-                        f"[size=32sp][color=#efcc00]{output}[/color][/size]",
+                        f"[size={self.SIZE_G}sp][color=#efcc00]{output}[/color][/size]",
                         "",
-                        f"[size=16sp]{logout_msg}",
+                        f"[size={self.SIZE_M}sp]{logout_msg}",
                         f"{backin_msg}.",
                         "",
                         f"{not_worry_msg}.[/size]",

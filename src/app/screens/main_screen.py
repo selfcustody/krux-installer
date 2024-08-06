@@ -95,8 +95,8 @@ class MainScreen(BaseScreen):
 
                     self.ids[instance.id].text = "\n".join(
                         [
-                            f"[size=18sp][color=#efcc00][b]{self.translate("Fetching data from")}[/b][/color][/size]",
-                            "[size=16sp][color=#efcc00]https://api.github.com/repos/selfcustody/krux/releases[/color][/size]",
+                            f"[size={self.SIZE_M}sp][color=#efcc00][b]{self.translate("Fetching data from")}[/b][/color][/size]",
+                            f"[size={self.SIZE_MP}sp][color=#efcc00]https://api.github.com/repos/selfcustody/krux/releases[/color][/size]",
                         ]
                     )
 

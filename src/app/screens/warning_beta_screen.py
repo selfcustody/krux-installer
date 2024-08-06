@@ -44,12 +44,17 @@ class WarningBetaScreen(BaseScreen):
         )
 
         text = [
-            f"[size=32sp][color=#efcc00][b]{warning}[/b][/color][/size]",
+            f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
             "",
-            f"[size=20sp][color=#efcc00]{test_repo}[/color][/size]",
+            f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
             "",
-            f"[size=16sp]{unsg_bin}[/size]",
-            f"[size=16sp]{just_try}[/size]",
+            f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
+            f"[size={self.SIZE_MP}sp]{just_try}[/size]",
+            "",
+            "",
+            f"[size={self.SIZE_MM}]",
+            "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
+            "[/size]"
         ]
 
         # START of on_press buttons
@@ -100,12 +105,17 @@ class WarningBetaScreen(BaseScreen):
             )
 
             text = [
-                f"[size=32sp][color=#efcc00][b]{warning}[/b][/color][/size]",
+                f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
                 "",
-                f"[size=20sp][color=#efcc00]{test_repo}[/color][/size]",
+                f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
                 "",
-                f"[size=16sp]{unsg_bin}[/size]",
-                f"[size=16sp]{just_try}[/size]",
+                f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
+                f"[size={self.SIZE_MP}sp]{just_try}[/size]",
+                "",
+                "",
+                f"[size={self.SIZE_MM}]",
+                "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
+                "[/size]"
             ]
 
             self.ids["warning_beta_screen_warn"].text = "\n".join(text)

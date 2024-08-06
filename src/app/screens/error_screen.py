@@ -107,15 +107,15 @@ class ErrorScreen(BaseScreen):
 
         elif key == "error":
             self.error(str(value.__context__))
-            stack = [msg for msg in str(value.__context__).split(":") if len(msg) < 80]
+            stack = [msg for msg in str(value.__context__).split(":") if len(msg) < 120]
 
             self.ids[f"{self.id}_button"].text = "\n".join(
                 [
-                    f"[size=18sp][color=#ff0000]{stack[0]}[/color][/size]",
-                    f"[size=16sp][color=#efcc00]{"\n".join(stack[1:])}[/color][/size]",
+                    f"[size={self.SIZE_M}sp][color=#ff0000]{stack[0]}[/color][/size]",
+                    f"[size={self.SIZE_MP}sp][color=#efcc00]{"\n".join(stack[1:])}[/color][/size]",
                     "",
                     "",
-                    "[size=16sp]Report issue at",
+                    f"[size={self.SIZE_P}sp]Report issue at",
                     "".join(
                         [
                             "[color=#00aabb]",

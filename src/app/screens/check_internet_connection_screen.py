@@ -63,7 +63,7 @@ class CheckInternetConnectionScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             text="".join(
                 [
-                    "[size=32sp]",
+                    f"[size={self.SIZE_MM}sp]",
                     "[color=#efcc00]",
                     self.translate("Checking your internet connection"),
                     "[/color]",

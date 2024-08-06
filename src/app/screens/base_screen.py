@@ -28,6 +28,7 @@ from pathlib import Path
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
+from kivy.core.window import Window
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
@@ -60,6 +61,15 @@ class BaseScreen(Screen, Trigger):
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
         self._error_img = os.path.join(root_assets_path, "assets", "error.png")
         self.locale = BaseScreen.get_locale()
+
+        self.SIZE_XG = Window.size[0] // 4
+        self.SIZE_GG = Window.size[0] // 8
+        self.SIZE_G = Window.size[0] // 16
+        self.SIZE_MM = Window.size[0] // 24
+        self.SIZE_M = Window.size[0] // 32
+        self.SIZE_MP = Window.size[0] // 48
+        self.SIZE_P = Window.size[0] // 64
+        self.SIZE_PP = Window.size[0] // 128
 
     @property
     def logo_img(self) -> str:

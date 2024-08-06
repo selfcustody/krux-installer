@@ -54,7 +54,7 @@ class WarningBetaScreen(BaseScreen):
             "",
             f"[size={self.SIZE_MM}]",
             "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
-            "[/size]"
+            "[/size]",
         ]
 
         # START of on_press buttons
@@ -115,7 +115,7 @@ class WarningBetaScreen(BaseScreen):
                 "",
                 f"[size={self.SIZE_MM}]",
                 "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
-                "[/size]"
+                "[/size]",
             ]
 
             self.ids["warning_beta_screen_warn"].text = "\n".join(text)

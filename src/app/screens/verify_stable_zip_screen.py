@@ -107,8 +107,6 @@ class VerifyStableZipScreen(BaseScreen):
 
         # Check locale
         if key == "locale":
-            print(key)
-            print(value)
             if value is not None:
                 self.locale = value
             else:
@@ -195,7 +193,7 @@ class VerifyStableZipScreen(BaseScreen):
                 "",
                 "",
                 "",
-                f"[size=20sp][u]{integrity_msg.upper()}[/u]:[/size]",
+                f"[size={Window.size[0] // 20}sp][u]{integrity_msg.upper()}[/u]:[/size]",
                 "",
                 f"[size=16sp][b][color=777777]{assets_dir}/krux-{version}.zip[/b]",
                 "[size=16sp][b](computed hash)[/b][/color][/size]",

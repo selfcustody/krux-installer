@@ -21,6 +21,7 @@
 """
 __init__.py
 """
+import os
 import sys
 from functools import partial
 from kivy import resources as kv_resources

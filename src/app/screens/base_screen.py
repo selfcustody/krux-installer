@@ -48,7 +48,12 @@ class BaseScreen(Screen, Trigger):
         self.id = wid
         self.name = name
 
-        root_assets_path = Path(__file__).parent.parent.parent.parent
+        if getattr(sys, "frozen", False):
+            # this is a Pyinstaller bundle
+            root_assets_path = getattr(sys, "_MEIPASS")
+        else:
+            root_assets_path = Path(__file__).parent.parent.parent.parent
+
         self._logo_img = os.path.join(root_assets_path, "assets", "logo.png")
         self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")

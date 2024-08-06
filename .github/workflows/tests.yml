@@ -236,7 +236,8 @@ jobs:
         with:
           run: |
             poetry add pytest-xvfb
-            poetry run poe build
+            poetry run python ./ci/create-spec.py
+            poetry run python -m PyInstaller krux-installer.spec
 
       - name: Build dist (MacOS)
         if: ${{ runner.os == 'macOS' }}
@@ -244,13 +245,17 @@ jobs:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
         run: |
           poetry run poe clean-mac
-          poetry run poe build
+          poetry run python ./ci/create-spec.py
+          poetry run python -m PyInstaller krux-installer.spec
         
       - name: Build dist (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
-        run: poetry run poe build
+        run: |
+          poetry run python .ci/create-spec.py
+          .\.ci\edit-spec.ps1
+          poetry run python -m PyInstaller krux-installer.spec
           
       - name: Build release deb (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -316,14 +321,12 @@ jobs:
         id: release-windows
         shell: pwsh
         run: |
-          Get-ChildItem -Path .\dist\
-          choco --yes install nsis 
-          New-Item ".\release" -Type Directory
+          choco --yes install nsis
+          New-Item ".\release" -Type Directory  
           $name = poetry run python -c 'from src.utils.constants import get_name; print(get_name())'
           $version = poetry run python -c 'from src.utils.constants import get_version; print(get_version())'
           $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
           poetry run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\LICENSE -i .\assets\icon.ico -O .
-          Get-Content -Path .\krux-installer.nsi
           makensis.exe .\krux-installer.nsi
           Move-Item -Path ".\krux-installer Setup.exe" -Destination ".\release\krux-installer_v$version Setup.exe"
           echo "build-path=$pwd\release" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 

@@ -236,7 +236,7 @@ jobs:
         with:
           run: |
             poetry add pytest-xvfb
-            poetry run python ./ci/create-spec.py
+            poetry run python .ci/create-spec.py
             poetry run python -m PyInstaller krux-installer.spec
 
       - name: Build dist (MacOS)
@@ -245,7 +245,7 @@ jobs:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
         run: |
           poetry run poe clean-mac
-          poetry run python ./ci/create-spec.py
+          poetry run python .ci/create-spec.py
           poetry run python -m PyInstaller krux-installer.spec
         
       - name: Build dist (Windows)

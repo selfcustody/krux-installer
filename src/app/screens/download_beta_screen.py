@@ -130,9 +130,10 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
             self.ids[f"{self.id}_info"].text = "\n".join(
                 [
-                    "Downloading",
+                    f"[size={self.SIZE_MP}sp]" "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
                     "" f"to {self.downloader.destdir}",
+                    "[/size]",
                 ]
             )
 
@@ -147,16 +148,18 @@ class DownloadBetaScreen(BaseDownloadScreen):
             downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
             self.ids[f"{self.id}_progress"].text = "\n".join(
                 [
-                    f"[size=100sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                    f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
                     "",
-                    f"[size=16sp]{downs[0]} of {downs[1]} MB[/size]",
+                    f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
                 ]
             )
 
             if percent == 1.0:
                 self.ids[f"{self.id}_info"].text = "\n".join(
                     [
+                        f"[size={self.SIZE_MP}sp]",
                         f"{self.downloader.destdir}/kboot.kfpkg downloaded",
+                        "[/size]",
                     ]
                 )
 

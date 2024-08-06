@@ -198,6 +198,8 @@ class TestDownloadBetaScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
+        fontsize_mp = window.size[0] // 48
 
         # do tests
         screen.update(name=screen.name, key="downloader")
@@ -207,7 +209,7 @@ class TestDownloadBetaScreen(GraphicUnitTest):
         # do tests
         text = "\n".join(
             [
-                "Downloading",
+                f"[size={fontsize_mp}sp]" "Downloading",
                 "".join(
                     [
                         "[color=#00AABB][ref=https://raw.githubusercontent.com/odudex",
@@ -216,6 +218,7 @@ class TestDownloadBetaScreen(GraphicUnitTest):
                     ]
                 ),
                 f"to {firmware_path}",
+                "[/size]",
             ]
         )
         # default assertions
@@ -239,6 +242,9 @@ class TestDownloadBetaScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
+        fontsize_g = window.size[0] // 16
+        fontsize_mp = window.size[0] // 48
 
         # do tests
 
@@ -251,9 +257,9 @@ class TestDownloadBetaScreen(GraphicUnitTest):
         # do tests
         text = "\n".join(
             [
-                "[size=100sp][b]1.00 %[/b][/size]",
+                f"[size={fontsize_g}sp][b]1.00 %[/b][/size]",
                 "",
-                "[size=16sp]0.20 of 20.03 MB[/size]",
+                f"[size={fontsize_mp}sp]0.20 of 20.03 MB[/size]",
             ]
         )
 
@@ -277,6 +283,9 @@ class TestDownloadBetaScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
+        fontsize_g = window.size[0] // 16
+        fontsize_mp = window.size[0] // 48
 
         # do tests
         with patch.object(screen, "trigger") as mock_trigger, patch.object(
@@ -293,13 +302,15 @@ class TestDownloadBetaScreen(GraphicUnitTest):
             # do tests
             text_progress = "\n".join(
                 [
-                    "[size=100sp][b]100.00 %[/b][/size]",
+                    f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
                     "",
-                    "[size=16sp]20.03 of 20.03 MB[/size]",
+                    f"[size={fontsize_mp}sp]20.03 of 20.03 MB[/size]",
                 ]
             )
 
-            text_info = "mockdir/kboot.kfpkg downloaded"
+            text_info = "\n".join(
+                [f"[size={fontsize_mp}sp]", "mockdir/kboot.kfpkg downloaded", "[/size]"]
+            )
 
             self.assertEqual(
                 screen.ids["download_beta_screen_progress"].text, text_progress

@@ -47,7 +47,7 @@ class BaseDownloadScreen(BaseScreen):
         # progress label, show a "Connecting"
         # before start the download to make
         progress = Label(
-            text="[color=#efcc00][size=40sp]Connecting...[/size][/color]",
+            text=f"[size={self.SIZE_G}sp][color=#efcc00]Connecting...[/color][/size]",
             markup=True,
             valign="center",
             halign="center",

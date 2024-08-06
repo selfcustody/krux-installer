@@ -110,10 +110,11 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
 
             self.ids[f"{self.id}_info"].text = "\n".join(
                 [
-                    "Downloading",
+                    f"[size={self.SIZE_MP}sp]" "Downloading",
                     f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
                     ""
                     f"to {self.downloader.destdir}/krux-{self.version}.zip.sha256.txt",
+                    "[/size]",
                 ]
             )
 
@@ -124,16 +125,18 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
 
             self.ids[f"{self.id}_progress"].text = "\n".join(
                 [
-                    f"[size=100sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                    f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
                     "",
-                    f"[size=16sp]{lens[0]} of {lens[1]} B[/size]",
+                    f"[size={self.SIZE_MP}sp]{lens[0]} of {lens[1]} B[/size]",
                 ]
             )
 
             if percent == 1.00:
                 self.ids[f"{self.id}_info"].text = "\n".join(
                     [
+                        f"[size={self.SIZE_MP}sp]",
                         f"{self.downloader.destdir}/krux-{self.version}.zip.sha256.txt downloaded",
+                        "[/size]",
                     ]
                 )
 

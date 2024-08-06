@@ -129,10 +129,11 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                     destdir = getattr(self.downloader, "destdir")
                     self.ids[f"{self.id}_info"].text = "\n".join(
                         [
-                            "Downloading",
+                            f"[size={self.SIZE_MP}sp]" "Downloading",
                             f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
                             "",
                             f"to {destdir}/krux-{self.version}.zip",
+                            "[/size]",
                         ]
                     )
 
@@ -154,9 +155,9 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
                 self.ids[f"{self.id}_progress"].text = "\n".join(
                     [
-                        f"[size=100sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                        f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
                         "",
-                        f"[size=16sp]{downs[0]} of {downs[1]} MB[/size]",
+                        f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
                     ]
                 )
 
@@ -167,7 +168,9 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                         destdir = getattr(self.downloader, "destdir")
                         self.ids[f"{self.id}_info"].text = "\n".join(
                             [
+                                f"[size={self.SIZE_MP}sp]",
                                 f"{destdir}/krux-{self.version}.zip downloaded",
+                                "[/size]",
                             ]
                         )
 

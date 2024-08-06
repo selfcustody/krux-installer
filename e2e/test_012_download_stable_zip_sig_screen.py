@@ -139,6 +139,9 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
+        fontsize_g = window.size[0] // 16
+        fontsize_mp = window.size[0] // 48
 
         # do tests
 
@@ -151,9 +154,9 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         # do tests
         text = "\n".join(
             [
-                "[size=100sp][b]1.00 %[/b][/size]",
+                f"[size={fontsize_g}sp][b]1.00 %[/b][/size]",
                 "",
-                "[size=16sp]210000 of 21000000 B[/size]",
+                f"[size={fontsize_mp}sp]210000 of 21000000 B[/size]",
             ]
         )
 
@@ -225,6 +228,9 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
+        fontsize_g = window.size[0] // 16
+        fontsize_mp = window.size[0] // 48
 
         # do tests
         with patch.object(screen, "trigger") as mock_trigger, patch.object(
@@ -241,13 +247,19 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
             # do tests
             text_progress = "\n".join(
                 [
-                    "[size=100sp][b]100.00 %[/b][/size]",
+                    f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
                     "",
-                    "[size=16sp]21 of 21 B[/size]",
+                    f"[size={fontsize_mp}sp]21 of 21 B[/size]",
                 ]
             )
 
-            text_info = "mockdir/krux-v24.07.0.zip.sig downloaded"
+            text_info = "\n".join(
+                [
+                    f"[size={fontsize_mp}sp]",
+                    "mockdir/krux-v24.07.0.zip.sig downloaded",
+                    "[/size]",
+                ]
+            )
 
             self.assertEqual(
                 screen.ids["download_stable_zip_sig_screen_progress"].text,

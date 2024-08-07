@@ -21,6 +21,7 @@
 """
 about_screen.py
 """
+import sys
 from functools import partial
 from kivy.clock import Clock
 from kivy.graphics.vertex_instructions import Rectangle
@@ -47,55 +48,41 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
 
         self.make_grid(wid=f"{self.id}_grid", rows=2)
 
-        warning = Label(
-            text="",
-            markup=True,
-            valign="center",
-            halign="center",
+        self.make_image(
+            wid=f"{self.id}_loader",
+            source=self.warn_img,
+            root_widget=f"{self.id}_grid",
         )
-        warning.id = f"{self.id}_label"
-        self.ids[f"{self.id}_grid"].add_widget(warning)
-        self.ids[warning.id] = WeakProxy(warning)
 
-        stack = StackLayout()
-        stack.id = f"{self.id}_stack_buttons"
-        self.ids[f"{self.id}_grid"].add_widget(stack)
-        self.ids[stack.id] = WeakProxy(stack)
+        self.make_label(
+            wid=f"{self.id}_label",
+            text="",
+            root_widget=f"{self.id}_grid",
+            markup=True,
+            halign="justify",
+        )
 
-        buttons = [f"{self.id}_download_button", f"{self.id}_proceed_button"]
+        def _on_ref_press(*args):
+            if args[1] == "DownloadStableZipScreen":
+                main_screen = self.manager.get_screen("MainScreen")
+                download_screen = self.manager.get_screen("DownloadStableZipScreen")
+                fn = partial(
+                    download_screen.update,
+                    name=self.name,
+                    key="version",
+                    value=main_screen.version,
+                )
+                Clock.schedule_once(fn, 0)
+                self.set_screen(name="DownloadStableZipScreen", direction="left")
 
-        for wid in buttons:
+            if args[1] == "VerifyStableZipScreen":
+                self.set_screen(name="VerifyStableZipScreen", direction="left")
 
-            def _press(instance):
-                self.debug(f"Calling Button::{instance.id}::on_press")
-                self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-
-            def _release(instance):
-                self.debug(f"Calling Button::{instance.id}::on_release")
-                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-
-                if instance.id == f"{self.id}_download_button":
-                    main_screen = self.manager.get_screen("MainScreen")
-                    download_screen = self.manager.get_screen("DownloadStableZipScreen")
-                    fn = partial(
-                        download_screen.update,
-                        name=self.name,
-                        key="version",
-                        value=main_screen.version,
-                    )
-                    Clock.schedule_once(fn, 0)
-                    self.set_screen(name="DownloadStableZipScreen", direction="right")
-
-                if instance.id == f"{self.id}_proceed_button":
-                    self.set_screen(name="VerifyStableZipScreen", direction="right")
-
-            self.make_stack_button(
-                root_widget=f"{self.id}_stack_buttons",
-                wid=wid,
-                size_hint=(0.5, None),
-                on_press=_press,
-                on_release=_release,
-            )
+        # When [ref] markup text is clicked, do a action like a button
+        setattr(
+            WarningAlreadyDownloadedScreen, f"on_ref_press_{self.id}", _on_ref_press
+        )
+        self.ids[f"{self.id}_label"].bind(on_ref_press=_on_ref_press)
 
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
@@ -133,38 +120,41 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             download_msg = self.translate("Download again")
             proceed_msg = self.translate("Proceed with files")
 
-            self.ids[f"{self.id}_download_button"].text = (
-                f"[color=#00ff00]{download_msg}[/color]"
-            )
-            self.ids[f"{self.id}_proceed_button"].text = (
-                f"[color=#00ccef]{proceed_msg}[/color]"
-            )
+            if sys.platform in ("linux", "win32"):
+                size = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
+
+            else:
+                size = [self.SIZE_MP, self.SIZE_P, self.SIZE_PP]
+
             self.ids[f"{self.id}_label"].text = "\n".join(
                 [
+                    f"[size={size[0]}sp][b]{warning_msg}[/b][/size]",
+                    "",
+                    f"[size={size[2]}sp]* krux-{value}.zip[/size]",
+                    "",
+                    f"[size={size[2]}sp]* krux-{value}.zip.sha256.txt[/size]",
+                    "",
+                    f"[size={size[2]}sp]* krux-{value}.zip.sig[/size]",
+                    "",
+                    f"[size={size[2]}sp]* selfcustody.pem[/size]",
                     "",
                     "",
+                    f"[size={size[1]}sp]{ask_proceed}[/size]",
                     "",
                     "",
-                    "",
-                    "",
-                    f"[size=36sp][color=#efcc00][b]{warning_msg}[/b][/color][/size]",
-                    "",
-                    "",
-                    "",
-                    f"[size=20sp][color=#efcc00]krux-{value}.zip[/color][/size]",
-                    "",
-                    f"[size=20sp][color=#efcc00]krux-{value}.zip.sha256.txt[/color][/size]",
-                    "",
-                    f"[size=20sp][color=#efcc00]krux-{value}.zip.sig[/color][/size]",
-                    "",
-                    "[size=20sp][color=#efcc00]selfcustody.pem[/color][/size]",
-                    "",
-                    "",
-                    "",
-                    f"[size=16sp]{ask_proceed}[/size]",
-                    "",
-                    "",
-                    "",
+                    "".join(
+                        [
+                            f"[size={size[0]}]" f"[color=#00ff00]",
+                            "[ref=DownloadStableZipScreen]",
+                            download_msg,
+                            "[/ref]",
+                            "[/color]" "        ",
+                            "[color=#efcc00]" "[ref=VerifyStableZipScreen]",
+                            proceed_msg,
+                            "[/ref]",
+                            "[/color]" "[/size]",
+                        ]
+                    ),
                 ]
             )
 

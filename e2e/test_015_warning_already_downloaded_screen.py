@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -22,17 +23,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[1]
-        stack = grid.children[0]
 
         # default assertions
-        self.assertEqual(grid.id, f"{screen.id}_grid")
-        self.assertEqual(label.id, f"{screen.id}_label")
-        self.assertEqual(stack.id, f"{screen.id}_stack_buttons")
-        self.assertEqual(stack.children[1].id, f"{screen.id}_download_button")
-        self.assertEqual(stack.children[0].id, f"{screen.id}_proceed_button")
+        self.assertTrue(f"{screen.id}_grid" in screen.ids)
+        self.assertTrue(f"{screen.id}_label" in screen.ids)
 
         # patch assertions
         mock_get_locale.assert_called()
@@ -113,44 +107,54 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
 
-        # do tests
+        size = [0, 0]
+
+        if sys.platform in ("linux", "win32"):
+            size = [window.size[0] // 32, window.size[0] // 48, window.size[0] // 64]
+
+        if sys.platform == "darwin":
+            size = [window.size[0] // 128, window.size[0] // 192, window.size[0] // 256]
+
         label_text = "\n".join(
             [
+                f"[size={size[0]}sp][b]Assets already downloaded[/b][/size]",
+                "",
+                f"[size={size[2]}sp]* krux-v0.0.1.zip[/size]",
+                "",
+                f"[size={size[2]}sp]* krux-v0.0.1.zip.sha256.txt[/size]",
+                "",
+                f"[size={size[2]}sp]* krux-v0.0.1.zip.sig[/size]",
+                "",
+                f"[size={size[2]}sp]* selfcustody.pem[/size]",
                 "",
                 "",
+                f"[size={size[1]}sp]Do you want to proceed with the same file or do you want to download it again?[/size]",
                 "",
                 "",
-                "",
-                "",
-                "[size=36sp][color=#efcc00][b]Assets already downloaded[/b][/color][/size]",
-                "",
-                "",
-                "",
-                "[size=20sp][color=#efcc00]krux-v0.0.1.zip[/color][/size]",
-                "",
-                "[size=20sp][color=#efcc00]krux-v0.0.1.zip.sha256.txt[/color][/size]",
-                "",
-                "[size=20sp][color=#efcc00]krux-v0.0.1.zip.sig[/color][/size]",
-                "",
-                "[size=20sp][color=#efcc00]selfcustody.pem[/color][/size]",
-                "",
-                "",
-                "",
-                "[size=16sp]Do you want to proceed with the same file or do you want to download it again?[/size]",
-                "",
-                "",
-                "",
+                "".join(
+                    [
+                        f"[size={size[0]}]" f"[color=#00ff00]",
+                        "[ref=DownloadStableZipScreen]",
+                        "Download again",
+                        "[/ref]",
+                        "[/color]",
+                        "        ",
+                        "[color=#efcc00]",
+                        "[ref=VerifyStableZipScreen]",
+                        "Proceed with files",
+                        "[/ref]",
+                        "[/color]",
+                        "[/size]",
+                    ]
+                ),
             ]
         )
-        download_text = "[color=#00ff00]Download again[/color]"
-        proceed_text = "[color=#00ccef]Proceed with files[/color]"
 
         screen.update(name=screen.name, key="version", value="v0.0.1")
 
         # default assertions
-        self.assertEqual(screen.ids[f"{screen.id}_download_button"].text, download_text)
-        self.assertEqual(screen.ids[f"{screen.id}_proceed_button"].text, proceed_text)
         self.assertEqual(screen.ids[f"{screen.id}_label"].text, label_text)
 
         # patch assertions
@@ -161,95 +165,28 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
-        "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
-    )
-    def test_on_press_donwload_button(self, mock_set_background, mock_get_locale):
-        mock_get_locale.config = MagicMock()
-        mock_get_locale.config.get = MagicMock(return_value="en-US")
-
-        screen = WarningAlreadyDownloadedScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        button = screen.ids[f"{screen.id}_download_button"]
-
-        action = getattr(screen, f"on_press_{screen.id}_download_button")
-        action(button)
-
-        mock_set_background.assert_called_once_with(
-            wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
-        )
-        mock_get_locale.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
-    )
-    def test_on_press_proceed_button(self, mock_set_background, mock_get_locale):
-        mock_get_locale.config = MagicMock()
-        mock_get_locale.config.get = MagicMock(return_value="en-US")
-
-        screen = WarningAlreadyDownloadedScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        button = screen.ids[f"{screen.id}_proceed_button"]
-
-        action = getattr(screen, f"on_press_{screen.id}_proceed_button")
-        action(button)
-
-        mock_set_background.assert_called_once_with(
-            wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
-        )
-        mock_get_locale.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
-    )
-    @patch(
         "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.manager"
     )
     @patch("src.app.screens.warning_already_downloaded_screen.partial")
     @patch("src.app.screens.warning_already_downloaded_screen.Clock.schedule_once")
-    @patch(
-        "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_screen"
-    )
-    def test_on_release_download(
-        self,
-        mock_set_screen,
-        mock_schedule_once,
-        mock_partial,
-        mock_manager,
-        mock_set_background,
-        mock_get_locale,
+    def test_on_press_donwload_button(
+        self, mock_schedule_once, mock_partial, mock_manager, mock_get_locale
     ):
-
-        mock_manager.get_screen = MagicMock()
         mock_get_locale.config = MagicMock()
         mock_get_locale.config.get = MagicMock(return_value="en-US")
+
+        mock_manager.get_screen = MagicMock()
 
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        button = screen.ids[f"{screen.id}_download_button"]
 
-        action = getattr(screen, f"on_release_{screen.id}_download_button")
-        action(button)
+        action = getattr(WarningAlreadyDownloadedScreen, f"on_ref_press_{screen.id}")
+        action("Mock", "DownloadStableZipScreen")
 
-        # patch assertions
-        mock_get_locale.assert_called()
-        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
+        mock_get_locale.assert_called_once()
         mock_manager.get_screen.assert_has_calls(
             [call("MainScreen"), call("DownloadStableZipScreen")]
         )
@@ -267,24 +204,15 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_schedule_once.assert_has_calls(
             [call(mock_partial(), 0), call(mock_partial(), 0)]
         )
-        mock_set_screen.assert_called_once_with(
-            name="DownloadStableZipScreen", direction="right"
-        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
-        "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_background"
-    )
-    @patch(
         "src.app.screens.warning_already_downloaded_screen.WarningAlreadyDownloadedScreen.set_screen"
     )
-    def test_on_release_proceed(
-        self, mock_set_screen, mock_set_background, mock_get_locale
-    ):
-
+    def test_on_press_proceed(self, mock_set_screen, mock_get_locale):
         mock_get_locale.config = MagicMock()
         mock_get_locale.config.get = MagicMock(return_value="en-US")
 
@@ -293,14 +221,11 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        button = screen.ids[f"{screen.id}_proceed_button"]
 
-        action = getattr(screen, f"on_release_{screen.id}_proceed_button")
-        action(button)
+        action = getattr(WarningAlreadyDownloadedScreen, f"on_ref_press_{screen.id}")
+        action("Mock", "VerifyStableZipScreen")
 
-        # patch assertions
-        mock_get_locale.assert_called()
-        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
+        mock_get_locale.assert_called_once()
         mock_set_screen.assert_called_once_with(
-            name="VerifyStableZipScreen", direction="right"
+            name="VerifyStableZipScreen", direction="left"
         )

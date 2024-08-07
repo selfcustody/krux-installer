@@ -1,3 +1,4 @@
+import sys
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -104,10 +105,27 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        window = EventLoop.window
+
+        fontsize_mm = 0
+
+        if sys.platform in ("linux", "win32"):
+            fontsize_mm = window.size[0] // 24
+
+        if sys.platform == "darwin":
+            fontsize_mm = window.size[0] // 48
 
         screen.on_pre_enter()
 
-        text = "[size=32sp][color=#efcc00]Verifying integrity and authenticity[/color][/size]"
+        text = "\n".join(
+            [
+                f"[size={fontsize_mm}sp]",
+                "[color=#efcc00]",
+                "Verifying integrity and authenticity",
+                "[/color]",
+                "[/size]",
+            ]
+        )
         self.assertEqual(len(screen.ids["verify_stable_zip_screen_grid"].children), 1)
         self.assertEqual(screen.ids["verify_stable_zip_screen_label"].text, text)
 

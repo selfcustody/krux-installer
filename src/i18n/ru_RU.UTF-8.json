@@ -58,8 +58,8 @@
     "you can check manually with the following command": "Вы можете проверить вручную с помощью следующей команды"
   },  
   "unzip_stable_screen": {
-    "Flash update with": "Программирование \nфлэш-памяти с помощью",
-    "Airgap update with": "Программирование \nAirgap с помощью",
+    "Flash with": "Вспышка с",
+    "Air-gapped update with": "Программирование \nAir-gapped с помощью",
     "Unziping": "Декомпрессия",
     "Unziped": "Неупакованный"
   },

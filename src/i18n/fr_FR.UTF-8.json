@@ -58,8 +58,8 @@
     "you can check manually with the following command": "vous pouvez vérifier manuellement avec la commande suivante"
   },
   "unzip_stable_screen": {
-    "Flash update with": "Programmer par flash avec",
-    "Airgap update with": "Programmer de manière airgap avec",
+    "Flash with": "Flash avec",
+    "Air-gapped update with": "Programmer de manière air-gapped avec",
     "Unziping": "Décompression de",
     "Unziped": "Décompressé"
   },

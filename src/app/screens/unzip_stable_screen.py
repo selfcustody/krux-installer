@@ -22,6 +22,7 @@
 verify_stable_zip_screen.py
 """
 import os
+import sys
 import time
 from functools import partial
 from kivy.clock import Clock
@@ -97,15 +98,25 @@ class UnzipStableScreen(BaseScreen):
         zip_file = f"{self.assets_dir}/krux-{self.version}.zip"
         base_path = f"krux-{self.version}/maixpy_{self.device}"
         rel_path = f"{self.assets_dir}/{base_path}"
-        flash_msg = self.translate("Flash update with")
+        flash_msg = self.translate("Flash with")
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
+
+        size = [0, 0]
+
+        if sys.platform in ("linux", "win32"):
+            size = [self.SIZE_MM, self.SIZE_MP]
+        else:
+            size = [self.SIZE_M, self.SIZE_P]
 
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
             file_path = f"{rel_path}/kboot.kfpkg"
             self.ids[instance.id].text = "\n".join(
-                [extract_msg, f"[size=14sp][color=#efcc00]{file_path}[/color][/size]"]
+                [
+                    f"[size={size[0]}sp]{extract_msg}[/size]",
+                    f"[size={size[1]}sp][color=#efcc00]{file_path}[/color][/size]",
+                ]
             )
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
@@ -134,8 +145,8 @@ class UnzipStableScreen(BaseScreen):
 
             self.ids[instance.id].text = "\n".join(
                 [
-                    extracted_msg,
-                    f"[size=12sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
+                    f"[size={size[0]}sp]{extracted_msg}[/size]",
+                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
                 ]
             )
 
@@ -150,8 +161,8 @@ class UnzipStableScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             text=f"\n".join(
                 [
-                    flash_msg,
-                    f"[size=14sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
+                    f"[size={size[0]}sp]{flash_msg}[/size]",
+                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
                 ]
             ),
             markup=True,
@@ -169,11 +180,21 @@ class UnzipStableScreen(BaseScreen):
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
 
+        size = [0, 0]
+
+        if sys.platform in ("linux", "win32"):
+            size = [self.SIZE_MM, self.SIZE_MP]
+        else:
+            size = [self.SIZE_M, self.SIZE_P]
+
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
             file_path = f"{rel_path}/firmware.bin"
             self.ids[instance.id].text = "\n".join(
-                [extract_msg, f"[size=14sp][color=#efcc00]{file_path}[/color][/size]"]
+                [
+                    f"[size={size[0]}sp]{extract_msg}[/size]",
+                    f"[size={size[1]}sp][color=#efcc00]{file_path}[/color][/size]",
+                ]
             )
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
@@ -197,8 +218,8 @@ class UnzipStableScreen(BaseScreen):
 
             self.ids[instance.id].text = "\n".join(
                 [
-                    extracted_msg,
-                    f"[size=12sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
+                    f"[size={size[0]}sp]{extracted_msg}[/size]",
+                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
                 ]
             )
 
@@ -213,8 +234,8 @@ class UnzipStableScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             text="\n".join(
                 [
-                    airgap_msg,
-                    f"[size=14sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
+                    f"[size={size[0]}sp]{airgap_msg}[/size]",
+                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
                 ]
             ),
             markup=True,

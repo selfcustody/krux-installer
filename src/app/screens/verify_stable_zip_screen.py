@@ -21,7 +21,7 @@
 """
 verify_stable_zip_screen.py
 """
-import io
+import sys
 import time
 from functools import partial
 from kivy.clock import Clock
@@ -196,23 +196,29 @@ class VerifyStableZipScreen(BaseScreen):
         sha_0 = "\n".join(subset_sha_0)
         sha_1 = "\n".join(subset_sha_1)
 
+        if sys.platform in ("linux", "win32"):
+            size = [self.SIZE_MP, self.SIZE_PP, self.SIZE_P]
+
+        else:
+            size = [self.SIZE_M, self.SIZE_P, self.SIZE_MP]
+
         return "\n".join(
             [
                 "",
-                f"[size={self.SIZE_M}sp][u]{integrity_msg.upper()}[/u]:[/size]",
+                f"[size={size[0]}sp][u]{integrity_msg.upper()}[/u]:[/size]",
                 "",
-                f"[size={self.SIZE_P}sp][b][color=777777]{assets_dir}/krux-{version}.zip[/b]",
-                f"[size={self.SIZE_P}sp][b](computed hash)[/b][/color][/size]",
+                f"[size={size[1]}sp][b][color=777777]{assets_dir}/krux-{version}.zip[/b][/size]",
+                f"[size={size[1]}sp][b](computed hash)[/b][/color][/size]",
                 "",
-                f"[size={self.SIZE_MP}sp]{sha_0}[/size]",
+                f"[size={size[2]}sp]{sha_0}[/size]",
                 "",
                 "",
-                f"[size={self.SIZE_P}sp][b][color=#777777]{assets_dir}/krux-{version}.zip.sha256.txt[/b][/size]",
-                f"[size={self.SIZE_P}sp][b](provided hash from github)[/b][/color][/size]",
+                f"[size={size[1]}sp][b][color=#777777]{assets_dir}/krux-{version}.zip.sha256.txt[/b][/size]",
+                f"[size={size[1]}sp][b](provided hash from github)[/b][/color][/size]",
                 "",
-                f"[size={self.SIZE_MP}sp]{sha_1}[/size]",
+                f"[size={size[2]}sp]{sha_1}[/size]",
                 "",
-                f"[size={self.SIZE_MP}sp]Result: [color=#{"00ff00" if checksum else "ff0000"}][b]{success_msg if checksum else failed_msg}[/b][/color][/size]",
+                f"[size={size[2]}sp][color=#{"00ff00" if checksum else "ff0000"}][b]{success_msg if checksum else failed_msg}[/b][/color][/size]",
                 "",
                 "",
             ]
@@ -243,30 +249,36 @@ class VerifyStableZipScreen(BaseScreen):
         installed_msg = self.translate("If you have openssl installed on your system")
         check_msg = self.translate("you can check manually with the following command")
 
+        if sys.platform in ("linux", "win32"):
+            size = [self.SIZE_MP, self.SIZE_P]
+
+        else:
+            size = [self.SIZE_M, self.SIZE_MP]
+
         return "\n".join(
             [
                 "",
                 "",
-                f"[size={self.SIZE_M}sp][u]{authenticity_msg.upper()}[/u]:[/size]",
+                f"[size={size[0]}sp][u]{authenticity_msg.upper()}[/u]:[/size]",
                 "",
                 "",
                 "",
-                f"[size={self.SIZE_MP}sp]{installed_msg}[/size]",
-                f"[size={self.SIZE_MP}sp]{check_msg}:[/size]",
+                f"[size={size[1]}sp]{installed_msg}[/size]",
+                f"[size={size[1]}sp]{check_msg}:[/size]",
                 "",
                 "",
                 "",
-                f"[size={self.SIZE_MP}sp][b]openssl sha256< [color=#777777]{assets_dir}/krux-{version}.zip[/color] -binary | \\",
+                f"[size={size[1]}sp][b]openssl sha256< [color=#777777]{assets_dir}/krux-{version}.zip[/color] -binary | \\",
                 f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{assets_dir}/selfcustody.pem[/color] \\",
                 f"-sigfile [color=#777777]{assets_dir}/krux-{version}.zip.sig[/color][/size][/color][/b][/size]",
                 "",
                 "",
                 "",
-                f"[size={self.SIZE_MP}sp]Result: [b][color=#{"00ff00" if checksig else "ff0000"}]{good_msg if checksig else bad_msg} {sig_msg}[/b][/color][/size]",
+                f"[size={size[1]}sp][b][color=#{"00ff00" if checksig else "ff0000"}]{good_msg if checksig else bad_msg} {sig_msg}[/b][/color][/size]",
                 "",
                 "",
                 "",
-                f"[size={self.SIZE_M}sp]",
+                f"[size={size[0]}sp]",
                 "[b]"
                 "             ".join(
                     [

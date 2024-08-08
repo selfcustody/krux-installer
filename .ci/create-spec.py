@@ -84,6 +84,7 @@ if __name__ == "__main__":
         # to add a hidden import for ssl
         # (necessary for request module)
         BUILDER_ARGS.append("--hidden-import=ssl")
+        BUILDER_ARGS.append("--hidden-import=pillow")
 
     # Necessary for get version and
     # another infos in application

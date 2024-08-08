@@ -90,6 +90,7 @@ class ErrorScreen(BaseScreen):
             "SelectDeviceScreen",
             "SelectVersionScreen",
             "SelectOldVersionScreen",
+            "AboutScreen",
             "ErrorScreen",
         ):
             self.debug(f"Updating {self.name} from {name}...")

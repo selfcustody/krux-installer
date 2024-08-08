@@ -11,11 +11,10 @@ class TestAboutScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_render_main_screen(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_render_main_screen(self, mock_get_locale):
         screen = AboutScreen()
         self.render(screen)
 
@@ -23,30 +22,58 @@ class TestAboutScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[0]
+        label = grid.children[0]
 
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "AboutScreen")
         self.assertEqual(screen.id, "about_screen")
         self.assertEqual(grid.id, "about_screen_grid")
-        self.assertEqual(button.id, "about_screen_button")
+        self.assertEqual(label.id, "about_screen_label")
 
-        title = "[b]krux-installer[/b]"
-        version = "v0.0.2-alpha-1"
-        source = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer]Check source code[/ref][/color]"
-        issues = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer/issues]I found a bug![/ref][/color]"
+        text = "\n".join(
+            [
+                "".join(
+                    [
+                        f"[size={screen.SIZE_G}sp]",
+                        "[color=#00AABB]",
+                        "[ref=SourceCode][b]v0.0.2-alpha-1[/b][/ref]",
+                        "[/color]",
+                        "[/size]",
+                    ]
+                ),
+                "",
+                "",
+                "".join(
+                    [
+                        f"[size={screen.SIZE_M}sp]",
+                        "follow us on X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
+                        "[/size]",
+                    ]
+                ),
+                "",
+                "",
+                "".join(
+                    [
+                        f"[size={screen.SIZE_M}sp]",
+                        "[color=#00FF00]",
+                        "[ref=Back]",
+                        "Back",
+                        "[/ref]",
+                        "[/color]",
+                        "[/size]",
+                    ]
+                ),
+            ]
+        )
 
-        "\n".join([title, version, "", source, "", issues])
-
-        self.assertEqual(button.text, "")
-        mock_get_running_app.assert_called_once()
+        self.assertEqual(label.text, text)
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_update_locale(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="pt_BR.UTF-8"
+    )
+    def test_update_locale(self, mock_get_locale):
         screen = AboutScreen()
         self.render(screen)
 
@@ -54,89 +81,106 @@ class TestAboutScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        button = grid.children[0]
+        label = grid.children[0]
 
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
 
-        title = "[b]krux-installer[/b]"
-        version = "v0.0.2-alpha-1"
-        source = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer]Verifique o código-fonte[/ref][/color]"
-        issues = "[color=#00AABB][ref=https://github.com/selfcustody/krux-installer/issues]Eu encontrei um bug![/ref][/color]"
-
-        self.assertEqual(
-            button.text, "\n".join([title, version, "", source, "", issues])
+        text = "\n".join(
+            [
+                "".join(
+                    [
+                        f"[size={screen.SIZE_G}sp]",
+                        "[color=#00AABB]",
+                        "[ref=SourceCode][b]v0.0.2-alpha-1[/b][/ref]",
+                        "[/color]",
+                        "[/size]",
+                    ]
+                ),
+                "",
+                "",
+                "".join(
+                    [
+                        f"[size={screen.SIZE_M}sp]",
+                        "siga-nos no X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
+                        "[/size]",
+                    ]
+                ),
+                "",
+                "",
+                "".join(
+                    [
+                        f"[size={screen.SIZE_M}sp]",
+                        "[color=#00FF00]",
+                        "[ref=Back]",
+                        "Voltar",
+                        "[/ref]",
+                        "[/color]",
+                        "[/size]",
+                    ]
+                ),
+            ]
         )
-        mock_get_running_app.assert_called_once()
+        self.assertEqual(label.text, text)
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    @patch("src.app.screens.about_screen.AboutScreen.set_background")
-    def test_on_press(self, mock_set_background, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.about_screen.webbrowser")
+    def test_on_press_version(self, mock_webbrowser, mock_get_locale):
+        mock_webbrowser.open = MagicMock()
 
         screen = AboutScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
 
-        action = getattr(screen, "on_press_about_screen_button")
-        action(button)
+        action = getattr(screen, "on_ref_press_about_screen_label")
+        action("Mock", "SourceCode")
 
-        mock_set_background.assert_called_once_with(
-            wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
+        mock_get_locale.assert_called_once()
+        mock_webbrowser.open.assert_called_once_with(
+            "https://selfcustody.github.io/krux/getting-started/installing/from-gui/"
         )
-        mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    @patch("src.app.screens.about_screen.AboutScreen.set_background")
-    @patch("src.app.screens.about_screen.AboutScreen.set_screen")
-    def test_on_release(
-        self, mock_set_screen, mock_set_background, mock_get_running_app
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.about_screen.webbrowser")
+    def test_on_press_x_formerly_known_as_twitter(
+        self, mock_webbrowser, mock_get_locale
     ):
-
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+        mock_webbrowser.open = MagicMock()
 
         screen = AboutScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
 
-        action = getattr(screen, "on_release_about_screen_button")
-        action(button)
+        action = getattr(screen, "on_ref_press_about_screen_label")
+        action("Mock", "X")
 
-        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
+        mock_webbrowser.open.assert_called_once_with("https://x.com/selfcustodykrux")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    @patch("src.app.screens.about_screen.webbrowser.open")
-    def test_on_ref_press(self, mock_webbrowser_open, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.about_screen.AboutScreen.set_screen")
+    def test_on_press_back(self, mock_set_screen, mock_get_locale):
         screen = AboutScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
 
-        action = getattr(screen, "on_ref_press_about_screen_button")
-        action(button, "https://mock.test")
+        action = getattr(screen, "on_ref_press_about_screen_label")
+        action("Mock", "Back")
 
-        mock_get_running_app.assert_called_once()
-        mock_webbrowser_open.assert_called_once_with("https://mock.test")
+        mock_get_locale.assert_called_once()
+        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")

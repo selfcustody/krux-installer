@@ -21,7 +21,12 @@
 """
 about_screen.py
 """
+from functools import partial
 import webbrowser
+from kivy.clock import Clock
+from kivy.core.window import Window
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
 from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
 
@@ -31,38 +36,46 @@ class AboutScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="about_screen", name="AboutScreen", **kwargs)
+        self.src_code = (
+            "https://selfcustody.github.io/krux/getting-started/installing/from-gui/"
+        )
+
         self.make_grid(wid="about_screen_grid", rows=1)
-        self.src_code = "https://github.com/selfcustody/krux-installer"
 
-        def _on_press(instance):
-            self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-
-        def _on_release(instance):
-            self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-            self.set_screen(name="MainScreen", direction="right")
-
-        self.make_button(
-            row=0,
-            id="about_screen_button",
-            root_widget="about_screen_grid",
+        self.make_label(
+            wid=f"{self.id}_label",
             text="",
+            root_widget=f"{self.id}_grid",
             markup=True,
-            on_press=_on_press,
-            on_release=_on_release,
+            halign="justify",
         )
 
         def _on_ref_press(*args):
             self.debug(f"Calling Button::{args[0]}::on_ref_press")
             self.debug(f"Opening {args[1]}")
-            webbrowser.open(args[1])
 
-        self.ids["about_screen_button"].halign = "center"
-        self.ids["about_screen_button"].valign = "center"
+            if args[1] == "Back":
+                self.set_screen(name="MainScreen", direction="right")
 
-        setattr(self, "on_ref_press_about_screen_button", _on_ref_press)
-        self.ids["about_screen_button"].bind(on_ref_press=_on_ref_press)
+            elif args[1] == "X":
+                webbrowser.open("https://x.com/selfcustodykrux")
+
+            elif args[1] == "SourceCode":
+                webbrowser.open(self.src_code)
+
+            else:
+                self.redirect_error(f"Invalid ref: {args[1]}")
+
+        setattr(self, f"on_ref_press_{self.id}_label", _on_ref_press)
+        self.ids[f"{self.id}_label"].bind(on_ref_press=_on_ref_press)
+
+        fns = [
+            partial(self.update, name=self.name, key="canvas"),
+            partial(self.update, name=self.name, key="locale", value=self.locale),
+        ]
+
+        for fn in fns:
+            Clock.schedule_once(fn, 0)
 
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
@@ -71,45 +84,58 @@ class AboutScreen(BaseScreen):
         value = kwargs.get("value")
 
         # Check if update to screen
-        if name in (
-            "KruxInstallerApp",
-            "ConfigKruxInstaller",
-        ):
+        if name in ("KruxInstallerApp", "ConfigKruxInstaller", "AboutScreen"):
             self.debug(f"Updating {self.name} from {name}...")
         else:
             self.redirect_error(msg=f"Invalid screen name: {name}")
 
+        if key == "canvas":
+            # prepare background
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
+
         # Check locale
-        if key == "locale":
+        elif key == "locale":
             if value is not None:
                 self.locale = value
-                title = f"[b]{get_name()}[/b]"
-                version = f"v{get_version()}"
+                follow = self.translate("follow us on X")
+                back = self.translate("Back")
 
-                source = "".join(
+                version = "".join(
                     [
+                        f"[size={self.SIZE_G}sp]",
                         "[color=#00AABB]",
-                        f"[ref={self.src_code}]",
-                        self.translate("Check source code"),
-                        "[/ref]",
+                        f"[ref=SourceCode][b]v{get_version()}[/b][/ref]",
                         "[/color]",
+                        "[/size]",
                     ]
                 )
 
-                issues = "".join(
+                X = "".join(
                     [
-                        "[color=#00AABB]",
-                        f"[ref={self.src_code}/issues]",
-                        f"{self.translate("I found a bug")}!",
-                        "[/ref]",
-                        "[/color]",
+                        f"[size={self.SIZE_M}sp]",
+                        f"{follow}: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
+                        "[/size]",
                     ]
                 )
 
-                if f"{self.id}_button" in self.ids:
-                    self.ids[f"{self.id}_button"].text = "\n".join(
-                        [title, version, "", source, "", issues]
-                    )
+                back = "".join(
+                    [
+                        f"[size={self.SIZE_M}sp]",
+                        "[color=#00FF00]",
+                        "[ref=Back]",
+                        back,
+                        "[/ref]",
+                        "[/color]",
+                        "[/size]",
+                    ]
+                )
+
+                self.ids[f"{self.id}_label"].text = "\n".join(
+                    [version, "", "", X, "", "", back]
+                )
+
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 

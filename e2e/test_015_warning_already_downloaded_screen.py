@@ -115,7 +115,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             size = [window.size[0] // 32, window.size[0] // 48, window.size[0] // 64]
 
         if sys.platform == "darwin":
-            size = [window.size[0] // 128, window.size[0] // 192, window.size[0] // 256]
+            size = [window.size[0] // 48, window.size[0] // 128, window.size[0] // 128]
 
         label_text = "\n".join(
             [

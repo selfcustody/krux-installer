@@ -124,7 +124,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 size = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
 
             else:
-                size = [self.SIZE_MP, self.SIZE_P, self.SIZE_PP]
+                size = [self.SIZE_MM, self.SIZE_MP, self.SIZE_MP]
 
             self.ids[f"{self.id}_label"].text = "\n".join(
                 [

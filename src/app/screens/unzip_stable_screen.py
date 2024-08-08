@@ -101,13 +101,7 @@ class UnzipStableScreen(BaseScreen):
         flash_msg = self.translate("Flash with")
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [self.SIZE_MM, self.SIZE_MP]
-        else:
-            size = [self.SIZE_M, self.SIZE_P]
+        size = [self.SIZE_MM, self.SIZE_MP]
 
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
@@ -176,55 +170,54 @@ class UnzipStableScreen(BaseScreen):
         zip_file = f"{self.assets_dir}/krux-{self.version}.zip"
         base_path = f"krux-{self.version}/maixpy_{self.device}"
         rel_path = f"{self.assets_dir}/{base_path}"
-        airgap_msg = self.translate("Airgap update with")
+        airgap_msg = self.translate("Air-gapped update with")
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
 
-        size = [0, 0]
+        size = [self.SIZE_MM, self.SIZE_MP]
 
-        if sys.platform in ("linux", "win32"):
-            size = [self.SIZE_MM, self.SIZE_MP]
-        else:
-            size = [self.SIZE_M, self.SIZE_P]
+        activated = False
 
         def _press(instance):
-            self.debug(f"Calling Button::{instance.id}::on_press")
-            file_path = f"{rel_path}/firmware.bin"
-            self.ids[instance.id].text = "\n".join(
-                [
-                    f"[size={size[0]}sp]{extract_msg}[/size]",
-                    f"[size={size[1]}sp][color=#efcc00]{file_path}[/color][/size]",
-                ]
-            )
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+            if activated:
+                self.debug(f"Calling Button::{instance.id}::on_press")
+                file_path = f"{rel_path}/firmware.bin"
+                self.ids[instance.id].text = "\n".join(
+                    [
+                        f"[size={size[0]}sp]{extract_msg}[/size]",
+                        f"[size={size[1]}sp][color=#efcc00]{file_path}[/color][/size]",
+                    ]
+                )
+                self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
         def _release(instance):
-            self.debug(f"Calling Button::{instance.id}::on_release")
-            file_path = f"{base_path}/firmware.bin"
-            unziper = FirmwareUnzip(
-                filename=zip_file, device=self.device, output=self.assets_dir
-            )
+            if activated:
+                self.debug(f"Calling Button::{instance.id}::on_release")
+                file_path = f"{base_path}/firmware.bin"
+                unziper = FirmwareUnzip(
+                    filename=zip_file, device=self.device, output=self.assets_dir
+                )
 
-            screen = self.manager.get_screen("AirgapScreen")
-            fns = [
-                partial(screen.update, key="firmware", value=file_path),
-                partial(screen.update, key="device", value=self.device),
-            ]
-            for fn in fns:
-                Clock.schedule_once(fn, 0)
-
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-            unziper.load()
-
-            self.ids[instance.id].text = "\n".join(
-                [
-                    f"[size={size[0]}sp]{extracted_msg}[/size]",
-                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
+                screen = self.manager.get_screen("AirgapScreen")
+                fns = [
+                    partial(screen.update, key="firmware", value=file_path),
+                    partial(screen.update, key="device", value=self.device),
                 ]
-            )
+                for fn in fns:
+                    Clock.schedule_once(fn, 0)
 
-            time.sleep(2.1)
-            self.set_screen(name="AirgapScreen", direction="left")
+                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+                unziper.load()
+
+                self.ids[instance.id].text = "\n".join(
+                    [
+                        f"[size={size[0]}sp]{extracted_msg}[/size]",
+                        f"[size={size[1]}sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
+                    ]
+                )
+
+                time.sleep(2.1)
+                self.set_screen(name="AirgapScreen", direction="left")
 
         setattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button", _press)
         setattr(UnzipStableScreen, f"on_release_{self.id}_airgap_button", _release)
@@ -234,8 +227,8 @@ class UnzipStableScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             text="\n".join(
                 [
-                    f"[size={size[0]}sp]{airgap_msg}[/size]",
-                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
+                    f"[size={size[0]}sp][color=#333333]{airgap_msg}[/color][/size]",
+                    f"[size={size[1]}sp][color=#333333]{rel_path}/firmware.bin[/color][/size]",
                 ]
             ),
             markup=True,

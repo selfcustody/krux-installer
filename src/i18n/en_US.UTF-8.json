@@ -63,6 +63,10 @@
     "Unziping": "Extracting",
     "Unziped": "Extracted"
   },
+  "flash_screen": {
+    "DONE": "DONE",
+    "Back": "Back"
+  },
   "about_screen": {
     "follow us on X": "follow us on X",
     "Back": "Back"

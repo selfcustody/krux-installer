@@ -63,6 +63,10 @@
     "Unziping": "Uitpak",
     "Unziped": "Uitgepak"
   },  
+  "flash_screen": {
+    "DONE": "GEDOEN",
+    "Back": "Terug"
+  },
   "about_screen": {
     "follow us on X": "volg ons op X",
     "Back": "Terug"

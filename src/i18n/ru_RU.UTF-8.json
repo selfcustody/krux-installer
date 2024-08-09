@@ -63,6 +63,10 @@
     "Unziping": "Декомпрессия",
     "Unziped": "Неупакованный"
   },
+  "flash_screen": {
+    "DONE": "ДОГОВОРИЛИСЬ",
+    "Back": "Назад"
+  },
   "about_screen": {
     "follow us on X": "следите за нами на X",
     "Back": "Назад"

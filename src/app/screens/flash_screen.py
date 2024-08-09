@@ -97,10 +97,47 @@ class FlashScreen(BaseFlashScreen):
                 ]
             )
 
+        def on_ref_press(*args):
+            if args[1] == "Back":
+                self.set_screen(name="MainScreen", direction="right")
+
+            elif args[1] == "Quit":
+                App.get_running_app().stop()
+
+            else:
+                self.redirect_error(f"Invalid ref: {args[1]}")
+
         def on_trigger_callback(dt):
+            del self.output[4:]
             self.ids[f"{self.id}_loader"].source = self.done_img
             self.ids[f"{self.id}_loader"].reload()
-            self.ids[f"{self.id}_progress"].text = "[size=48sp][b]DONE![/b][/size]"
+            done = self.translate("DONE")
+            back = self.translate("Back")
+            quit = self.translate("Quit")
+            self.ids[f"{self.id}_progress"].text = "\n".join(
+                [
+                    "".join(
+                        [
+                            f"[font={self.font}]",
+                            f"[size={self.SIZE_MP}sp][b]{done}![/b][/size]",
+                            "[/font]",
+                        ]
+                    ),
+                    "",
+                    "",
+                    "".join(
+                        [
+                            f"[font={self.font}]",
+                            f"[size={self.SIZE_MP}sp]",
+                            f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
+                            "        ",
+                            f"[color=#00FF00][ref=Quit]{quit}[/ref][/color]",
+                            "[/font]",
+                        ]
+                    ),
+                ]
+            )
+            self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
 
         setattr(FlashScreen, "on_print_callback", on_print_callback)
         setattr(FlashScreen, "on_process_callback", on_process_callback)

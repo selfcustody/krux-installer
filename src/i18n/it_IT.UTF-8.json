@@ -62,7 +62,11 @@
     "Air-gapped update with": "Aggiornamento isolato con",
     "Unziping": "Decompressione",
     "Unziped": "Decompresso"
-  },  
+  },
+  "flash_screen": {
+    "DONE": "FATTO",
+    "Back": "Indietro"
+  },
   "about_screen": {
     "follow us on X": "seguici su X",
     "Back": "Ritirati"

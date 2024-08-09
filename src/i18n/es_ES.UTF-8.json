@@ -63,6 +63,10 @@
     "Unziping": "Descomprimir",
     "Unziped": "Descomprimido"
   },
+  "flash_screen": {
+    "DONE": "HECHO",
+    "Back": "Volver"
+  },
   "about_screen": {
     "follow us on X": "síguenos en X",
     "Back": "Volver"

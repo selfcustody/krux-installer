@@ -1,0 +1,70 @@
+{
+  "check_permissions_screen": {
+    "Setup": "설치",
+    "for": "때문에",
+    "Checking": "확인",
+    "permissions for": "에 대한 권한",
+    "WARNING": "경고",
+    "This is first run of KruxInstaller in": "이것은 KruxInstaller의 첫 번째 실행입니다.",
+    "and it appears that you do not have privileged access to make flash procedures": "그리고 플래시 절차를 만들 수있는 권한이없는 것 같습니다.",
+    "To proceed, click in the screen and a prompt will ask for your password": "계속하려면 화면을 클릭하면 암호를 묻는 메시지가 표시됩니다",
+    "to execute the following command": "다음 명령을 실행합니다",
+    "You may need to logout (or even reboot)": "로그아웃(또는 재부팅)이 필요할 수 있습니다.",
+    "and back in for the new group to take effect": "그리고 새 그룹이 적용되도록 다시 참여합니다.",
+    "Do not worry, this message won't appear again": "이 메시지는 다시 나타나지 않으므로 걱정하지 마십시오"
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "인터넷 연결 확인"
+  },
+  "main_screen": {
+    "Version": "버전",
+    "Device": "장치",
+    "select a new one": "새 것을 선택하십시오",
+    "Flash": "펌웨어 업데이트",
+    "Wipe": "장치 지우기",
+    "Settings": "설정",
+    "About": "약",
+    "Fetching data from": "데이터 가져오기"
+  },
+  "select_version_screen": {
+    "Old versions": "이전 버전",
+    "Back": "뒤로"
+  },
+  "select_old_version_screen": {
+    "Back": "뒤로"
+  },
+  "warning_beta_screen": {
+    "WARNING": "경고",
+    "This is our test repository": "이것은 우리의 테스트 저장소입니다",
+    "These are unsigned binaries for the latest and most experimental features": "이는 최신 및 가장 실험적인 기능에 대한 서명되지 않은 이진 파일입니다",
+    "and it's just for trying new things and providing feedback.": "그리고 그것은 단지 새로운 것을 시도하고 피드백을 제공하기 위한 것입니다."
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "이미 다운로드한 자산",
+    "Do you want to proceed with the same file or do you want to download it again?": "동일한 파일로 계속 진행하시겠습니까, 아니면 다시 다운로드하시겠습니까?",
+    "Download again": "다시 다운로드",
+    "Proceed with current file": "현재 파일로 계속"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "무결성 및 신뢰성 확인",
+    "Integrity verification": "무결성 검증",
+    "SUCCESS": "성공",
+    "FAILED": "실패",
+    "Authenticity verification": "진위 여부 확인",
+    "GOOD": "좋다",
+    "BAD": "나쁘다",
+    "SIGNATURE": "서명",
+    "If you have openssl installed on your system": "시스템에 openssl이 설치되어 있는 경우",
+    "you can check manually with the following command": "다음 명령으로 확인할 수 있습니다"
+  },
+  "unzip_stable_screen": {
+    "Flash with": "플래시 사용",
+    "Air-gapped update with": "에어 갭 업데이트",
+    "Unziping": "추출",
+    "Unziped": "추출"
+  },
+  "about_screen": {
+    "follow us on X": "X에서 우리를 따르십시오",
+    "Back": "뒤로"
+  }
+}

@@ -24,10 +24,8 @@ __init__.py
 import os
 import sys
 from functools import partial
-from kivy import resources as kv_resources
 from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.greetings_screen import GreetingsScreen
 from src.app.screens.check_permissions_screen import CheckPermissionsScreen
@@ -68,27 +66,6 @@ class KruxInstallerApp(ConfigKruxInstaller):
         # Window.size = (640, 800)
         self.debug(f"Window.size={Window.size}")
         Window.clearcolor = (0.9, 0.9, 0.9, 1)
-
-        # When program is frozen exe
-        # try to fix the problem with windows
-        # that do not render images on bundled .exe
-        # https://stackoverflow.com/questions/71656465/
-        # how-to-include-image-in-kivy-application-with-onefile-mode-pyinstaller
-        # sys._MEIPASS is a temporary folder for PyInstaller.
-        if getattr(sys, "frozen", False):
-            # this is a Pyinstaller bundle
-            _meipass = getattr(sys, "_MEIPASS")
-            self.info(f"Adding resources from {_meipass}")
-            kv_resources.resource_add_path(_meipass)
-            assets_path = os.path.join(_meipass, "assets")
-        else:
-            cwd_path = os.path.dirname(__file__)
-            rel_assets_path = os.path.join(cwd_path, "..", "..", "assets")
-            assets_path = os.path.abspath(rel_assets_path)
-
-        terminus_path = f"{assets_path}/terminus.ttf"
-        self.info(f"Registering default font terminus={terminus_path}")
-        LabelBase.register(DEFAULT_FONT, terminus_path)
 
     def build(self):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""

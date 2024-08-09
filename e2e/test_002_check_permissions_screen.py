@@ -1,8 +1,10 @@
+import os
 import sys
 from unittest.mock import patch, MagicMock, call
 from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.check_permissions_screen import CheckPermissionsScreen
 
 
@@ -10,6 +12,17 @@ from src.app.screens.check_permissions_screen import CheckPermissionsScreen
 # they will break because it do not have the builtin 'grp' module
 @mark.skipif(sys.platform == "win32", reason="does not run on windows")
 class TestAboutScreen(GraphicUnitTest):
+
+    @classmethod
+    def setUpClass(cls):
+        cwd_path = os.path.dirname(__file__)
+        rel_assets_path = os.path.join(cwd_path, "..", "assets")
+        assets_path = os.path.abspath(rel_assets_path)
+        terminus_path = os.path.join(assets_path, "terminus.ttf")
+        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="neodgm", fn_regular=nanum_path)
+        LabelBase.register(DEFAULT_FONT, terminus_path)
 
     @classmethod
     def teardown_class(cls):
@@ -129,7 +142,15 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Ubuntu[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]Setup mockeduser for Ubuntu[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -173,7 +194,17 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Fedora[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]",
+                "Setup mockeduser for Fedora",
+                "[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -217,7 +248,17 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Mint[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]",
+                "Setup mockeduser for Mint",
+                "[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -263,7 +304,17 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Mockos[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]",
+                "Setup mockeduser for Mockos",
+                "[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -307,7 +358,14 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for ArchLinux[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for ArchLinux[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -351,7 +409,15 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Manjaro[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]Setup mockeduser for Manjaro[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -397,7 +463,15 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Slackware[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]Setup mockeduser for Slackware[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)
@@ -441,7 +515,17 @@ class TestAboutScreen(GraphicUnitTest):
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="check_user")
-        message = f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for Gentoo[/color][/size]"
+        message = "".join(
+            [
+                "[font=terminus]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]",
+                "Setup mockeduser for Gentoo",
+                "[/color]",
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # default assertions
         self.assertEqual(button.text, message)

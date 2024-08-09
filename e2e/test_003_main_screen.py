@@ -1,11 +1,24 @@
+import os
 import re
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.main_screen import MainScreen
 
 
 class TestMainScreen(GraphicUnitTest):
+
+    @classmethod
+    def setUpClass(cls):
+        cwd_path = os.path.dirname(__file__)
+        rel_assets_path = os.path.join(cwd_path, "..", "assets")
+        assets_path = os.path.abspath(rel_assets_path)
+        terminus_path = os.path.join(assets_path, "terminus.ttf")
+        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="neodgm", fn_regular=nanum_path)
+        LabelBase.register(DEFAULT_FONT, terminus_path)
 
     @classmethod
     def teardown_class(cls):
@@ -179,13 +192,23 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        self.assertEqual(
-            device_button.text, "Version: [color=#00AABB]select a new one[/color]"
+        text_device = "".join(
+            [
+                "[font=terminus]",
+                "Version: [color=#00AABB]select a new one[/color]",
+                "[/font]",
+            ]
         )
-        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
-        self.assertTrue(flash_button.markup)
-        self.assertTrue(wipe_button.markup)
+        text_flash = "".join(
+            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+        )
+        text_wipe = "".join(
+            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
+        )
+
+        self.assertEqual(device_button.text, text_device)
+        self.assertEqual(flash_button.text, text_flash)
+        self.assertEqual(wipe_button.text, text_wipe)
 
         for version in (
             "odudex/krux_binaries",
@@ -196,16 +219,16 @@ class TestMainScreen(GraphicUnitTest):
             "v22.08.0",
             "v22.03.0",
         ):
+            text_version = "".join(
+                [
+                    "[font=terminus]",
+                    f"Version: [color=#00AABB]{version}[/color]" "[/font]",
+                ]
+            )
             screen.update(name="SelectVersionScreen", key="version", value=version)
-            self.assertEqual(
-                device_button.text, f"Version: [color=#00AABB]{version}[/color]"
-            )
-            self.assertEqual(
-                flash_button.text, "[color=#333333]Update firmware[/color]"
-            )
-            self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
-            self.assertTrue(flash_button.markup)
-            self.assertTrue(wipe_button.markup)
+            self.assertEqual(device_button.text, text_version)
+            self.assertEqual(flash_button.text, text_flash)
+            self.assertEqual(wipe_button.text, text_wipe)
 
         mock_get_locale.assert_called_once()
 
@@ -225,23 +248,44 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        self.assertEqual(
-            device_button.text, "Device: [color=#00AABB]select a new one[/color]"
+        text_device = "".join(
+            [
+                "[font=terminus]",
+                "Device: [color=#00AABB]select a new one[/color]",
+                "[/font]",
+            ]
         )
-        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
-        self.assertTrue(flash_button.markup)
-        self.assertTrue(wipe_button.markup)
+        mocked_text_device = "".join(
+            [
+                "[font=terminus]",
+                "Device: [color=#00AABB]Mocked device[/color]",
+                "[/font]",
+            ]
+        )
+        text_flash = "".join(
+            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+        )
+        mocked_text_flash = "".join(["[font=terminus]", "Update firmware", "[/font]"])
+        text_wipe = "".join(
+            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
+        )
+        mocked_text_wipe = "".join(["[font=terminus]", "Wipe device", "[/font]"])
+
+        self.assertEqual(device_button.text, text_device)
+        self.assertEqual(flash_button.text, text_flash)
+        self.assertEqual(wipe_button.text, text_wipe)
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
             screen.update(name="SelectVersionScreen", key="device", value=device)
-            self.assertEqual(
-                device_button.text, f"Device: [color=#00AABB]{device}[/color]"
+            mocked_text_device = "".join(
+                [
+                    "[font=terminus]",
+                    f"Device: [color=#00AABB]{device}[/color]" "[/font]",
+                ]
             )
-            self.assertEqual(flash_button.text, "Update firmware")
-            self.assertEqual(wipe_button.text, "Wipe device")
-            self.assertFalse(flash_button.markup)
-            self.assertFalse(wipe_button.markup)
+            self.assertEqual(device_button.text, mocked_text_device)
+            self.assertEqual(flash_button.text, mocked_text_flash)
+            self.assertEqual(wipe_button.text, mocked_text_wipe)
 
         mock_get_locale.assert_called_once()
 
@@ -295,23 +339,33 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        self.assertEqual(
-            device_button.text, "Device: [color=#00AABB]select a new one[/color]"
+        text_device = "".join(
+            [
+                "[font=terminus]",
+                "Device: [color=#00AABB]select a new one[/color]", "[/font]",
+            ]
         )
-        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
-        self.assertTrue(flash_button.markup)
-        self.assertTrue(wipe_button.markup)
+        mocked_text_device = "".join(
+            [
+                "[font=terminus]",
+                "Device: [color=#00AABB]Mocked device[/color]", "[/font]",
+            ]
+        )
+        text_flash = "".join(
+            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+        )
+        text_wipe = "".join(
+            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
+        )
+        self.assertEqual(device_button.text, text_device)
+        self.assertEqual(flash_button.text, text_flash)
+        self.assertEqual(wipe_button.text, text_wipe)
 
         screen.update(name="SelectDeviceScreen", key="device", value="Mocked device")
 
-        self.assertEqual(
-            device_button.text, "Device: [color=#00AABB]Mocked device[/color]"
-        )
-        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
-        self.assertTrue(flash_button.markup)
-        self.assertTrue(wipe_button.markup)
+        self.assertEqual(device_button.text, mocked_text_device)
+        self.assertEqual(flash_button.text, text_flash)
+        self.assertEqual(wipe_button.text, text_wipe)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -347,10 +401,14 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(
             name="ConfigKruxInstaller", key="device", value="select a new one"
         )
-        self.assertEqual(screen.device, "select a new one")
-        self.assertEqual(
-            device_button.text, "Device: [color=#00AABB]select a new one[/color]"
+        text_device = "".join(
+            [
+                "[font=terminus]",
+                "Device: [color=#00AABB]select a new one[/color]", "[/font]",
+            ]
         )
+        self.assertEqual(screen.device, "select a new one")
+        self.assertEqual(device_button.text, text_device)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -369,8 +427,11 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
+        text_flash = "".join(
+            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+        )
         self.assertTrue(flash_button.markup)
-        self.assertEqual(flash_button.text, "[color=#333333]Update firmware[/color]")
+        self.assertEqual(flash_button.text, text_flash)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -390,8 +451,8 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
-        self.assertFalse(flash_button.markup)
-        self.assertEqual(flash_button.text, "Update firmware")
+        text_flash = "".join(["[font=terminus]", "Update firmware", "[/font]"])
+        self.assertEqual(flash_button.text, text_flash)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -413,8 +474,10 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
 
-        self.assertTrue(wipe_button.markup)
-        self.assertEqual(wipe_button.text, "[color=#333333]Wipe device[/color]")
+        text_wipe = "".join(
+            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
+        )
+        self.assertEqual(wipe_button.text, text_wipe)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -433,9 +496,9 @@ class TestMainScreen(GraphicUnitTest):
         wipe_button = grid.children[2]
 
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
+        text_wipe = "".join(["[font=terminus]", "Wipe device", "[/font]"])
 
-        self.assertFalse(wipe_button.markup)
-        self.assertEqual(wipe_button.text, "Wipe device")
+        self.assertEqual(wipe_button.text, text_wipe)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -454,7 +517,8 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="settings", value=None)
 
-        self.assertEqual(s_button.text, "Settings")
+        settings_text = "".join(["[font=terminus]", "Settings", "[/font]"])
+        self.assertEqual(s_button.text, settings_text)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -472,8 +536,8 @@ class TestMainScreen(GraphicUnitTest):
         a_button = grid.children[0]
 
         screen.update(name="ConfigKruxInstaller", key="about", value=None)
-
-        self.assertEqual(a_button.text, "About")
+        about_text = "".join(["[font=terminus]", "About", "[/font]"])
+        self.assertEqual(a_button.text, about_text)
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

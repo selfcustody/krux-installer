@@ -63,6 +63,7 @@ class BaseScreen(Screen, Trigger):
         self._error_img = os.path.join(root_assets_path, "assets", "error.png")
 
         self.locale = BaseScreen.get_locale()
+        self.font = "nanum" if self.locale.startswith("ko_KR") else "terminus"
 
         # Setup the correct font size
         if sys.platform in ("linux", "win32"):
@@ -278,6 +279,21 @@ class BaseScreen(Screen, Trigger):
 
     @staticmethod
     def get_locale() -> str:
+        app = App.get_running_app()
+        locale = app.config.get("locale", "lang")
+
+        if sys.platform in ("linux", "darwin"):
+            locale = locale.split(".")
+            return f"{locale[0].replace("-", "_")}.{locale[1]}"
+
+        elif sys.platform == "win32":
+            return f"{locale}.UTF-8"
+
+        else:
+            raise RuntimeError(f"Not implemented for '{sys.platform}'")
+
+    @staticmethod
+    def get_font_name() -> str:
         app = App.get_running_app()
         locale = app.config.get("locale", "lang")
 

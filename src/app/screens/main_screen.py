@@ -59,18 +59,63 @@ class MainScreen(BaseScreen):
         buttons = [
             (
                 "main_select_version",
-                f"{self.translate("Version")}: [color=#00AABB]{self.translate(self.version)}[/color]",
+                "".join(
+                    [
+                        f"[font={self.font}]",
+                        f"{self.translate("Version")}: ",
+                        "[color=#00AABB]",
+                        self.translate(self.version),
+                        "[/color]",
+                        "[/font]",
+                    ]
+                ),
                 True,
             ),
             (
                 "main_select_device",
-                f"{self.translate("Device")}: [color=#00AABB]{self.translate(self.device)}[/color]",
+                "".join(
+                    [
+                        f"[font={self.font}]",
+                        f"{self.translate("Device")}: ",
+                        "[color=#00AABB]",
+                        self.translate(self.device),
+                        "[/color]",
+                        "[/font]",
+                    ]
+                ),
                 True,
             ),
-            ("main_flash", f"[color=#333333]{self.translate("Flash")}[/color]", True),
-            ("main_wipe", f"[color=#333333]{self.translate("Wipe")}[/color]", True),
-            ("main_settings", self.translate("Settings"), False),
-            ("main_about", self.translate("About"), False),
+            (
+                "main_flash",
+                "".join(
+                    [
+                        f"[font={self.font}]",
+                        f"[color=#333333]{self.translate("Flash")}[/color]" "[/font]",
+                    ]
+                ),
+                True,
+            ),
+            (
+                "main_wipe",
+                "".join(
+                    [
+                        f"[font={self.font}]",
+                        f"[color=#333333]{self.translate("Wipe")}[/color]",
+                        "[/font]",
+                    ]
+                ),
+                True,
+            ),
+            (
+                "main_settings",
+                "".join([f"[font={self.font}]", self.translate("Settings"), "[/font]"]),
+                True,
+            ),
+            (
+                "main_about",
+                "".join([f"[font={self.font}]", self.translate("About"), "[/font]"]),
+                True,
+            ),
         ]
 
         # START of buttons
@@ -95,8 +140,18 @@ class MainScreen(BaseScreen):
 
                     self.ids[instance.id].text = "\n".join(
                         [
-                            f"[size={self.SIZE_M}sp][color=#efcc00][b]{self.translate("Fetching data from")}[/b][/color][/size]",
-                            f"[size={self.SIZE_MP}sp][color=#efcc00]https://api.github.com/repos/selfcustody/krux/releases[/color][/size]",
+                            f"[font={self.font}]",
+                            f"[size={self.SIZE_M}sp]",
+                            "[color=#efcc00]",
+                            f"[b]{self.translate("Fetching data from")}[/b]",
+                            "[/color]",
+                            "[/size]",
+                            f"[size={self.SIZE_MP}sp]",
+                            "[color=#efcc00]",
+                            "https://api.github.com/repos/selfcustody/krux/releases",
+                            "[/color]",
+                            "[/size]",
+                            "[/font]",
                         ]
                     )
 
@@ -323,10 +378,20 @@ class MainScreen(BaseScreen):
         # Check if update to given key
         elif key == "version":
 
-            self.version = value
-            self.ids["main_select_version"].text = (
-                f"{self.translate("Version")}: [color=#00AABB]{value}[/color]"
-            )
+            if value is not None:
+                self.version = value
+                self.ids["main_select_version"].text = "".join(
+                    [
+                        f"[font={self.font}]",
+                        f"{self.translate("Version")}: ",
+                        "[color=#00AABB]",
+                        value,
+                        "[/color]",
+                        "[/font]",
+                    ]
+                )
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "device":
 
@@ -335,56 +400,92 @@ class MainScreen(BaseScreen):
                 self.device = value
                 self.will_flash = True
                 self.will_wipe = True
-                self.ids["main_flash"].markup = False
-                self.ids["main_wipe"].markup = False
-                self.ids["main_flash"].text = self.translate("Flash")
-                self.ids["main_wipe"].text = self.translate("Wipe")
+                self.ids["main_flash"].text = "".join(
+                    [f"[font={self.font}]", self.translate("Flash"), "[/font]"]
+                )
+                self.ids["main_wipe"].text = "".join(
+                    [f"[font={self.font}]", self.translate("Wipe"), "[/font]"]
+                )
+
             else:
                 self.will_flash = False
                 self.will_wipe = False
                 self.ids["main_flash"].markup = True
                 self.ids["main_wipe"].markup = True
-                self.ids["main_flash"].text = (
-                    f"[color=#333333]{self.translate("Flash")}[/color]"
+                self.ids["main_flash"].text = "".join(
+                    [
+                        f"[font={self.font}]",
+                        "[color=#333333]",
+                        self.translate("Flash"),
+                        "[/color]",
+                        "[/font]",
+                    ]
                 )
-                self.ids["main_wipe"].text = (
-                    f"[color=#333333]{self.translate("Wipe")}[/color]"
+                self.ids["main_wipe"].text = "".join(
+                    [
+                        f"[font={self.font}]",
+                        "[color=#333333]",
+                        self.translate("Wipe"),
+                        "[/color]",
+                        "[/font]",
+                    ]
                 )
 
             if value == "select a new one":
                 value = self.translate("select a new one")
 
-            self.ids["main_select_device"].text = (
-                f"{self.translate("Device")}: [color=#00AABB]{value}[/color]"
-            )
+            if value is not None:
+                self.ids["main_select_device"].text = "".join(
+                    [
+                        f"[font={self.font}]",
+                        f"{self.translate("Device")}: ",
+                        "[color=#00AABB]",
+                        value,
+                        "[/color]" "[/font]",
+                    ]
+                )
 
         elif key == "flash":
             if not self.will_flash:
-                self.ids["main_flash"].markup = True
-                self.ids["main_flash"].text = (
-                    f"[color=#333333]{self.translate("Flash")}[/color]"
+                self.ids["main_flash"].text = "".join(
+                    [
+                        f"[font={self.font}]",
+                        "[color=#333333]",
+                        self.translate("Flash"),
+                        "[/color]",
+                        "[/font]",
+                    ]
                 )
             else:
-                self.ids["main_flash"].markup = False
-                self.ids["main_flash"].text = self.translate("Flash")
+                self.ids["main_flash"].text = "".join(
+                    [f"[font={self.font}]", self.translate("Flash"), "[/font]"]
+                )
 
         elif key == "wipe":
             if not self.will_wipe:
-                self.ids["main_wipe"].markup = True
-                self.ids["main_wipe"].text = (
-                    f"[color=#333333]{self.translate("Wipe")}[/color]"
+                self.ids["main_wipe"].text = "".join(
+                    [
+                        f"[font={self.font}]",
+                        "[color=#333333]",
+                        self.translate("Wipe"),
+                        "[/color]",
+                        "[/font]",
+                    ]
                 )
             else:
-                self.ids["main_wipe"].markup = False
-                self.ids["main_wipe"].text = self.translate("Wipe")
+                self.ids["main_wipe"].text = "".join(
+                    [f"[font={self.font}]", self.translate("Wipe"), "[/font]"]
+                )
 
         elif key == "settings":
-            self.ids["main_settings"].markup = False
-            self.ids["main_settings"].text = self.translate("Settings")
+            self.ids["main_settings"].text = "".join(
+                [f"[font={self.font}]", self.translate("Settings"), "[/font]"]
+            )
 
         elif key == "about":
-            self.ids["main_about"].markup = False
-            self.ids["main_about"].text = self.translate("About")
+            self.ids["main_about"].text = "".join(
+                [f"[font={self.font}]", self.translate("About"), "[/font]"]
+            )
 
         else:
             self.redirect_error(msg=f'Invalid key: "{key}"')

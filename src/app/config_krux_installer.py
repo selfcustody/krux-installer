@@ -27,13 +27,43 @@ import json
 import ctypes
 import locale
 from functools import partial
+from kivy import resources as kv_resources
 from kivy.clock import Clock
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.utils.trigger import Trigger
 from src.app.base_krux_installer import BaseKruxInstaller
 
 
 class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
     """BaseKruxInstller is the base for Appliction"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # When program is frozen exe
+        # try to fix the problem with windows
+        # that do not render images on bundled .exe
+        # https://stackoverflow.com/questions/71656465/
+        # how-to-include-image-in-kivy-application-with-onefile-mode-pyinstaller
+        # sys._MEIPASS is a temporary folder for PyInstaller.
+        if getattr(sys, "frozen", False):
+            # this is a Pyinstaller bundle
+            _meipass = getattr(sys, "_MEIPASS")
+            self.info(f"Adding resources from {_meipass}")
+            kv_resources.resource_add_path(_meipass)
+            self.assets_path = os.path.join(_meipass, "assets")
+        else:
+            cwd_path = os.path.dirname(__file__)
+            rel_assets_path = os.path.join(cwd_path, "..", "..", "assets")
+            self.assets_path = os.path.abspath(rel_assets_path)
+
+        self.info(f"Registering assets path={self.assets_path}")
+
+        terminus_path = os.path.join(self.assets_path, "terminus.ttf")
+        nanum_path = os.path.join(self.assets_path, "NanumGothic-Regular.ttf")
+
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="nanum", fn_regular=nanum_path)
 
     @staticmethod
     def make_lang_code(lang: str) -> str:
@@ -127,7 +157,16 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
 
         lang = ConfigKruxInstaller.get_system_lang()
         config.setdefaults("locale", {"lang": lang})
-        self.debug(f"{config}.lang={lang}")
+        self.info(f"{config}.lang={lang}")
+
+        if lang is not None:
+            if lang.startswith("kr_KO"):
+                font = os.path.join(self.assets_path, "NanumGothic-Regular.ttf")
+
+            else:
+                font = os.path.join(self.assets_path, "terminus.ttf")
+
+            LabelBase.register(DEFAULT_FONT, fn_regular=font)
 
     def build_settings(self, settings):
         """Create settings panel"""
@@ -158,6 +197,7 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                     ConfigKruxInstaller.make_lang_code("es_ES"),
                     ConfigKruxInstaller.make_lang_code("fr_FR"),
                     ConfigKruxInstaller.make_lang_code("it_IT"),
+                    ConfigKruxInstaller.make_lang_code("ko_KR"),
                     ConfigKruxInstaller.make_lang_code("pt_BR"),
                     ConfigKruxInstaller.make_lang_code("ru_RU"),
                 ],

@@ -342,13 +342,15 @@ class TestMainScreen(GraphicUnitTest):
         text_device = "".join(
             [
                 "[font=terminus]",
-                "Device: [color=#00AABB]select a new one[/color]", "[/font]",
+                "Device: [color=#00AABB]select a new one[/color]",
+                "[/font]",
             ]
         )
         mocked_text_device = "".join(
             [
                 "[font=terminus]",
-                "Device: [color=#00AABB]Mocked device[/color]", "[/font]",
+                "Device: [color=#00AABB]Mocked device[/color]",
+                "[/font]",
             ]
         )
         text_flash = "".join(
@@ -404,7 +406,8 @@ class TestMainScreen(GraphicUnitTest):
         text_device = "".join(
             [
                 "[font=terminus]",
-                "Device: [color=#00AABB]select a new one[/color]", "[/font]",
+                "Device: [color=#00AABB]select a new one[/color]",
+                "[/font]",
             ]
         )
         self.assertEqual(screen.device, "select a new one")

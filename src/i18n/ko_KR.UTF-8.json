@@ -7,11 +7,13 @@
     "WARNING": "경고",
     "This is first run of KruxInstaller in": "이것은 KruxInstaller의 첫 번째 실행입니다.",
     "and it appears that you do not have privileged access to make flash procedures": "그리고 플래시 절차를 만들 수있는 권한이없는 것 같습니다.",
-    "To proceed, click in the screen and a prompt will ask for your password": "계속하려면 화면을 클릭하면 암호를 묻는 메시지가 표시됩니다",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "To proceed, click in the Allow button and a prompt will ask for your password",
     "to execute the following command": "다음 명령을 실행합니다",
     "You may need to logout (or even reboot)": "로그아웃(또는 재부팅)이 필요할 수 있습니다.",
     "and back in for the new group to take effect": "그리고 새 그룹이 적용되도록 다시 참여합니다.",
-    "Do not worry, this message won't appear again": "이 메시지는 다시 나타나지 않으므로 걱정하지 마십시오"
+    "Do not worry, this message won't appear again": "이 메시지는 다시 나타나지 않으므로 걱정하지 마십시오",
+    "Allow": "Allow",
+    "Deny": "Deny"
   },
   "check_internet_connection_screen": {
     "Checking your internet connection": "인터넷 연결 확인"

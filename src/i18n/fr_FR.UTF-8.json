@@ -7,11 +7,13 @@
     "WARNING": "AVERTISSEMENT",
     "This is first run of KruxInstaller in": "Il s'agit de la première exécution de KruxInstaller dans",
     "and it appears that you do not have privileged access to make flash procedures": "et il semble que vous n'ayez pas d'accès privilégié pour effectuer des procédures flash",
-    "To proceed, click in the screen and a prompt will ask for your password": "Pour continuer, cliquez sur l'écran et une invite vous demandera votre mot de passe",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "Pour continuer, cliquez sur le bouton Autoriser et une invite vous demandera votre mot de passe",
     "to execute the following command": "pour exécuter la commande suivante",
     "You may need to logout (or even reboot)": "Vous devrez peut-être vous déconnecter (ou même redémarrer)",
     "and back in for the new group to take effect": "et de retour pour que le nouveau groupe prenne effet",
-    "Do not worry, this message won't appear again": "Ne vous inquiétez pas, ce message n'apparaîtra plus"
+    "Do not worry, this message won't appear again": "Ne vous inquiétez pas, ce message n'apparaîtra plus",    
+    "Allow": "Autoriser",
+    "Deny": "Nier"
   }, 
   "check_internet_connection_screen": {
     "Checking your internet connection": "Vérification de votre connexion Internet"

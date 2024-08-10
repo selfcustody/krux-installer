@@ -131,7 +131,7 @@ class FlashScreen(BaseFlashScreen):
                             f"[size={self.SIZE_MP}sp]",
                             f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                             "        ",
-                            f"[color=#00FF00][ref=Quit]{quit}[/ref][/color]",
+                            f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
                             "[/font]",
                         ]
                     ),

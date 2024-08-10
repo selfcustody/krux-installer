@@ -243,8 +243,10 @@ class TestWipeScreen(GraphicUnitTest):
         mock_trigger.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_on_trigger_callback(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_on_trigger_callback(self, mock_get_locale):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
@@ -253,16 +255,36 @@ class TestWipeScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        text = "[size=48sp][b]DONE![/b][/size]"
+        text = "\n".join(
+            [
+                "".join(
+                    [
+                        "[font=terminus]",
+                        f"[size={screen.SIZE_MP}sp][b]DONE![/b][/size]",
+                        "[/font]",
+                    ]
+                ),
+                "",
+                "",
+                "".join(
+                    [
+                        "[font=terminus]",
+                        f"[size={screen.SIZE_MP}sp]",
+                        "[color=#00FF00][ref=Back]Back[/ref][/color]",
+                        "        ",
+                        "[color=#EFCC00][ref=Quit]Quit[/ref][/color]",
+                        "[/font]",
+                    ]
+                ),
+            ]
+        )
         on_trigger_callback = getattr(WipeScreen, "on_trigger_callback")
         on_trigger_callback(0)
 
         self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
         # patch assertions
 
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")

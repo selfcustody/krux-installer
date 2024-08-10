@@ -11,7 +11,7 @@ from src.app.screens.check_permissions_screen import CheckPermissionsScreen
 # WARNING: Do not run these tests on windows
 # they will break because it do not have the builtin 'grp' module
 @mark.skipif(sys.platform == "win32", reason="does not run on windows")
-class TestAboutScreen(GraphicUnitTest):
+class TestCheckPermissionsScreen(GraphicUnitTest):
 
     @classmethod
     def setUpClass(cls):
@@ -21,7 +21,7 @@ class TestAboutScreen(GraphicUnitTest):
         terminus_path = os.path.join(assets_path, "terminus.ttf")
         nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
         LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="neodgm", fn_regular=nanum_path)
+        LabelBase.register(name="nanum", fn_regular=nanum_path)
         LabelBase.register(DEFAULT_FONT, terminus_path)
 
     @classmethod
@@ -649,8 +649,12 @@ class TestAboutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
-        mock_partial.assert_called_once_with(
-            screen.update, name="CheckPermissionsScreen", key="check_user"
+        mock_partial.assert_has_calls(
+            [
+                call(screen.update, name="CheckPermissionsScreen", key="canvas"),
+                call(screen.update, name="CheckPermissionsScreen", key="check_user"),
+            ],
+            any_order=True,
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -663,44 +667,11 @@ class TestAboutScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        buttons = grid.children
 
-        self.assertEqual(len(buttons), 1)
-        self.assertEqual(buttons[0].id, "check_permissions_screen_button")
+        self.assertTrue("check_permissions_screen_label" in screen.ids)
 
         # patch assertions
         mock_get_locale.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    @patch(
-        "src.app.screens.check_permissions_screen.CheckPermissionsScreen.set_background"
-    )
-    def test_on_press_check_permissions_button(
-        self, mock_set_background, mock_get_locale
-    ):
-        screen = CheckPermissionsScreen()
-        screen.manager = MagicMock()
-        screen.manager.get_screen = MagicMock()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
-        action = getattr(screen, "on_press_check_permissions_screen_button")
-
-        # Do the test
-        action(button)
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_set_background.assert_called_once_with(
-            wid="check_permissions_screen_button", rgba=(0.25, 0.25, 0.25, 1)
-        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
@@ -708,12 +679,9 @@ class TestAboutScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    @patch(
-        "src.app.screens.check_permissions_screen.CheckPermissionsScreen.set_background"
-    )
     @patch("src.app.screens.check_permissions_screen.SudoerLinux.exec")
-    def test_fail_on_release_check_permissions_button(
-        self, mock_exec, mock_set_background, mock_redirect_error, mock_get_locale
+    def test_fail_on_ref_press_allow(
+        self, mock_exec, mock_redirect_error, mock_get_locale
     ):
         screen = CheckPermissionsScreen()
         screen.manager = MagicMock()
@@ -722,61 +690,18 @@ class TestAboutScreen(GraphicUnitTest):
         screen.bin_args = ["-a", "-G"]
         screen.group = "mockedgroup"
         screen.user = "mockeduser"
+        screen.on_permission_created = None
 
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
-        action = getattr(screen, "on_release_check_permissions_screen_button")
-        action(button)
+        action = getattr(screen, f"on_ref_press_{screen.id}_label")
+        action("Allow")
 
         # patch assertions
         mock_get_locale.assert_called_once()
         mock_redirect_error.assert_called_once_with(
             msg="Invalid on_permission_created: None"
         )
-        mock_set_background.assert_called_once_with(
-            wid="check_permissions_screen_button", rgba=(0, 0, 0, 1)
-        )
         mock_exec.assert_not_called()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("sys.platform", "linux")
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.check_permissions_screen.CheckPermissionsScreen.set_background"
-    )
-    @patch("src.app.screens.check_permissions_screen.SudoerLinux.exec")
-    def test_on_release_greetings_button(
-        self, mock_exec, mock_set_background, mock_get_locale
-    ):
-        screen = CheckPermissionsScreen()
-        screen.bin = "mock"
-        screen.bin_args = ["-a", "-G"]
-        screen.group = "mockedgroup"
-        screen.user = "mockeduser"
-
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
-        action = getattr(screen, "on_release_check_permissions_screen_button")
-
-        # Do the test
-        screen.update(name="CheckPermissionsScreen", key="make_on_permission_created")
-        action(button)
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_set_background.assert_called_once_with(
-            wid="check_permissions_screen_button", rgba=(0, 0, 0, 1)
-        )
-        mock_exec.assert_called_once()

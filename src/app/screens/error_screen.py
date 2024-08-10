@@ -85,6 +85,7 @@ class ErrorScreen(BaseScreen):
         value = kwargs.get("value")
 
         if name in (
+            "CheckPermissionsScreen",
             "ConfigKruxInstaller",
             "CheckInternetConnectionScreen",
             "SelectDeviceScreen",

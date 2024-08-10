@@ -29,7 +29,9 @@ import time
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
-from kivy.cache import Cache
+from kivy.graphics.context_instructions import Color
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.core.window import Window
 from .base_screen import BaseScreen
 from src.i18n import T
 from pysudoer import SudoerLinux
@@ -61,45 +63,49 @@ class CheckPermissionsScreen(BaseScreen):
         self.in_dialout = False
         self.on_permission_created = None
 
-        # START of on_press buttons
-        def _press(instance):
-            self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+        def _on_ref_press(*args):
+            print(args)
+            if args[1] == "Allow":
+                # If user isnt in the dialout group,
+                # but the configuration was done correctly
+                # create the command
 
-        def _release(instance):
-            self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=f"{instance.id}", rgba=(0, 0, 0, 1))
-
-            # If user isnt in the dialout group,
-            # but the configuration was done correctly
-            # create the command
-            if self.on_permission_created:
-                try:
-                    cmd = (
-                        [self.bin]
-                        + [a for a in self.bin_args]
-                        + [self.group]
-                        + [self.user]
+                if self.on_permission_created and self.bin_args:
+                    try:
+                        cmd = (
+                            [self.bin]
+                            + [a for a in self.bin_args]
+                            + [self.group]
+                            + [self.user]
+                        )
+                        self.debug(f"cmd={cmd}")
+                        sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
+                        sudoer.exec(
+                            cmd=cmd, env={}, callback=self.on_permission_created
+                        )
+                    except Exception as err:
+                        self.redirect_error(msg=str(err.__traceback__))
+                else:
+                    self.redirect_error(
+                        msg=f"Invalid on_permission_created: {self.on_permission_created}"
                     )
-                    self.debug(f"cmd={cmd}")
-                    sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
-                    sudoer.exec(cmd=cmd, env={}, callback=self.on_permission_created)
-                except Exception as err:
-                    self.redirect_error(msg=str(err.__traceback__))
-            else:
-                self.redirect_error(
-                    msg=f"Invalid on_permission_created: {self.on_permission_created}"
-                )
 
-        self.make_button(
-            row=0,
-            id=f"{self.id}_button",
-            root_widget=f"{self.id}_grid",
+            if args[1] == "Deny":
+                App.get_running_app().stop()
+
+        self.make_label(
+            wid=f"{self.id}_label",
             text="",
+            root_widget=f"{self.id}_grid",
             markup=True,
-            on_press=_press,
-            on_release=_release,
+            halign="justify",
         )
+
+        setattr(CheckPermissionsScreen, f"on_ref_press_{self.id}_label", _on_ref_press)
+        self.ids[f"{self.id}_label"].bind(on_ref_press=_on_ref_press)
+
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)
 
     def update(self, *args, **kwargs):
         """
@@ -111,7 +117,11 @@ class CheckPermissionsScreen(BaseScreen):
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if name in ("ConfigKruxInstaller", "CheckPermissionsScreen"):
+        if name in (
+            "ConfigKruxInstaller",
+            "CheckPermissionsScreen",
+            "CheckPermissionsScreen",
+        ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
             self.redirect_error(msg=f"Invalid screen: '{name}'")
@@ -122,6 +132,12 @@ class CheckPermissionsScreen(BaseScreen):
                 self.redirect_error(msg=f"Invalid locale: '{value}'")
             else:
                 self.locale = value
+
+        elif key == "canvas":
+            # prepare background
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
 
         elif key == "check_user":
 
@@ -136,7 +152,7 @@ class CheckPermissionsScreen(BaseScreen):
             setup_msg = self.translate("Setup")
             for_msg = self.translate("for")
 
-            self.ids[f"{self.id}_button"].text = "".join(
+            self.ids[f"{self.id}_label"].text = "".join(
                 [
                     f"[font={self.font}]",
                     f"[size={self.SIZE_MM}sp]",
@@ -178,7 +194,7 @@ class CheckPermissionsScreen(BaseScreen):
             check_msg = self.translate("Checking")
             perm_msg = self.translate("permissions for")
 
-            self.ids[f"{self.id}_button"].text = "".join(
+            self.ids[f"{self.id}_label"].text = "".join(
                 [
                     f"[size={self.SIZE_G}sp]",
                     f"[color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]",
@@ -207,22 +223,37 @@ class CheckPermissionsScreen(BaseScreen):
                     "and it appears that you do not have privileged access to make flash procedures"
                 )
                 proceed_msg = self.translate(
-                    "To proceed, click in the screen and a prompt will ask for your password"
+                    "To proceed, click in the Allow button and a prompt will ask for your password"
                 )
                 exec_msg = self.translate("to execute the following command")
 
-                self.ids[f"{self.id}_button"].text = "\n".join(
+                self.ids[f"{self.id}_label"].text = "\n".join(
                     [
+                        f"[font={self.font}]"
                         f"[size={self.SIZE_G}sp][color=#efcc00]{warn_msg}[/color][/size]",
                         "",
-                        f'[size={self.SIZE_M}sp]{first_msg} "{distro.name(pretty=True)}"',
+                        f'[size={self.SIZE_MP}sp]{first_msg} "{distro.name(pretty=True)}"',
                         f"{access_msg}.",
                         proceed_msg,
                         f"{exec_msg}:",
-                        ""
+                        "[/font]" "",
+                        "",
                         # a little hack on join method (the `or []` clause)
                         # to avoid errors when screen do not completly exit in tests
+                        "[font=terminus]"
                         f"[color=#00ff00]{self.bin} {" ".join(self.bin_args or [])} {self.group} {self.user}[/color][/size]",
+                        "[/font]",
+                        "",
+                        "",
+                        f"[font={self.font}]",
+                        f"[size={self.SIZE_M}]",
+                        "        ".join(
+                            [
+                                "[color=#00FF00][ref=Allow]Allow[/ref][/color]",
+                                "[color=#FF0000][ref=Deny]Deny[/ref][/color]",
+                            ]
+                        ),
+                        "[/size]" "[/font]",
                     ]
                 )
 
@@ -252,7 +283,7 @@ class CheckPermissionsScreen(BaseScreen):
                     "Do not worry, this message won't appear again"
                 )
 
-                self.ids[f"{self.id}_button"].text = "\n".join(
+                self.ids[f"{self.id}_label"].text = "\n".join(
                     [
                         f"[size={self.SIZE_G}sp][color=#efcc00]{output}[/color][/size]",
                         "",

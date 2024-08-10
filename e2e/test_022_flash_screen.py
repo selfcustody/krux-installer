@@ -416,7 +416,7 @@ class TestFlashScreen(GraphicUnitTest):
                         f"[size={screen.SIZE_MP}sp]",
                         "[color=#00FF00][ref=Back]Back[/ref][/color]",
                         "        ",
-                        "[color=#00FF00][ref=Quit]Quit[/ref][/color]",
+                        "[color=#EFCC00][ref=Quit]Quit[/ref][/color]",
                         "[/font]",
                     ]
                 ),

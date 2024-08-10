@@ -7,11 +7,13 @@
     "WARNING": "AVISO",
     "This is first run of KruxInstaller in": "Esta é a primeira execução do KruxInstaller no",
     "and it appears that you do not have privileged access to make flash procedures": "e parece que você não tem acesso privilegiado para realizar procedimentos de flash",
-    "To proceed, click in the screen and a prompt will ask for your password": "para proceder, clique na tela e um prompt irá solicitar sua senha",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "Para continuar, clique no botão Permitir e um prompt solicitará sua senha",
     "to execute the following command": "para executar o seguinte comando",
     "You may need to logout (or even reboot)": "Talvez você precise deslogar (ou até mesmo reiniciar)",
     "and back in for the new group to take effect": "e re-logar para que o novo grupo tenha efeito",
-    "Do not worry, this message won't appear again": "Não se preocupe, essa mensagem não irá aparecer novamente"
+    "Do not worry, this message won't appear again": "Não se preocupe, essa mensagem não irá aparecer novamente",    
+    "Allow": "Permitir",
+    "Deny": "Negar"
   }, 
   "check_internet_connection_screen": {
     "Checking your internet connection": "Checando sua conexão com a internet"

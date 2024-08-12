@@ -34,26 +34,31 @@ class TestAboutScreen(GraphicUnitTest):
             [
                 "".join(
                     [
+                        "[font=terminus]",
                         f"[size={screen.SIZE_G}sp]",
                         "[color=#00AABB]",
                         "[ref=SourceCode][b]v0.0.2-alpha-1[/b][/ref]",
                         "[/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
+                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "follow us on X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
+                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
@@ -61,6 +66,7 @@ class TestAboutScreen(GraphicUnitTest):
                         "[/ref]",
                         "[/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 ),
             ]
@@ -89,26 +95,31 @@ class TestAboutScreen(GraphicUnitTest):
             [
                 "".join(
                     [
+                        "[font=terminus]",
                         f"[size={screen.SIZE_G}sp]",
                         "[color=#00AABB]",
                         "[ref=SourceCode][b]v0.0.2-alpha-1[/b][/ref]",
                         "[/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
+                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "siga-nos no X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
+                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
@@ -116,6 +127,7 @@ class TestAboutScreen(GraphicUnitTest):
                         "[/ref]",
                         "[/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 ),
             ]

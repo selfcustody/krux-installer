@@ -104,31 +104,38 @@ class AboutScreen(BaseScreen):
 
                 version = "".join(
                     [
-                        f"[size={self.SIZE_G}sp]",
+                        f"[font={self.font}]" f"[size={self.SIZE_G}sp]",
                         "[color=#00AABB]",
                         f"[ref=SourceCode][b]v{get_version()}[/b][/ref]",
                         "[/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 )
 
                 X = "".join(
                     [
+                        f"[font={self.font}]",
                         f"[size={self.SIZE_M}sp]",
-                        f"{follow}: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
+                        f"{follow}: ",
+                        "[color=#00AABB]",
+                        "[ref=X]@selfcustodykrux[/ref]",
+                        "[/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 )
 
                 back = "".join(
                     [
-                        f"[size={self.SIZE_M}sp]",
+                        f"[font={self.font}]" f"[size={self.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
                         back,
                         "[/ref]",
                         "[/color]",
                         "[/size]",
+                        "[/font]",
                     ]
                 )
 

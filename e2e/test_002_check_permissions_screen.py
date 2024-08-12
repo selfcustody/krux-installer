@@ -599,19 +599,20 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
-        fontsize_g = window.size[0] // 16
         fontsize_m = window.size[0] // 32
 
         # Do the test
         screen.update(name="CheckPermissionsScreen", key="make_on_permission_created")
         text = "\n".join(
             [
-                f"[size={fontsize_g}sp][color=#efcc00]mocked command[/color][/size]",
+                "[font=terminus]",
+                f"[size={fontsize_m}sp][color=#efcc00]mocked command[/color][/size]",
                 "",
                 f"[size={fontsize_m}sp]You may need to logout (or even reboot)",
                 "and back in for the new group to take effect.",
                 "",
                 "Do not worry, this message won't appear again.[/size]",
+                "[/font]",
             ]
         )
 

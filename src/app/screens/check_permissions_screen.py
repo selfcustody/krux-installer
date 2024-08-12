@@ -196,8 +196,10 @@ class CheckPermissionsScreen(BaseScreen):
 
             self.ids[f"{self.id}_label"].text = "".join(
                 [
+                    f"[font={self.font}]",
                     f"[size={self.SIZE_G}sp]",
                     f"[color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]",
+                    "[/font]",
                 ]
             )
 
@@ -238,10 +240,10 @@ class CheckPermissionsScreen(BaseScreen):
                         f"{exec_msg}:",
                         "[/font]" "",
                         "",
-                        # a little hack on join method (the `or []` clause)
-                        # to avoid errors when screen do not completly exit in tests
-                        "[font=terminus]"
-                        f"[color=#00ff00]{self.bin} {" ".join(self.bin_args or [])} {self.group} {self.user}[/color][/size]",
+                        "[font=terminus]" "[color=#00ff00]",
+                        f"{self.bin} {" ".join(self.bin_args or [])} {self.group} {self.user}",
+                        "[/color]",
+                        "[/size]",
                         "[/font]",
                         "",
                         "",
@@ -253,7 +255,8 @@ class CheckPermissionsScreen(BaseScreen):
                                 "[color=#FF0000][ref=Deny]Deny[/ref][/color]",
                             ]
                         ),
-                        "[/size]" "[/font]",
+                        "[/size]",
+                        "[/font]",
                     ]
                 )
 
@@ -285,12 +288,14 @@ class CheckPermissionsScreen(BaseScreen):
 
                 self.ids[f"{self.id}_label"].text = "\n".join(
                     [
-                        f"[size={self.SIZE_G}sp][color=#efcc00]{output}[/color][/size]",
+                        f"[font={self.font}]",
+                        f"[size={self.SIZE_M}sp][color=#efcc00]{output}[/color][/size]",
                         "",
                         f"[size={self.SIZE_M}sp]{logout_msg}",
                         f"{backin_msg}.",
                         "",
                         f"{not_worry_msg}.[/size]",
+                        "[/font]",
                     ]
                 )
 

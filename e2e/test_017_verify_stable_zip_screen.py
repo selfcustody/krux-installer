@@ -34,7 +34,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         )
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

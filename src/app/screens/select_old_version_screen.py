@@ -48,8 +48,7 @@ class SelectOldVersionScreen(BaseScreen):
         self.clear_grid(wid="select_old_version_screen_grid")
 
         for row, text in enumerate(old_versions):
-            sanitized = text.replace(".", "_").replace("/", "_")
-
+            sanitized = (text.replace(".", "_").replace("/", "_"),)
             wid = f"select_old_version_{sanitized}"
 
             def _press(instance):
@@ -72,8 +71,8 @@ class SelectOldVersionScreen(BaseScreen):
                 row=row,
                 id=wid,
                 root_widget="select_old_version_screen_grid",
-                text=text,
-                markup=False,
+                text=f"[font=terminus]{text}[/font]",
+                markup=True,
                 on_press=_press,
                 on_release=_release,
             )
@@ -90,12 +89,13 @@ class SelectOldVersionScreen(BaseScreen):
             self.set_background(wid="select_old_version_back", rgba=(0, 0, 0, 1))
             self.set_screen(name="SelectVersionScreen", direction="right")
 
+        back = self.translate("Back")
         self.make_button(
             row=len(old_versions) + 1,
             id="select_old_version_back",
             root_widget="select_old_version_screen_grid",
-            text=self.translate("Back"),
-            markup=False,
+            text=f"[font={SelectOldVersionScreen.get_font_name()}]{back}[/font]",
+            markup=True,
             on_press=_press_back,
             on_release=_release_back,
         )
@@ -118,7 +118,14 @@ class SelectOldVersionScreen(BaseScreen):
                 self.locale = value
 
                 if "select_old_version_back" in self.ids:
-                    self.ids["select_old_version_back"].text = self.translate("Back")
+                    back = self.translate("Back")
+                    self.ids["select_old_version_back"].text = "".join(
+                        [
+                            f"[font={SelectOldVersionScreen.get_font_name()}]",
+                            back,
+                            "[/font]",
+                        ]
+                    )
 
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")

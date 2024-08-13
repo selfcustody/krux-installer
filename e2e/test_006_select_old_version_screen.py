@@ -108,7 +108,7 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
             calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -158,7 +158,7 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
 
         mock_set_background.assert_has_calls(set_background_calls)
         mock_set_screen.assert_has_calls(set_screen_calls)
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -174,15 +174,15 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         self.render(screen)
 
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
-
+        text_back = "[font=terminus]Voltar[/font]"
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
         button_back = grid.children[0]
 
-        self.assertEqual(button_back.text, "Voltar")
-        mock_get_locale.assert_called_once()
+        self.assertEqual(button_back.text, text_back)
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -203,4 +203,4 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
         mock_redirect_error.assert_called_once_with("Invalid screen name: Mock")
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()

@@ -39,13 +39,15 @@
     "WARNING": "AVERTISSEMENT",
     "This is our test repository": "Ceci est notre référentiel de tests",
     "These are unsigned binaries for the latest and most experimental features": "Ce sont des binaires non signés pour les fonctionnalités\nles plus récentes et les plus expérimentales",
-    "and it's just for trying new things and providing feedback.": "et c'est juste pour essayer de nouvelles choses et fournir des commentaires."
+    "and it's just for trying new things and providing feedback.": "et c'est juste pour essayer de nouvelles choses et fournir des commentaires.",
+    "Proceed": "Continuez",
+    "Back": "Retour"
   },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Ressources déjà téléchargées",
     "Do you want to proceed with the same file or do you want to download it again?": "Voulez-vous continuer avec le même fichier ou souhaitez-vous le télécharger à nouveau?",
     "Download again": "Télécharger à nouveau",
-    "Proceed with current file": "Passer au fichier actuel"
+    "Proceed with current file": "Passer au fichier actuel" 
   },  
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Vérification de l'intégrité et de l'authenticité",

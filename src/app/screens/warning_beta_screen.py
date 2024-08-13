@@ -43,19 +43,28 @@ class WarningBetaScreen(BaseScreen):
             "and it's just for trying new things and providing feedback."
         )
 
-        text = [
-            f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
-            "",
-            f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
-            "",
-            f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
-            f"[size={self.SIZE_MP}sp]{just_try}[/size]",
-            "",
-            "",
-            f"[size={self.SIZE_MM}sp]",
-            "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
-            "[/size]",
-        ]
+        proceed = self.translate("Proceed")
+        back = self.translate("Back")
+
+        text = "".join(
+            [
+                f"[font={WarningBetaScreen.get_font_name()}]",
+                f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
+                "\n",
+                "\n",
+                f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
+                "\n",
+                f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
+                "\n",
+                f"[size={self.SIZE_MP}sp]{just_try}[/size]",
+                "\n",
+                "\n",
+                f"[size={self.SIZE_MM}sp]",
+                f"[color=#00ff00]{proceed}[/color]        [color=#ff0000]{back}[/color]"
+                "[/size]",
+                "[/font]",
+            ]
+        )
 
         # START of on_press buttons
         def _press(instance):
@@ -74,7 +83,7 @@ class WarningBetaScreen(BaseScreen):
             row=0,
             id="warning_beta_screen_warn",
             root_widget="warning_beta_screen_grid",
-            text="\n".join(text),
+            text=text,
             markup=True,
             on_press=_press,
             on_release=_release,
@@ -90,35 +99,47 @@ class WarningBetaScreen(BaseScreen):
         if name in ("ConfigKruxInstaller",):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
 
         # Check locale
         if key == "locale":
-            self.locale = value
-            warning = self.translate("WARNING")
-            test_repo = self.translate("This is our test repository")
-            unsg_bin = self.translate(
-                "These are unsigned binaries for the latest and most experimental features"
-            )
-            just_try = self.translate(
-                "and it's just for trying new things and providing feedback."
-            )
+            if value is not None:
+                self.locale = value
+                warning = self.translate("WARNING")
+                test_repo = self.translate("This is our test repository")
+                unsg_bin = self.translate(
+                    "These are unsigned binaries for the latest and most experimental features"
+                )
+                just_try = self.translate(
+                    "and it's just for trying new things and providing feedback."
+                )
+                proceed = self.translate("Proceed")
+                back = self.translate("Back")
 
-            text = [
-                f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
-                "",
-                f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
-                "",
-                f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
-                f"[size={self.SIZE_MP}sp]{just_try}[/size]",
-                "",
-                "",
-                f"[size={self.SIZE_MM}sp]",
-                "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]"
-                "[/size]",
-            ]
+                text = "".join(
+                    [
+                        f"[font={WarningBetaScreen.get_font_name()}]",
+                        f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
+                        "\n",
+                        "\n",
+                        f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
+                        "\n",
+                        f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
+                        "\n",
+                        f"[size={self.SIZE_MP}sp]{just_try}[/size]",
+                        "\n",
+                        "\n",
+                        f"[size={self.SIZE_MM}sp]",
+                        f"[color=#00ff00]{proceed}[/color]        [color=#ff0000]{back}[/color]",
+                        "[/size]",
+                        "[/font]",
+                    ]
+                )
 
-            self.ids["warning_beta_screen_warn"].text = "\n".join(text)
+                self.ids["warning_beta_screen_warn"].text = text
+
+            else:
+                self.redirect_error(f"Invalid value for key {key}: {value}")
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')

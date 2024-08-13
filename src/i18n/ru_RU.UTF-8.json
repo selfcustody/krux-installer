@@ -39,7 +39,9 @@
     "WARNING": "ПРЕДУПРЕЖДЕНИЕ",
     "This is our test repository": "Это наш тестовый репозиторий",
     "These are unsigned binaries for the latest and most experimental features": "Это неподписанные двоичные\nфайлы для новейших и наиболее экспериментальных функций",
-    "and it's just for trying new things and providing feedback.": "и это просто для того, чтобы попробовать\nчто-то новое и оставить отзыв"
+    "and it's just for trying new things and providing feedback.": "и это просто для того, чтобы попробовать\nчто-то новое и оставить отзыв",
+    "Proceed": "Продолжать",
+    "Back": "Вернуться"
   },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Ресурсы уже загружены",

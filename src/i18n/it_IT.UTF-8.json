@@ -39,7 +39,9 @@
     "WARNING": "AVVERTIMENTO",
     "This is our test repository": "Questo è il nostro repository di testare",
     "These are unsigned binaries for the latest and most experimental features": "Questi sono file binari non firmati per le funzionalità più recenti e sperimentali",
-    "and it's just for trying new things and providing feedback.": "ed è solo per provare cose nuove e fornire feedback."
+    "and it's just for trying new things and providing feedback.": "ed è solo per provare cose nuove e fornire feedback.",
+    "Proceed": "Procedere",
+    "Back": "Indietro"
   },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Risorse già scaricate",

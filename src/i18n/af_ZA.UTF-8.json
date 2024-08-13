@@ -39,7 +39,9 @@
     "WARNING": "WAARSKUWING",
     "This is our test repository": "Dit is ons toetsbewaarplek",
     "These are unsigned binaries for the latest and most experimental features": "Dit is ongetekende binaries vir die nuutste en mees eksperimentele kenmerke",
-    "and it's just for trying new things and providing feedback.": "en dit is net om nuwe dinge te probeer en terugvoer te gee."
+    "and it's just for trying new things and providing feedback.": "en dit is net om nuwe dinge te probeer en terugvoer te gee.",
+    "Proceed": "Voortgaan",
+    "Back": "Terug"
   },
   "warning_already_downloaded_screen": {   
     "Assets already downloaded": "Bates wat reeds afgelaai is",

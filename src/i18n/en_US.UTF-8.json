@@ -39,7 +39,9 @@
     "WARNING": "WARNING",
     "This is our test repository": "This is our test repository",
     "These are unsigned binaries for the latest and most experimental features": "These are unsigned binaries for the latest and most experimental features",
-    "and it's just for trying new things and providing feedback.": "and it's just for trying new things and providing feedback."
+    "and it's just for trying new things and providing feedback.": "and it's just for trying new things and providing feedback.",
+    "Proceed": "Proceed",
+    "Back": "Back"
   },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Assets already downloaded",

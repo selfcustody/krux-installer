@@ -39,7 +39,9 @@
     "WARNING": "경고",
     "This is our test repository": "이것은 우리의 테스트 저장소입니다",
     "These are unsigned binaries for the latest and most experimental features": "이는 최신 및 가장 실험적인 기능에 대한 서명되지 않은 이진 파일입니다",
-    "and it's just for trying new things and providing feedback.": "그리고 그것은 단지 새로운 것을 시도하고 피드백을 제공하기 위한 것입니다."
+    "and it's just for trying new things and providing feedback.": "그리고 그것은 단지 새로운 것을 \n시도하고 피드백을 제공하기 위한 것입니다.",
+    "Proceed": "진행",
+    "Back": "뒤로"
   },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "이미 다운로드한 자산",

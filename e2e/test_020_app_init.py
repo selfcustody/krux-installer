@@ -3,10 +3,22 @@ from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.uix.screenmanager import ScreenManager
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app import KruxInstallerApp
 
 
 class TestConfigKruxInstaller(GraphicUnitTest):
+
+    @classmethod
+    def setUpClass(cls):
+        cwd_path = os.path.dirname(__file__)
+        rel_assets_path = os.path.join(cwd_path, "..", "assets")
+        assets_path = os.path.abspath(rel_assets_path)
+        terminus_path = os.path.join(assets_path, "terminus.ttf")
+        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="nanum", fn_regular=nanum_path)
+        LabelBase.register(DEFAULT_FONT, terminus_path)
 
     @classmethod
     def teardown_class(cls):
@@ -20,7 +32,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         self.assertIsInstance(app.screen_manager, ScreenManager)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch.dict(os.environ, {"LANG": "en_US.UTF-8"}, clear=True)
     def test_setup_screen_manager(self):
         mock_screen = MagicMock(name="MockScreen")
 
@@ -39,7 +50,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch.dict(os.environ, {"LANG": "en_US.UTF-8"}, clear=True)
     def test_fail_setup_screen_manager(self):
         app = KruxInstallerApp()
         with self.assertRaises(RuntimeError) as exc_info:
@@ -55,9 +65,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_setup_screens(self, mock_get_destdir_assets, mock_get_locale):
+    def test_setup_screens(
+        self, mock_get_destdir_assets, mock_get_font_name, mock_get_locale
+    ):
         app = KruxInstallerApp()
         app.setup_screens()
 
@@ -88,6 +103,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
+        mock_get_font_name.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "win32")
@@ -95,9 +111,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_setup_screens_win32(self, mock_get_destdir_assets, mock_get_locale):
+    def test_setup_screens_win32(
+        self, mock_get_destdir_assets, mock_get_font_name, mock_get_locale
+    ):
         app = KruxInstallerApp()
         app.setup_screens()
 
@@ -127,6 +148,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
+        mock_get_font_name.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "darwin")
@@ -134,9 +156,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_setup_screens_darwin(self, mock_get_destdir_assets, mock_get_locale):
+    def test_setup_screens_darwin(
+        self, mock_get_destdir_assets, mock_get_font_name, mock_get_locale
+    ):
         app = KruxInstallerApp()
         app.setup_screens()
 
@@ -165,7 +192,32 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             self.assertIn(screen.name, allowed_screens)
 
         mock_get_destdir_assets.assert_called_once()
-        mock_get_locale.assert_called()
+        mock_get_font_name.assert_has_calls(
+            [call(), call(), call(), call(), call(), call(), call()]
+        )
+        mock_get_locale.assert_has_calls(
+            [
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+                call(),
+            ]
+        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch.dict(os.environ, {"LANG": "en_US.UTF-8"}, clear=True)
@@ -185,7 +237,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         mock_schedule_once.assert_called_once_with(mock_partial(), 0)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch.dict(os.environ, {"LANG": "en_US.UTF-8"}, clear=True)
     @patch("src.app.KruxInstallerApp.on_greetings")
     def test_on_start(self, mock_on_greetings):
         app = KruxInstallerApp()
@@ -193,10 +244,22 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         mock_on_greetings.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
     @patch("src.app.KruxInstallerApp.setup_screens")
     @patch("src.app.KruxInstallerApp.setup_screen_manager")
-    def test_build(self, mock_setup_screen_manager, mock_setup_screens):
+    # pylint: disable=unused-argument
+    def test_build(
+        self,
+        mock_setup_screen_manager,
+        mock_setup_screens,
+        mock_get_font_name,
+        mock_get_locale,
+    ):
         app = KruxInstallerApp()
         app.build()
 

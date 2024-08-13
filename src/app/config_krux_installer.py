@@ -29,7 +29,7 @@ import locale
 from functools import partial
 from kivy import resources as kv_resources
 from kivy.clock import Clock
-from kivy.core.text import LabelBase, DEFAULT_FONT
+from kivy.core.text import LabelBase
 from src.utils.trigger import Trigger
 from src.app.base_krux_installer import BaseKruxInstaller
 
@@ -158,15 +158,6 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
         lang = ConfigKruxInstaller.get_system_lang()
         config.setdefaults("locale", {"lang": lang})
         self.info(f"{config}.lang={lang}")
-
-        if lang is not None:
-            if lang.startswith("kr_KO"):
-                font = os.path.join(self.assets_path, "NanumGothic-Regular.ttf")
-
-            else:
-                font = os.path.join(self.assets_path, "terminus.ttf")
-
-            LabelBase.register(DEFAULT_FONT, fn_regular=font)
 
     def build_settings(self, settings):
         """Create settings panel"""

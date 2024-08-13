@@ -118,7 +118,7 @@ class FlashScreen(BaseFlashScreen):
                 [
                     "".join(
                         [
-                            f"[font={self.font}]",
+                            f"[font={FlashScreen.get_font_name()}]",
                             f"[size={self.SIZE_MP}sp][b]{done}![/b][/size]",
                             "[/font]",
                         ]
@@ -127,7 +127,7 @@ class FlashScreen(BaseFlashScreen):
                     "",
                     "".join(
                         [
-                            f"[font={self.font}]",
+                            f"[font={FlashScreen.get_font_name()}]",
                             f"[size={self.SIZE_MP}sp]",
                             f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                             "        ",

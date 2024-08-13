@@ -428,7 +428,7 @@ class TestFlashScreen(GraphicUnitTest):
         self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
         # patch assertions
 
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call(), call()])
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")

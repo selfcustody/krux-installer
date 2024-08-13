@@ -103,7 +103,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_redirect_error.assert_called_once_with(msg="Not implemented for 'mockos'")
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_has_calls([call(), call(pretty=True)])
@@ -156,7 +156,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_called_once()
@@ -210,7 +210,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_called_once()
@@ -264,7 +264,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_called_once()
@@ -320,7 +320,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -371,7 +371,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -423,7 +423,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -477,7 +477,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -531,7 +531,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -578,7 +578,9 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(screen.in_dialout, False)
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls(
+            [call(), call(), call(), call()], any_order=True
+        )
         mock_distro_name.assert_called_once_with(pretty=True)
         mock_grp.getgrall.assert_called_once()
 
@@ -629,7 +631,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
 
         # Do test again
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "mockos")

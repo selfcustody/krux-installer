@@ -154,7 +154,7 @@ class CheckPermissionsScreen(BaseScreen):
 
             self.ids[f"{self.id}_label"].text = "".join(
                 [
-                    f"[font={self.font}]",
+                    f"[font={CheckPermissionsScreen.get_font_name()}]",
                     f"[size={self.SIZE_MM}sp]",
                     f"[color=#efcc00]{setup_msg} {self.user} {for_msg} {distro.name()}[/color]",
                     "[/size]",
@@ -196,7 +196,7 @@ class CheckPermissionsScreen(BaseScreen):
 
             self.ids[f"{self.id}_label"].text = "".join(
                 [
-                    f"[font={self.font}]",
+                    f"[font={CheckPermissionsScreen.get_font_name()}]",
                     f"[size={self.SIZE_G}sp]",
                     f"[color=#efcc00]{check_msg} {self.group} {perm_msg} {self.user}[/color][/size]",
                     "[/font]",
@@ -231,7 +231,7 @@ class CheckPermissionsScreen(BaseScreen):
 
                 self.ids[f"{self.id}_label"].text = "\n".join(
                     [
-                        f"[font={self.font}]"
+                        f"[font={CheckPermissionsScreen.get_font_name()}]"
                         f"[size={self.SIZE_G}sp][color=#efcc00]{warn_msg}[/color][/size]",
                         "",
                         f'[size={self.SIZE_MP}sp]{first_msg} "{distro.name(pretty=True)}"',
@@ -247,7 +247,7 @@ class CheckPermissionsScreen(BaseScreen):
                         "[/font]",
                         "",
                         "",
-                        f"[font={self.font}]",
+                        f"[font={CheckPermissionsScreen.get_font_name()}]",
                         f"[size={self.SIZE_M}]",
                         "        ".join(
                             [
@@ -288,7 +288,7 @@ class CheckPermissionsScreen(BaseScreen):
 
                 self.ids[f"{self.id}_label"].text = "\n".join(
                     [
-                        f"[font={self.font}]",
+                        f"[font={CheckPermissionsScreen.get_font_name()}]",
                         f"[size={self.SIZE_M}sp][color=#efcc00]{output}[/color][/size]",
                         "",
                         f"[size={self.SIZE_M}sp]{logout_msg}",

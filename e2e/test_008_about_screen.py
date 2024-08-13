@@ -1,10 +1,23 @@
-from unittest.mock import patch, MagicMock
+import os
+from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.about_screen import AboutScreen
 
 
 class TestAboutScreen(GraphicUnitTest):
+
+    @classmethod
+    def setUpClass(cls):
+        cwd_path = os.path.dirname(__file__)
+        rel_assets_path = os.path.join(cwd_path, "..", "assets")
+        assets_path = os.path.abspath(rel_assets_path)
+        terminus_path = os.path.join(assets_path, "terminus.ttf")
+        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="nanum", fn_regular=nanum_path)
+        LabelBase.register(DEFAULT_FONT, terminus_path)
 
     @classmethod
     def teardown_class(cls):
@@ -73,7 +86,7 @@ class TestAboutScreen(GraphicUnitTest):
         )
 
         self.assertEqual(label.text, text)
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call(), call(), call()])
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -133,7 +146,9 @@ class TestAboutScreen(GraphicUnitTest):
             ]
         )
         self.assertEqual(label.text, text)
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls(
+            [call(), call(), call(), call(), call(), call(), call()]
+        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -152,7 +167,7 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_ref_press_about_screen_label")
         action("Mock", "SourceCode")
 
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call(), call(), call()])
         mock_webbrowser.open.assert_called_once_with(
             "https://selfcustody.github.io/krux/getting-started/installing/from-gui/"
         )
@@ -176,7 +191,7 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_ref_press_about_screen_label")
         action("Mock", "X")
 
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call(), call(), call()])
         mock_webbrowser.open.assert_called_once_with("https://x.com/selfcustodykrux")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -194,5 +209,5 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_ref_press_about_screen_label")
         action("Mock", "Back")
 
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_has_calls([call(), call(), call()])
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")

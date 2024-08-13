@@ -15,10 +15,8 @@ class TestBaseScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_render(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_render(self, mock_get_locale):
 
         screen = BaseScreen(wid="mock", name="Mock")
         self.render(screen)
@@ -31,50 +29,47 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(window.children[0], screen)
         self.assertEqual(window.children[0].height, window.height)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_get_logo_img(self, mock_get_running_app):
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_get_logo_img(self, mock_get_locale):
         root = Path(__file__).parent.parent
         logo = os.path.join(root, "assets", "logo.png")
         screen = BaseScreen(wid="mock", name="Mock")
         self.assertEqual(screen.logo_img, logo)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_get_warn_img(self, mock_get_running_app):
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_get_warn_img(self, mock_get_locale):
         root = Path(__file__).parent.parent
         warn = os.path.join(root, "assets", "warning.png")
         screen = BaseScreen(wid="mock", name="Mock")
         self.assertEqual(screen.warn_img, warn)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_get_load_gif(self, mock_get_running_app):
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_get_load_gif(self, mock_get_locale):
         root = Path(__file__).parent.parent
         warn = os.path.join(root, "assets", "load.gif")
         screen = BaseScreen(wid="mock", name="Mock")
         self.assertEqual(screen.load_img, warn)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_get_done_img(self, mock_get_running_app):
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_get_done_img(self, mock_get_locale):
         root = Path(__file__).parent.parent
         warn = os.path.join(root, "assets", "done.png")
         screen = BaseScreen(wid="mock", name="Mock")
         self.assertEqual(screen.done_img, warn)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_set_background(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_set_background(self, mock_get_locale):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.ids = {}
         screen.ids["mocked_button"] = Button()
@@ -92,14 +87,11 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(window.children[0].ids["mocked_button"].background_color[2], 0)
         self.assertEqual(window.children[0].ids["mocked_button"].background_color[3], 0)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_set_screen(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_set_screen(self, mock_get_locale):
         screen_manager = ScreenManager()
         screen_0 = BaseScreen(wid="mock_0", name="Mock_0")
         screen_1 = BaseScreen(wid="mock_1", name="Mock_1")
@@ -116,17 +108,11 @@ class TestBaseScreen(GraphicUnitTest):
         screen_1.set_screen(name="Mock_0", direction="right")
         self.assertEqual(screen_manager.current, "Mock_0")
 
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang"), call().config.get("locale", "lang")],
-            any_order=True,
-        )
+        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_make_grid(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_make_grid(self, mock_get_locale):
         screen_0 = BaseScreen(wid="mock", name="Mock")
         screen_0.make_grid(wid="mock_grid", rows=1)
         self.render(screen_0)
@@ -139,14 +125,11 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(screen.id, "mock")
         self.assertEqual(screen.name, "Mock")
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_make_subgrid(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_make_subgrid(self, mock_get_locale):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.make_grid(wid="mock_grid", rows=1)
         screen.make_subgrid(wid="mock_subgrid", rows=1, root_widget="mock_grid")
@@ -159,14 +142,11 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(screen.id, "mock")
         self.assertEqual(screen.name, "Mock")
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_make_label(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_make_label(self, mock_get_locale):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.make_grid(wid="mock_grid", rows=1)
         screen.make_label(
@@ -186,14 +166,11 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(screen.id, "mock")
         self.assertEqual(screen.name, "Mock")
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_make_button(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_make_button(self, mock_get_locale):
         screen_0 = BaseScreen(wid="mock", name="Mock")
         screen_0.make_grid(wid="mock_grid", rows=1)
         screen_0.make_button(
@@ -226,14 +203,11 @@ class TestBaseScreen(GraphicUnitTest):
         screen.on_press_mock_button.assert_called_once()
         screen.on_release_mock_button.assert_called_once()
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.App.get_running_app")
-    def test_clear_grid(self, mock_get_running_app):
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.get = MagicMock(return_value="en-US")
-
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_clear_grid(self, mock_get_locale):
         screen_0 = BaseScreen(wid="mock", name="Mock")
         screen_0.make_grid(wid="mock_grid", rows=3)
 
@@ -257,4 +231,4 @@ class TestBaseScreen(GraphicUnitTest):
         screen.clear_grid(wid="mock_grid")
         self.assertFalse("mock_button_0" in grid.ids)
 
-        mock_get_running_app.assert_called_once()
+        mock_get_locale.assert_called_once()

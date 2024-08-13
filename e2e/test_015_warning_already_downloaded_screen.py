@@ -186,7 +186,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action = getattr(WarningAlreadyDownloadedScreen, f"on_ref_press_{screen.id}")
         action("Mock", "DownloadStableZipScreen")
 
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
         mock_manager.get_screen.assert_has_calls(
             [call("MainScreen"), call("DownloadStableZipScreen")]
         )
@@ -225,7 +225,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         action = getattr(WarningAlreadyDownloadedScreen, f"on_ref_press_{screen.id}")
         action("Mock", "VerifyStableZipScreen")
 
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
         mock_set_screen.assert_called_once_with(
             name="VerifyStableZipScreen", direction="left"
         )

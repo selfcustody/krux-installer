@@ -98,7 +98,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(buttons[1].id, "select_version_old")
         self.assertEqual(buttons[0].id, "select_version_back")
 
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.utils.selector.requests")
@@ -139,7 +139,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.utils.selector.requests")
@@ -203,7 +203,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_set_background.assert_has_calls(calls_set_background)
         mock_manager.get_screen.assert_has_calls(calls_get_screen)
         mock_set_screen.assert_has_calls(calls_set_screen)
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.utils.selector.requests")
@@ -233,13 +233,15 @@ class TestSelectVersionScreen(GraphicUnitTest):
         button_old_versions = grid.children[1]
         button_back = grid.children[0]
 
+        text_old_versions = "[font=terminus]Versões antigas[/font]"
+        text_back_button = "[font=terminus]Voltar[/font]"
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
 
-        self.assertEqual(button_old_versions.text, "Versões antigas")
-        self.assertEqual(button_back.text, "Voltar")
+        self.assertEqual(button_old_versions.text, text_old_versions)
+        self.assertEqual(button_back.text, text_back_button)
 
         mock_manager.get_screen.assert_called_once()
-        mock_get_locale.assert_called_once()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

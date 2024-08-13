@@ -53,11 +53,26 @@ class SelectVersionScreen(BaseScreen):
         try:
             selector = Selector()
 
+            old = self.translate("Old versions")
+            back = self.translate("Back")
+
             buttons = [
-                ("select_version_latest", selector.releases[0], False),
-                ("select_version_beta", selector.releases[-1], False),
-                ("select_version_old", self.translate("Old versions"), False),
-                ("select_version_back", self.translate("Back"), False),
+                (
+                    "select_version_latest",
+                    f"[font=terminus]{selector.releases[0]}[/font]",
+                ),
+                (
+                    "select_version_beta",
+                    f"[font=terminus]{selector.releases[-1]}[/font]",
+                ),
+                (
+                    "select_version_old",
+                    f"[font={SelectVersionScreen.get_font_name()}]{old}[/font]",
+                ),
+                (
+                    "select_version_back",
+                    f"[font={SelectVersionScreen.get_font_name()}]{back}[/font]",
+                ),
             ]
 
             # Push other releases to SelectOldVersionScreen
@@ -132,7 +147,7 @@ class SelectVersionScreen(BaseScreen):
                     id=_tuple[0],
                     root_widget="select_version_screen_grid",
                     text=_tuple[1],
-                    markup=_tuple[2],
+                    markup=True,
                     on_press=_press,
                     on_release=_release,
                 )
@@ -157,10 +172,24 @@ class SelectVersionScreen(BaseScreen):
             if value is not None:
                 self.locale = value
                 if "select_version_old" in self.ids:
-                    self.ids["select_version_old"].text = self.translate("Old versions")
+                    old = self.translate("Old versions")
+                    self.ids["select_version_old"].text = "".join(
+                        [
+                            f"[font={SelectVersionScreen.get_font_name()}]",
+                            old,
+                            "[/font]",
+                        ]
+                    )
 
                 if "select_version_back" in self.ids:
-                    self.ids["select_version_back"].text = self.translate("Back")
+                    back = self.translate("Back")
+                    self.ids["select_version_back"].text = "".join(
+                        [
+                            f"[font={SelectVersionScreen.get_font_name()}]",
+                            back,
+                            "[/font]",
+                        ]
+                    )
 
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")

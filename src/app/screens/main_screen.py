@@ -29,7 +29,6 @@ from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
 from .base_screen import BaseScreen
-from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.utils.selector import VALID_DEVICES
 from src.i18n import T
 
@@ -153,20 +152,18 @@ class MainScreen(BaseScreen):
                         self.warning(f"Button::{instance.id} disabled")
 
                 if instance.id == "main_select_version":
-
-                    self.ids[instance.id].text = "\n".join(
+                    url = "https://api.github.com/repos/selfcustody/krux/releases"
+                    self.ids[instance.id].text = "".join(
                         [
                             f"[font={MainScreen.get_font_name()}]",
                             f"[size={self.SIZE_M}sp]",
                             "[color=#efcc00]",
                             f"[b]{self.translate("Fetching data from")}[/b]",
-                            "[/color]",
-                            "[/size]",
+                            "\n",
                             f"[size={self.SIZE_MP}sp]",
-                            "[color=#efcc00]",
-                            "https://api.github.com/repos/selfcustody/krux/releases",
-                            "[/color]",
+                            url,
                             "[/size]",
+                            "[/color]",
                             "[/font]",
                         ]
                     )

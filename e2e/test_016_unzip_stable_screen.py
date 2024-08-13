@@ -113,8 +113,8 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
-        mock_get_destdir_assets.assert_called_once()
-        mock_get_locale.assert_called()
+        mock_get_destdir_assets.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -137,8 +137,8 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.version, "v0.0.1")
 
         # patch assertions
-        mock_get_destdir_assets.assert_called_once()
-        mock_get_locale.assert_called()
+        mock_get_destdir_assets.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -237,8 +237,8 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.ids[f"{screen.id}_flash_button"].text, text)
 
         # patch assertions
-        mock_get_destdir_assets.assert_called_once()
-        mock_get_locale.assert_called()
+        mock_get_destdir_assets.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

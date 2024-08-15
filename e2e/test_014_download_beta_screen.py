@@ -398,10 +398,12 @@ class TestDownloadBetaScreen(GraphicUnitTest):
                 ]
             )
 
+            kboot = os.path.join("mockdir", "kboot.kfpkg")
             text_info = "".join(
                 [
                     "[font=terminus]",
-                    f"[size={fontsize_mp}sp]" "mockdir/kboot.kfpkg",
+                    f"[size={fontsize_mp}sp]",
+                    kboot,
                     "\n",
                     "downloaded",
                     "[/size]",

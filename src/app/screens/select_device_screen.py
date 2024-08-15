@@ -21,6 +21,7 @@
 """
 select_device_screen.py
 """
+import re
 from functools import partial
 from kivy.clock import Clock
 from kivy.cache import Cache
@@ -68,7 +69,7 @@ class SelectDeviceScreen(BaseScreen):
                 row=row,
                 id=f"select_device_{device}",
                 root_widget="select_device_screen_grid",
-                text=device,
+                text="",
                 markup=True,
                 on_press=_on_press,
                 on_release=_on_release,
@@ -95,15 +96,23 @@ class SelectDeviceScreen(BaseScreen):
                 self.enabled_devices = []
 
                 for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
-                    if device not in VALID_DEVICES_VERSIONS[value]:
-                        self.ids[f"select_device_{device}"].markup = True
-                        self.ids[f"select_device_{device}"].text = (
-                            f"[color=#333333]{device}[/color]"
+                    cleanr = re.compile("\\[.*?\\]")
+                    clean_text = re.sub(cleanr, "", value)
+                    if device not in VALID_DEVICES_VERSIONS[clean_text]:
+                        self.ids[f"select_device_{device}"].text = "".join(
+                            [
+                                "[font=terminus]",
+                                "[color=#333333]",
+                                device,
+                                "[/color]",
+                                "[/font]",
+                            ]
                         )
                     else:
                         self.enabled_devices.append(f"select_device_{device}")
-                        self.ids[f"select_device_{device}"].markup = False
-                        self.ids[f"select_device_{device}"].text = device
+                        self.ids[f"select_device_{device}"].text = "".join(
+                            ["[font=terminus]", device, "[/font]"]
+                        )
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
         else:

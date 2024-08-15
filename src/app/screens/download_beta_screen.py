@@ -67,16 +67,20 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         def on_progress(data: bytes):
             # calculate downloaded percentage
-            fn = partial(
-                self.update,
-                name=self.name,
-                key="progress",
-                value={
-                    "downloaded_len": self.downloader.downloaded_len,
-                    "content_len": self.downloader.content_len,
-                },
-            )
-            Clock.schedule_once(fn, 0)
+            if self.downloader is not None:
+                fn = partial(
+                    self.update,
+                    name=self.name,
+                    key="progress",
+                    value={
+                        "downloaded_len": self.downloader.downloaded_len,
+                        "content_len": self.downloader.content_len,
+                    },
+                )
+                Clock.schedule_once(fn, 0)
+
+            else:
+                self.redirect_error("Downloader isnt initialized")
 
         self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
         setattr(self.__class__, "on_trigger", on_trigger)
@@ -94,12 +98,16 @@ class DownloadBetaScreen(BaseDownloadScreen):
         value = kwargs.get("value")
 
         if name in ("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
+            self.debug(f"Updating {self.name} from {name}::{key}={value}")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
 
         if key == "locale":
-            self.locale = value
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "canvas":
             # prepare background
@@ -108,64 +116,98 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 Rectangle(size=(Window.width, Window.height))
 
         elif key == "firmware":
-            if value in ("kboot.kfpkg", "firmware.bin"):
+            if value is None:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+            elif value in ("kboot.kfpkg", "firmware.bin"):
                 self.firmware = value
             else:
-                raise ValueError(f"Invalid firmware: {value}")
+                self.redirect_error(f"Invalid firmware: {value}")
 
         elif key == "device":
             if value in ("m5stickv", "amigo", "dock", "bit", "cube"):
                 self.device = value
             else:
-                raise ValueError(f"Invalid device: {value}")
+                self.redirect_error(f'Invalid device: "{value}"')
 
         elif key == "downloader":
-            destdir = DownloadBetaScreen.get_destdir_assets()
-            destdir = os.path.join(destdir, "krux_binaries", f"maixpy_{self.device}")
-            self.downloader = BetaDownloader(
-                device=self.device,
-                binary_type=self.firmware,
-                destdir=destdir,
-            )
 
-            self.ids[f"{self.id}_info"].text = "\n".join(
-                [
-                    f"[size={self.SIZE_MP}sp]" "Downloading",
-                    f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    "" f"to {self.downloader.destdir}",
-                    "[/size]",
-                ]
-            )
+            if self.downloader is None:
+                destdir = DownloadBetaScreen.get_destdir_assets()
+                destdir = os.path.join(
+                    destdir, "krux_binaries", f"maixpy_{self.device}"
+                )
 
-        elif key == "progress":
-            # calculate percentage of download
-            lens = [value["downloaded_len"], value["content_len"]]
-            percent = lens[0] / lens[1]
+                self.downloader = BetaDownloader(
+                    device=self.device,
+                    binary_type=self.firmware,
+                    destdir=destdir,
+                )
 
-            # Format bytes (one liner) in MB
-            # https://stackoverflow.com/questions/
-            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-            downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-            self.ids[f"{self.id}_progress"].text = "\n".join(
-                [
-                    f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                    "",
-                    f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
-                ]
-            )
+                downloading = self.translate("Downloading")
+                to = self.translate("to")
 
-            if percent == 1.0:
-                self.ids[f"{self.id}_info"].text = "\n".join(
+                self.ids[f"{self.id}_info"].text = "".join(
                     [
                         f"[size={self.SIZE_MP}sp]",
-                        f"{self.downloader.destdir}/kboot.kfpkg downloaded",
+                        f"[font={DownloadBetaScreen.get_font_name()}]",
+                        downloading,
+                        "[/font]",
+                        "\n",
+                        "[color=#00AABB]",
+                        f"[ref={self.downloader.url}]{self.downloader.url}[/ref]",
+                        "[/color]",
+                        "\n",
+                        f"[font={DownloadBetaScreen.get_font_name()}]",
+                        to,
+                        "[/font]",
+                        "\n",
+                        self.downloader.destdir,
+                        "\n",
                         "[/size]",
                     ]
                 )
 
-                # When finish, change the label, wait some seconds
-                # and then change screen
-                self.trigger()
+            else:
+                self.redirect_error("Downloader already initialized")
+
+        elif key == "progress":
+            # calculate percentage of download
+            if value is not None and self.downloader is not None:
+                lens = [value["downloaded_len"], value["content_len"]]
+                percent = lens[0] / lens[1]
+
+                # Format bytes (one liner) in MB
+                # https://stackoverflow.com/questions/
+                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+                downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
+                self.ids[f"{self.id}_progress"].text = "".join(
+                    [
+                        "[font=terminus]",
+                        f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                        "\n",
+                        f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
+                        "[/font]",
+                    ]
+                )
+
+                if percent == 1.0:
+                    downloaded = self.translate("downloaded")
+                    destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
+                    self.ids[f"{self.id}_info"].text = "".join(
+                        [
+                            f"[font={DownloadBetaScreen.get_font_name()}]",
+                            f"[size={self.SIZE_MP}sp]",
+                            destdir,
+                            "\n",
+                            downloaded,
+                            "[/size]",
+                            "[/font]",
+                        ]
+                    )
+
+                    # When finish, change the label, wait some seconds
+                    # and then change screen
+                    self.trigger()
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')

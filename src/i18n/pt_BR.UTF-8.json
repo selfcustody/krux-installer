@@ -49,6 +49,12 @@
     "Download again": "Baixe novamente",
     "Proceed with current file": "Proceda com o arquivo atual"
   },
+  "download_beta_screen": {
+    "Connecting": "Conectando",
+    "Downloading": "Baixando",
+    "to": "para",
+    "downloaded": "baixado"
+  },
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Verificando integridade e autenticidade",
     "Integrity verification": "Verificação de integridade",

@@ -90,10 +90,14 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
         ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
 
         if key == "locale":
-            self.locale = value
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error("Invalid value for 'key': '{value}'")
 
         elif key == "canvas":
             # prepare background
@@ -102,47 +106,54 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
                 Rectangle(size=(Window.width, Window.height))
 
         elif key == "version":
-            self.version = value
-            self.downloader = Sha256Downloader(
-                version=value,
-                destdir=App.get_running_app().config.get("destdir", "assets"),
-            )
+            if value is not None:
+                self.version = value
+                self.downloader = Sha256Downloader(
+                    version=value,
+                    destdir=DownloadStableZipSha256Screen.get_destdir_assets(),
+                )
 
-            self.ids[f"{self.id}_info"].text = "\n".join(
-                [
-                    f"[size={self.SIZE_MP}sp]" "Downloading",
-                    f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    ""
-                    f"to {self.downloader.destdir}/krux-{self.version}.zip.sha256.txt",
-                    "[/size]",
-                ]
-            )
-
-        elif key == "progress":
-            # calculate percentage of download
-            lens = [value["downloaded_len"], value["content_len"]]
-            percent = lens[0] / lens[1]
-
-            self.ids[f"{self.id}_progress"].text = "\n".join(
-                [
-                    f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                    "",
-                    f"[size={self.SIZE_MP}sp]{lens[0]} of {lens[1]} B[/size]",
-                ]
-            )
-
-            if percent == 1.00:
                 self.ids[f"{self.id}_info"].text = "\n".join(
                     [
-                        f"[size={self.SIZE_MP}sp]",
-                        f"{self.downloader.destdir}/krux-{self.version}.zip.sha256.txt downloaded",
+                        f"[size={self.SIZE_MP}sp]" "Downloading",
+                        f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][color]",
+                        ""
+                        f"to {self.downloader.destdir}/krux-{self.version}.zip.sha256.txt",
                         "[/size]",
                     ]
                 )
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
-                # When finish, change the label, wait some seconds
-                # and then change screen
-                self.trigger()
+        elif key == "progress":
+            # calculate percentage of download
+            if value is not None:
+                lens = [value["downloaded_len"], value["content_len"]]
+                percent = lens[0] / lens[1]
+
+                self.ids[f"{self.id}_progress"].text = "\n".join(
+                    [
+                        f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                        "",
+                        f"[size={self.SIZE_MP}sp]{lens[0]} of {lens[1]} B[/size]",
+                    ]
+                )
+
+                if percent == 1.00:
+                    self.ids[f"{self.id}_info"].text = "\n".join(
+                        [
+                            f"[size={self.SIZE_MP}sp]",
+                            f"{self.downloader.destdir}/krux-{self.version}.zip.sha256.txt downloaded",
+                            "[/size]",
+                        ]
+                    )
+
+                    # When finish, change the label, wait some seconds
+                    # and then change screen
+                    self.trigger()
+
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')

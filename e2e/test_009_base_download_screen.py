@@ -1,18 +1,40 @@
-from unittest.mock import patch, call, MagicMock
+import os
+from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.base_download_screen import BaseDownloadScreen
 
 
 class TestBaseDownloadScreen(GraphicUnitTest):
 
     @classmethod
+    def setUpClass(cls):
+        cwd_path = os.path.dirname(__file__)
+        rel_assets_path = os.path.join(cwd_path, "..", "assets")
+        assets_path = os.path.abspath(rel_assets_path)
+        terminus_path = os.path.join(assets_path, "terminus.ttf")
+        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="nanum", fn_regular=nanum_path)
+        LabelBase.register(DEFAULT_FONT, terminus_path)
+
+    @classmethod
     def teardown_class(cls):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_init(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    def test_init(
+        self,
+        mock_get_font_name,
+        mock_get_locale,
+    ):
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
         screen.to_screen = "AnotherMockScreen"
         self.render(screen)
@@ -33,14 +55,20 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         self.assertEqual(grid.children[0].id, "mock_screen_info")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
     @patch("src.app.screens.base_download_screen.Clock.create_trigger")
-    def test_set_trigger(self, mock_create_trigger, mock_get_running_app):
+    def test_set_trigger(
+        self, mock_create_trigger, mock_get_font_name, mock_get_locale
+    ):
         mock_trigger = MagicMock()
 
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
@@ -54,15 +82,19 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         # default assertions
         self.assertFalse(screen.trigger is None)
 
-        # patch tests
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        # patch assertions
         mock_create_trigger.assert_called()
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_set_thread(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    def test_set_thread(self, mock_get_font_name, mock_get_locale):
         mock_target = MagicMock()
 
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
@@ -77,13 +109,20 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         self.assertFalse(screen.thread is None)
 
         # patch tests
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_on_enter(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_on_enter(
+        self, mock_redirect_error, mock_get_font_name, mock_get_locale
+    ):
 
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
         screen.to_screen = "AnotherMockScreen"
@@ -94,29 +133,36 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        with self.assertRaises(ValueError) as exc_info:
-            screen.on_enter()
+        screen.on_enter()
 
         # default assertions
-        self.assertEqual(
-            str(exc_info.exception),
-            "Downloader isnt configured. Use `update` method first",
-        )
         self.assertTrue(screen.trigger is None)
         self.assertTrue(screen.thread is None)
 
         # patch tests
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
+        mock_redirect_error.assert_called_once_with(
+            "Downloader isnt configured. Use `update` method first"
         )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
     @patch("src.app.screens.base_download_screen.partial")
     @patch("src.app.screens.base_download_screen.Clock.create_trigger")
     @patch("src.app.screens.base_download_screen.Thread.start")
     def test_on_enter(
-        self, mock_thread, mock_create_trigger, mock_partial, mock_get_running_app
+        self,
+        mock_thread,
+        mock_create_trigger,
+        mock_partial,
+        mock_get_font_name,
+        mock_get_locale,
     ):
         screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
         screen.to_screen = "AnotherMockScreen"
@@ -140,9 +186,8 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         screen.on_enter()
 
         # patch tests
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
         on_progress = getattr(BaseDownloadScreen, "on_progress")
         mock_partial.assert_called_once_with(

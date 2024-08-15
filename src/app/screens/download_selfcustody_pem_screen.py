@@ -86,7 +86,8 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
 
         if key == "locale":
             self.locale = value
@@ -99,7 +100,7 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
 
         elif key == "public-key-certificate":
             self.downloader = PemDownloader(
-                destdir=App.get_running_app().config.get("destdir", "assets"),
+                destdir=DownloadSelfcustodyPemScreen.get_destdir_assets()
             )
 
             self.ids[f"{self.id}_info"].text = "\n".join(
@@ -145,4 +146,4 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
                 self.trigger()
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')

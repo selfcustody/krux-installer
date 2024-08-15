@@ -1,19 +1,37 @@
+import os
 import sys
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.download_stable_zip_screen import DownloadStableZipScreen
 
 
 class TestDownloadStableZipScreen(GraphicUnitTest):
 
     @classmethod
+    def setUpClass(cls):
+        cwd_path = os.path.dirname(__file__)
+        rel_assets_path = os.path.join(cwd_path, "..", "assets")
+        assets_path = os.path.abspath(rel_assets_path)
+        terminus_path = os.path.join(assets_path, "terminus.ttf")
+        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="nanum", fn_regular=nanum_path)
+        LabelBase.register(DEFAULT_FONT, terminus_path)
+
+    @classmethod
     def teardown_class(cls):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_init(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    def test_init(self, mock_get_font_name, mock_get_locale):
         screen = DownloadStableZipScreen()
         self.render(screen)
 
@@ -33,14 +51,23 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         self.assertEqual(grid.children[0].id, "download_stable_zip_screen_info")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_invalid_name(self, mock_redirect_error, mock_get_locale):
+    def test_fail_update_invalid_name(
+        self,
+        mock_redirect_error,
+        mock_get_font_name,
+        mock_get_locale,
+    ):
         screen = DownloadStableZipScreen()
         self.render(screen)
 
@@ -51,13 +78,21 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         screen.update(name="MockScreen")
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
         mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
+    def test_fail_update_key(
+        self, mock_redirect_error, mock_get_font_name, mock_get_locale
+    ):
         screen = DownloadStableZipScreen()
         self.render(screen)
 
@@ -68,12 +103,18 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="mock")
 
         # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
         mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_locale(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    def test_update_locale(self, mock_get_font_name, mock_get_locale):
         screen = DownloadStableZipScreen()
         self.render(screen)
 
@@ -87,17 +128,28 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets",
+        return_value="mockdir",
+    )
     @patch("src.app.screens.download_stable_zip_screen.ZipDownloader")
-    def test_update_version(self, mock_downloader, mock_get_running_app):
-        attrs = {"get.side_effect": ["en-US.UTF8", "mockdir"]}
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.configure_mock(**attrs)
+    def test_update_version(
+        self,
+        mock_downloader,
+        mock_get_destdir_assets,
+        mock_get_font_name,
+        mock_get_locale,
+    ):
 
         screen = DownloadStableZipScreen()
         self.render(screen)
@@ -110,22 +162,19 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="version", value="v0.0.1")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [
-                call().config.get("locale", "lang"),
-                call().config.get("destdir", "assets"),
-            ],
-            any_order=True,
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
+        mock_get_destdir_assets.assert_any_call()
         mock_downloader.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_progress(self, mock_get_running_app):
-        attrs = {"get.side_effect": ["en-US.UTF8", "mockdir"]}
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.configure_mock(**attrs)
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    def test_update_progress(self, mock_get_font_name, mock_get_locale):
         screen = DownloadStableZipScreen()
         self.render(screen)
 
@@ -163,18 +212,17 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         self.assertEqual(screen.ids["download_stable_zip_screen_progress"].text, text)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")],
-            any_order=True,
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_update_progress_100_percent(self, mock_get_running_app):
-        attrs = {"get.side_effect": ["en-US.UTF8", "mockdir"]}
-        mock_get_running_app.config = MagicMock()
-        mock_get_running_app.config.configure_mock(**attrs)
-
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
+    def test_update_progress_100_percent(self, mock_get_font_name, mock_get_locale):
         screen = DownloadStableZipScreen()
         screen.version = "v24.07.0"
         self.render(screen)
@@ -231,20 +279,27 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
             )
 
             # patch assertions
-            mock_get_running_app.assert_has_calls(
-                [call().config.get("locale", "lang")],
-                any_order=True,
-            )
-
+            mock_get_font_name.assert_any_call()
+            mock_get_locale.assert_any_call()
             assert len(mock_trigger.mock_calls) >= 1
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
     @patch("src.app.screens.download_stable_zip_screen.ZipDownloader")
     @patch("src.app.screens.download_stable_zip_screen.partial")
     @patch("src.app.screens.download_stable_zip_screen.Clock.schedule_once")
     def test_on_progress(
-        self, mock_schedule_once, mock_partial, mock_downloader, mock_get_running_app
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_downloader,
+        mock_get_font_name,
+        mock_get_locale,
     ):
 
         mock_downloader.downloaded_len = 8
@@ -263,10 +318,8 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         DownloadStableZipScreen.on_progress(data=b"")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
-
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
         mock_partial.assert_has_calls(
             [
                 call(screen.update, name=screen.name, key="canvas"),
@@ -278,13 +331,17 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
                 ),
             ]
         )
-
         mock_schedule_once.assert_has_calls(
             [call(mock_partial(), 0), call(mock_partial(), 0)]
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
+    )
     @patch("src.app.screens.download_stable_zip_screen.time.sleep")
     @patch("src.app.screens.download_stable_zip_screen.DownloadStableZipScreen.manager")
     @patch("src.app.screens.download_stable_zip_screen.partial")
@@ -299,7 +356,8 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         mock_partial,
         mock_manager,
         mock_sleep,
-        mock_get_running_app,
+        mock_get_font_name,
+        mock_get_locale,
     ):
         # Mocks
         mock_manager.get_screen = MagicMock()
@@ -324,10 +382,8 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         self.assertFalse(screen.trigger is None)
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")],
-            any_order=True,
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
         mock_sleep.assert_called_once_with(2.1)
         mock_manager.get_screen.assert_called_once_with("DownloadStableZipSha256Screen")
         mock_partial.assert_has_calls(

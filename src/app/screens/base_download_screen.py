@@ -46,8 +46,20 @@ class BaseDownloadScreen(BaseScreen):
 
         # progress label, show a "Connecting"
         # before start the download to make
+        connecting = self.translate("Connecting")
+        text = "".join(
+            [
+                f"[font={BaseDownloadScreen.get_font_name()}]",
+                f"[size={self.SIZE_G}]",
+                f"{connecting}...",
+                "[/size]",
+                "[color=#efcc00]",
+                "[/color]" "[/font]",
+            ]
+        )
+
         progress = Label(
-            text=f"[size={self.SIZE_G}sp][color=#efcc00]Connecting...[/color][/size]",
+            text=text,
             markup=True,
             valign="center",
             halign="center",
@@ -151,4 +163,4 @@ class BaseDownloadScreen(BaseScreen):
             self.thread = Thread(name=self.name, target=_fn)
             self.thread.start()
         else:
-            raise ValueError("Downloader isnt configured. Use `update` method first")
+            self.redirect_error("Downloader isnt configured. Use `update` method first")

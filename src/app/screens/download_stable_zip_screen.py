@@ -121,7 +121,7 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 self.version = value
                 self.downloader = ZipDownloader(
                     version=self.version,
-                    destdir=App.get_running_app().config.get("destdir", "assets"),
+                    destdir=DownloadStableZipScreen.get_destdir_assets(),
                 )
 
                 if self.downloader is not None:

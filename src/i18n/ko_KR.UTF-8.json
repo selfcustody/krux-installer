@@ -43,6 +43,12 @@
     "Proceed": "진행",
     "Back": "뒤로"
   },
+  "download_beta_screen": {
+    "Connecting": "연결",
+    "Downloading": "다운로드",
+    "to": "l에",
+    "downloaded": "다운로드한 파일"
+  },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "이미 다운로드한 자산",
     "Do you want to proceed with the same file or do you want to download it again?": "동일한 파일로 계속 진행하시겠습니까, 아니면 다시 다운로드하시겠습니까?",

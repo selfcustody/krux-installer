@@ -43,6 +43,12 @@
     "Proceed": "Продолжать",
     "Back": "Вернуться"
   },
+  "download_beta_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Скачивание",
+    "to": "в",
+    "downloaded": "Загрузить"
+  },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Ресурсы уже загружены",
     "Do you want to proceed with the same file or do you want to download it again?": "Хотите продолжить с последним файлом или как загрузить новый файл?",    

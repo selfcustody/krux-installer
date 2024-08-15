@@ -91,6 +91,7 @@ class ErrorScreen(BaseScreen):
             "SelectDeviceScreen",
             "SelectVersionScreen",
             "SelectOldVersionScreen",
+            "DownloadBetaScreen",
             "AboutScreen",
             "ErrorScreen",
         ):

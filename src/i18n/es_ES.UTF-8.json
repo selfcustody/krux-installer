@@ -43,6 +43,12 @@
     "Proceed": "Proceder",
     "Back": "Volver"
   },
+  "download_beta_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "downloaded": "se descargó"
+  },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Recursos ya descargados",
     "Do you want to proceed with the same file or do you want to download it again?": "¿Quieres continuar con el mismo archivo o quieres descargarlo nuevamente?",

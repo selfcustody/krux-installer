@@ -1,4 +1,4 @@
-# The MIT License (MIT)
+#         The MIT License (MIT)
 
 # Copyright (c) 2021-2024 Krux contributors
 
@@ -61,10 +61,20 @@ class SelectOldVersionScreen(BaseScreen):
                 version = self.ids[instance.id].text
                 self.debug(f"on_release::{instance.id} = {version}")
                 main_screen = self.manager.get_screen("MainScreen")
-                fn = partial(
-                    main_screen.update, name=self.name, key="version", value=version
+                fn_version = partial(
+                    main_screen.update,
+                    name=self.name,
+                    key="version",
+                    value=version
                 )
-                Clock.schedule_once(fn, 0)
+                fn_device = partial(
+                    main_screen.update,
+                    name=self.name,
+                    key="device",
+                    value="select a new one",
+                )
+                Clock.schedule_once(fn_version, 0)
+                Clock.schedule_once(fn_device, 0)
                 self.set_screen(name="MainScreen", direction="right")
 
             self.make_button(

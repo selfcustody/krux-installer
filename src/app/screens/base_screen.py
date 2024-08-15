@@ -22,6 +22,7 @@
 base_screen.py
 """
 import os
+import re
 import sys
 import typing
 from pathlib import Path
@@ -305,3 +306,8 @@ class BaseScreen(Screen, Trigger):
     def open_settings():
         app = App.get_running_app()
         app.open_settings()
+
+    @staticmethod
+    def sanitize_markup(msg: str) -> str:
+        cleanr = re.compile("\\[.*?\\]")
+        return re.sub(cleanr, "", msg)

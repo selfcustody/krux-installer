@@ -57,10 +57,14 @@ class SelectDeviceScreen(BaseScreen):
                     self.debug(f"Calling Button::{instance.id}::on_release")
                     self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
                     device = self.ids[instance.id].text
-                    self.debug(f"on_release::{instance.id} = {device}")
+                    clean_device = SelectDeviceScreen.sanitize_markup(device)
+                    self.debug(f"on_release::{instance.id} = {clean_device}")
                     main_screen = self.manager.get_screen("MainScreen")
                     fn = partial(
-                        main_screen.update, name=self.name, key="device", value=device
+                        main_screen.update,
+                        name=self.name,
+                        key="device",
+                        value=clean_device
                     )
                     Clock.schedule_once(fn, 0)
                     self.set_screen(name="MainScreen", direction="right")

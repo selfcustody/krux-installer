@@ -29,13 +29,14 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertTrue(f"{screen.id}_label" in screen.ids)
 
         # patch assertions
-        mock_get_locale.assert_called()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_fail_update_invalid_name(self, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_invalid_name(self, mock_redirect_error, mock_get_locale):
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
 
@@ -43,20 +44,18 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="MockScreen")
-
-        # default assertions
-        self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
+        screen.update(name="MockScreen")
 
         # patch assertions
-        mock_get_locale.assert_called()
+        mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_fail_update_key(self, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
         screen = WarningAlreadyDownloadedScreen()
         self.render(screen)
 
@@ -64,14 +63,11 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name=screen.name, key="mock")
-
-        # default assertions
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
+        screen.update(name=screen.name, key="mock")
 
         # patch assertions
-        mock_get_locale.assert_called()
+        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -91,7 +87,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
-        mock_get_locale.assert_called()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -117,38 +113,45 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         if sys.platform == "darwin":
             size = [window.size[0] // 48, window.size[0] // 128, window.size[0] // 128]
 
-        label_text = "\n".join(
+        label_text = "".join(
             [
+                f"[font=terminus]"
                 f"[size={size[0]}sp][b]Assets already downloaded[/b][/size]",
-                "",
+                "[/font]",
+                "\n",
+                "\n",
+                "[font=terminus]",
                 f"[size={size[2]}sp]* krux-v0.0.1.zip[/size]",
-                "",
+                "\n",
+                "\n",
                 f"[size={size[2]}sp]* krux-v0.0.1.zip.sha256.txt[/size]",
-                "",
+                "\n",
+                "\n",
                 f"[size={size[2]}sp]* krux-v0.0.1.zip.sig[/size]",
-                "",
+                "\n",
+                "\n",
                 f"[size={size[2]}sp]* selfcustody.pem[/size]",
-                "",
-                "",
+                "\n",
+                "\n",
+                "\n",
+                "[font=terminus]",
                 f"[size={size[1]}sp]Do you want to proceed with the same file or do you want to download it again?[/size]",
-                "",
-                "",
-                "".join(
-                    [
-                        f"[size={size[0]}]" f"[color=#00ff00]",
-                        "[ref=DownloadStableZipScreen]",
-                        "Download again",
-                        "[/ref]",
-                        "[/color]",
-                        "        ",
-                        "[color=#efcc00]",
-                        "[ref=VerifyStableZipScreen]",
-                        "Proceed with files",
-                        "[/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                ),
+                "\n",
+                "\n",
+                "\n",
+                f"[size={size[0]}]" f"[color=#00ff00]",
+                "[ref=DownloadStableZipScreen]",
+                "Download again",
+                "[/ref]",
+                "[/color]",
+                "        ",
+                "[color=#efcc00]",
+                "[ref=VerifyStableZipScreen]",
+                "Proceed with current file",
+                "[/ref]",
+                "[/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
 

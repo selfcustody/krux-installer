@@ -100,11 +100,15 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         ):
             self.debug(f"Updating {self.name} from {name}")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
 
         # Check locale
         if key == "locale":
-            self.locale = value
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "canvas":
             # prepare background
@@ -118,7 +122,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 "Do you want to proceed with the same file or do you want to download it again?"
             )
             download_msg = self.translate("Download again")
-            proceed_msg = self.translate("Proceed with files")
+            proceed_msg = self.translate("Proceed with current file")
 
             if sys.platform in ("linux", "win32"):
                 size = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
@@ -126,37 +130,47 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             else:
                 size = [self.SIZE_MM, self.SIZE_MP, self.SIZE_MP]
 
-            self.ids[f"{self.id}_label"].text = "\n".join(
+            self.ids[f"{self.id}_label"].text = "".join(
                 [
+                    f"[font={WarningAlreadyDownloadedScreen.get_font_name()}]"
                     f"[size={size[0]}sp][b]{warning_msg}[/b][/size]",
-                    "",
+                    "[/font]",
+                    "\n",
+                    "\n"
+                    f"[font=terminus]"
                     f"[size={size[2]}sp]* krux-{value}.zip[/size]",
-                    "",
+                    "\n",
+                    "\n",
                     f"[size={size[2]}sp]* krux-{value}.zip.sha256.txt[/size]",
-                    "",
+                    "\n",
+                    "\n",
                     f"[size={size[2]}sp]* krux-{value}.zip.sig[/size]",
-                    "",
+                    "\n",
+                    "\n",
                     f"[size={size[2]}sp]* selfcustody.pem[/size]",
-                    "",
-                    "",
+                    "\n",
+                    "\n",
+                    "\n",
+                    f"[font={WarningAlreadyDownloadedScreen.get_font_name()}]"
                     f"[size={size[1]}sp]{ask_proceed}[/size]",
-                    "",
-                    "",
-                    "".join(
-                        [
-                            f"[size={size[0]}]" f"[color=#00ff00]",
-                            "[ref=DownloadStableZipScreen]",
-                            download_msg,
-                            "[/ref]",
-                            "[/color]" "        ",
-                            "[color=#efcc00]" "[ref=VerifyStableZipScreen]",
-                            proceed_msg,
-                            "[/ref]",
-                            "[/color]" "[/size]",
-                        ]
-                    ),
+                    "\n",
+                    "\n",
+                    "\n",
+                    f"[size={size[0]}]" f"[color=#00ff00]",
+                    "[ref=DownloadStableZipScreen]",
+                    download_msg,
+                    "[/ref]",
+                    "[/color]",
+                    "        ",
+                    "[color=#efcc00]",
+                    "[ref=VerifyStableZipScreen]",
+                    proceed_msg,
+                    "[/ref]",
+                    "[/color]",
+                    "[/size]",
+                    "[/font]",
                 ]
             )
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')

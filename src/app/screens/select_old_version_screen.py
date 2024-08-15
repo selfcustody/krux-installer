@@ -62,10 +62,7 @@ class SelectOldVersionScreen(BaseScreen):
                 self.debug(f"on_release::{instance.id} = {version}")
                 main_screen = self.manager.get_screen("MainScreen")
                 fn_version = partial(
-                    main_screen.update,
-                    name=self.name,
-                    key="version",
-                    value=version
+                    main_screen.update, name=self.name, key="version", value=version
                 )
                 fn_device = partial(
                     main_screen.update,

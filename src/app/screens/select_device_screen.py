@@ -64,7 +64,7 @@ class SelectDeviceScreen(BaseScreen):
                         main_screen.update,
                         name=self.name,
                         key="device",
-                        value=clean_device
+                        value=clean_device,
                     )
                     Clock.schedule_once(fn, 0)
                     self.set_screen(name="MainScreen", direction="right")

@@ -415,53 +415,63 @@ class MainScreen(BaseScreen):
 
             if value is not None:
                 value = MainScreen.sanitize_markup(value)
-                
+
                 # check if update to given values
                 if value in VALID_DEVICES:
                     self.device = value
                     self.will_flash = True
                     self.will_wipe = True
-                    self.ids["main_flash"].text = "".join([
-                        f"[font={MainScreen.get_font_name()}]",
-                        self.translate("Flash"),
-                        "[/font]",
-                    ])
-                    self.ids["main_wipe"].text = "".join([
-                        f"[font={MainScreen.get_font_name()}]",
-                        self.translate("Wipe"),
-                        "[/font]"
-                    ])
+                    self.ids["main_flash"].text = "".join(
+                        [
+                            f"[font={MainScreen.get_font_name()}]",
+                            self.translate("Flash"),
+                            "[/font]",
+                        ]
+                    )
+                    self.ids["main_wipe"].text = "".join(
+                        [
+                            f"[font={MainScreen.get_font_name()}]",
+                            self.translate("Wipe"),
+                            "[/font]",
+                        ]
+                    )
 
                 else:
                     self.will_flash = False
                     self.will_wipe = False
                     self.ids["main_flash"].markup = True
                     self.ids["main_wipe"].markup = True
-                    self.ids["main_flash"].text = "".join([
-                        f"[font={MainScreen.get_font_name()}]",
-                        "[color=#333333]",
-                        self.translate("Flash"),
-                        "[/color]",
-                        "[/font]",
-                    ])
-                    self.ids["main_wipe"].text = "".join([
-                        f"[font={MainScreen.get_font_name()}]",
-                        "[color=#333333]",
-                        self.translate("Wipe"),
-                        "[/color]",
-                        "[/font]",
-                    ])
+                    self.ids["main_flash"].text = "".join(
+                        [
+                            f"[font={MainScreen.get_font_name()}]",
+                            "[color=#333333]",
+                            self.translate("Flash"),
+                            "[/color]",
+                            "[/font]",
+                        ]
+                    )
+                    self.ids["main_wipe"].text = "".join(
+                        [
+                            f"[font={MainScreen.get_font_name()}]",
+                            "[color=#333333]",
+                            self.translate("Wipe"),
+                            "[/color]",
+                            "[/font]",
+                        ]
+                    )
 
                 if value == "select a new one":
                     value = self.translate("select a new one")
 
-                self.ids["main_select_device"].text = "".join([
-                    f"[font={MainScreen.get_font_name()}]",
-                    f"{self.translate("Device")}: ",
-                    "[color=#00AABB]",
-                    value,
-                    "[/color]" "[/font]"
-                ])
+                self.ids["main_select_device"].text = "".join(
+                    [
+                        f"[font={MainScreen.get_font_name()}]",
+                        f"{self.translate("Device")}: ",
+                        "[color=#00AABB]",
+                        value,
+                        "[/color]" "[/font]",
+                    ]
+                )
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 

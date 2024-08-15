@@ -53,14 +53,47 @@ patch-win = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1"
 
 clean-mac = "find . -name '.DS_Store' -delete"
 
-build = "python .ci/build.py"
-
 lint.sequence = [
   { cmd = "jsonlint src/i18n/*.json"},
   { cmd = "pylint --rcfile .pylint/src ./src" },
   { cmd = "pylint --rcfile .pylint/tests ./tests"},
   { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
 ]
+
+[tool.poe.tasks.build-deb]
+interpreter = "bash"
+shell = """
+python .ci/create-spec.py
+python -m PyInstaller krux-installer.spec
+NAME="$(python -c 'from src.utils.constants import get_name; print(get_name())')"
+VER="$(python -c 'from src.utils.constants import get_version; print(get_version())')"
+mkdir -p ./release
+create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
+"""
+
+[tool.poe.tasks.build-rpm]
+interpreter = "bash"
+shell = """
+python .ci/create-spec.py
+python -m PyInstaller krux-installer.spec
+NAME="$(python -c 'from src.utils.constants import get_name; print(get_name())')"
+VER="$(python -c 'from src.utils.constants import get_version; print(get_version())')"
+RPM_VERSION=$(sed -e 's/-/_/g' <<< $VERSION)
+mkdir -p ./release
+sh .ci/create-rpm.sh -a "${NAME}" -v $RPM_VERSION -m qlrd -e qlrddev@gmail.com -d "${DESCRIPTION}" -c ./CHANGELOG.md -r ./README.md -b "./dist/${NAME}" -i ./assets/icon.png
+rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.spec
+"""
+
+[tool.poe.tasks.build-dmg]
+interpreter = "zsh"
+shell = """
+python .ci/create-spec.py
+python -m PyInstaller krux-installer.spec
+NAME="$(python -c 'from src.utils.constants import get_name; print(get_name())')"
+VER="$(python -c 'from src.utils.constants import get_version; print(get_version())')"
+mkdir -p ./release
+create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
+"""
 
 [tool.poe.tasks.dev-debug]
 env = { LOGLEVEL = "debug" }

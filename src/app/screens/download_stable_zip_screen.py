@@ -127,13 +127,28 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 if self.downloader is not None:
                     url = getattr(self.downloader, "url")
                     destdir = getattr(self.downloader, "destdir")
-                    self.ids[f"{self.id}_info"].text = "\n".join(
+                    downloading = self.translate("Downloading")
+                    to = self.translate("to")
+                    filepath = os.path.join(destdir, f"krux-{self.version}.zip")
+
+                    self.ids[f"{self.id}_info"].text = "".join(
                         [
-                            f"[size={self.SIZE_MP}sp]" "Downloading",
+                            f"[size={self.SIZE_MP}sp]",
+                            f"[font={DownloadStableZipScreen.get_font_name()}]",
+                            downloading,
+                            "[/font]",
+                            "\n",
+                            "[font=terminus]",
                             f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                            "",
-                            f"to {destdir}/krux-{self.version}.zip",
-                            "[/size]",
+                            "[/font]",
+                            "\n",
+                            f"[font={DownloadStableZipScreen.get_font_name()}]",
+                            to,
+                            "[/font]",
+                            "\n",
+                            "[font=terminus]",
+                            filepath,
+                            "[/font]" "[/size]",
                         ]
                     )
 
@@ -153,11 +168,22 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 # https://stackoverflow.com/questions/
                 # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
                 downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-                self.ids[f"{self.id}_progress"].text = "\n".join(
+
+                of = self.translate("of")
+                self.ids[f"{self.id}_progress"].text = "".join(
                     [
+                        "[font=terminus]",
                         f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                        "",
-                        f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
+                        "[/font]",
+                        "\n",
+                        f"[size={self.SIZE_MP}sp]",
+                        downs[0],
+                        f"[font={DownloadStableZipScreen.get_font_name()}]",
+                        f" {of} ",
+                        "[/font]",
+                        downs[1],
+                        " MB",
+                        "[/size]",
                     ]
                 )
 
@@ -166,10 +192,18 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 if percent == 1.00:
                     if self.downloader is not None:
                         destdir = getattr(self.downloader, "destdir")
-                        self.ids[f"{self.id}_info"].text = "\n".join(
+                        downloaded = self.translate("downloaded")
+                        filepath = os.path.join(destdir, f"krux-{self.version}.zip")
+                        self.ids[f"{self.id}_info"].text = "".join(
                             [
                                 f"[size={self.SIZE_MP}sp]",
-                                f"{destdir}/krux-{self.version}.zip downloaded",
+                                "[font=terminus]",
+                                filepath,
+                                "[/font]",
+                                "\n",
+                                f"[font={DownloadStableZipScreen.get_font_name()}]",
+                                downloaded,
+                                "[/font]",
                                 "[/size]",
                             ]
                         )

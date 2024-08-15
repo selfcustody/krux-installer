@@ -43,16 +43,45 @@
     "Proceed": "Proceder",
     "Back": "Voltar"
   },
+  "download_beta_screen": {
+    "Connecting": "Conectando",
+    "Downloading": "Baixando",
+    "to": "para",
+    "of": "de",
+    "downloaded": "baixado"
+  },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Arquivos já baixados",
     "Do you want to proceed with the same file or do you want to download it again?": "Você quer proceder com o mesmo arquivo ou quer fazer o download dele novamente?",
     "Download again": "Baixe novamente",
     "Proceed with current file": "Proceda com o arquivo atual"
   },
-  "download_beta_screen": {
+  "download_stable_zip_screen": {
     "Connecting": "Conectando",
     "Downloading": "Baixando",
     "to": "para",
+    "of": "de",
+    "downloaded": "baixado"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Conectando",
+    "Downloading": "Baixando",
+    "to": "para",
+    "of": "de",
+    "downloaded": "baixado"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Conectando",
+    "Downloading": "Baixando",
+    "to": "para",
+    "of": "de",
+    "downloaded": "baixado"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Conectando",
+    "Downloading": "Baixando",
+    "to": "para",
+    "of": "de",
     "downloaded": "baixado"
   },
   "verify_stable_zip_screen": {

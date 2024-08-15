@@ -47,6 +47,7 @@
     "Connecting": "Соединительный",
     "Downloading": "Скачивание",
     "to": "в",
+    "of": "из",
     "downloaded": "Загрузить"
   },
   "warning_already_downloaded_screen": {
@@ -55,6 +56,34 @@
     "Download again": "Скачать еще раз",
     "Proceed with current file": "Продолжить работу\nс текущим файлом"
   },  
+  "download_stable_zip_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Проверка целостности и подлинности",
     "Integrity verification": "Проверка целостности",

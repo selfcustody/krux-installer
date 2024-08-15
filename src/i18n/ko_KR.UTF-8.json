@@ -47,6 +47,7 @@
     "Connecting": "연결",
     "Downloading": "다운로드",
     "to": "l에",
+    "of": "의",
     "downloaded": "다운로드한 파일"
   },
   "warning_already_downloaded_screen": {
@@ -54,6 +55,34 @@
     "Do you want to proceed with the same file or do you want to download it again?": "동일한 파일로 계속 진행하시겠습니까, 아니면 다시 다운로드하시겠습니까?",
     "Download again": "다시 다운로드",
     "Proceed with current file": "현재 파일로 계속"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "연결",
+    "Downloading": "다운로드",
+    "to": "l에",
+    "of": "의",
+    "downloaded": "다운로드한 파일"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "연결",
+    "Downloading": "다운로드",
+    "to": "l에",
+    "of": "의",
+    "downloaded": "다운로드한 파일"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "연결",
+    "Downloading": "다운로드",
+    "to": "l에",
+    "of": "의",
+    "downloaded": "다운로드한 파일"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "연결",
+    "Downloading": "다운로드",
+    "to": "l에",
+    "of": "의",
+    "downloaded": "다운로드한 파일"
   },
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "무결성 및 신뢰성 확인",

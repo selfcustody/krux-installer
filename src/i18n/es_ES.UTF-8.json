@@ -47,6 +47,7 @@
     "Connecting": "Conectando a",
     "Downloading": "Descargar",
     "to": "a",
+    "of": "de",
     "downloaded": "se descargó"
   },
   "warning_already_downloaded_screen": {
@@ -55,6 +56,34 @@
     "Download again": "Descargar de nuevo",
     "Proceed with current file": "Continuar con el archivo actual"
   },  
+  "download_stable_zip_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Verificación de la integridad y autenticidad",
     "Integrity verification": "Verificación de integridad",

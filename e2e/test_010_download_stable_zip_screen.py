@@ -201,11 +201,19 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
         )
 
         # do tests
-        text = "\n".join(
+        text = "".join(
             [
+                "[font=terminus]",
                 f"[size={fontsize_g}sp][b]1.00 %[/b][/size]",
-                "",
-                f"[size={fontsize_mp}sp]0.20 of 20.03 MB[/size]",
+                "[/font]",
+                "\n",
+                f"[size={fontsize_mp}sp]",
+                "0.20",
+                "[font=terminus]",
+                " of ",
+                "[/font]",
+                "20.03 MB",
+                "[/size]",
             ]
         )
 
@@ -255,18 +263,34 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
             )
 
             # do tests
-            text_progress = "\n".join(
+            text_progress = "".join(
                 [
+                    "[font=terminus]",
                     f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
-                    "",
-                    f"[size={fontsize_mp}sp]20.03 of 20.03 MB[/size]",
+                    "[/font]",
+                    "\n",
+                    f"[size={fontsize_mp}sp]",
+                    "20.03",
+                    "[font=terminus]",
+                    " of ",
+                    "[/font]",
+                    "20.03",
+                    " MB",
+                    "[/size]",
                 ]
             )
 
-            text_info = "\n".join(
+            filepath = os.path.join("mockdir", "krux-v24.07.0.zip")
+            text_info = "".join(
                 [
                     f"[size={fontsize_mp}sp]",
-                    "mockdir/krux-v24.07.0.zip downloaded",
+                    "[font=terminus]",
+                    filepath,
+                    "[/font]",
+                    "\n",
+                    "[font=terminus]",
+                    "downloaded",
+                    "[/font]",
                     "[/size]",
                 ]
             )

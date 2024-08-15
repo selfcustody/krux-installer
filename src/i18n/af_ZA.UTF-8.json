@@ -47,6 +47,7 @@
     "Connecting": "Koppel tans",
     "Downloading": "Laai",
     "to": "af na",
+    "of": "van",
     "downloaded": "afgelaai"
   },
   "warning_already_downloaded_screen": {   
@@ -54,6 +55,33 @@
     "Do you want to proceed with the same file or do you want to download it again?": "Wil jy voortgaan met dieselfde lêer of wil jy dit weer aflaai?",
     "Download again": "Laai weer af",
     "Proceed with current file": "Gaan voort met\ndie huidige lêer"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "of": "van",
+    "downloaded": "afgelaai"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "of": "van",
+    "downloaded": "afgelaai"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "of": "van",
+    "downloaded": "afgelaai"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "downloaded": "afgelaai"
   },
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Verifieer integriteit en egtheid",

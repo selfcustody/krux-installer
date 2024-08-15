@@ -19,14 +19,14 @@
     "Checking your internet connection": "Checking your internet connection"
   },
   "main_screen": {
-    "Version": "Version",
-    "Device": "Device",
-    "select a new one": "select a new one",
-    "Flash": "Update firmware",
-    "Wipe": "Wipe device",
-    "Settings": "Settings",
-    "About": "About",
-    "Fetching data from": "Fetching data from"
+    "Version": "Versie",
+    "Device": "Apparaat",
+    "select a new one": "Selecteer een nieuwe",
+    "Flash": "Firmware programmeren",
+    "Wipe": "Apparaat wissen",
+    "Settings": "Instellingen",
+    "About": "Over",
+    "Fetching data from": "Gegevens ophalen van"
   },
   "select_version_screen": {
     "Old versions": "Old versions",

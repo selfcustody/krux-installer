@@ -21,6 +21,7 @@
 """
 download_selfcustody_pem_screen.py
 """
+import os
 import time
 from functools import partial
 from kivy.app import App
@@ -99,18 +100,42 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
                 Rectangle(size=(Window.width, Window.height))
 
         elif key == "public-key-certificate":
-            self.downloader = PemDownloader(
-                destdir=DownloadSelfcustodyPemScreen.get_destdir_assets()
-            )
+            if value is None:
+                self.downloader = PemDownloader(
+                    destdir=DownloadSelfcustodyPemScreen.get_destdir_assets()
+                )
 
-            self.ids[f"{self.id}_info"].text = "\n".join(
-                [
-                    f"[size={self.SIZE_MP}sp]" "Downloading",
-                    f"[color=#00AABB][ref={self.downloader.url}]{self.downloader.url}[/ref][/color]",
-                    "" f"to {self.downloader.destdir}/selfcustody.pem",
-                    "[/size]",
-                ]
-            )
+                if self.downloader is not None:
+                    url = getattr(self.downloader, "url")
+                    destdir = getattr(self.downloader, "destdir")
+                    downloading = self.translate("Downloading")
+                    to = self.translate("to")
+                    filepath = os.path.join(destdir, "selfcustoduuy.pem")
+
+                    self.ids[f"{self.id}_info"].text = "".join(
+                        [
+                            f"[size={self.SIZE_MP}sp]",
+                            f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
+                            downloading,
+                            "[/font]",
+                            "\n",
+                            "[font=terminus]",
+                            f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
+                            "[/font]",
+                            "\n",
+                            f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
+                            to,
+                            "[/font]",
+                            "\n",
+                            "[font=terminus]",
+                            filepath,
+                            "[/font]",
+                            "[/size]",
+                        ]
+                    )
+
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "progress":
             # calculate percentage of download
@@ -118,28 +143,55 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
 
             percent = lens[0] / lens[1]
 
+            # for some unknow reason (yet)
+            # the screen show that downloaded
+            # 130B of 128B, so limit it to 128
             if percent > 1.0:
                 percent = 1.0
 
             if lens[0] > lens[1]:
                 lens[0] = lens[1]
 
-            self.ids[f"{self.id}_progress"].text = "\n".join(
+            of = self.translate("of")
+            self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                    "",
-                    f"[size={self.SIZE_MP}sp]{lens[0]} of {lens[1]} B[/size]",
+                    "[font=terminus]",
+                    f"[size={self.SIZE_G}sp][b]{percent * 100:,.2f} %[/b][/size]",
+                    "[/font]",
+                    "\n",
+                    "[font=terminus]",
+                    f"[size={self.SIZE_MP}sp]",
+                    str(lens[0]),
+                    "[/font]",
+                    f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
+                    f" {of} ",
+                    "[/font]",
+                    "[font=terminus]",
+                    str(lens[1]),
+                    " B",
+                    "[/font]",
+                    "[/size]",
                 ]
             )
 
             if percent == 1.00:
-                self.ids[f"{self.id}_info"].text = "\n".join(
-                    [
-                        f"[size={self.SIZE_MP}sp]",
-                        f"{self.downloader.destdir}/selfcustody.pem downloaded",
-                        "[/size]",
-                    ]
-                )
+                if self.downloader is not None:
+                    destdir = getattr(self.downloader, "destdir")
+                    downloaded = self.translate("downloaded")
+                    filepath = os.path.join(destdir, "selfcustody.pem")
+                    self.ids[f"{self.id}_info"].text = "".join(
+                        [
+                            f"[size={self.SIZE_MP}sp]",
+                            "[font=terminus]",
+                            filepath,
+                            "[/font]",
+                            "\n",
+                            f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
+                            downloaded,
+                            "[/font]",
+                            "[/size]",
+                        ]
+                    )
 
                 # When finish, change the label, wait some seconds
                 # and then change screen

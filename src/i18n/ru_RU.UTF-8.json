@@ -54,7 +54,7 @@
     "Assets already downloaded": "Ресурсы уже загружены",
     "Do you want to proceed with the same file or do you want to download it again?": "Хотите продолжить с последним файлом или как загрузить новый файл?",    
     "Download again": "Скачать еще раз",
-    "Proceed with current file": "Продолжить работу\nс текущим файлом"
+    "Proceed with current file": "Продолжить работу с текущим файлом"
   },  
   "download_stable_zip_screen": {
     "Connecting": "Соединительный",

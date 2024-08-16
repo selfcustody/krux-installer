@@ -148,7 +148,8 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                             "\n",
                             "[font=terminus]",
                             filepath,
-                            "[/font]" "[/size]",
+                            "[/font]",
+                            "[/size]",
                         ]
                     )
 
@@ -207,7 +208,8 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                                 "[/size]",
                             ]
                         )
-
+                        # When finish, change the label, wait some seconds
+                        # and then change screen
                         self.trigger()
 
                     else:

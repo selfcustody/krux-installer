@@ -205,11 +205,24 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         )
 
         # do tests
-        text = "\n".join(
+        text = "".join(
             [
+                "[font=terminus]",
                 f"[size={fontsize_g}sp][b]1.00 %[/b][/size]",
-                "",
-                f"[size={fontsize_mp}sp]210000 of 21000000 B[/size]",
+                "[/font]",
+                "\n",
+                "[font=terminus]",
+                f"[size={fontsize_mp}sp]",
+                "210000",
+                "[/font]",
+                "[font=terminus]",
+                " of ",
+                "[/font]",
+                "[font=terminus]",
+                "21000000",
+                " B",
+                "[/font]",
+                "[/size]",
             ]
         )
 
@@ -318,18 +331,36 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
             )
 
             # do tests
-            text_progress = "\n".join(
+            text_progress = "".join(
                 [
-                    f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
-                    "",
-                    f"[size={fontsize_mp}sp]21 of 21 B[/size]",
+                    "[font=terminus]" f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
+                    "[/font]",
+                    "\n",
+                    "[font=terminus]" f"[size={fontsize_mp}sp]",
+                    "21",
+                    "[/font]",
+                    "[font=terminus]",
+                    " of ",
+                    "[/font]",
+                    "[font=terminus]",
+                    "21",
+                    " B",
+                    "[/font]",
+                    "[/size]",
                 ]
             )
 
-            text_info = "\n".join(
+            filepath = os.path.join("mockdir", "krux-v24.07.0.zip.sha256.txt")
+            text_info = "".join(
                 [
                     f"[size={fontsize_mp}sp]",
-                    "mockdir/krux-v24.07.0.zip.sha256.txt downloaded",
+                    "[font=terminus]",
+                    filepath,
+                    "[/font]",
+                    "\n",
+                    "[font=terminus]",
+                    "downloaded",
+                    "[/font]",
                     "[/size]",
                 ]
             )

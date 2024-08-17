@@ -1,13 +1,26 @@
+import os
 import sys
 from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.unzip_stable_screen import (
     UnzipStableScreen,
 )
 
 
 class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
+
+    @classmethod
+    def setUpClass(cls):
+        cwd_path = os.path.dirname(__file__)
+        rel_assets_path = os.path.join(cwd_path, "..", "assets")
+        assets_path = os.path.abspath(rel_assets_path)
+        terminus_path = os.path.join(assets_path, "terminus.ttf")
+        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
+        LabelBase.register(name="terminus", fn_regular=terminus_path)
+        LabelBase.register(name="nanum", fn_regular=nanum_path)
+        LabelBase.register(DEFAULT_FONT, terminus_path)
 
     @classmethod
     def teardown_class(cls):
@@ -74,7 +87,13 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_fail_update_key(self, mock_get_locale, mock_get_destdir_assets):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_key(
+        self,
+        mock_redirect_error,
+        mock_get_destdir_assets,
+        mock_get_locale,
+    ):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -82,15 +101,14 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name=screen.name, key="mock")
+        screen.update(name=screen.name, key="mock")
 
         # default assertions
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
 
         # patch assertions
         mock_get_destdir_assets.assert_any_call()
         mock_get_locale.assert_any_call()
+        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -226,10 +244,20 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="flash-button")
-        text = "\n".join(
+
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "kboot.kfpkg")
+        text = "".join(
             [
-                f"[size={size[0]}sp]Flash with[/size]",
-                f"[size={size[1]}sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
+                "[font=terminus]" f"[size={size[0]}sp]",
+                "Flash with",
+                "[/size]",
+                "\n",
+                f"[size={size[1]}sp]",
+                "[color=#efcc00]",
+                p,
+                "[/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
 
@@ -267,10 +295,23 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="airgap-button")
-        text = "\n".join(
+
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
+        text = "".join(
             [
-                f"[size={size[0]}sp][color=#333333]Air-gapped update with[/color][/size]",
-                f"[size={size[1]}sp][color=#333333]mock/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
+                "[font=terminus]",
+                f"[size={size[0]}sp]",
+                "[color=#333333]",
+                "Air-gapped update with",
+                "[/color]",
+                "[/size]",
+                "\n",
+                f"[size={size[1]}sp]",
+                "[color=#333333]",
+                p,
+                "[/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
 
@@ -320,10 +361,21 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         button = screen.ids[f"{screen.id}_flash_button"]
         action = getattr(screen, f"on_press_{screen.id}_flash_button")
         action(button)
-        text = "\n".join(
+
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "kboot.kfpkg")
+        text = "".join(
             [
-                f"[size={size[0]}sp]Extracting[/size]",
-                f"[size={size[1]}sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
+                "[font=terminus]",
+                f"[size={size[0]}sp]",
+                "Extracting",
+                "[/size]",
+                "\n",
+                f"[size={size[1]}sp]",
+                "[color=#efcc00]",
+                p,
+                "[/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
 
@@ -370,10 +422,23 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         button = screen.ids[f"{screen.id}_airgap_button"]
         action = getattr(screen, f"on_press_{screen.id}_airgap_button")
         action(button)
-        text = "\n".join(
+
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
+        text = "".join(
             [
-                f"[size={size[0]}sp][color=#333333]Air-gapped update with[/color][/size]",
-                f"[size={size[1]}sp][color=#333333]mock/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
+                "[font=terminus]",
+                f"[size={size[0]}sp]",
+                "[color=#333333]",
+                "Air-gapped update with",
+                "[/color]",
+                "[/size]",
+                "\n",
+                f"[size={size[1]}sp]",
+                "[color=#333333]",
+                p,
+                "[/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
 
@@ -432,10 +497,21 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         button = screen.ids[f"{screen.id}_flash_button"]
         action = getattr(screen, f"on_release_{screen.id}_flash_button")
         action(button)
-        text = "\n".join(
+
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "kboot.kfpkg")
+        text = "".join(
             [
-                f"[size={size[0]}sp]Extracted[/size]",
-                f"[size={size[1]}sp][color=#efcc00]mock/krux-v0.0.1/maixpy_mock/kboot.kfpkg[/color][/size]",
+                "[font=terminus]",
+                f"[size={size[0]}sp]",
+                "Extracted",
+                "[/size]",
+                "\n",
+                f"[size={size[1]}sp]",
+                "[color=#efcc00]",
+                p,
+                "[/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
 
@@ -500,10 +576,23 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         button = screen.ids[f"{screen.id}_airgap_button"]
         action = getattr(screen, f"on_release_{screen.id}_airgap_button")
         action(button)
-        text = "\n".join(
+
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
+        text = "".join(
             [
-                f"[size={size[0]}sp][color=#333333]Air-gapped update with[/color][/size]",
-                f"[size={size[1]}sp][color=#333333]mock/krux-v0.0.1/maixpy_mock/firmware.bin[/color][/size]",
+                "[font=terminus]",
+                f"[size={size[0]}sp]",
+                "[color=#333333]",
+                "Air-gapped update with",
+                "[/color]",
+                "[/size]",
+                "\n",
+                f"[size={size[1]}sp]",
+                "[color=#333333]",
+                p,
+                "[/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
 
@@ -514,13 +603,6 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
         mock_firmware_unzip.assert_not_called()
-        # mock_firmware_unzip.assert_called_once_with(
-        #    filename="mock/krux-v0.0.1.zip", device="mock", output="mock"
-        # )
-        # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_not_called()
-        # mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
         mock_manager.get_screen.assert_not_called()
-        # mock_manager.get_screen.assert_called_once_with("AirgapScreen")
         mock_sleep.assert_not_called()
-        # mock_sleep.assert_called_once_with(2.1)

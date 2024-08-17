@@ -72,13 +72,22 @@ class UnzipStableScreen(BaseScreen):
 
         # Check locale
         if key == "locale":
-            self.locale = value
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "version":
-            self.version = value
+            if value is not None:
+                self.version = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "device":
-            self.device = value
+            if value is not None:
+                self.device = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "clear":
             self.debug(f"Clearing '{self.id}_grid'")
@@ -91,13 +100,13 @@ class UnzipStableScreen(BaseScreen):
             self.build_extract_to_airgap_button()
 
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')
 
     def build_extract_to_flash_button(self):
         self.debug("Building flash button")
-        zip_file = f"{self.assets_dir}/krux-{self.version}.zip"
-        base_path = f"krux-{self.version}/maixpy_{self.device}"
-        rel_path = f"{self.assets_dir}/{base_path}"
+        zip_file = os.path.join(self.assets_dir, f"krux-{self.version}.zip")
+        base_path = os.path.join(f"krux-{self.version}", f"maixpy_{self.device}")
+        rel_path = os.path.join(self.assets_dir, base_path)
         flash_msg = self.translate("Flash with")
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
@@ -105,44 +114,71 @@ class UnzipStableScreen(BaseScreen):
 
         def _press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
-            file_path = f"{rel_path}/kboot.kfpkg"
-            self.ids[instance.id].text = "\n".join(
+            file_path = os.path.join(rel_path, "kboot.kfpkg")
+            self.ids[instance.id].text = "".join(
                 [
-                    f"[size={size[0]}sp]{extract_msg}[/size]",
-                    f"[size={size[1]}sp][color=#efcc00]{file_path}[/color][/size]",
+                    f"[font={UnzipStableScreen.get_font_name()}]",
+                    f"[size={size[0]}sp]",
+                    extract_msg,
+                    "[/size]",
+                    "\n",
+                    f"[size={size[1]}sp]",
+                    "[color=#efcc00]",
+                    file_path,
+                    "[/color]",
+                    "[/size]",
+                    "[/font]",
                 ]
             )
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
         def _release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
-            file_path = os.path.join(base_path, "kboot.kfpkg")
-            baudrate = UnzipStableScreen.get_baudrate()
-            full_path = os.path.join(self.assets_dir, file_path)
+            if self.device is not None:
+                file_path = os.path.join(base_path, "kboot.kfpkg")
+                full_path = os.path.join(self.assets_dir, file_path)
+                baudrate = UnzipStableScreen.get_baudrate()
 
-            unziper = KbootUnzip(
-                filename=zip_file, device=self.device, output=self.assets_dir
-            )
+                unziper = KbootUnzip(
+                    filename=zip_file, device=self.device, output=self.assets_dir
+                )
 
-            screen = self.manager.get_screen("FlashScreen")
-            fns = [
-                partial(screen.update, name=self.name, key="firmware", value=full_path),
-                partial(screen.update, name=self.name, key="baudrate", value=baudrate),
-                partial(screen.update, name=self.name, key="flasher"),
-            ]
-
-            for fn in fns:
-                Clock.schedule_once(fn, 0)
-
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-            unziper.load()
-
-            self.ids[instance.id].text = "\n".join(
-                [
-                    f"[size={size[0]}sp]{extracted_msg}[/size]",
-                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
+                # load variables to FlashScreen before get in
+                screen = self.manager.get_screen("FlashScreen")
+                fns = [
+                    partial(
+                        screen.update, name=self.name, key="firmware", value=full_path
+                    ),
+                    partial(
+                        screen.update, name=self.name, key="baudrate", value=baudrate
+                    ),
+                    partial(screen.update, name=self.name, key="flasher"),
                 ]
-            )
+
+                for fn in fns:
+                    Clock.schedule_once(fn, 0)
+
+                # start the unzip process
+                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+                unziper.load()
+
+                # once unziped, give some messages
+                p = os.path.join(rel_path, "kboot.kfpkg")
+                self.ids[instance.id].text = "".join(
+                    [
+                        f"[font={UnzipStableScreen.get_font_name()}]",
+                        f"[size={size[0]}sp]",
+                        extracted_msg,
+                        "[/size]",
+                        "\n",
+                        f"[size={size[1]}sp]",
+                        "[color=#efcc00]",
+                        p,
+                        "[/color]",
+                        "[/size]",
+                        "[/font]",
+                    ]
+                )
 
             time.sleep(2.1)
             self.set_screen(name="FlashScreen", direction="left")
@@ -150,13 +186,23 @@ class UnzipStableScreen(BaseScreen):
         setattr(UnzipStableScreen, f"on_press_{self.id}_flash_button", _press)
         setattr(UnzipStableScreen, f"on_release_{self.id}_flash_button", _release)
 
+        p = os.path.join(rel_path, "kboot.kfpkg")
         self.make_button(
             id=f"{self.id}_flash_button",
             root_widget=f"{self.id}_grid",
-            text=f"\n".join(
+            text="".join(
                 [
-                    f"[size={size[0]}sp]{flash_msg}[/size]",
-                    f"[size={size[1]}sp][color=#efcc00]{rel_path}/kboot.kfpkg[/color][/size]",
+                    f"[font={UnzipStableScreen.get_font_name()}]",
+                    f"[size={size[0]}sp]",
+                    flash_msg,
+                    "[/size]",
+                    "\n",
+                    f"[size={size[1]}sp]",
+                    "[color=#efcc00]",
+                    p,
+                    "[/color]",
+                    "[/size]",
+                    "[/font]",
                 ]
             ),
             markup=True,
@@ -181,11 +227,20 @@ class UnzipStableScreen(BaseScreen):
         def _press(instance):
             if activated:
                 self.debug(f"Calling Button::{instance.id}::on_press")
-                file_path = f"{rel_path}/firmware.bin"
-                self.ids[instance.id].text = "\n".join(
+                file_path = os.path.join(rel_path, "firmware.bin")
+                self.ids[instance.id].text = "".join(
                     [
-                        f"[size={size[0]}sp]{extract_msg}[/size]",
-                        f"[size={size[1]}sp][color=#efcc00]{file_path}[/color][/size]",
+                        f"[font={UnzipStableScreen.get_font_name()}]",
+                        f"[size={size[0]}sp]",
+                        extract_msg,
+                        "[/size]",
+                        "\n",
+                        f"[size={size[1]}sp]",
+                        "[color=#efcc00]",
+                        file_path,
+                        "[/color]",
+                        "[/size]",
+                        "[/font]",
                     ]
                 )
                 self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
@@ -193,42 +248,65 @@ class UnzipStableScreen(BaseScreen):
         def _release(instance):
             if activated:
                 self.debug(f"Calling Button::{instance.id}::on_release")
-                file_path = f"{base_path}/firmware.bin"
-                unziper = FirmwareUnzip(
-                    filename=zip_file, device=self.device, output=self.assets_dir
-                )
+                if self.device is not None:
+                    file_path = f"{base_path}/firmware.bin"
+                    unziper = FirmwareUnzip(
+                        filename=zip_file, device=self.device, output=self.assets_dir
+                    )
 
-                screen = self.manager.get_screen("AirgapScreen")
-                fns = [
-                    partial(screen.update, key="firmware", value=file_path),
-                    partial(screen.update, key="device", value=self.device),
-                ]
-                for fn in fns:
-                    Clock.schedule_once(fn, 0)
-
-                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-                unziper.load()
-
-                self.ids[instance.id].text = "\n".join(
-                    [
-                        f"[size={size[0]}sp]{extracted_msg}[/size]",
-                        f"[size={size[1]}sp][color=#efcc00]{rel_path}/firmware.bin[/color][/size]",
+                    screen = self.manager.get_screen("AirgapScreen")
+                    fns = [
+                        partial(screen.update, key="firmware", value=file_path),
+                        partial(screen.update, key="device", value=self.device),
                     ]
-                )
+                    for fn in fns:
+                        Clock.schedule_once(fn, 0)
 
-                time.sleep(2.1)
-                self.set_screen(name="AirgapScreen", direction="left")
+                    self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+                    unziper.load()
+
+                    p = os.path.join(rel_path, "firmware.bin")
+                    self.ids[instance.id].text = "".join(
+                        [
+                            f"[font={UnzipStableScreen.get_font_name()}]",
+                            f"[size={size[0]}sp]",
+                            extracted_msg,
+                            "[/size]",
+                            "\n",
+                            f"[size={size[1]}sp]",
+                            "[color=#efcc00]",
+                            p,
+                            "[/color]",
+                            "[/size]",
+                            "[/font]",
+                        ]
+                    )
+
+                    time.sleep(2.1)
+                    self.set_screen(name="AirgapScreen", direction="left")
 
         setattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button", _press)
         setattr(UnzipStableScreen, f"on_release_{self.id}_airgap_button", _release)
 
+        p = os.path.join(rel_path, "firmware.bin")
         self.make_button(
             id=f"{self.id}_airgap_button",
             root_widget=f"{self.id}_grid",
-            text="\n".join(
+            text="".join(
                 [
-                    f"[size={size[0]}sp][color=#333333]{airgap_msg}[/color][/size]",
-                    f"[size={size[1]}sp][color=#333333]{rel_path}/firmware.bin[/color][/size]",
+                    f"[font={UnzipStableScreen.get_font_name()}]",
+                    f"[size={size[0]}sp]",
+                    "[color=#333333]",
+                    airgap_msg,
+                    "[/color]",
+                    "[/size]",
+                    "\n",
+                    f"[size={size[1]}sp]",
+                    "[color=#333333]",
+                    p,
+                    "[/color]",
+                    "[/size]",
+                    "[/font]",
                 ]
             ),
             markup=True,

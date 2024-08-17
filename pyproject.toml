@@ -95,6 +95,30 @@ mkdir -p ./release
 create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
 """
 
+[tool.pow.tasks.build-dmg]
+interpreter = ["pwsh", "powershell"]
+shell = """
+$releasePath = ".\\release"
+$name = python -c 'from src.utils.constants import get_name; print(get_name())'
+$version = python -c 'from src.utils.constants import get_version; print(get_version())'
+$description= python -c 'from src.utils.constants import get_description; print(get_description())'
+
+if (-not (Test-Path -Path $releasePath)) {
+  New-Item -Path $releasePath -ItemType Directory
+} else {
+  if (Test-Path -Path "$releasePath\\krux-installer_v$version Setup.exe") {
+    Remove-Item ".\\release\\krux-installer_v$version Setup.exe"
+  }
+}
+
+python .ci\\create-spec.py
+.ci\\edit-spec.ps1
+python -m PyInstaller krux-installer.spec
+python .ci\\create-nsis.py -a $name -b .\\dist\\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\\LICENSE -i .\\assets\\icon.ico -O .
+makensis.exe .\\krux-installer.nsi
+Move-Item -Path ".\\krux-installer Setup.exe" -Destination ".\\release\\krux-installer_v$version Setup.exe"
+"""
+
 [tool.poe.tasks.dev-debug]
 env = { LOGLEVEL = "debug" }
 cmd = "python krux-installer.py"

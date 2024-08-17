@@ -87,6 +87,8 @@
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "무결성 및 신뢰성 확인",
     "Integrity verification": "무결성 검증",
+    "computed hash from": "계산된 해시",
+    "provided hash from": "다음에서 제공된 해시",
     "SUCCESS": "성공",
     "FAILED": "실패",
     "Authenticity verification": "진위 여부 확인",
@@ -94,7 +96,9 @@
     "BAD": "나쁘다",
     "SIGNATURE": "서명",
     "If you have openssl installed on your system": "시스템에 openssl이 설치되어 있는 경우",
-    "you can check manually with the following command": "다음 명령으로 확인할 수 있습니다"
+    "you can check manually with the following command": "다음 명령으로 확인할 수 있습니다",
+    "Proceed": "진행",
+    "Back": "진행"
   },
   "unzip_stable_screen": {
     "Flash with": "플래시 사용",

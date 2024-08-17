@@ -87,6 +87,8 @@
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Проверка целостности и подлинности",
     "Integrity verification": "Проверка целостности",
+    "computed hash from": "вычисленный хеш из",
+    "provided hash from": "предоставленный хеш из",
     "SUCCESS": "УСПЕХ",
     "FAILED": "НЕУДАВШИЙСЯ",
     "Authenticity verification": "Проверка подлинности",
@@ -94,7 +96,9 @@
     "BAD": "НЕПРАВИЛЬНАЯ",
     "SIGNATURE": "ПОДПИСЬ",
     "If you have openssl installed on your system": "Если в вашей системе установлен openssl",
-    "you can check manually with the following command": "Вы можете проверить вручную с помощью следующей команды"
+    "you can check manually with the following command": "Вы можете проверить вручную с помощью следующей команды",
+    "Proceed": "Продолжать",
+    "Back": "Вернись"
   },  
   "unzip_stable_screen": {
     "Flash with": "Вспышка с",

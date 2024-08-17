@@ -21,6 +21,7 @@
 """
 verify_stable_zip_screen.py
 """
+import os
 import sys
 import time
 from functools import partial
@@ -125,13 +126,15 @@ class VerifyStableZipScreen(BaseScreen):
         verifying_msg = self.translate("Verifying integrity and authenticity")
 
         warning = Label(
-            text="\n".join(
+            text="".join(
                 [
+                    f"[font={VerifyStableZipScreen.get_font_name()}]",
                     f"[size={self.SIZE_MM}sp]",
                     "[color=#efcc00]",
                     verifying_msg,
                     "[/color]",
                     "[/size]",
+                    "[/font]",
                 ]
             ),
             markup=True,
@@ -176,9 +179,19 @@ class VerifyStableZipScreen(BaseScreen):
         # memorize result
         self.success = checksum
 
+        filepath = os.path.join(assets_dir, f"krux-{version}.zip")
         integrity_msg = self.translate("Integrity verification")
         success_msg = self.translate("SUCCESS")
         failed_msg = self.translate("FAILED")
+        computed_msg = self.translate("computed hash from")
+        provided_msg = self.translate("provided hash from")
+        hash_color = ""
+        hash_msg = ""
+
+        if sys.platform in ("linux", "win32"):
+            size = [self.SIZE_MP, self.SIZE_P, self.SIZE_PP]
+        else:
+            size = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
 
         # slice strings, two by two, to better visualization
         chunk_sha_0 = [txt_hash_0[i : i + 2] for i in range(0, len(txt_hash_0), 2)]
@@ -196,31 +209,44 @@ class VerifyStableZipScreen(BaseScreen):
         sha_0 = "\n".join(subset_sha_0)
         sha_1 = "\n".join(subset_sha_1)
 
-        if sys.platform in ("linux", "win32"):
-            size = [self.SIZE_MP, self.SIZE_PP, self.SIZE_P]
-
+        if checksum:
+            hash_color = "#00FF00"
+            hash_msg = success_msg
         else:
-            size = [self.SIZE_M, self.SIZE_P, self.SIZE_MP]
+            hash_color = "FF0000"
+            hash_msg = failed_message
 
-        return "\n".join(
+        return "".join(
             [
-                "",
-                f"[size={size[0]}sp][u]{integrity_msg.upper()}[/u]:[/size]",
-                "",
-                f"[size={size[1]}sp][b][color=777777]{assets_dir}/krux-{version}.zip[/b][/size]",
-                f"[size={size[1]}sp][b](computed hash)[/b][/color][/size]",
-                "",
-                f"[size={size[2]}sp]{sha_0}[/size]",
-                "",
-                "",
-                f"[size={size[1]}sp][b][color=#777777]{assets_dir}/krux-{version}.zip.sha256.txt[/b][/size]",
-                f"[size={size[1]}sp][b](provided hash from github)[/b][/color][/size]",
-                "",
-                f"[size={size[2]}sp]{sha_1}[/size]",
-                "",
-                f"[size={size[2]}sp][color=#{"00ff00" if checksum else "ff0000"}][b]{success_msg if checksum else failed_msg}[/b][/color][/size]",
-                "",
-                "",
+                f"[font={VerifyStableZipScreen.get_font_name()}]"
+                f"[size={size[0]}sp][u]{integrity_msg.upper()}[/u]: [b][color=#00ff00]{hash_msg}[/color][/b][/size]",
+                "[/font]",
+                "\n",
+                "\n",
+                f"[font={VerifyStableZipScreen.get_font_name()}]",
+                f"[size={size[1]}sp][b]{computed_msg} [color=#777777]{filepath}[/color][/b][/size]",
+                "[/font]",
+                "\n",
+                "[font=terminus]",
+                f"[size={size[1]}sp]{sha_0}[/size]",
+                "[/font]",
+                "\n",
+                "\n",
+                f"[font={VerifyStableZipScreen.get_font_name()}]",
+                f"[size={size[1]}sp][b]{provided_msg} [color=#777777]{filepath}.sha256.txt[/color][/b][/size]",
+                "[/font]",
+                "\n",
+                "[font=terminus]",
+                f"[size={size[1]}sp]{sha_1}[/size]",
+                "[/font]",
+                "\n",
+                "\n",
+                "[/font]",
+                "\n",
+                f"[font={VerifyStableZipScreen.get_font_name()}]",
+                "[/font]",
+                "\n",
+                "\n",
             ]
         )
 
@@ -248,45 +274,60 @@ class VerifyStableZipScreen(BaseScreen):
         sig_msg = self.translate("SIGNATURE")
         installed_msg = self.translate("If you have openssl installed on your system")
         check_msg = self.translate("you can check manually with the following command")
+        proceed = self.translate("Proceed")
+        back = self.translate("Back")
+        filepath = os.path.join(assets_dir, f"krux-{version}.zip")
+        pempath = os.path.join(assets_dir, "selfcustody.pem")
 
         if sys.platform in ("linux", "win32"):
             size = [self.SIZE_MP, self.SIZE_P]
-
         else:
             size = [self.SIZE_M, self.SIZE_MP]
 
-        return "\n".join(
+        if checksig:
+            sig_color = "#00FF00"
+            res_msg = good_msg
+        else:
+            sig_color = "FF0000"
+            res_msg = bad_msg
+
+        return "".join(
             [
-                "",
-                "",
-                f"[size={size[0]}sp][u]{authenticity_msg.upper()}[/u]:[/size]",
-                "",
-                "",
-                "",
+                f"[font={VerifyStableZipScreen.get_font_name()}]",
+                f"[size={size[0]}sp][u]{authenticity_msg.upper()}[/u]: [b][color={sig_color}]{res_msg} {sig_msg}[/color][/b][/size]",
+                "[/font]",
+                "\n",
+                "\n",
+                "\n",
+                f"[font={VerifyStableZipScreen.get_font_name()}]",
                 f"[size={size[1]}sp]{installed_msg}[/size]",
-                f"[size={size[1]}sp]{check_msg}:[/size]",
-                "",
-                "",
-                "",
-                f"[size={size[1]}sp][b]openssl sha256< [color=#777777]{assets_dir}/krux-{version}.zip[/color] -binary | \\",
-                f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{assets_dir}/selfcustody.pem[/color] \\",
-                f"-sigfile [color=#777777]{assets_dir}/krux-{version}.zip.sig[/color][/size][/color][/b][/size]",
-                "",
-                "",
-                "",
-                f"[size={size[1]}sp][b][color=#{"00ff00" if checksig else "ff0000"}]{good_msg if checksig else bad_msg} {sig_msg}[/b][/color][/size]",
-                "",
-                "",
-                "",
-                f"[size={size[0]}sp]",
-                "[b]"
-                "             ".join(
-                    [
-                        "[ref=UnzipStableScreen][color=#00ff00]Proceed[/ref][/color]",
-                        "[ref=MainScreen][color=#ff0000]Back[/ref][/color]",
-                    ]
-                ),
+                "\n" f"[size={size[1]}sp]{check_msg}:[/size]",
+                "[/font]",
+                "\n",
+                "\n",
+                "[font=terminus]" f"[size={size[1]}sp]",
+                "[b]",
+                f"openssl sha256< [color=#777777]{filepath}[/color] -binary | \\",
+                "\n"
+                f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{pempath}[/color] \\",
+                "\n",
+                f"-sigfile [color=#777777]{filepath}.sig[/color]",
+                "[/size]",
+                "[/b]",
+                "[/font]",
+                "\n",
+                "\n",
+                f"[font={VerifyStableZipScreen.get_font_name()}]"
+                f"[size={size[1]}sp][b][color=#{sig_color}]{res_msg} {sig_msg}[/b][/color][/size]",
+                "[/font]",
+                "\n",
+                "\n",
+                f"[font={VerifyStableZipScreen.get_font_name()}]" f"[size={size[0]}sp]",
+                f"[ref=UnzipStableScreen][color=#00ff00]{proceed}[/ref][/color]",
+                "             ",
+                f"[ref=MainScreen][color=#ff0000]{back}[/ref][/color]",
                 "[/b]",
                 "[/size]",
+                "[/font]",
             ]
         )

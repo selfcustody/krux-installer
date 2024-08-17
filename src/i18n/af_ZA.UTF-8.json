@@ -54,7 +54,7 @@
     "Assets already downloaded": "Bates wat reeds afgelaai is",
     "Do you want to proceed with the same file or do you want to download it again?": "Wil jy voortgaan met dieselfde lêer of wil jy dit weer aflaai?",
     "Download again": "Laai weer af",
-    "Proceed with current file": "Gaan voort met\ndie huidige lêer"
+    "Proceed with current file": "Gaan voort met die huidige lêer"
   },
   "download_stable_zip_screen": {
     "Connecting": "Koppel tans",
@@ -86,6 +86,8 @@
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Verifieer integriteit en egtheid",
     "Integrity verification": "Integriteit verifikasie",
+    "computed hash from": "berekende hash van",
+    "provided hash from": "verskaf hash van",
     "SUCCESS": "SUKSES",
     "FAILED": "HET MISLUK",
     "Authenticity verification": "Verifikasie van egtheid",
@@ -93,7 +95,9 @@
     "BAD": "SLEGTE",
     "SIGNATURE": "HANDTEKENING",
     "If you have openssl installed on your system": "As u openssl op u stelsel geïnstalleer het",
-    "you can check manually with the following command": "U kan handmatig met die volgende opdrag kyk"
+    "you can check manually with the following command": "U kan handmatig met die volgende opdrag kyk",
+    "Proceed": "Voortgaan",
+    "Back": "Terug"
   },  
   "unzip_stable_screen": {
     "Flash with": "Flits met",

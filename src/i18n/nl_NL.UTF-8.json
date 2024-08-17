@@ -87,6 +87,8 @@
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Verifying integrity and authenticity",
     "Integrity verification": "Integrity verification",
+    "computed hash from": "berekende hash van",
+    "provided hash from": "verstrekte hash van",
     "SUCCESS": "SUCCESS",
     "FAILED": "FAILED",
     "Authenticity verification": "Authenticity verification",
@@ -94,7 +96,9 @@
     "BAD": "BAD",
     "SIGNATURE": "SIGNATURE",
     "If you have openssl installed on your system": "If you have openssl installed on your system",
-    "you can check manually with the following command": "you can check with the following command"
+    "you can check manually with the following command": "you can check with the following command",
+    "Proceed": "Doorgaan",
+    "Back": "Kom terug"
   },
   "unzip_stable_screen": {
     "Flash with": "Flash with",

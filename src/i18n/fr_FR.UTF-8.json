@@ -87,6 +87,8 @@
   "verify_stable_zip_screen": {
     "Verifying integrity and authenticity": "Vérification de l'intégrité et de l'authenticité",
     "Integrity verification": "Vérification de l'intégrité",
+    "computed hash from": "hash calculé à partir de",
+    "provided hash from": "hash fourni à partir de",
     "SUCCESS": "SUCCÈS",
     "FAILED": "RATÉ",
     "Authenticity verification": "Vérification de l'authenticité",
@@ -94,7 +96,9 @@
     "BAD": "MAUVAISE",
     "SIGNATURE": "SIGNATURE",
     "If you have openssl installed on your system": "Si openssl est installé sur votre système",
-    "you can check manually with the following command": "vous pouvez vérifier manuellement avec la commande suivante"
+    "you can check manually with the following command": "vous pouvez vérifier manuellement avec la commande suivante",
+    "Proceed": "Continuer",
+    "Back": "Recul"
   },
   "unzip_stable_screen": {
     "Flash with": "Flash avec",

@@ -524,7 +524,9 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_get_locale.assert_called()
         mock_get_destdir_assets.assert_called_once()
         mock_kboot_unzip.assert_called_once_with(
-            filename="mock/krux-v0.0.1.zip", device="mock", output="mock"
+            filename=os.path.join("mock", "krux-v0.0.1.zip"),
+            device="mock",
+            output="mock",
         )
         # mock_kboot_unzip.load.assert_called_once()
         mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))

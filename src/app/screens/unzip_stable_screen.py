@@ -213,9 +213,9 @@ class UnzipStableScreen(BaseScreen):
 
     def build_extract_to_airgap_button(self):
         self.debug("Building airgap button")
-        zip_file = f"{self.assets_dir}/krux-{self.version}.zip"
-        base_path = f"krux-{self.version}/maixpy_{self.device}"
-        rel_path = f"{self.assets_dir}/{base_path}"
+        zip_file = os.path.join(self.assets_dir, f"krux-{self.version}.zip")
+        base_path = os.path.join(f"krux-{self.version}", f"maixpy_{self.device}")
+        rel_path = os.path.join(self.assets_dir, base_path)
         airgap_msg = self.translate("Air-gapped update with")
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")

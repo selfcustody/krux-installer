@@ -108,7 +108,14 @@
   },
   "flash_screen": {
     "DONE": "FEITO ",
-    "Back": "Voltar"
+    "Back": "Voltar",
+    "Quit": "Sair"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR NÃO DESPLUGUE SEU DISPOSITIVO",
+    "DONE": "FEITO",
+    "Back": "Voltar",
+    "Quit": "Sair"
   },
   "about_screen": {
     "follow us on X": "siga-nos no X",

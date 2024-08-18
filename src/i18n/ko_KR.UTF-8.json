@@ -106,6 +106,17 @@
     "Unziping": "추출",
     "Unziped": "추출"
   },
+  "flash_screen": {
+    "DONE": "수행",
+    "Back": "뒤로",
+    "Quit": "사임하다"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "장치의 플러그를 뽑지 마십시오.",
+    "DONE": "수행",
+    "Back": "뒤로",
+    "Quit": "사임하다"
+  },
   "about_screen": {
     "follow us on X": "X에서 우리를 따르십시오",
     "Back": "뒤로"

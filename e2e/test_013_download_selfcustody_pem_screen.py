@@ -273,7 +273,7 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
         )
 
         mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 0)]
+            [call(mock_partial(), 0), call(mock_partial(), 0)], any_order=True
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

@@ -108,7 +108,14 @@
   },
   "flash_screen": {
     "DONE": "HECHO",
-    "Back": "Volver"
+    "Back": "Volver",
+    "Quit": "Salir"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR, NO DESCONECTE SU DISPOSITIVO",
+    "DONE": "HECHO",
+    "Back": "Volve",
+    "Quit": "Salir"
   },
   "about_screen": {
     "follow us on X": "síguenos en X",

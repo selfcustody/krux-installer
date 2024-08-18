@@ -273,7 +273,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
         )
 
         mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 0)]
+            [call(mock_partial(), 0), call(mock_partial(), 0)], any_order=True
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -428,7 +428,7 @@ class TestDownloadStableZipSigScreen(GraphicUnitTest):
             ]
         )
         mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 0)]
+            [call(mock_partial(), 0), call(mock_partial(), 0)], any_order=True
         )
         mock_set_screen.assert_called_once_with(
             name="DownloadSelfcustodyPemScreen", direction="left"

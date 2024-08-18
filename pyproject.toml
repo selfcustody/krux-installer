@@ -95,7 +95,7 @@ mkdir -p ./release
 create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
 """
 
-[tool.pow.tasks.build-win]
+[tool.poe.tasks.build-win]
 interpreter = ["pwsh", "powershell"]
 shell = """
 $releasePath = ".\\release"

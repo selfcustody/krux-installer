@@ -61,9 +61,11 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
 
         terminus_path = os.path.join(self.assets_path, "terminus.ttf")
         nanum_path = os.path.join(self.assets_path, "NanumGothic-Regular.ttf")
+        sc_path = os.path.join(self.assets_path, "NotoSansSC-Regular.ttf")
 
         LabelBase.register(name="terminus", fn_regular=terminus_path)
         LabelBase.register(name="nanum", fn_regular=nanum_path)
+        LabelBase.register(name="noto-sc", fn_regular=sc_path)
 
     @staticmethod
     def make_lang_code(lang: str) -> str:
@@ -192,6 +194,7 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                     ConfigKruxInstaller.make_lang_code("nl_NL"),
                     ConfigKruxInstaller.make_lang_code("pt_BR"),
                     ConfigKruxInstaller.make_lang_code("ru_RU"),
+                    ConfigKruxInstaller.make_lang_code("zh_CN"),
                 ],
             },
         ]

@@ -415,6 +415,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                     f"nl_NL{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
                     f"pt_BR{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
                     f"ru_RU{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"zh_CN{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
                 ],
             },
         ]

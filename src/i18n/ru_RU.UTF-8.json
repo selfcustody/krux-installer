@@ -109,12 +109,14 @@
   "flash_screen": {
     "DONE": "ДОГОВОРИЛИСЬ",
     "Back": "Назад",
-    "Quit": "Покидать"
+    "Quit": "Покидать",
+    "Flashing": "Перепрошивка на",
+    "at": "на"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "ПОЖАЛУЙСТА, НЕ ОТКЛЮЧАЙТЕ УСТРОЙСТВО ОТ СЕТИ",
-    "DONE": "DONE",
-    "Back": "Back",
+    "DONE": "ДОГОВОРИЛИСЬ",
+    "Back": "Назад",
     "Quit": "Покидать"
   },
   "about_screen": {

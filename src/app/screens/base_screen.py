@@ -299,6 +299,9 @@ class BaseScreen(Screen, Trigger):
         if locale.startswith("ko_KR"):
             return "nanum"
 
+        elif locale.startswith("zh_CN"):
+            return "noto-sc"
+
         else:
             return "terminus"
 

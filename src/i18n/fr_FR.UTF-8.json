@@ -109,7 +109,9 @@
   "flash_screen": {
     "DONE": "FAIT",
     "Back": "Précédent",
-    "Quit": "Sors"
+    "Quit": "Sors",
+    "Flashing": "Réalisation du flash",
+    "at": "à"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "VEUILLEZ NE PAS DÉBRANCHER VOTRE APPAREIL",

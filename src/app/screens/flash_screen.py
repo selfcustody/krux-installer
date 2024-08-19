@@ -24,7 +24,8 @@ main_screen.py
 import math
 import typing
 from functools import partial
-from threading import Thread
+import threading
+import traceback
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
@@ -89,11 +90,29 @@ class FlashScreen(BaseFlashScreen):
             file_type: str, iteration: int, total: int, suffix: str
         ):
             percent = (iteration / total) * 100
-            self.ids[f"{self.id}_progress"].text = "\n".join(
+            flashing = self.translate("Flashing")
+            at = self.translate("at")
+
+            self.ids[f"{self.id}_progress"].text = "".join(
                 [
+                    f"[font={FlashScreen.get_font_name()}]",
                     f"[size=100sp]{percent:.2f} %[/size]",
-                    "",
-                    f"[size=28sp]Flashing [color=#efcc00][b]{file_type}[/b][/color] at [color=#efcc00][b]{suffix}[/b][/color][/size]",
+                    "\n",
+                    "[size=28sp]",
+                    f"{flashing} ",
+                    "[color=#efcc00]",
+                    "[b]",
+                    file_type,
+                    "[/b]",
+                    "[/color]",
+                    f" {at} ",
+                    "[color=#efcc00]",
+                    "[b]",
+                    suffix,
+                    "[/b]",
+                    "[/color]",
+                    "[/size]",
+                    "[/font]",
                 ]
             )
 
@@ -183,10 +202,54 @@ class FlashScreen(BaseFlashScreen):
                 self.flasher.flash,
                 callback=getattr(self.__class__, "on_process_callback"),
             )
-            self.thread = Thread(name=self.name, target=on_process_callback)
+            self.thread = threading.Thread(name=self.name, target=on_process_callback)
+
+            # if anything wrong happen, show it
+            def hook(err):
+                msg = "".join(
+                    traceback.format_exception(
+                        err.exc_type, err.exc_value, err.exc_traceback
+                    )
+                )
+                self.error(msg)
+
+                back = self.translate("Back")
+                quit = self.translate("Quit")
+                self.ids[f"{self.id}_progress"].text = "".join(
+                    [
+                        "[font=terminus]",
+                        f"[size={self.SIZE_G}]",
+                        "[color=#FF0000]Flash failed[/color]",
+                        "[/size]",
+                        "\n",
+                        "\n",
+                        f"[size={self.SIZE_MM}]"
+                        f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
+                        "        ",
+                        f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
+                        "[/size]",
+                        "[/font]",
+                    ]
+                )
+
+                self.ids[f"{self.id}_info"].text = "".join(
+                    [
+                        "[font=terminus]",
+                        f"[size={self.SIZE_MP}]",
+                        msg,
+                        "[/size]",
+                        "[/font]",
+                    ]
+                )
+
+            # hook what happened
+            threading.excepthook = hook
+
+            # start thread
             self.thread.start()
+            self.thread.join()
         else:
-            raise RuntimeError("Flasher isnt configured")
+            self.redirect_error("Flasher isnt configured")
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
@@ -208,7 +271,10 @@ class FlashScreen(BaseFlashScreen):
         value = kwargs.get("value")
 
         if key == "locale":
-            self.locale = value
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "canvas":
             # prepare background
@@ -217,15 +283,23 @@ class FlashScreen(BaseFlashScreen):
                 Rectangle(size=(Window.width, Window.height))
 
         elif key == "baudrate":
-            self.baudrate = value
+            if value is not None:
+                self.baudrate = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "firmware":
-            self.firmware = value
+            if value is not None:
+                self.firmware = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "flasher":
             self.flasher = Flasher()
             self.flasher.firmware = self.firmware
             self.flasher.baudrate = self.baudrate
 
+        elif key == "exception":
+            self.redirect_error("")
         else:
-            raise ValueError(f'Invalid key: "{key}"')
+            self.redirect_error(f'Invalid key: "{key}"')

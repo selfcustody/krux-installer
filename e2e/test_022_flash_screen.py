@@ -61,23 +61,22 @@ class TestFlashScreen(GraphicUnitTest):
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_update_wrong_key(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_wrong_key(self, mock_redirect_error, mock_get_locale):
         screen = FlashScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name=screen.name, key="mock")
-
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
+        screen.update(name=screen.name, key="mock")
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_any_call()
+        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
@@ -352,8 +351,10 @@ class TestFlashScreen(GraphicUnitTest):
         mock_trigger.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_on_process_callback(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_on_process_callback(self, mock_get_locale):
         screen = FlashScreen()
         screen.output = []
         screen.on_pre_enter()
@@ -362,16 +363,15 @@ class TestFlashScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        text = "\n".join(
+        text = "".join(
             [
+                "[font=terminus]",
                 "[size=100sp]4.76 %[/size]",
-                "",
-                "".join(
-                    [
-                        "[size=28sp]Flashing [color=#efcc00][b]firmware.bin[/b][/color] at ",
-                        "[color=#efcc00][b]21 KiB/s[/b][/color][/size]",
-                    ]
-                ),
+                "\n",
+                "[size=28sp]Flashing [color=#efcc00][b]firmware.bin[/b][/color] at ",
+                "[color=#efcc00][b]21 KiB/s[/b][/color]",
+                "[/size]",
+                "[/font]",
             ]
         )
         on_process_callback = getattr(FlashScreen, "on_process_callback")
@@ -382,9 +382,7 @@ class TestFlashScreen(GraphicUnitTest):
         self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
         # patch assertions
 
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -431,8 +429,11 @@ class TestFlashScreen(GraphicUnitTest):
         mock_get_locale.assert_has_calls([call(), call(), call()])
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.App.get_running_app")
-    def test_fail_on_enter(self, mock_get_running_app):
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_on_enter(self, mock_redirect_error, mock_get_locale):
         screen = FlashScreen()
         screen.on_pre_enter()
         self.render(screen)
@@ -440,20 +441,16 @@ class TestFlashScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        with self.assertRaises(RuntimeError) as exc_info:
-            screen.on_enter()
-
-        self.assertEqual(str(exc_info.exception), "Flasher isnt configured")
+        screen.on_enter()
 
         # patch assertions
-        mock_get_running_app.assert_has_calls(
-            [call().config.get("locale", "lang")], any_order=True
-        )
+        mock_get_locale.assert_any_call()
+        mock_redirect_error.assert_called_once_with("Flasher isnt configured")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")
     @patch("src.app.screens.flash_screen.partial")
-    @patch("src.app.screens.flash_screen.Thread")
+    @patch("src.app.screens.flash_screen.threading.Thread")
     @patch("src.utils.flasher.Flasher")
     def test_on_enter(
         self, mock_flasher, mock_thread, mock_partial, mock_get_running_app

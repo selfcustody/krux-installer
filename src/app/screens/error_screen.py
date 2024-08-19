@@ -93,6 +93,7 @@ class ErrorScreen(BaseScreen):
             "SelectOldVersionScreen",
             "DownloadBetaScreen",
             "DownloadSelfcustodyPemScreen",
+            "FlashScreen",
             "AboutScreen",
             "ErrorScreen",
         ):

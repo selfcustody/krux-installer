@@ -247,7 +247,6 @@ class FlashScreen(BaseFlashScreen):
 
             # start thread
             self.thread.start()
-            self.thread.join()
         else:
             self.redirect_error("Flasher isnt configured")
 

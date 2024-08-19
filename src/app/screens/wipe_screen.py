@@ -142,15 +142,14 @@ class WipeScreen(BaseFlashScreen):
             root_widget=f"{self.id}_subgrid",
         )
 
+        please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
         self.make_label(
             wid=f"{self.id}_progress",
-            text="\n".join(
+            text="".join(
                 [
-                    # "[size=36sp]Screen will appear fronzen until done.[/size]",
-                    "[size=20sp][b]PLEASE DO NOT UNPLUG YOUR DEVICE[/b]",
-                    "[b]UNTIL YOU SEE THE MESSAGE",
-                    "[color=#efcc00]SPI Flash erased[/color]",
-                    "[b]IN THE PROMPT BELOW [/b][/size]",
+                    f"[font={WipeScreen.get_font_name()}]",
+                    f"[size=20sp][b]{please}[/b]",
+                    "[/font]",
                 ]
             ),
             root_widget=f"{self.id}_subgrid",
@@ -182,7 +181,7 @@ class WipeScreen(BaseFlashScreen):
             self.thread = Thread(name=self.name, target=on_process_callback)
             self.thread.start()
         else:
-            raise RuntimeError("Wiper isnt configured")
+            self.redirect_error("Wiper isnt configured")
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
@@ -197,13 +196,17 @@ class WipeScreen(BaseFlashScreen):
         ):
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            raise ValueError(f"Invalid screen name: {name}")
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
 
         key = kwargs.get("key")
         value = kwargs.get("value")
 
         if key == "locale":
-            self.locale = value
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': {value}")
 
         elif key == "canvas":
             # prepare background
@@ -212,11 +215,17 @@ class WipeScreen(BaseFlashScreen):
                 Rectangle(size=(Window.width, Window.height))
 
         elif key == "device":
-            self.device = value
+            if value is not None:
+                self.device = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': {value}")
 
         elif key == "wiper":
-            self.wiper = Wiper()
-            self.wiper.baudrate = value
+            if value is not None:
+                self.wiper = Wiper()
+                self.wiper.baudrate = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': {value}")
 
         else:
             raise ValueError(f'Invalid key: "{key}"')

@@ -108,7 +108,14 @@
   },
   "flash_screen": {
     "DONE": "ДОГОВОРИЛИСЬ",
-    "Back": "Назад"
+    "Back": "Назад",
+    "Quit": "Покидать"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "ПОЖАЛУЙСТА, НЕ ОТКЛЮЧАЙТЕ УСТРОЙСТВО ОТ СЕТИ",
+    "DONE": "DONE",
+    "Back": "Back",
+    "Quit": "Покидать"
   },
   "about_screen": {
     "follow us on X": "следите за нами на X",

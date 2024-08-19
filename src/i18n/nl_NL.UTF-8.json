@@ -108,7 +108,14 @@
   },
   "flash_screen": {
     "DONE": "KLAAR",
-    "Back": "Terug"
+    "Back": "Terug",
+    "Quit": "Verlaten"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL UW APPARAAT NIET LOS",
+    "DONE": "KLAAR",
+    "Back": "Terug",
+    "Quit": "Verlaten"
   },
   "about_screen": {
     "follow us on X": "volg ons op X",

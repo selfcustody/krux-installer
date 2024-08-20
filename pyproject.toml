@@ -60,67 +60,16 @@ lint.sequence = [
   { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
 ]
 
-[tool.poe.tasks.build-deb]
-interpreter = "bash"
-shell = """
-python .ci/create-spec.py
-python -m PyInstaller krux-installer.spec
-NAME="$(python -c 'from src.utils.constants import get_name; print(get_name())')"
-VER="$(python -c 'from src.utils.constants import get_version; print(get_version())')"
-mkdir -p ./release
-create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
-"""
+build-nix.sequence = [
+  { cmd = "python .ci/create-spec.py"},
+  { cmd = "python -m PyInstaller krux-installer.spec"}
+]
 
-[tool.poe.tasks.build-rpm]
-interpreter = "bash"
-shell = """
-python .ci/create-spec.py
-python -m PyInstaller krux-installer.spec
-NAME="$(python -c 'from src.utils.constants import get_name; print(get_name())')"
-VER="$(python -c 'from src.utils.constants import get_version; print(get_version())')"
-RPM_VERSION=$(sed -e 's/-/_/g' <<< $VERSION)
-mkdir -p ./release
-sh .ci/create-rpm.sh -a "${NAME}" -v $RPM_VERSION -m qlrd -e qlrddev@gmail.com -d "${DESCRIPTION}" -c ./CHANGELOG.md -r ./README.md -b "./dist/${NAME}" -i ./assets/icon.png
-rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.spec
-"""
-
-[tool.poe.tasks.build-dmg]
-interpreter = "zsh"
-shell = """
-rm -rfv ./build
-rm -rfv ./dist
-rm -rfv ./release
-poetry run python .ci/create-spec.py
-poetry run python -m PyInstaller krux-installer.spec
-NAME="$(python -c 'from src.utils.constants import get_name; print(get_name())')"
-VER="$(python -c 'from src.utils.constants import get_version; print(get_version())')"
-mkdir -p ./release
-create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
-"""
-
-[tool.poe.tasks.build-win]
-interpreter = ["pwsh", "powershell"]
-shell = """
-$releasePath = ".\\release"
-$name = python -c 'from src.utils.constants import get_name; print(get_name())'
-$version = python -c 'from src.utils.constants import get_version; print(get_version())'
-$description= python -c 'from src.utils.constants import get_description; print(get_description())'
-
-if (-not (Test-Path -Path $releasePath)) {
-  New-Item -Path $releasePath -ItemType Directory
-} else {
-  if (Test-Path -Path "$releasePath\\krux-installer_v$version Setup.exe") {
-    Remove-Item ".\\release\\krux-installer_v$version Setup.exe"
-  }
-}
-
-python .ci\\create-spec.py
-.ci\\edit-spec.ps1
-python -m PyInstaller krux-installer.spec
-python .ci\\create-nsis.py -a $name -b .\\dist\\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\\LICENSE -i .\\assets\\icon.ico -O .
-makensis.exe .\\krux-installer.nsi
-Move-Item -Path ".\\krux-installer Setup.exe" -Destination ".\\release\\krux-installer_v$version Setup.exe"
-"""
+build-win.sequence = [
+  { cmd = "python .ci/create-spec.py"},
+  { cmd = ".ci\\edit-spec.ps1"},
+  { cmd = "python -m PyInstaller krux-installer.spec"}
+]
 
 [tool.poe.tasks.dev-debug]
 env = { LOGLEVEL = "debug" }

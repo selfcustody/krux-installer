@@ -10,6 +10,22 @@
 Krux Installer is a GUI based tool to flash [Krux](https://github.com/selfcustody/krux)
 without typing any command in terminal for [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
 
+
+# Installing:
+
+There are pre-built [releases](https://github.com/selfcustody/krux-installer/releases) for:
+
+* Linux:
+  * Debian-like
+  * Fedora-like
+* Windows
+* MacOS:
+  * intel processors
+  * arm64 processors (M1/M2/M3)
+  
+
+To build it from the source, please follow the steps below:
+
 * [System setup](/#system-setup)
   * [Linux](/#linux)
   * [Windows](/#windows)
@@ -44,7 +60,7 @@ Follow the instructions at [python.org](https://www.python.org/downloads/windows
 
 ### MacOS
 
-Before installing `krux-installer` source code, you will need:
+Before installing `krux-installer` source code, you will need prepare the system:
 
 #### Install `brew` package manager:
 
@@ -175,25 +191,11 @@ poetry run poe test --no-xvfb
 At the moment, you'll need to [patch some code on `kivy`](https://github.com/kivy/kivy/issues/8653#issuecomment-2028509695)
 to build the Graphical User Interface:
 
-**Debian**
+**Debian/Fedora/MacOS**
 
 ```
 poetry run poe patch-nix
-poetry run poe build-deb
-```
-
-**Fedora**
-
-```
-poetry run poe patch-nix
-poetry run poe build-rpm
-```
-
-**MacOS**:
-
-```
-poetry run poe patch-nix
-poetry run poe build-dmg
+poetry run poe build-nux
 ```
 
 **Windows**:
@@ -203,11 +205,10 @@ poetry run poe patch-win
 poetry run poe build-win
 ```
 
-It will export all project in a binary:
+It will export all project in a [`one-file`](https://pyinstaller.org/en/stable/usage.html#cmdoption-F) binary:
 
 - linux: `./dist/krux-installer`
 - macOS: `./dist/krux-installer.app/Contents/MacOS/krux-installer`
 - windows: `./dist/krux-installer.exe`
 
-
-Or as a packaged installer at `release` folder.
+To more options see [.ci/create-spec.py](./.ci/create-spec.py) against the PyInstaller [options](https://pyinstaller.org)

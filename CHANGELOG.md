@@ -1,7 +1,34 @@
-- **0.0.2-alpha-1**
-  -  Major updates dependencies:
+- **0.0.2-alpha**
   - code refactoration from `nodejs` to `python`;
-  - build project from `electron` to `kivy`
+  - re-build project from `electron` to `kivy`;
+  - Support for MacOS (arm64 and intel processors);
+  - Support to download older versions;
+  - Support to devices according to the appropriate version:
+    - M5stickV;
+    - Amigo;
+    - Dock;
+    - Bit;
+    - Yahboom;
+    - Cube;
+  - Flash made with the `ktool` from its source;
+  - Wipe made with the `ktool` from its source;
+  - Added settings page:
+    - Enable change path of downloaded assets;
+    - Enable change of flash baudrate;
+    - Enable change of locale;
+  - Added about page
+  - Locale support for 10 languages:
+    - af_ZA (South Africa Afrikaans);
+    - en_US (USA English);
+    - es_ES (Spain spanish);
+    - fr_FR (France french);
+    - it_IT (Italian);
+    - ko_KR (South Korean korean);
+    - nl_NL (Netherlands dutch);
+    - pt_BR (Brazilian portuguese);
+    - ru_RU (Russian cyrillic);
+    - zh_CN (Simplified chinese)
+  
 - **0.0.1**
   - Major updates dependencies:
     - `electron`: 28.1.0;

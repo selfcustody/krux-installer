@@ -136,7 +136,7 @@ class FlashScreen(BaseFlashScreen):
             if sys.platform in ("linux", "win32"):
                 size = self.SIZE_M
             else:
-                size = self.SIZE_G
+                size = self.SIZE_M
 
             self.ids[f"{self.id}_progress"].text = "\n".join(
                 [
@@ -212,7 +212,7 @@ class FlashScreen(BaseFlashScreen):
             if sys.platform in ("linux", "win32"):
                 sizes = [self.SIZE_M, self.SIZE_P]
             else:
-                sizes = [self.SIZE_G, self.SIZE_MM]
+                sizes = [self.SIZE_MM, self.SIZE_MP]
 
             # if anything wrong happen, show it
             def hook(err):

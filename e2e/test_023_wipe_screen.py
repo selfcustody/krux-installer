@@ -262,7 +262,7 @@ class TestWipeScreen(GraphicUnitTest):
             size = screen.SIZE_M
 
         else:
-            size = screen.SIZE_G
+            size = screen.SIZE_M
 
         text = "\n".join(
             [

@@ -195,7 +195,7 @@ to build the Graphical User Interface:
 
 ```
 poetry run poe patch-nix
-poetry run poe build-nux
+poetry run poe build-nix
 ```
 
 **Windows**:

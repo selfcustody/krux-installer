@@ -119,6 +119,15 @@
     "Back": "Back",
     "Quit": "Quit"
   },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "You are about to initiate a FULL WIPE of this device",
+    "This operation will": "This operation will",
+    "Permanently erase all saved data": "Permanently erase all saved data",
+    "Remove the existing firmware": "Remove the existing firmware",
+    "Render the device non-functional until new firmware is re-flashed": "Render the device non-functional until new firmware is re-flashed",    
+    "Proceed": "Proceed",
+    "Back": "Back"
+  },
   "about_screen": {
     "follow us on X": "follow us on X",
     "Back": "Back"

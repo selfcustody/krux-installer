@@ -119,6 +119,15 @@
     "Back": "Indietro",
     "Quit": "Dimettersi"
   },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Stai per avviare una CANCELLAZIONE COMPLETA di questo dispositivo",
+    "This operation will": "Questa operazione",
+    "Permanently erase all saved data": "Cancella definitivamente tutti i dati salvati",
+    "Remove the existing firmware": "Rimuovere il firmware esistente",
+    "Render the device non-functional until new firmware is re-flashed": "Renderi il dispositivo non funzionante fino a quando non viene eseguito nuovamente il flashing del nuovo firmware",    
+    "Proceed": "Procedere",
+    "Back": "Indietro"
+  },
   "about_screen": {
     "follow us on X": "seguici su X",
     "Back": "Ritirati"

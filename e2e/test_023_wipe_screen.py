@@ -314,7 +314,7 @@ class TestWipeScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.wipe_screen.partial")
-    @patch("src.app.screens.wipe_screen.Thread")
+    @patch("src.app.screens.wipe_screen.threading.Thread")
     @patch("src.utils.flasher.Flasher")
     def test_on_enter(self, mock_flasher, mock_thread, mock_partial, mock_get_locale):
         mock_flasher.__class__.print_callback = MagicMock()

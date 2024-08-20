@@ -87,8 +87,11 @@ rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.sp
 [tool.poe.tasks.build-dmg]
 interpreter = "zsh"
 shell = """
-python .ci/create-spec.py
-python -m PyInstaller krux-installer.spec
+rm -rfv ./build
+rm -rfv ./dist
+rm -rfv ./release
+poetry run python .ci/create-spec.py
+poetry run python -m PyInstaller krux-installer.spec
 NAME="$(python -c 'from src.utils.constants import get_name; print(get_name())')"
 VER="$(python -c 'from src.utils.constants import get_version; print(get_version())')"
 mkdir -p ./release

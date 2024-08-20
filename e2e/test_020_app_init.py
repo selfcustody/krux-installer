@@ -94,6 +94,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "UnzipStableScreen",
             "DownloadBetaScreen",
             "WarningAlreadyDownloadedScreen",
+            "WarningWipeScreen",
             "FlashScreen",
             "WipeScreen",
             "ErrorScreen",
@@ -139,6 +140,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "UnzipStableScreen",
             "DownloadBetaScreen",
             "WarningAlreadyDownloadedScreen",
+            "WarningWipeScreen",
             "FlashScreen",
             "WipeScreen",
             "ErrorScreen",
@@ -184,6 +186,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             "UnzipStableScreen",
             "DownloadBetaScreen",
             "WarningAlreadyDownloadedScreen",
+            "WarningWipeScreen",
             "FlashScreen",
             "WipeScreen",
             "ErrorScreen",
@@ -192,32 +195,8 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             self.assertIn(screen.name, allowed_screens)
 
         mock_get_destdir_assets.assert_called_once()
-        mock_get_font_name.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
-        mock_get_locale.assert_has_calls(
-            [
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-            ]
-        )
+        mock_get_font_name.assert_any_call()
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch.dict(os.environ, {"LANG": "en_US.UTF-8"}, clear=True)

@@ -21,15 +21,14 @@
 """
 wipe_screen.py
 """
-import os
+import threading
+import traceback
 from functools import partial
-from threading import Thread
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from kivy.uix.image import Image
 from src.utils.flasher.wiper import Wiper
 from src.app.screens.base_flash_screen import BaseFlashScreen
 
@@ -142,16 +141,9 @@ class WipeScreen(BaseFlashScreen):
             root_widget=f"{self.id}_subgrid",
         )
 
-        please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
         self.make_label(
             wid=f"{self.id}_progress",
-            text="".join(
-                [
-                    f"[font={WipeScreen.get_font_name()}]",
-                    f"[size=20sp][b]{please}[/b]",
-                    "[/font]",
-                ]
-            ),
+            text="",
             root_widget=f"{self.id}_subgrid",
             markup=True,
             halign="center",
@@ -169,7 +161,16 @@ class WipeScreen(BaseFlashScreen):
         """
         Event fired when the screen is displayed and the entering animation is complete.
         """
+        self.debug("Staring wipe...")
         if self.wiper is not None:
+            please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
+            self.ids[f"{self.id}_progress"].text = "".join(
+                [
+                    f"[font={WipeScreen.get_font_name()}]",
+                    f"[size=20sp][b]{please}[/b]",
+                    "[/font]",
+                ]
+            )
             self.output = []
             self.progress = ""
             self.is_done = False
@@ -178,7 +179,49 @@ class WipeScreen(BaseFlashScreen):
                 self.__class__, "on_print_callback"
             )
             on_process_callback = partial(self.wiper.wipe, device=self.device)
-            self.thread = Thread(name=self.name, target=on_process_callback)
+            self.thread = threading.Thread(name=self.name, target=on_process_callback)
+
+            # if anything wrong happen, show it
+            def hook(err):
+                msg = "".join(
+                    traceback.format_exception(
+                        err.exc_type, err.exc_value, err.exc_traceback
+                    )
+                )
+                self.error(msg)
+
+                back = self.translate("Back")
+                quit = self.translate("Quit")
+                self.ids[f"{self.id}_progress"].text = "".join(
+                    [
+                        "[font=terminus]",
+                        f"[size={self.SIZE_G}]",
+                        "[color=#FF0000]Wipe failed[/color]",
+                        "[/size]",
+                        "[/font]" "\n",
+                        "\n",
+                        f"[font={WipeScreen.get_font_name()}]"
+                        f"[size={self.SIZE_MM}]"
+                        f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
+                        "        ",
+                        f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
+                        "[/size]",
+                        "[/font]",
+                    ]
+                )
+
+                self.ids[f"{self.id}_info"].text = "".join(
+                    [
+                        "[font=terminus]",
+                        f"[size={self.SIZE_MP}]",
+                        msg,
+                        "[/size]",
+                        "[/font]",
+                    ]
+                )
+
+            # hook what happened
+            threading.excepthook = hook
             self.thread.start()
         else:
             self.redirect_error("Wiper isnt configured")
@@ -192,6 +235,7 @@ class WipeScreen(BaseFlashScreen):
         if name in (
             "ConfigKruxInstaller",
             "MainScreen",
+            "WarningWipeScreen",
             "WipeScreen",
         ):
             self.debug(f"Updating {self.name} from {name}...")

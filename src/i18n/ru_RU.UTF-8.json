@@ -119,6 +119,15 @@
     "Back": "Назад",
     "Quit": "Покидать"
   },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Вы собираетесь инициировать ПОЛНУЮ ОЧИСТКУ этого устройства",
+    "This operation will": "Эта операция позволит",
+    "Permanently erase all saved data": "Безвозвратное стирание всех сохраненных данных",
+    "Remove the existing firmware": "Удалите существующую прошивку",
+    "Render the device non-functional until new firmware is re-flashed": "Сделайте устройство неработоспособным до тех пор, пока не будет перепрошита новая прошивка",    
+    "Proceed": "Продолжать",
+    "Back": "Вернись"
+  },
   "about_screen": {
     "follow us on X": "следите за нами на X",
     "Back": "Назад"

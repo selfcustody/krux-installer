@@ -98,7 +98,7 @@
     "If you have openssl installed on your system": "Si openssl est installé sur votre système",
     "you can check manually with the following command": "vous pouvez vérifier manuellement avec la commande suivante",
     "Proceed": "Continuer",
-    "Back": "Recul"
+    "Back": "Retour"
   },
   "unzip_stable_screen": {
     "Flash with": "Flash avec",
@@ -108,19 +108,28 @@
   },
   "flash_screen": {
     "DONE": "FAIT",
-    "Back": "Précédent",
+    "Back": "Retour",
     "Quit": "Sors",
     "Flashing": "Réalisation du flash",
     "at": "à"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "VEUILLEZ NE PAS DÉBRANCHER VOTRE APPAREIL",
-    "DONE": "HECHO",
-    "Back": "Précédent",
+    "DONE": "FAIT",
+    "Back": "Retour",
     "Quit": "Sors"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Vous êtes sur le point de lancer un EFFACEMENT COMPLET de cet appareil",
+    "This operation will": "Cette opération fera l'affaire",
+    "Permanently erase all saved data": "Effacez définitivement toutes les données sauvegardées",
+    "Remove the existing firmware": "Supprimer le firmware existant",
+    "Render the device non-functional until new firmware is re-flashed": "Rendez l'appareil non fonctionnel jusqu'à ce que le nouveau firmware soit reflashé.",    
+    "Proceed": "Continuer",
+    "Back": "Retour"
   },
   "about_screen": {
     "follow us on X": "suivez-nous sur X",
-    "Back": "Recul"
+    "Back": "Retour"
   }
 }

@@ -119,6 +119,15 @@
     "Back": "返回",
     "Quit": "退出"
   },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "您将要启动此设备的完全擦除",
+    "This operation will": "此操作将",
+    "Permanently erase all saved data": "永久擦除所有已保存的数据",
+    "Remove the existing firmware": "删除现有固件",
+    "Render the device non-functional until new firmware is re-flashed": "在重新刷新新固件之前，使设备无法正常工作",    
+    "Proceed": "进行",
+    "Back": "返回"
+  },
   "about_screen": {
     "follow us on X": "在X上关注我们",
     "Back": "返回"

@@ -119,6 +119,15 @@
     "Back": "Volve",
     "Quit": "Salir"
   },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Está a punto de iniciar un BORRADO COMPLETO de este dispositivo",
+    "This operation will": "Esta operación",
+    "Permanently erase all saved data": "Borrar permanentemente todos los datos guardados",
+    "Remove the existing firmware": "Eliminar el firmware existente",
+    "Render the device non-functional until new firmware is re-flashed": "Hacer que el dispositivo no funcione hasta que se vuelva a actualizar el nuevo firmware",    
+    "Proceed": "Proceder",
+    "Back": "Volver"
+  },
   "about_screen": {
     "follow us on X": "síguenos en X",
     "Back": "Volver"

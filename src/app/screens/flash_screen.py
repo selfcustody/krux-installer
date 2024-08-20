@@ -21,11 +21,9 @@
 """
 main_screen.py
 """
-import math
-import typing
-from functools import partial
 import threading
 import traceback
+from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window

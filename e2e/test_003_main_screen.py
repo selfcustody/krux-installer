@@ -876,10 +876,8 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.get_baudrate", return_value=1500000)
     def test_on_release_wipe(
         self,
-        mock_get_baudrate,
         mock_get_locale,
         mock_manager,
         mock_set_screen,
@@ -906,11 +904,10 @@ class TestMainScreen(GraphicUnitTest):
             wipe_action(wipe_button)
 
             calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 1)))
-            calls_set_screen.append(call(name="WipeScreen", direction="left"))
+            calls_set_screen.append(call(name="WarningWipeScreen", direction="left"))
             calls_locale.append(call())
             calls_locale.append(call())
 
-        mock_get_baudrate.assert_called()
         mock_get_locale.assert_has_calls(calls_locale)
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)

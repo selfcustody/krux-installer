@@ -119,6 +119,15 @@
     "Back": "뒤로",
     "Quit": "사임하다"
   },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "이 장치의 전체 지우기를 시작하려고 합니다.",
+    "This operation will": "이 작업은 다음을 수행합니다.",
+    "Permanently erase all saved data": "저장된 모든 데이터를 영구적으로 지우기",
+    "Remove the existing firmware": "기존 펌웨어를 제거합니다",
+    "Render the device non-functional until new firmware is re-flashed": "새 펌웨어가 다시 플래시될 때까지 장치를 작동하지 않게 만듭니다.",    
+    "Proceed": "진행",
+    "Back": "진행"
+  },
   "about_screen": {
     "follow us on X": "X에서 우리를 따르십시오",
     "Back": "뒤로"

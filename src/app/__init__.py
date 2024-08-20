@@ -51,6 +51,7 @@ from src.app.screens.warning_already_downloaded_screen import (
     WarningAlreadyDownloadedScreen,
 )
 from src.app.screens.flash_screen import FlashScreen
+from src.app.screens.warning_wipe_screen import WarningWipeScreen
 from src.app.screens.wipe_screen import WipeScreen
 from src.app.screens.error_screen import ErrorScreen
 
@@ -111,6 +112,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             UnzipStableScreen(),
             DownloadBetaScreen(),
             WarningAlreadyDownloadedScreen(),
+            WarningWipeScreen(),
             FlashScreen(),
             WipeScreen(),
             ErrorScreen(),

@@ -118,6 +118,15 @@
     "Back": "Terug",
     "Quit": "Sluit"
   },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "U is op die punt om 'n VOLLEDIGE WIPE van hierdie toestel te begin",
+    "This operation will": "Hierdie operasie sal",
+    "Permanently erase all saved data": "Vee alle gestoorde data permanent uit",
+    "Remove the existing firmware": "Verwyder die bestaande firmware",
+    "Render the device non-functional until new firmware is re-flashed": "Maak die toestel nie funksioneel totdat nuwe firmware weer geflits is nie",    
+    "Proceed": "Voortgaan",
+    "Back": "Terug"
+  },
   "about_screen": {
     "follow us on X": "volg ons op X",
     "Back": "Terug"

@@ -21,6 +21,7 @@
 """
 wipe_screen.py
 """
+import sys
 import threading
 import traceback
 from functools import partial
@@ -39,6 +40,7 @@ class WipeScreen(BaseFlashScreen):
     def __init__(self, **kwargs):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
         self.wiper = None
+        self.success = False
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -97,6 +99,7 @@ class WipeScreen(BaseFlashScreen):
                 self.redirect_error(f"Invalid ref: {args[1]}")
 
         def on_trigger_callback(dt):
+            self.success = True
             del self.output[4:]
             self.ids[f"{self.id}_loader"].source = self.done_img
             self.ids[f"{self.id}_loader"].reload()
@@ -189,19 +192,26 @@ class WipeScreen(BaseFlashScreen):
                     )
                 )
                 self.error(msg)
-
+                done = self.translate("DONE")
                 back = self.translate("Back")
                 quit = self.translate("Quit")
+
+                if sys.platform in ("linux", "win32"):
+                    sizes = [self.SIZE_M, self.SIZE_P]
+                else:
+                    sizes = [self.SIZE_G, self.SIZE_MM]
+
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
                         "[font=terminus]",
-                        f"[size={self.SIZE_G}]",
-                        "[color=#FF0000]Wipe failed[/color]",
+                        f"[size={sizes[0]}]",
+                        f"[color=#FF0000]{"Wipe failed" if not self.success else done}[/color]",
                         "[/size]",
-                        "[/font]" "\n",
+                        "[/font]",
+                        "\n",
                         "\n",
                         f"[font={WipeScreen.get_font_name()}]"
-                        f"[size={self.SIZE_MM}]"
+                        f"[size={sizes[1]}]"
                         f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                         "        ",
                         f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
@@ -213,7 +223,7 @@ class WipeScreen(BaseFlashScreen):
                 self.ids[f"{self.id}_info"].text = "".join(
                     [
                         "[font=terminus]",
-                        f"[size={self.SIZE_MP}]",
+                        f"[size={sizes[1]}]",
                         msg,
                         "[/size]",
                         "[/font]",

@@ -149,17 +149,23 @@ class WarningWipeScreen(BaseScreen):
         proceed = self.translate("Proceed")
         back = self.translate("Back")
 
+        if sys.platform in ("linux", "win32"):
+            sizes = [self.SIZE_MP, self.SIZE_P]
+
+        else:
+            sizes = [self.SIZE_MM, self.SIZE_M]
+
         return "".join(
             [
                 f"[font={WarningWipeScreen.get_font_name()}]",
                 "[color=#EFCC00]",
-                f"[size={self.SIZE_MM}]",
+                f"[size={sizes[0]}]",
                 full_wipe,
                 "[/size]",
                 "[/color]" "\n",
                 "\n",
                 "\n",
-                f"[size={self.SIZE_M}]",
+                f"[size={sizes[1]}]",
                 f"{operation}:",
                 "\n",
                 "\n",

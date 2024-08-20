@@ -21,6 +21,7 @@
 """
 main_screen.py
 """
+import sys
 import threading
 import traceback
 from functools import partial
@@ -131,12 +132,18 @@ class FlashScreen(BaseFlashScreen):
             done = self.translate("DONE")
             back = self.translate("Back")
             quit = self.translate("Quit")
+
+            if sys.platform in ("linux", "win32"):
+                size = self.SIZE_M
+            else:
+                size = self.SIZE_G
+
             self.ids[f"{self.id}_progress"].text = "\n".join(
                 [
                     "".join(
                         [
                             f"[font={FlashScreen.get_font_name()}]",
-                            f"[size={self.SIZE_MP}sp][b]{done}![/b][/size]",
+                            f"[size={size}sp][b]{done}![/b][/size]",
                             "[/font]",
                         ]
                     ),
@@ -145,7 +152,7 @@ class FlashScreen(BaseFlashScreen):
                     "".join(
                         [
                             f"[font={FlashScreen.get_font_name()}]",
-                            f"[size={self.SIZE_MP}sp]",
+                            f"[size={size}sp]",
                             f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                             "        ",
                             f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
@@ -202,6 +209,11 @@ class FlashScreen(BaseFlashScreen):
             )
             self.thread = threading.Thread(name=self.name, target=on_process_callback)
 
+            if sys.platform in ("linux", "win32"):
+                sizes = [self.SIZE_M, self.SIZE_P]
+            else:
+                sizes = [self.SIZE_G, self.SIZE_MM]
+
             # if anything wrong happen, show it
             def hook(err):
                 msg = "".join(
@@ -216,12 +228,13 @@ class FlashScreen(BaseFlashScreen):
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
                         "[font=terminus]",
-                        f"[size={self.SIZE_G}]",
+                        f"[size={sizes[0]}]",
                         "[color=#FF0000]Flash failed[/color]",
                         "[/size]",
+                        "[/font]," "\n",
                         "\n",
-                        "\n",
-                        f"[size={self.SIZE_MM}]"
+                        f"[size={sizes[0]}]",
+                        f"[font={FlashScreen.get_font_name()}]"
                         f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                         "        ",
                         f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
@@ -233,7 +246,7 @@ class FlashScreen(BaseFlashScreen):
                 self.ids[f"{self.id}_info"].text = "".join(
                     [
                         "[font=terminus]",
-                        f"[size={self.SIZE_MP}]",
+                        f"[size={sizes[1]}]",
                         msg,
                         "[/size]",
                         "[/font]",

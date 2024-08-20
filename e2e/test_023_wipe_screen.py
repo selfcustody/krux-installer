@@ -1,3 +1,4 @@
+import sys
 import os
 from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
@@ -257,12 +258,18 @@ class TestWipeScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
+        if sys.platform in ("linux", "win32"):
+            size = screen.SIZE_M
+
+        else:
+            size = screen.SIZE_G
+
         text = "\n".join(
             [
                 "".join(
                     [
                         "[font=terminus]",
-                        f"[size={screen.SIZE_MP}sp][b]DONE![/b][/size]",
+                        f"[size={size}sp][b]DONE![/b][/size]",
                         "[/font]",
                     ]
                 ),
@@ -271,7 +278,7 @@ class TestWipeScreen(GraphicUnitTest):
                 "".join(
                     [
                         "[font=terminus]",
-                        f"[size={screen.SIZE_MP}sp]",
+                        f"[size={size}sp]",
                         "[color=#00FF00][ref=Back]Back[/ref][/color]",
                         "        ",
                         "[color=#EFCC00][ref=Quit]Quit[/ref][/color]",

@@ -106,12 +106,17 @@ class WipeScreen(BaseFlashScreen):
             done = self.translate("DONE")
             back = self.translate("Back")
             quit = self.translate("Quit")
+            if sys.platform in ("linux", "win32"):
+                size = self.SIZE_M
+            else:
+                size = self.SIZE_G
+
             self.ids[f"{self.id}_progress"].text = "\n".join(
                 [
                     "".join(
                         [
                             f"[font={WipeScreen.get_font_name()}]",
-                            f"[size={self.SIZE_MP}sp][b]{done}![/b][/size]",
+                            f"[size={size}sp][b]{done}![/b][/size]",
                             "[/font]",
                         ]
                     ),
@@ -120,7 +125,7 @@ class WipeScreen(BaseFlashScreen):
                     "".join(
                         [
                             f"[font={WipeScreen.get_font_name()}]",
-                            f"[size={self.SIZE_MP}sp]",
+                            f"[size={size}sp]",
                             f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                             "        ",
                             f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
@@ -167,10 +172,15 @@ class WipeScreen(BaseFlashScreen):
         self.debug("Staring wipe...")
         if self.wiper is not None:
             please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
+            if sys.platform in ("linux", "win32"):
+                sizes = [self.SIZE_M, self.SIZE_PP]
+            else:
+                sizes = [self.SIZE_G, self.SIZE_MM]
+
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
                     f"[font={WipeScreen.get_font_name()}]",
-                    f"[size=20sp][b]{please}[/b]",
+                    f"[size={sizes[0]}sp][b]{please}[/b]",
                     "[/font]",
                 ]
             )
@@ -196,11 +206,6 @@ class WipeScreen(BaseFlashScreen):
                 back = self.translate("Back")
                 quit = self.translate("Quit")
 
-                if sys.platform in ("linux", "win32"):
-                    sizes = [self.SIZE_M, self.SIZE_P]
-                else:
-                    sizes = [self.SIZE_G, self.SIZE_MM]
-
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
                         "[font=terminus]",
@@ -211,7 +216,7 @@ class WipeScreen(BaseFlashScreen):
                         "\n",
                         "\n",
                         f"[font={WipeScreen.get_font_name()}]"
-                        f"[size={sizes[1]}]"
+                        f"[size={sizes[0]}]"
                         f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                         "        ",
                         f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",

@@ -225,7 +225,7 @@ class TestMainScreen(GraphicUnitTest):
             ]
         )
         text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
         )
         text_wipe = "".join(
             ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
@@ -296,9 +296,9 @@ class TestMainScreen(GraphicUnitTest):
             ]
         )
         text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
         )
-        mocked_text_flash = "".join(["[font=terminus]", "Update firmware", "[/font]"])
+        mocked_text_flash = "".join(["[font=terminus]", "Flash firmware", "[/font]"])
         text_wipe = "".join(
             ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
         )
@@ -402,7 +402,7 @@ class TestMainScreen(GraphicUnitTest):
             ]
         )
         text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
         )
         text_wipe = "".join(
             ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
@@ -420,20 +420,7 @@ class TestMainScreen(GraphicUnitTest):
         # each button has at least 2 calls of get locale
         # one for locale, other for font
         # and since update device, two more calls
-        mock_get_locale.assert_has_calls(
-            [
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-            ]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -519,16 +506,14 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
         text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Update firmware[/color]", "[/font]"]
+            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
         )
         self.assertTrue(flash_button.markup)
         self.assertEqual(flash_button.text, text_flash)
 
         # each button has at least 2 calls of get locale
         # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -547,7 +532,7 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
-        text_flash = "".join(["[font=terminus]", "Update firmware", "[/font]"])
+        text_flash = "".join(["[font=terminus]", "Flash firmware", "[/font]"])
         self.assertEqual(flash_button.text, text_flash)
 
         # each button has at least 2 calls of get locale

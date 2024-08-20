@@ -22,8 +22,8 @@
     "Version": "版本",
     "Device": "装置",
     "select a new one": "选择一个新的",
-    "Flash": "闪光",
-    "Wipe": "擦",
+    "Flash": "闪存固件",
+    "Wipe": "擦除设备",
     "Settings": "设置",
     "About": "大约",
     "Fetching data from": "从中获取数据"

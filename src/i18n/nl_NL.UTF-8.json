@@ -3,17 +3,17 @@
     "Setup": "Installatie",
     "for": "voor",
     "Checking": "Controleren",
-    "permissions for": "Machtigingen voor",
+    "permissions for": "Permissie voor",
     "WARNING": "WAARSCHUWING",
-    "This is first run of KruxInstaller in": "Dit is de eerste run van KruxInstaller in",
-    "and it appears that you do not have privileged access to make flash procedures": "En het lijkt erop dat u geen bevoorrechte toegang heeft om flash-procedures uit te voeren",
-    "To proceed, click in the Allow button and a prompt will ask for your password": "Om verder te gaan, klikt u op de knop Toestaan en wordt u gevraagd om uw wachtwoord",
+    "This is first run of KruxInstaller in": "De eerste keer gebruikmaken van KruxInstaller in",
+    "and it appears that you do not have privileged access to make flash procedures": "en het blijkt dat er geen voldoende rechten zijn om te flashen",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "Om verder te gaan, klik op de knop 'Toestaan' en vul je wachtwoord in",
     "to execute the following command": "om de volgende opdracht uit te voeren",
-    "You may need to logout (or even reboot)": "Mogelijk moet u zich afmelden (of zelfs opnieuw opstarten)",
-    "and back in for the new group to take effect": "en terug naar binnen voor de nieuwe groep om in werking te treden",
+    "You may need to logout (or even reboot)": "Mogelijk moet je je afmelden (of zelfs opnieuw opstarten)",
+    "and back in for the new group to take effect": "om de nieuw aangemaakte groep te activeren",
     "Do not worry, this message won't appear again": "Maak je geen zorgen, dit bericht verschijnt niet meer",
     "Allow": "Toestaan",
-    "Deny": "Ontkennen"
+    "Deny": "Annuleren"
   },
   "check_internet_connection_screen": {
     "Checking your internet connection": "Je internetverbinding controleren"
@@ -21,7 +21,7 @@
   "main_screen": {
     "Version": "Versie",
     "Device": "Apparaat",
-    "select a new one": "Selecteer een nieuwe",
+    "select a new one": "selecteer een nieuwe",
     "Flash": "Flash de firmware",
     "Wipe": "Apparaat wissen",
     "Settings": "Instellingen",
@@ -37,48 +37,48 @@
   },
   "warning_beta_screen": {
     "WARNING": "WAARSCHUWING",
-    "This is our test repository": "Dit is onze testrepository",
-    "These are unsigned binaries for the latest and most experimental features": "Dit zijn niet-ondertekende binaire bestanden voor\nde nieuwste en meest experimentele functies",
-    "and it's just for trying new things and providing feedback.": "En het is gewoon om nieuwe dingen te proberen en feedback te geven.",
+    "This is our test repository": "Dit is onze test omgeving",
+    "These are unsigned binaries for the latest and most experimental features": "Dit zijn niet ondergetekende binaire bestanden voor\nde nieuwste en meest experimentele functies",
+    "and it's just for trying new things and providing feedback.": "om nieuwe dingen te proberen en feedback te geven.",
     "Proceed": "Doorgaan",
     "Back": "Terug"
   },
   "download_beta_screen": {
-    "Connecting": "Aansluiten",
+    "Connecting": "Verbinden",
     "Downloading": "Downloaden van",
     "to": "naar",
     "of": "van",
     "downloaded": "gedownload"
   },
   "warning_already_downloaded_screen": {
-    "Assets already downloaded": "Reeds gedownloade items",
+    "Assets already downloaded": "Eerder gedownloade items",
     "Do you want to proceed with the same file or do you want to download it again?": "Wil je doorgaan met hetzelfde bestand of wil je het opnieuw downloaden?",
     "Download again": "Opnieuw downloaden",
     "Proceed with current file": "Ga verder met het huidige bestand"
   },
   "download_stable_zip_screen": {
-    "Connecting": "Aansluiten",
+    "Connecting": "Verbinden",
     "Downloading": "Downloaden van",
     "to": "naar",
     "of": "van",
     "downloaded": "gedownload"
   },
   "download_stable_zip_sha256_screen": {
-    "Connecting": "Aansluiten",
+    "Connecting": "Verbinden",
     "Downloading": "Downloaden van",
     "to": "naar",
     "of": "van",
     "downloaded": "gedownload"
   },
   "download_stable_zip_sig_screen": {
-    "Connecting": "Aansluiten",
+    "Connecting": "Verbinden",
     "Downloading": "Downloaden van",
     "to": "naar",
     "of": "van",
     "downloaded": "gedownload"
   },
   "download_selfcustody_pem_screen": {
-    "Connecting": "Aansluiten",
+    "Connecting": "Verbinden",
     "Downloading": "Downloaden van",
     "to": "naar",
     "of": "van",
@@ -91,38 +91,38 @@
     "provided hash from": "verstrekte hash van",
     "SUCCESS": "SUCCES",
     "FAILED": "MISLUKT",
-    "Authenticity verification": "Verificatie van de echtheid",
+    "Authenticity verification": "Verificatie van echtheid",
     "GOOD": "GOED",
     "BAD": "SLECHT",
     "SIGNATURE": "HANDTEKENING",
     "If you have openssl installed on your system": "Als je openssl op je systeem hebt geïnstalleerd",
-    "you can check manually with the following command": "U kunt dit controleren met de volgende opdracht",
+    "you can check manually with the following command": "kan je dit controleren met de volgende commando",
     "Proceed": "Doorgaan",
     "Back": "Terug"
   },
   "unzip_stable_screen": {
-    "Flash with": "Flitser met",
-    "Air-gapped update with": "Geïsoleerde update met",
+    "Flash with": "Flash met",
+    "Air-gapped update with": "Update zonder computer met",
     "Unziping": "Uitpakken",
     "Unziped": "Uitgepakt"
   },
   "flash_screen": {
     "DONE": "KLAAR",
     "Back": "Terug",
-    "Quit": "Verlaten"
+    "Quit": "Stoppen"
   },
   "wipe_screen": {
-    "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL UW APPARAAT NIET LOS",
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL HET APPARAAT NIET LOS",
     "DONE": "KLAAR",
     "Back": "Terug",
-    "Quit": "Verlaten"
+    "Quit": "Stoppen"
   },
   "warning_wipe_screen": {
-    "You are about to initiate a FULL WIPE of this device": "U staat op het punt om een VOLLEDIGE WISSEN van dit apparaat te starten",
-    "This operation will": "Deze operatie is voldoende",
+    "You are about to initiate a FULL WIPE of this device": "Je staat op het punt om te starten met het VOLLEDIGE WISSEN van dit apparaat",
+    "This operation will": "Deze operatie is zal",
     "Permanently erase all saved data": "Alle opgeslagen gegevens permanent wissen",
-    "Remove the existing firmware": "Verwijder de bestaande firmware",
-    "Render the device non-functional until new firmware is re-flashed": "Maak het apparaat niet-functioneel totdat de nieuwe firmware opnieuw wordt geflasht",    
+    "Remove the existing firmware": "Verwijderen van de bestaande firmware",
+    "Render the device non-functional until new firmware is re-flashed": "Maakt het apparaat niet meer functioneel totdat de nieuwste firmware opnieuw geflasht is",    
     "Proceed": "Doorgaan",
     "Back": "Terug"
   },

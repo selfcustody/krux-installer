@@ -3,7 +3,7 @@ name: Tests
 on:
   push:
     branches:
-      - kivy
+      - main
       
   pull_request:
 

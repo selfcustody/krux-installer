@@ -1,0 +1,135 @@
+{
+  "check_permissions_screen": {
+    "Setup": "设置",
+    "for": "为",
+    "Checking": "检查",
+    "permissions for": "的权限",
+    "WARNING": "警告",
+    "This is first run of KruxInstaller in": "这是 KruxInstaller 的首次运行。",
+    "and it appears that you do not have privileged access to make flash procedures": "而且您似乎没有特权访问权限来执行闪存过程",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "要继续，请单击\"允许\"按钮，系统将提示您输入密码",
+    "to execute the following command": "执行以下命令",
+    "You may need to logout (or even reboot)": "您可能需要注销（甚至重新启动）",
+    "and back in for the new group to take effect": "并返回以使新组生效",
+    "Do not worry, this message won't appear again": "不用担心，此消息不会再次出现",
+    "Allow": "允许",
+    "Deny": "否认"
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "检查您的互联网连接"
+  },
+  "main_screen": {
+    "Version": "版本",
+    "Device": "装置",
+    "select a new one": "选择一个新的",
+    "Flash": "闪存固件",
+    "Wipe": "擦除设备",
+    "Settings": "设置",
+    "About": "大约",
+    "Fetching data from": "从中获取数据"
+  },
+  "select_version_screen": {
+    "Old versions": "旧版本",
+    "Back": "返回"
+  },
+  "select_old_version_screen": {
+    "Back": "返回"
+  },
+  "warning_beta_screen": {
+    "WARNING": "警告",
+    "This is our test repository": "这是我们的测试仓库",
+    "These are unsigned binaries for the latest and most experimental features": "这些是最新和最具实验性功能的无符号二进制文件",
+    "and it's just for trying new things and providing feedback.": "它只是为了尝试新事物和提供反馈。",
+    "Proceed": "进行",
+    "Back": "返回"
+  },
+  "download_beta_screen": {
+    "Connecting": "连接",
+    "Downloading": "下载",
+    "to": "自",
+    "of": "之",
+    "downloaded": "下载"
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "已下载的资产",
+    "Do you want to proceed with the same file or do you want to download it again?": "是要继续处理同一文件，还是要再次下载？",
+    "Download again": "再次下载",
+    "Proceed with current file": "继续处理当前文件"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "连接",
+    "Downloading": "下载",
+    "to": "自",
+    "of": "之",
+    "downloaded": "下载"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "连接",
+    "Downloading": "下载",
+    "to": "自",
+    "of": "之",
+    "downloaded": "下载"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "连接",
+    "Downloading": "下载",
+    "to": "自",
+    "of": "之",
+    "downloaded": "下载"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "连接",
+    "Downloading": "下载",
+    "to": "自",
+    "of": "之",
+    "downloaded": "下载"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "验证完整性和真实性",
+    "Integrity verification": "完整性验证",
+    "computed hash from": "计算出的哈希值",
+    "provided hash from": "提供的哈希值来自",
+    "SUCCESS": "成功",
+    "FAILED": "失败",
+    "Authenticity verification": "真实性验证",
+    "GOOD": "好",
+    "BAD": "坏",
+    "SIGNATURE": "签名",
+    "If you have openssl installed on your system": "如果您的系统上安装了 openssl",
+    "you can check manually with the following command": "您可以使用以下命令手动检查",
+    "Proceed": "进行",
+    "Back": "返回"
+  },
+  "unzip_stable_screen": {
+    "Flash with": "闪光灯",
+    "Air-gapped update with": "气隙更新",
+    "Unziping": "解压缩",
+    "Unziped": "解压"
+  },
+  "flash_screen": {
+    "DONE": "做",
+    "Back": "返回",
+    "Quit": "退出",
+    "Flashing": "闪烁",
+    "at": "在"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "请不要拔下您的设备",
+    "DONE": "做",
+    "Back": "返回",
+    "Quit": "退出"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "您将要启动此设备的完全擦除",
+    "This operation will": "此操作将",
+    "Permanently erase all saved data": "永久擦除所有已保存的数据",
+    "Remove the existing firmware": "删除现有固件",
+    "Render the device non-functional until new firmware is re-flashed": "在重新刷新新固件之前，使设备无法正常工作",    
+    "Proceed": "进行",
+    "Back": "返回"
+  },
+  "about_screen": {
+    "follow us on X": "在X上关注我们",
+    "Back": "返回"
+  }
+}

@@ -5,29 +5,17 @@
   - [x] Flash to Sipeed Amigo;
   - [x] Flash to Sipeed Bit;
   - [x] Flash to Sipeed Dock;
-  - [ ] Flash to Yahboom Aimotion
-  - [ ] Build from source to M5stickV;
-  - [ ] Build from source to Sipeed Amigo;
-  - [ ] Build from source to Sipeed Bit;
-  - [ ] Build from source to Sipeed Dock;
-  - [ ] Debug for M5stickV;
-  - [ ] Debug for Sipeed Amigo;
-  - [ ] Debug for Sipeed Bit;
-  - [ ] Debug for Sipeed Dock;
+  - [x] Flash to Yahboom Aimotion
+  - [x] Flash to Sipeed Cube  
+  - [x] Flash to Yahboom WonderMV
 - [odudex Android version](https://github.com/odudex/krux_binaries/tree/main/Android):
   - [ ] Transfer to device;
   - [ ] Build for device;
   - [ ] Debug for device.
 - Windows:
   - [x] Build NSIS installer;
-  - [ ] Build Portable installer;
-  - [ ] Build AppX installer;
 - Linux:
-  - [x] Build `AppImage` standalone;
   - [x] Build `deb` package for [apt-get](https://www.debian.org/doc/manuals/apt-howto/);
-  - [ ] Build `snap` package for [snapcraft](https://snapcraft.io/);
-  - [ ] Build `pacman` package for [pacman](https://wiki.archlinux.org/title/Pacman).
+  - [x] Build `rpm` package for [apt-get](https://access.redhat.com/sites/default/files/attachments/rpm_building_howto.pdf);
 - MacOS:
   - [x] Build DMG installer;
-  - [ ] Build PKG installer;
-  - [ ] Build MAS installer;

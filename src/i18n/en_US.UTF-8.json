@@ -1,0 +1,135 @@
+{
+  "check_permissions_screen": {
+    "Setup": "Setup",
+    "for": "for",
+    "Checking": "Checking",
+    "permissions for": "permissions for",
+    "WARNING": "WARNING",
+    "This is first run of KruxInstaller in": "This is first run of KruxInstaller in",
+    "and it appears that you do not have privileged access to make flash procedures": "and it appears that you do not have privileged access to make flash procedures",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "To proceed, click in the Allow button and a prompt will ask for your password",
+    "to execute the following command": "to execute the following command",
+    "You may need to logout (or even reboot)": "You may need to logout (or even reboot)",
+    "and back in for the new group to take effect": "and back in for the new group to take effect",
+    "Do not worry, this message won't appear again": "Do not worry, this message won't appear again",
+    "Allow": "Allow",
+    "Deny": "Deny"
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Checking your internet connection"
+  },
+  "main_screen": {
+    "Version": "Version",
+    "Device": "Device",
+    "select a new one": "select a new one",
+    "Flash": "Flash firmware",
+    "Wipe": "Wipe device",
+    "Settings": "Settings",
+    "About": "About",
+    "Fetching data from": "Fetching data from"
+  },
+  "select_version_screen": {
+    "Old versions": "Old versions",
+    "Back": "Back"
+  },
+  "select_old_version_screen": {
+    "Back": "Back"
+  },
+  "warning_beta_screen": {
+    "WARNING": "WARNING",
+    "This is our test repository": "This is our test repository",
+    "These are unsigned binaries for the latest and most experimental features": "These are unsigned binaries for the latest and most experimental features",
+    "and it's just for trying new things and providing feedback.": "and it's just for trying new things and providing feedback.",
+    "Proceed": "Proceed",
+    "Back": "Back"
+  },
+  "download_beta_screen": {
+    "Connecting": "Connecting",
+    "Downloading": "Downloading",
+    "to": "to",
+    "of": "of",
+    "downloaded": "downloaded"
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "Assets already downloaded",
+    "Do you want to proceed with the same file or do you want to download it again?": "Do you want to proceed with the same file or do you want to download it again?",
+    "Download again": "Download again",
+    "Proceed with current file": "Proceed with current file"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "Connecting",
+    "Downloading": "Downloading",
+    "to": "to",
+    "of": "of",
+    "downloaded": "downloaded"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Connecting",
+    "Downloading": "Downloading",
+    "to": "to",
+    "of": "of",
+    "downloaded": "downloaded"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Connecting",
+    "Downloading": "Downloading",
+    "to": "to",
+    "of": "of",
+    "downloaded": "downloaded"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Connecting",
+    "Downloading": "Downloading",
+    "to": "to",
+    "of": "of",
+    "downloaded": "downloaded"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Verifying integrity and authenticity",
+    "Integrity verification": "Integrity verification",
+    "computed hash from": "computed hash from",
+    "provided hash from": "provided hash from",
+    "SUCCESS": "SUCCESS",
+    "FAILED": "FAILED",
+    "Authenticity verification": "Authenticity verification",
+    "GOOD": "GOOD",
+    "BAD": "BAD",
+    "SIGNATURE": "SIGNATURE",
+    "If you have openssl installed on your system": "If you have openssl installed on your system",
+    "you can check manually with the following command": "you can check with the following command",
+    "Proceed": "Proceed",
+    "Back": "Back"
+  },
+  "unzip_stable_screen": {
+    "Flash with": "Flash with",
+    "Air-gapped update with": "Air-gapped update with",
+    "Unziping": "Extracting",
+    "Unziped": "Extracted"
+  },
+  "flash_screen": {
+    "DONE": "DONE",
+    "Back": "Back",
+    "Quit": "Quit",
+    "Flashing": "Flashing",
+    "at": "at"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "PLEASE DO NOT UNPLUG YOUR DEVICE",
+    "DONE": "DONE",
+    "Back": "Back",
+    "Quit": "Quit"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "You are about to initiate a FULL WIPE of this device",
+    "This operation will": "This operation will",
+    "Permanently erase all saved data": "Permanently erase all saved data",
+    "Remove the existing firmware": "Remove the existing firmware",
+    "Render the device non-functional until new firmware is re-flashed": "Render the device non-functional until new firmware is re-flashed",    
+    "Proceed": "Proceed",
+    "Back": "Back"
+  },
+  "about_screen": {
+    "follow us on X": "follow us on X",
+    "Back": "Back"
+  }
+}

@@ -5,7 +5,7 @@
     "Checking": "检查",
     "permissions for": "的权限",
     "WARNING": "警告",
-    "This is first run of KruxInstaller in": "这是 KruxInstaller 的首次运行。",
+    "This is the first run of KruxInstaller in": "这是 KruxInstaller 的首次运行。",
     "and it appears that you do not have privileged access to make flash procedures": "而且您似乎没有特权访问权限来执行闪存过程",
     "To proceed, click in the Allow button and a prompt will ask for your password": "要继续，请单击\"允许\"按钮，系统将提示您输入密码",
     "to execute the following command": "执行以下命令",

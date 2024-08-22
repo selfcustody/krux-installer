@@ -366,13 +366,11 @@ class TestFlashScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[font=terminus]",
                 "[size=100sp]4.76 %[/size]",
                 "\n",
                 "[size=28sp]Flashing [color=#efcc00][b]firmware.bin[/b][/color] at ",
                 "[color=#efcc00][b]21 KiB/s[/b][/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
         on_process_callback = getattr(FlashScreen, "on_process_callback")
@@ -404,36 +402,25 @@ class TestFlashScreen(GraphicUnitTest):
         else:
             size = screen.SIZE_M
 
-        text = "\n".join(
+        text = "".join(
             [
-                "".join(
-                    [
-                        "[font=terminus]",
-                        f"[size={size}sp][b]DONE![/b][/size]",
-                        "[/font]",
-                    ]
-                ),
-                "",
-                "",
-                "".join(
-                    [
-                        "[font=terminus]",
-                        f"[size={size}sp]",
-                        "[color=#00FF00][ref=Back]Back[/ref][/color]",
-                        "        ",
-                        "[color=#EFCC00][ref=Quit]Quit[/ref][/color]",
-                        "[/font]",
-                    ]
-                ),
+                f"[size={size}sp][b]DONE![/b][/size]",
+                "\n",
+                "\n",
+                f"[size={size}sp]",
+                "[color=#00FF00][ref=Back]Back[/ref][/color]",
+                "        ",
+                "[color=#EFCC00][ref=Quit]Quit[/ref][/color]",
             ]
         )
+
         on_trigger_callback = getattr(FlashScreen, "on_trigger_callback")
         on_trigger_callback(0)
 
         self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
-        # patch assertions
 
-        mock_get_locale.assert_has_calls([call(), call(), call()])
+        # patch assertions
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

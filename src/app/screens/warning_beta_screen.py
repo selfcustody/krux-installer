@@ -48,7 +48,6 @@ class WarningBetaScreen(BaseScreen):
 
         text = "".join(
             [
-                f"[font={WarningBetaScreen.get_font_name()}]",
                 f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
                 "\n",
                 "\n",
@@ -62,7 +61,6 @@ class WarningBetaScreen(BaseScreen):
                 f"[size={self.SIZE_MM}sp]",
                 f"[color=#00ff00]{proceed}[/color]        [color=#ff0000]{back}[/color]"
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -118,7 +116,6 @@ class WarningBetaScreen(BaseScreen):
 
                 text = "".join(
                     [
-                        f"[font={WarningBetaScreen.get_font_name()}]",
                         f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
                         "\n",
                         "\n",
@@ -132,7 +129,6 @@ class WarningBetaScreen(BaseScreen):
                         f"[size={self.SIZE_MM}sp]",
                         f"[color=#00ff00]{proceed}[/color]        [color=#ff0000]{back}[/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 )
 

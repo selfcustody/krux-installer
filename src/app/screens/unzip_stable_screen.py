@@ -45,10 +45,6 @@ class UnzipStableScreen(BaseScreen):
     def __init__(self, **kwargs):
         super().__init__(wid="unzip_stable_screen", name="UnzipStableScreen", **kwargs)
         self.make_grid(wid=f"{self.id}_grid", rows=2)
-        # with self.canvas.before:
-        #    Color(0, 0, 0, 1)
-        #    Rectangle(size=(Window.width, Window.height))
-
         self.assets_dir = UnzipStableScreen.get_destdir_assets()
         self.device = None
         self.version = None
@@ -117,7 +113,6 @@ class UnzipStableScreen(BaseScreen):
             file_path = os.path.join(rel_path, "kboot.kfpkg")
             self.ids[instance.id].text = "".join(
                 [
-                    f"[font={UnzipStableScreen.get_font_name()}]",
                     f"[size={size[0]}sp]",
                     extract_msg,
                     "[/size]",
@@ -127,7 +122,6 @@ class UnzipStableScreen(BaseScreen):
                     file_path,
                     "[/color]",
                     "[/size]",
-                    "[/font]",
                 ]
             )
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
@@ -166,7 +160,6 @@ class UnzipStableScreen(BaseScreen):
                 p = os.path.join(rel_path, "kboot.kfpkg")
                 self.ids[instance.id].text = "".join(
                     [
-                        f"[font={UnzipStableScreen.get_font_name()}]",
                         f"[size={size[0]}sp]",
                         extracted_msg,
                         "[/size]",
@@ -176,7 +169,6 @@ class UnzipStableScreen(BaseScreen):
                         p,
                         "[/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 )
 
@@ -192,7 +184,6 @@ class UnzipStableScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             text="".join(
                 [
-                    f"[font={UnzipStableScreen.get_font_name()}]",
                     f"[size={size[0]}sp]",
                     flash_msg,
                     "[/size]",
@@ -202,7 +193,6 @@ class UnzipStableScreen(BaseScreen):
                     p,
                     "[/color]",
                     "[/size]",
-                    "[/font]",
                 ]
             ),
             markup=True,
@@ -230,7 +220,6 @@ class UnzipStableScreen(BaseScreen):
                 file_path = os.path.join(rel_path, "firmware.bin")
                 self.ids[instance.id].text = "".join(
                     [
-                        f"[font={UnzipStableScreen.get_font_name()}]",
                         f"[size={size[0]}sp]",
                         extract_msg,
                         "[/size]",
@@ -240,7 +229,6 @@ class UnzipStableScreen(BaseScreen):
                         file_path,
                         "[/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 )
                 self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
@@ -268,7 +256,6 @@ class UnzipStableScreen(BaseScreen):
                     p = os.path.join(rel_path, "firmware.bin")
                     self.ids[instance.id].text = "".join(
                         [
-                            f"[font={UnzipStableScreen.get_font_name()}]",
                             f"[size={size[0]}sp]",
                             extracted_msg,
                             "[/size]",
@@ -278,7 +265,6 @@ class UnzipStableScreen(BaseScreen):
                             p,
                             "[/color]",
                             "[/size]",
-                            "[/font]",
                         ]
                     )
 
@@ -294,7 +280,6 @@ class UnzipStableScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             text="".join(
                 [
-                    f"[font={UnzipStableScreen.get_font_name()}]",
                     f"[size={size[0]}sp]",
                     "[color=#333333]",
                     airgap_msg,
@@ -306,7 +291,6 @@ class UnzipStableScreen(BaseScreen):
                     p,
                     "[/color]",
                     "[/size]",
-                    "[/font]",
                 ]
             ),
             markup=True,

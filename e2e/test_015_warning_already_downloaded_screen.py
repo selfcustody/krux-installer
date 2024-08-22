@@ -115,28 +115,18 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         label_text = "".join(
             [
-                f"[font=terminus]"
                 f"[size={size[0]}sp][b]Assets already downloaded[/b][/size]",
-                "[/font]",
                 "\n",
-                "\n",
-                "[font=terminus]",
                 f"[size={size[2]}sp]* krux-v0.0.1.zip[/size]",
-                "\n",
                 "\n",
                 f"[size={size[2]}sp]* krux-v0.0.1.zip.sha256.txt[/size]",
                 "\n",
-                "\n",
                 f"[size={size[2]}sp]* krux-v0.0.1.zip.sig[/size]",
-                "\n",
                 "\n",
                 f"[size={size[2]}sp]* selfcustody.pem[/size]",
                 "\n",
                 "\n",
-                "\n",
-                "[font=terminus]",
                 f"[size={size[1]}sp]Do you want to proceed with the same file or do you want to download it again?[/size]",
-                "\n",
                 "\n",
                 "\n",
                 f"[size={size[0]}]" f"[color=#00ff00]",
@@ -151,7 +141,6 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
                 "[/ref]",
                 "[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 

@@ -134,21 +134,13 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                     self.ids[f"{self.id}_info"].text = "".join(
                         [
                             f"[size={self.SIZE_MP}sp]",
-                            f"[font={DownloadStableZipScreen.get_font_name()}]",
                             downloading,
-                            "[/font]",
                             "\n",
-                            "[font=terminus]",
                             f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                            "[/font]",
                             "\n",
-                            f"[font={DownloadStableZipScreen.get_font_name()}]",
                             to,
-                            "[/font]",
                             "\n",
-                            "[font=terminus]",
                             filepath,
-                            "[/font]",
                             "[/size]",
                         ]
                     )
@@ -173,15 +165,11 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 of = self.translate("of")
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
-                        "[font=terminus]",
                         f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                        "[/font]",
                         "\n",
                         f"[size={self.SIZE_MP}sp]",
                         downs[0],
-                        f"[font={DownloadStableZipScreen.get_font_name()}]",
                         f" {of} ",
-                        "[/font]",
                         downs[1],
                         " MB",
                         "[/size]",
@@ -198,13 +186,9 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                         self.ids[f"{self.id}_info"].text = "".join(
                             [
                                 f"[size={self.SIZE_MP}sp]",
-                                "[font=terminus]",
                                 filepath,
-                                "[/font]",
                                 "\n",
-                                f"[font={DownloadStableZipScreen.get_font_name()}]",
                                 downloaded,
-                                "[/font]",
                                 "[/size]",
                             ]
                         )

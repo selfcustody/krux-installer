@@ -18,11 +18,8 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        terminus_path = os.path.join(assets_path, "terminus.ttf")
-        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
-        LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="nanum", fn_regular=nanum_path)
-        LabelBase.register(DEFAULT_FONT, terminus_path)
+        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
     def teardown_class(cls):
@@ -103,7 +100,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_redirect_error.assert_called_once_with(msg="Not implemented for 'mockos'")
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_has_calls([call(), call(pretty=True)])
@@ -144,11 +141,9 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize}sp]",
                 "[color=#efcc00]Setup mockeduser for Ubuntu[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -156,7 +151,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_called_once()
@@ -196,13 +191,11 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize}sp]",
                 "[color=#efcc00]",
                 "Setup mockeduser for Fedora",
                 "[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -210,7 +203,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_called_once()
@@ -250,13 +243,11 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize}sp]",
                 "[color=#efcc00]",
                 "Setup mockeduser for Mint",
                 "[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -264,7 +255,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_called_once()
@@ -306,13 +297,11 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize}sp]",
                 "[color=#efcc00]",
                 "Setup mockeduser for Mockos",
                 "[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -320,7 +309,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -360,10 +349,9 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
-                f"[size={fontsize}sp][color=#efcc00]Setup mockeduser for ArchLinux[/color]",
+                f"[size={fontsize}sp]",
+                "[color=#efcc00]Setup mockeduser for ArchLinux[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -371,7 +359,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -411,11 +399,9 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize}sp]",
                 "[color=#efcc00]Setup mockeduser for Manjaro[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -423,7 +409,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -465,11 +451,9 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize}sp]",
                 "[color=#efcc00]Setup mockeduser for Slackware[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -477,7 +461,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -517,13 +501,11 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="check_user")
         message = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize}sp]",
                 "[color=#efcc00]",
                 "Setup mockeduser for Gentoo",
                 "[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -531,7 +513,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(button.text, message)
 
         # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
         mock_environ_get.assert_called_once_with("USER")
         mock_name.assert_called_once()
         mock_id.assert_has_calls([call(), call()])
@@ -578,9 +560,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(screen.in_dialout, False)
 
         # patch assertions
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call()], any_order=True
-        )
+        mock_get_locale.assert_any_call()
         mock_distro_name.assert_called_once_with(pretty=True)
         mock_grp.getgrall.assert_called_once()
 
@@ -607,14 +587,12 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         screen.update(name="CheckPermissionsScreen", key="make_on_permission_created")
         text = "\n".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize_m}sp][color=#efcc00]mocked command[/color][/size]",
                 "",
                 f"[size={fontsize_m}sp]You may need to logout (or even reboot)",
                 "and back in for the new group to take effect.",
                 "",
                 "Do not worry, this message won't appear again.[/size]",
-                "[/font]",
             ]
         )
 
@@ -628,10 +606,7 @@ class TestCheckPermissionsScreen(GraphicUnitTest):
         self.assertEqual(screen.bin_args, None)
         self.assertEqual(screen.group, None)
         self.assertEqual(screen.user, None)
-
-        # Do test again
-        # patch assertions
-        mock_get_locale.assert_has_calls([call(), call()], any_order=True)
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "mockos")

@@ -14,11 +14,8 @@ class TestMainScreen(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        terminus_path = os.path.join(assets_path, "terminus.ttf")
-        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
-        LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="nanum", fn_regular=nanum_path)
-        LabelBase.register(DEFAULT_FONT, terminus_path)
+        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
     def teardown_class(cls):
@@ -39,12 +36,7 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "MainScreen")
         self.assertEqual(screen.id, "main_screen")
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -62,12 +54,7 @@ class TestMainScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
 
         self.assertEqual(grid.id, "main_screen_grid")
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -90,12 +77,7 @@ class TestMainScreen(GraphicUnitTest):
         self.assertEqual(buttons[2].id, "main_wipe")
         self.assertEqual(buttons[1].id, "main_settings")
         self.assertEqual(buttons[0].id, "main_about")
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -124,12 +106,7 @@ class TestMainScreen(GraphicUnitTest):
                 calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -192,13 +169,7 @@ class TestMainScreen(GraphicUnitTest):
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_manager.get_screen.assert_has_calls(calls_manager)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
-
+        mock_get_locale.assert_any_call()
         mock_open_settings.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -217,20 +188,9 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        text_device = "".join(
-            [
-                "[font=terminus]",
-                "Version: [color=#00AABB]select a new one[/color]",
-                "[/font]",
-            ]
-        )
-        text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
-        )
-        text_wipe = "".join(
-            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
-        )
-
+        text_device = "Version: [color=#00AABB]select a new one[/color]"
+        text_flash = "[color=#333333]Flash firmware[/color]"
+        text_wipe = "[color=#333333]Wipe device[/color]"
         calls = []
 
         self.assertEqual(device_button.text, text_device)
@@ -246,12 +206,7 @@ class TestMainScreen(GraphicUnitTest):
             "v22.08.0",
             "v22.03.0",
         ):
-            text_version = "".join(
-                [
-                    "[font=terminus]",
-                    f"Version: [color=#00AABB]{version}[/color]" "[/font]",
-                ]
-            )
+            text_version = f"Version: [color=#00AABB]{version}[/color]"
             screen.update(name="SelectVersionScreen", key="version", value=version)
             self.assertEqual(device_button.text, text_version)
             self.assertEqual(flash_button.text, text_flash)
@@ -281,52 +236,25 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        text_device = "".join(
-            [
-                "[font=terminus]",
-                "Device: [color=#00AABB]select a new one[/color]",
-                "[/font]",
-            ]
-        )
-        mocked_text_device = "".join(
-            [
-                "[font=terminus]",
-                "Device: [color=#00AABB]Mocked device[/color]",
-                "[/font]",
-            ]
-        )
-        text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
-        )
-        mocked_text_flash = "".join(["[font=terminus]", "Flash firmware", "[/font]"])
-        text_wipe = "".join(
-            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
-        )
-        mocked_text_wipe = "".join(["[font=terminus]", "Wipe device", "[/font]"])
+        text_device = "Device: [color=#00AABB]select a new one[/color]"
+        mocked_text_device = "Device: [color=#00AABB]Mocked device[/color]"
+        text_flash = "[color=#333333]Flash firmware[/color]"
+        mocked_text_flash = "Flash firmware"
+        text_wipe = "[color=#333333]Wipe device[/color]"
+        mocked_text_wipe = "Wipe device"
 
         self.assertEqual(device_button.text, text_device)
         self.assertEqual(flash_button.text, text_flash)
         self.assertEqual(wipe_button.text, text_wipe)
 
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        calls = []
-
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
             screen.update(name="SelectVersionScreen", key="device", value=device)
-            mocked_text_device = "".join(
-                [
-                    "[font=terminus]",
-                    f"Device: [color=#00AABB]{device}[/color]" "[/font]",
-                ]
-            )
+            mocked_text_device = f"Device: [color=#00AABB]{device}[/color]"
             self.assertEqual(device_button.text, mocked_text_device)
             self.assertEqual(flash_button.text, mocked_text_flash)
             self.assertEqual(wipe_button.text, mocked_text_wipe)
-            calls.append(call())
-            calls.append(call())
 
-        mock_get_locale.assert_has_calls(calls)
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -341,11 +269,7 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         screen.update(name="MockedScreen", key="device", value="v24.03.0")
 
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
         mock_redirect_error.assert_called_once_with(
             msg="Invalid screen name: MockedScreen"
         )
@@ -363,12 +287,7 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         screen.update(name="SelectDeviceScreen", key="mock", value="mock")
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
         mock_redirect_error.assert_called_once_with(msg='Invalid key: "mock"')
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -387,26 +306,11 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        text_device = "".join(
-            [
-                "[font=terminus]",
-                "Device: [color=#00AABB]select a new one[/color]",
-                "[/font]",
-            ]
-        )
-        mocked_text_device = "".join(
-            [
-                "[font=terminus]",
-                "Device: [color=#00AABB]Mocked device[/color]",
-                "[/font]",
-            ]
-        )
-        text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
-        )
-        text_wipe = "".join(
-            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
-        )
+        text_device = "Device: [color=#00AABB]select a new one[/color]"
+        mocked_text_device = "Device: [color=#00AABB]Mocked device[/color]"
+        text_flash = "[color=#333333]Flash firmware[/color]"
+        text_wipe = "[color=#333333]Wipe device[/color]"
+
         self.assertEqual(device_button.text, text_device)
         self.assertEqual(flash_button.text, text_flash)
         self.assertEqual(wipe_button.text, text_wipe)
@@ -436,13 +340,7 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="locale", value="en_US.UTF-8")
 
         self.assertEqual(screen.locale, "en_US.UTF-8")
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        # and since update locale, one more
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -461,33 +359,10 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(
             name="ConfigKruxInstaller", key="device", value="select a new one"
         )
-        text_device = "".join(
-            [
-                "[font=terminus]",
-                "Device: [color=#00AABB]select a new one[/color]",
-                "[/font]",
-            ]
-        )
+        text_device = "Device: [color=#00AABB]select a new one[/color]"
         self.assertEqual(screen.device, "select a new one")
         self.assertEqual(device_button.text, text_device)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font,
-        # and more two because update device
-        mock_get_locale.assert_has_calls(
-            [
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-            ]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -505,9 +380,7 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
-        text_flash = "".join(
-            ["[font=terminus]", "[color=#333333]Flash firmware[/color]", "[/font]"]
-        )
+        text_flash = "[color=#333333]Flash firmware[/color]"
         self.assertTrue(flash_button.markup)
         self.assertEqual(flash_button.text, text_flash)
 
@@ -532,14 +405,9 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
-        text_flash = "".join(["[font=terminus]", "Flash firmware", "[/font]"])
+        text_flash = "Flash firmware"
         self.assertEqual(flash_button.text, text_flash)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -560,16 +428,9 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
 
-        text_wipe = "".join(
-            ["[font=terminus]", "[color=#333333]Wipe device[/color]", "[/font]"]
-        )
+        text_wipe = "[color=#333333]Wipe device[/color]"
         self.assertEqual(wipe_button.text, text_wipe)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -587,15 +448,10 @@ class TestMainScreen(GraphicUnitTest):
         wipe_button = grid.children[2]
 
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
-        text_wipe = "".join(["[font=terminus]", "Wipe device", "[/font]"])
+        text_wipe = "Wipe device"
 
         self.assertEqual(wipe_button.text, text_wipe)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -613,14 +469,9 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="settings", value=None)
 
-        settings_text = "".join(["[font=terminus]", "Settings", "[/font]"])
+        settings_text = "Settings"
         self.assertEqual(s_button.text, settings_text)
-
-        # each button has at least 2 calls of get locale
-        # one for locale itself, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -637,14 +488,9 @@ class TestMainScreen(GraphicUnitTest):
         a_button = grid.children[0]
 
         screen.update(name="ConfigKruxInstaller", key="about", value=None)
-        about_text = "".join(["[font=terminus]", "About", "[/font]"])
+        about_text = "About"
         self.assertEqual(a_button.text, about_text)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -663,9 +509,6 @@ class TestMainScreen(GraphicUnitTest):
         wipe_button = grid.children[2]
 
         background_calls = []
-        locale_calls = []
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
             screen.update(name="SelectVersionScreen", key="device", value=device)
@@ -675,11 +518,9 @@ class TestMainScreen(GraphicUnitTest):
             wipe_action(wipe_button)
             background_calls.append(call(wid="main_flash", rgba=(0.25, 0.25, 0.25, 1)))
             background_calls.append(call(wid="main_wipe", rgba=(0.25, 0.25, 0.25, 1)))
-            locale_calls.append(call())
-            locale_calls.append(call())
 
         mock_set_background.assert_has_calls(background_calls)
-        mock_get_locale.assert_has_calls(locale_calls)
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -717,23 +558,7 @@ class TestMainScreen(GraphicUnitTest):
         flash_action = getattr(screen, "on_release_main_flash")
         flash_action(flash_button)
 
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-            ]
-        )
-
+        mock_get_locale.assert_any_call()
         mock_get_destdir_assets.assert_called_once()
         mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(
@@ -779,12 +604,7 @@ class TestMainScreen(GraphicUnitTest):
         flash_action = getattr(screen, "on_release_main_flash")
         flash_action(flash_button)
 
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call(), call()]
-        )
-
+        mock_get_locale.assert_any_call()
         mock_get_destdir_assets.assert_called_once()
         mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(
@@ -826,23 +646,7 @@ class TestMainScreen(GraphicUnitTest):
         flash_action = getattr(screen, "on_release_main_flash")
         flash_action(flash_button)
 
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        mock_get_locale.assert_has_calls(
-            [
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-                call(),
-            ]
-        )
-
+        mock_get_locale.assert_any_call()
         mock_findall.assert_has_calls(
             [
                 call("^v\\d+\\.\\d+\\.\\d$", "odudex/krux_binaries"),
@@ -881,7 +685,6 @@ class TestMainScreen(GraphicUnitTest):
 
         calls_set_background = []
         calls_set_screen = []
-        calls_locale = []
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
             screen.update(name="SelectVersionScreen", key="device", value=device)
@@ -890,9 +693,7 @@ class TestMainScreen(GraphicUnitTest):
 
             calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 1)))
             calls_set_screen.append(call(name="WarningWipeScreen", direction="left"))
-            calls_locale.append(call())
-            calls_locale.append(call())
 
-        mock_get_locale.assert_has_calls(calls_locale)
+        mock_get_locale.assert_any_call()
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)

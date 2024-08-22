@@ -174,7 +174,7 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         self.render(screen)
 
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
-        text_back = "[font=terminus]Voltar[/font]"
+        text_back = "Voltar"
         # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window

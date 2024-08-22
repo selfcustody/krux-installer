@@ -233,8 +233,8 @@ class TestSelectVersionScreen(GraphicUnitTest):
         button_old_versions = grid.children[1]
         button_back = grid.children[0]
 
-        text_old_versions = "[font=terminus]Versões antigas[/font]"
-        text_back_button = "[font=terminus]Voltar[/font]"
+        text_old_versions = "Versões antigas"
+        text_back_button = "Voltar"
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
 
         self.assertEqual(button_old_versions.text, text_old_versions)

@@ -78,7 +78,7 @@ class SelectOldVersionScreen(BaseScreen):
                 row=row,
                 id=wid,
                 root_widget="select_old_version_screen_grid",
-                text=f"[font=terminus]{text}[/font]",
+                text=text,
                 markup=True,
                 on_press=_press,
                 on_release=_release,
@@ -101,7 +101,7 @@ class SelectOldVersionScreen(BaseScreen):
             row=len(old_versions) + 1,
             id="select_old_version_back",
             root_widget="select_old_version_screen_grid",
-            text=f"[font={SelectOldVersionScreen.get_font_name()}]{back}[/font]",
+            text=back,
             markup=True,
             on_press=_press_back,
             on_release=_release_back,
@@ -126,13 +126,7 @@ class SelectOldVersionScreen(BaseScreen):
 
                 if "select_old_version_back" in self.ids:
                     back = self.translate("Back")
-                    self.ids["select_old_version_back"].text = "".join(
-                        [
-                            f"[font={SelectOldVersionScreen.get_font_name()}]",
-                            back,
-                            "[/font]",
-                        ]
-                    )
+                    self.ids["select_old_version_back"].text = back
 
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")

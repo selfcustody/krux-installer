@@ -94,7 +94,6 @@ class FlashScreen(BaseFlashScreen):
 
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    f"[font={FlashScreen.get_font_name()}]",
                     f"[size=100sp]{percent:.2f} %[/size]",
                     "\n",
                     "[size=28sp]",
@@ -111,7 +110,6 @@ class FlashScreen(BaseFlashScreen):
                     "[/b]",
                     "[/color]",
                     "[/size]",
-                    "[/font]",
                 ]
             )
 
@@ -138,27 +136,15 @@ class FlashScreen(BaseFlashScreen):
             else:
                 size = self.SIZE_M
 
-            self.ids[f"{self.id}_progress"].text = "\n".join(
+            self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    "".join(
-                        [
-                            f"[font={FlashScreen.get_font_name()}]",
-                            f"[size={size}sp][b]{done}![/b][/size]",
-                            "[/font]",
-                        ]
-                    ),
-                    "",
-                    "",
-                    "".join(
-                        [
-                            f"[font={FlashScreen.get_font_name()}]",
-                            f"[size={size}sp]",
-                            f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
-                            "        ",
-                            f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
-                            "[/font]",
-                        ]
-                    ),
+                    f"[size={size}sp][b]{done}![/b][/size]",
+                    "\n",
+                    "\n",
+                    f"[size={size}sp]",
+                    f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
+                    "        ",
+                    f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
                 ]
             )
             self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
@@ -227,30 +213,21 @@ class FlashScreen(BaseFlashScreen):
                 quit = self.translate("Quit")
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
-                        "[font=terminus]",
                         f"[size={sizes[0]}]",
                         "[color=#FF0000]Flash failed[/color]",
                         "[/size]",
-                        "[/font]," "\n",
+                        "\n",
                         "\n",
                         f"[size={sizes[0]}]",
-                        f"[font={FlashScreen.get_font_name()}]"
                         f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                         "        ",
                         f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 )
 
                 self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        "[font=terminus]",
-                        f"[size={sizes[1]}]",
-                        msg,
-                        "[/size]",
-                        "[/font]",
-                    ]
+                    [f"[size={sizes[1]}]", msg, "[/size]"]
                 )
 
             # hook what happened

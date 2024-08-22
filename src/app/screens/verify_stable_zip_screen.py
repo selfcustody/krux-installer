@@ -128,13 +128,11 @@ class VerifyStableZipScreen(BaseScreen):
         warning = Label(
             text="".join(
                 [
-                    f"[font={VerifyStableZipScreen.get_font_name()}]",
                     f"[size={self.SIZE_MM}sp]",
                     "[color=#efcc00]",
                     verifying_msg,
                     "[/color]",
                     "[/size]",
-                    "[/font]",
                 ]
             ),
             markup=True,
@@ -181,8 +179,6 @@ class VerifyStableZipScreen(BaseScreen):
 
         filepath = os.path.join(assets_dir, f"krux-{version}.zip")
         integrity_msg = self.translate("Integrity verification")
-        success_msg = self.translate("SUCCESS")
-        failed_msg = self.translate("FAILED")
         computed_msg = self.translate("computed hash from")
         provided_msg = self.translate("provided hash from")
         hash_color = ""
@@ -211,40 +207,32 @@ class VerifyStableZipScreen(BaseScreen):
 
         if checksum:
             hash_color = "#00FF00"
-            hash_msg = success_msg
+            hash_msg = self.translate("SUCCESS")
         else:
             hash_color = "FF0000"
-            hash_msg = failed_message
+            hash_msg = self.translate("FAILED")
 
         return "".join(
             [
-                f"[font={VerifyStableZipScreen.get_font_name()}]"
-                f"[size={size[0]}sp][u]{integrity_msg.upper()}[/u]: [b][color=#00ff00]{hash_msg}[/color][/b][/size]",
-                "[/font]",
+                f"[size={size[0]}sp]",
+                f"[u]{integrity_msg.upper()}[/u]: ",
+                f"[b][color={hash_color}]{hash_msg}[/color][/b]",
+                "[/size]",
                 "\n",
                 "\n",
-                f"[font={VerifyStableZipScreen.get_font_name()}]",
-                f"[size={size[1]}sp][b]{computed_msg} [color=#777777]{filepath}[/color][/b][/size]",
-                "[/font]",
+                f"[size={size[1]}sp]",
+                f"[b]{computed_msg} [color=#777777]{filepath}[/color][/b]",
+                "[/size]",
                 "\n",
-                "[font=terminus]",
                 f"[size={size[1]}sp]{sha_0}[/size]",
-                "[/font]",
                 "\n",
                 "\n",
-                f"[font={VerifyStableZipScreen.get_font_name()}]",
-                f"[size={size[1]}sp][b]{provided_msg} [color=#777777]{filepath}.sha256.txt[/color][/b][/size]",
-                "[/font]",
+                f"[size={size[1]}sp]",
+                f"[b]{provided_msg} [color=#777777]{filepath}.sha256.txt[/color][/b]",
+                "[/size]",
                 "\n",
-                "[font=terminus]",
                 f"[size={size[1]}sp]{sha_1}[/size]",
-                "[/font]",
                 "\n",
-                "\n",
-                "[/font]",
-                "\n",
-                f"[font={VerifyStableZipScreen.get_font_name()}]",
-                "[/font]",
                 "\n",
                 "\n",
             ]
@@ -293,19 +281,18 @@ class VerifyStableZipScreen(BaseScreen):
 
         return "".join(
             [
-                f"[font={VerifyStableZipScreen.get_font_name()}]",
-                f"[size={size[0]}sp][u]{authenticity_msg.upper()}[/u]: [b][color={sig_color}]{res_msg} {sig_msg}[/color][/b][/size]",
-                "[/font]",
+                f"[size={size[0]}sp]",
+                f"[u]{authenticity_msg.upper()}[/u]: ",
+                f"[b][color={sig_color}]{res_msg} {sig_msg}[/color][/b]",
+                "[/size]",
                 "\n",
                 "\n",
                 "\n",
-                f"[font={VerifyStableZipScreen.get_font_name()}]",
                 f"[size={size[1]}sp]{installed_msg}[/size]",
                 "\n" f"[size={size[1]}sp]{check_msg}:[/size]",
-                "[/font]",
                 "\n",
                 "\n",
-                "[font=terminus]" f"[size={size[1]}sp]",
+                f"[size={size[1]}sp]",
                 "[b]",
                 f"openssl sha256< [color=#777777]{filepath}[/color] -binary | \\",
                 "\n"
@@ -314,20 +301,16 @@ class VerifyStableZipScreen(BaseScreen):
                 f"-sigfile [color=#777777]{filepath}.sig[/color]",
                 "[/size]",
                 "[/b]",
-                "[/font]",
                 "\n",
                 "\n",
-                f"[font={VerifyStableZipScreen.get_font_name()}]"
                 f"[size={size[1]}sp][b][color=#{sig_color}]{res_msg} {sig_msg}[/b][/color][/size]",
-                "[/font]",
                 "\n",
                 "\n",
-                f"[font={VerifyStableZipScreen.get_font_name()}]" f"[size={size[0]}sp]",
+                f"[size={size[0]}sp]",
                 f"[ref=UnzipStableScreen][color=#00ff00]{proceed}[/ref][/color]",
                 "             ",
                 f"[ref=MainScreen][color=#ff0000]{back}[/ref][/color]",
                 "[/b]",
                 "[/size]",
-                "[/font]",
             ]
         )

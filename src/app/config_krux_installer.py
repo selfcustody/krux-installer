@@ -29,7 +29,7 @@ import locale
 from functools import partial
 from kivy import resources as kv_resources
 from kivy.clock import Clock
-from kivy.core.text import LabelBase
+from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.utils.trigger import Trigger
 from src.app.base_krux_installer import BaseKruxInstaller
 
@@ -59,13 +59,8 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
 
         self.info(f"Registering assets path={self.assets_path}")
 
-        terminus_path = os.path.join(self.assets_path, "terminus.ttf")
-        nanum_path = os.path.join(self.assets_path, "NanumGothic-Regular.ttf")
-        sc_path = os.path.join(self.assets_path, "NotoSansSC-Regular.ttf")
-
-        LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="nanum", fn_regular=nanum_path)
-        LabelBase.register(name="noto-sc", fn_regular=sc_path)
+        noto_sans_path = os.path.join(self.assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @staticmethod
     def make_lang_code(lang: str) -> str:

@@ -1,5 +1,5 @@
 import os
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.core.text import LabelBase, DEFAULT_FONT
@@ -13,11 +13,8 @@ class TestAboutScreen(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        terminus_path = os.path.join(assets_path, "terminus.ttf")
-        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
-        LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="nanum", fn_regular=nanum_path)
-        LabelBase.register(DEFAULT_FONT, terminus_path)
+        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
     def teardown_class(cls):
@@ -47,31 +44,26 @@ class TestAboutScreen(GraphicUnitTest):
             [
                 "".join(
                     [
-                        "[font=terminus]",
                         f"[size={screen.SIZE_G}sp]",
                         "[color=#00AABB]",
                         "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
                         "[/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
-                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "follow us on X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
-                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
@@ -79,14 +71,13 @@ class TestAboutScreen(GraphicUnitTest):
                         "[/ref]",
                         "[/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 ),
             ]
         )
 
         self.assertEqual(label.text, text)
-        mock_get_locale.assert_has_calls([call(), call(), call(), call()])
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -108,31 +99,26 @@ class TestAboutScreen(GraphicUnitTest):
             [
                 "".join(
                     [
-                        "[font=terminus]",
                         f"[size={screen.SIZE_G}sp]",
                         "[color=#00AABB]",
                         "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
                         "[/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
-                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "siga-nos no X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 ),
                 "",
                 "",
                 "".join(
                     [
-                        "[font=terminus]",
                         f"[size={screen.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
@@ -140,15 +126,12 @@ class TestAboutScreen(GraphicUnitTest):
                         "[/ref]",
                         "[/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 ),
             ]
         )
         self.assertEqual(label.text, text)
-        mock_get_locale.assert_has_calls(
-            [call(), call(), call(), call(), call(), call(), call()]
-        )
+        mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -167,7 +150,7 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_ref_press_about_screen_label")
         action("Mock", "SourceCode")
 
-        mock_get_locale.assert_has_calls([call(), call(), call(), call()])
+        mock_get_locale.assert_any_call()
         mock_webbrowser.open.assert_called_once_with(
             "https://selfcustody.github.io/krux/getting-started/installing/from-gui/"
         )
@@ -191,7 +174,7 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_ref_press_about_screen_label")
         action("Mock", "X")
 
-        mock_get_locale.assert_has_calls([call(), call(), call(), call()])
+        mock_get_locale.assert_any_call()
         mock_webbrowser.open.assert_called_once_with("https://x.com/selfcustodykrux")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -209,5 +192,5 @@ class TestAboutScreen(GraphicUnitTest):
         action = getattr(screen, "on_ref_press_about_screen_label")
         action("Mock", "Back")
 
-        mock_get_locale.assert_has_calls([call(), call(), call()])
+        mock_get_locale.assert_any_call()
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")

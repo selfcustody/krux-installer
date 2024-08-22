@@ -111,27 +111,14 @@ class WipeScreen(BaseFlashScreen):
             else:
                 size = self.SIZE_M
 
-            self.ids[f"{self.id}_progress"].text = "\n".join(
+            self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    "".join(
-                        [
-                            f"[font={WipeScreen.get_font_name()}]",
-                            f"[size={size}sp][b]{done}![/b][/size]",
-                            "[/font]",
-                        ]
-                    ),
-                    "",
-                    "",
-                    "".join(
-                        [
-                            f"[font={WipeScreen.get_font_name()}]",
-                            f"[size={size}sp]",
-                            f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
-                            "        ",
-                            f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
-                            "[/font]",
-                        ]
-                    ),
+                    f"[size={size}sp][b]{done}![/b][/size]",
+                    "\n",
+                    f"[size={size}sp]",
+                    f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
+                    "        ",
+                    f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
                 ]
             )
             self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
@@ -177,13 +164,7 @@ class WipeScreen(BaseFlashScreen):
             else:
                 sizes = [self.SIZE_MM, self.SIZE_MP]
 
-            self.ids[f"{self.id}_progress"].text = "".join(
-                [
-                    f"[font={WipeScreen.get_font_name()}]",
-                    f"[size={sizes[0]}sp][b]{please}[/b]",
-                    "[/font]",
-                ]
-            )
+            self.ids[f"{self.id}_progress"].text = f"[size={sizes[0]}sp][b]{please}[/b]"
             self.output = []
             self.progress = ""
             self.is_done = False
@@ -208,30 +189,24 @@ class WipeScreen(BaseFlashScreen):
 
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
-                        "[font=terminus]",
                         f"[size={sizes[0]}]",
                         f"[color=#FF0000]{"Wipe failed" if not self.success else done}[/color]",
                         "[/size]",
-                        "[/font]",
                         "\n",
                         "\n",
-                        f"[font={WipeScreen.get_font_name()}]"
                         f"[size={sizes[0]}]"
                         f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
                         "        ",
                         f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
                         "[/size]",
-                        "[/font]",
                     ]
                 )
 
                 self.ids[f"{self.id}_info"].text = "".join(
                     [
-                        "[font=terminus]",
                         f"[size={sizes[1]}]",
                         msg,
                         "[/size]",
-                        "[/font]",
                     ]
                 )
 

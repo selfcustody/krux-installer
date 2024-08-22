@@ -14,11 +14,8 @@ class TestSelectVersionScreen(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        terminus_path = os.path.join(assets_path, "terminus.ttf")
-        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
-        LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="nanum", fn_regular=nanum_path)
-        LabelBase.register(DEFAULT_FONT, terminus_path)
+        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
     def teardown_class(cls):
@@ -60,7 +57,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                f"[font={WarningBetaScreen.get_font_name()}]",
                 f"[size={fontsize_mm}sp][color=#efcc00][b]WARNING[/b][/color][/size]",
                 "\n",
                 "\n",
@@ -74,7 +70,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 f"[size={fontsize_mm}sp]",
                 "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 
@@ -157,7 +152,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
         text = "".join(
             [
-                f"[font={WarningBetaScreen.get_font_name()}]",
                 f"[size={fontsize_mm}sp][color=#efcc00][b]ADVERTÊNCIA[/b][/color][/size]",
                 "\n",
                 "\n",
@@ -171,7 +165,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 f"[size={fontsize_mm}sp]",
                 "[color=#00ff00]Proceder[/color]        [color=#ff0000]Voltar[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
 

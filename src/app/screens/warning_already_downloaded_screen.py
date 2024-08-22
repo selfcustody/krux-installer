@@ -132,28 +132,18 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
 
             self.ids[f"{self.id}_label"].text = "".join(
                 [
-                    f"[font={WarningAlreadyDownloadedScreen.get_font_name()}]"
                     f"[size={size[0]}sp][b]{warning_msg}[/b][/size]",
-                    "[/font]",
                     "\n",
-                    "\n"
-                    f"[font=terminus]"
                     f"[size={size[2]}sp]* krux-{value}.zip[/size]",
-                    "\n",
                     "\n",
                     f"[size={size[2]}sp]* krux-{value}.zip.sha256.txt[/size]",
                     "\n",
-                    "\n",
                     f"[size={size[2]}sp]* krux-{value}.zip.sig[/size]",
-                    "\n",
                     "\n",
                     f"[size={size[2]}sp]* selfcustody.pem[/size]",
                     "\n",
                     "\n",
-                    "\n",
-                    f"[font={WarningAlreadyDownloadedScreen.get_font_name()}]"
                     f"[size={size[1]}sp]{ask_proceed}[/size]",
-                    "\n",
                     "\n",
                     "\n",
                     f"[size={size[0]}]" f"[color=#00ff00]",
@@ -168,7 +158,6 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                     "[/ref]",
                     "[/color]",
                     "[/size]",
-                    "[/font]",
                 ]
             )
 

@@ -16,11 +16,8 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        terminus_path = os.path.join(assets_path, "terminus.ttf")
-        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
-        LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="nanum", fn_regular=nanum_path)
-        LabelBase.register(DEFAULT_FONT, terminus_path)
+        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
     def teardown_class(cls):
@@ -30,10 +27,7 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
-    def test_init(self, mock_get_font_name, mock_get_locale):
+    def test_init(self, mock_get_locale):
         screen = DownloadStableZipSha256Screen()
         self.render(screen)
 
@@ -55,20 +49,14 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         self.assertEqual(grid.children[0].id, "download_stable_zip_sha256_screen_info")
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_invalid_name(
-        self, mock_redirect_error, mock_get_font_name, mock_get_locale
-    ):
+    def test_fail_update_invalid_name(self, mock_redirect_error, mock_get_locale):
         screen = DownloadStableZipSha256Screen()
         self.render(screen)
 
@@ -82,20 +70,14 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_key(
-        self, mock_redirect_error, mock_get_font_name, mock_get_locale
-    ):
+    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
         screen = DownloadStableZipSha256Screen()
         self.render(screen)
 
@@ -109,17 +91,13 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         mock_redirect_error.assert_any_call('Invalid key: "mock"')
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
-    def test_update_locale(self, mock_get_font_name, mock_get_locale):
+    def test_update_locale(self, mock_get_locale):
         screen = DownloadStableZipSha256Screen()
         self.render(screen)
 
@@ -133,15 +111,11 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
     )
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets",
@@ -152,7 +126,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         self,
         mock_downloader,
         mock_get_destdir_assets,
-        mock_get_font_name,
         mock_get_locale,
     ):
         screen = DownloadStableZipSha256Screen()
@@ -165,7 +138,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         screen.update(name="DownloadStableZipScreen", key="version", value="v0.0.1")
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
         mock_downloader.assert_called_once()
         mock_get_destdir_assets.assert_any_call()
@@ -174,10 +146,7 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
-    def test_update_progress(self, mock_get_font_name, mock_get_locale):
+    def test_update_progress(self, mock_get_locale):
         screen = DownloadStableZipSha256Screen()
         self.render(screen)
 
@@ -207,21 +176,13 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         # do tests
         text = "".join(
             [
-                "[font=terminus]",
                 f"[size={fontsize_g}sp][b]1.00 %[/b][/size]",
-                "[/font]",
                 "\n",
-                "[font=terminus]",
                 f"[size={fontsize_mp}sp]",
                 "210000",
-                "[/font]",
-                "[font=terminus]",
                 " of ",
-                "[/font]",
-                "[font=terminus]",
                 "21000000",
                 " B",
-                "[/font]",
                 "[/size]",
             ]
         )
@@ -231,15 +192,11 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         )
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
     )
     @patch("src.app.screens.download_stable_zip_sha256_screen.Sha256Downloader")
     @patch("src.app.screens.download_stable_zip_sha256_screen.partial")
@@ -249,7 +206,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         mock_schedule_once,
         mock_partial,
         mock_downloader,
-        mock_get_font_name,
         mock_get_locale,
     ):
 
@@ -269,7 +225,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         DownloadStableZipSha256Screen.on_progress(data=b"")
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
         mock_partial.assert_has_calls(
             [
@@ -291,12 +246,8 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
     def test_update_progress_100_percent(
         self,
-        mock_get_font_name,
         mock_get_locale,
     ):
         screen = DownloadStableZipSha256Screen()
@@ -333,19 +284,13 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
             # do tests
             text_progress = "".join(
                 [
-                    "[font=terminus]" f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
-                    "[/font]",
+                    f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
                     "\n",
-                    "[font=terminus]" f"[size={fontsize_mp}sp]",
+                    f"[size={fontsize_mp}sp]",
                     "21",
-                    "[/font]",
-                    "[font=terminus]",
                     " of ",
-                    "[/font]",
-                    "[font=terminus]",
                     "21",
                     " B",
-                    "[/font]",
                     "[/size]",
                 ]
             )
@@ -354,13 +299,9 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
             text_info = "".join(
                 [
                     f"[size={fontsize_mp}sp]",
-                    "[font=terminus]",
                     filepath,
-                    "[/font]",
                     "\n",
-                    "[font=terminus]",
                     "downloaded",
-                    "[/font]",
                     "[/size]",
                 ]
             )
@@ -374,16 +315,12 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
             )
 
             # patch assertions
-            mock_get_font_name.assert_any_call()
             mock_get_locale.assert_any_call()
             assert len(mock_trigger.mock_calls) >= 1
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
     )
     @patch("src.app.screens.download_stable_zip_sha256_screen.time.sleep")
     @patch(
@@ -401,7 +338,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         mock_partial,
         mock_manager,
         mock_sleep,
-        mock_get_font_name,
         mock_get_locale,
     ):
         # Mocks
@@ -427,7 +363,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         self.assertFalse(screen.trigger is None)
 
         # patch assertions
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
         mock_sleep.assert_called_once_with(2.1)
         mock_manager.get_screen.assert_called_once_with("DownloadStableZipSigScreen")

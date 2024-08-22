@@ -104,19 +104,12 @@ class SelectDeviceScreen(BaseScreen):
                     clean_text = re.sub(cleanr, "", value)
                     if device not in VALID_DEVICES_VERSIONS[clean_text]:
                         self.ids[f"select_device_{device}"].text = "".join(
-                            [
-                                "[font=terminus]",
-                                "[color=#333333]",
-                                device,
-                                "[/color]",
-                                "[/font]",
-                            ]
+                            ["[color=#333333]", device, "[/color]"]
                         )
                     else:
                         self.enabled_devices.append(f"select_device_{device}")
-                        self.ids[f"select_device_{device}"].text = "".join(
-                            ["[font=terminus]", device, "[/font]"]
-                        )
+                        self.ids[f"select_device_{device}"].text = device
+
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
         else:

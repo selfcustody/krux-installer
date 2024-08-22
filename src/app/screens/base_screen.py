@@ -293,19 +293,6 @@ class BaseScreen(Screen, Trigger):
             raise RuntimeError(f"Not implemented for '{sys.platform}'")
 
     @staticmethod
-    def get_font_name() -> str:
-        locale = BaseScreen.get_locale()
-
-        if locale.startswith("ko_KR"):
-            return "nanum"
-
-        elif locale.startswith("zh_CN"):
-            return "noto-sc"
-
-        else:
-            return "terminus"
-
-    @staticmethod
     def open_settings():
         app = App.get_running_app()
         app.open_settings()

@@ -149,17 +149,13 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 self.ids[f"{self.id}_info"].text = "".join(
                     [
                         f"[size={self.SIZE_MP}sp]",
-                        f"[font={DownloadBetaScreen.get_font_name()}]",
                         downloading,
-                        "[/font]",
                         "\n",
                         "[color=#00AABB]",
                         f"[ref={self.downloader.url}]{self.downloader.url}[/ref]",
                         "[/color]",
                         "\n",
-                        f"[font={DownloadBetaScreen.get_font_name()}]",
                         to,
-                        "[/font]",
                         "\n",
                         self.downloader.destdir,
                         "\n",
@@ -182,11 +178,9 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
-                        "[font=terminus]",
                         f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
                         "\n",
                         f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
-                        "[/font]",
                     ]
                 )
 
@@ -195,13 +189,11 @@ class DownloadBetaScreen(BaseDownloadScreen):
                     destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
                     self.ids[f"{self.id}_info"].text = "".join(
                         [
-                            f"[font={DownloadBetaScreen.get_font_name()}]",
                             f"[size={self.SIZE_MP}sp]",
                             destdir,
                             "\n",
                             downloaded,
                             "[/size]",
-                            "[/font]",
                         ]
                     )
 

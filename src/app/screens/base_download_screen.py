@@ -49,12 +49,11 @@ class BaseDownloadScreen(BaseScreen):
         connecting = self.translate("Connecting")
         text = "".join(
             [
-                f"[font={BaseDownloadScreen.get_font_name()}]",
                 f"[size={self.SIZE_G}]",
                 f"{connecting}...",
                 "[/size]",
                 "[color=#efcc00]",
-                "[/color]" "[/font]",
+                "[/color]",
             ]
         )
 

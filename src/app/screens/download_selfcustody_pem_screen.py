@@ -115,21 +115,13 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
                     self.ids[f"{self.id}_info"].text = "".join(
                         [
                             f"[size={self.SIZE_MP}sp]",
-                            f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
                             downloading,
-                            "[/font]",
                             "\n",
-                            "[font=terminus]",
                             f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                            "[/font]",
                             "\n",
-                            f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
                             to,
-                            "[/font]",
                             "\n",
-                            "[font=terminus]",
                             filepath,
-                            "[/font]",
                             "[/size]",
                         ]
                     )
@@ -155,21 +147,13 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
             of = self.translate("of")
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    "[font=terminus]",
                     f"[size={self.SIZE_G}sp][b]{percent * 100:,.2f} %[/b][/size]",
-                    "[/font]",
                     "\n",
-                    "[font=terminus]",
                     f"[size={self.SIZE_MP}sp]",
                     str(lens[0]),
-                    "[/font]",
-                    f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
                     f" {of} ",
-                    "[/font]",
-                    "[font=terminus]",
                     str(lens[1]),
                     " B",
-                    "[/font]",
                     "[/size]",
                 ]
             )
@@ -182,13 +166,9 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
                     self.ids[f"{self.id}_info"].text = "".join(
                         [
                             f"[size={self.SIZE_MP}sp]",
-                            "[font=terminus]",
                             filepath,
-                            "[/font]",
                             "\n",
-                            f"[font={DownloadSelfcustodyPemScreen.get_font_name()}]",
                             downloaded,
-                            "[/font]",
                             "[/size]",
                         ]
                     )

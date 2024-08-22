@@ -119,12 +119,11 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[font=terminus]" f"[size={fontsize_mm}sp]",
+                f"[size={fontsize_mm}sp]",
                 "[color=#efcc00]",
                 "Verifying integrity and authenticity",
                 "[/color]",
                 "[/size]",
-                "[/font]",
             ]
         )
         self.assertEqual(len(screen.ids["verify_stable_zip_screen_grid"].children), 1)

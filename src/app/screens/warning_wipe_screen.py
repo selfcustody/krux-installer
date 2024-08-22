@@ -157,7 +157,6 @@ class WarningWipeScreen(BaseScreen):
 
         return "".join(
             [
-                f"[font={WarningWipeScreen.get_font_name()}]",
                 "[color=#EFCC00]",
                 f"[size={sizes[0]}]",
                 full_wipe,
@@ -178,8 +177,6 @@ class WarningWipeScreen(BaseScreen):
                 f"[size={sizes[0]}]"
                 f"[color=#00FF00][ref=WipeScreen]{proceed}[/ref][/color]",
                 "        ",
-                f"[color=#FF0000][ref=MainScreen]{back}[/ref][/color]"
-                "[/size]"
-                "[/font]",
+                f"[color=#FF0000][ref=MainScreen]{back}[/ref][/color]" "[/size]",
             ]
         )

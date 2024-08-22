@@ -59,20 +59,17 @@ class SelectVersionScreen(BaseScreen):
             buttons = [
                 (
                     "select_version_latest",
-                    f"[font=terminus]{selector.releases[0]}[/font]",
+                    selector.releases[0],
                 ),
                 (
                     "select_version_beta",
-                    f"[font=terminus]{selector.releases[-1]}[/font]",
+                    selector.releases[-1],
                 ),
                 (
                     "select_version_old",
-                    f"[font={SelectVersionScreen.get_font_name()}]{old}[/font]",
+                    old,
                 ),
-                (
-                    "select_version_back",
-                    f"[font={SelectVersionScreen.get_font_name()}]{back}[/font]",
-                ),
+                ("select_version_back", back),
             ]
 
             # Push other releases to SelectOldVersionScreen
@@ -173,23 +170,11 @@ class SelectVersionScreen(BaseScreen):
                 self.locale = value
                 if "select_version_old" in self.ids:
                     old = self.translate("Old versions")
-                    self.ids["select_version_old"].text = "".join(
-                        [
-                            f"[font={SelectVersionScreen.get_font_name()}]",
-                            old,
-                            "[/font]",
-                        ]
-                    )
+                    self.ids["select_version_old"].text = old
 
                 if "select_version_back" in self.ids:
                     back = self.translate("Back")
-                    self.ids["select_version_back"].text = "".join(
-                        [
-                            f"[font={SelectVersionScreen.get_font_name()}]",
-                            back,
-                            "[/font]",
-                        ]
-                    )
+                    self.ids["select_version_back"].text = back
 
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")

@@ -14,11 +14,8 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        terminus_path = os.path.join(assets_path, "terminus.ttf")
-        nanum_path = os.path.join(assets_path, "NanumGothic-Regular.ttf")
-        LabelBase.register(name="terminus", fn_regular=terminus_path)
-        LabelBase.register(name="nanum", fn_regular=nanum_path)
-        LabelBase.register(DEFAULT_FONT, terminus_path)
+        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
     def teardown_class(cls):
@@ -65,14 +62,9 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
-    @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_setup_screens(
-        self, mock_get_destdir_assets, mock_get_font_name, mock_get_locale
-    ):
+    def test_setup_screens(self, mock_get_destdir_assets, mock_get_locale):
         app = KruxInstallerApp()
         app.setup_screens()
 
@@ -104,7 +96,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
-        mock_get_font_name.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "win32")
@@ -112,14 +103,9 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
-    @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_setup_screens_win32(
-        self, mock_get_destdir_assets, mock_get_font_name, mock_get_locale
-    ):
+    def test_setup_screens_win32(self, mock_get_destdir_assets, mock_get_locale):
         app = KruxInstallerApp()
         app.setup_screens()
 
@@ -150,7 +136,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
-        mock_get_font_name.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "darwin")
@@ -158,14 +143,9 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
-    @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_setup_screens_darwin(
-        self, mock_get_destdir_assets, mock_get_font_name, mock_get_locale
-    ):
+    def test_setup_screens_darwin(self, mock_get_destdir_assets, mock_get_locale):
         app = KruxInstallerApp()
         app.setup_screens()
 
@@ -195,7 +175,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             self.assertIn(screen.name, allowed_screens)
 
         mock_get_destdir_assets.assert_called_once()
-        mock_get_font_name.assert_any_call()
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -226,9 +205,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_font_name", return_value="terminus"
-    )
     @patch("src.app.KruxInstallerApp.setup_screens")
     @patch("src.app.KruxInstallerApp.setup_screen_manager")
     # pylint: disable=unused-argument
@@ -236,7 +212,6 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         self,
         mock_setup_screen_manager,
         mock_setup_screens,
-        mock_get_font_name,
         mock_get_locale,
     ):
         app = KruxInstallerApp()

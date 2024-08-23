@@ -197,6 +197,18 @@ to build the Graphical User Interface:
 
 #### Build for Debian, Fedora, MacOS
 
+Make sure you have the `wget` tool to download a
+[specific commit](https://raw.githubusercontent.com/ikus060/kivy/21c7110ee79f355d6a42da0a274d2426b1e18665/kivy/tools/packaging/pyinstaller_hooks/__init__.py).
+
+
+If you not have:
+
+- `Debian`: `sudo apt-get install wget`;
+- `Fedora`: `sudo dnf install wget`
+- `MacOS`: `brew install wget` 
+
+Then you can patch PyInstaller hook for kivy and build an executable:
+
 ```bash
 poetry run poe patch-nix
 poetry run poe build-nix

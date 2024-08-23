@@ -1,6 +1,6 @@
 {
   "check_permissions_screen": {
-    "Setup": "Configuration",
+    "Setup": "Configuration de",
     "for": "pour",
     "Checking": "Vérification",
     "permissions for": "des autorisations pour",
@@ -22,14 +22,14 @@
     "Version": "Version",
     "Device": "Appareil",
     "select a new one": "sélectionnez-en un nouveau",
-    "Flash": "Flash le firmware",
-    "Wipe": "Effacer l'appareil",
+    "Flash": "Flasher le firmware",
+    "Wipe": "Effacer toutes données",
     "Settings": "Paramètres",
     "About": "À propos",     
-    "Fetching data from": "Récupérer des données depuis"
+    "Fetching data from": "Récupérer les données sur"
   },
   "select_version_screen": {
-    "Old versions": "Anciennes versions",
+    "Old versions": "Versions précédentes",
     "Back": "Retour"
   },
   "select_old_version_screen": {
@@ -39,46 +39,46 @@
     "WARNING": "AVERTISSEMENT",
     "This is our test repository": "Ceci est notre référentiel de tests",
     "These are unsigned binaries for the latest and most experimental features": "Ce sont des binaires non signés pour les fonctionnalités\nles plus récentes et les plus expérimentales",
-    "and it's just for trying new things and providing feedback.": "et c'est juste pour essayer de nouvelles choses et fournir des commentaires.",
+    "and it's just for trying new things and providing feedback.": "en vue d'essayer de nouvelles choses et fournir des commentaires.",
     "Proceed": "Continuez",
     "Back": "Retour"
   },
   "download_beta_screen": {
-    "Connecting": "Connectant",
+    "Connecting": "Connexion en cours",
     "Downloading": "Teléchargement de",
     "to": "dans le",
     "of": "de",
     "downloaded": "téléchargé"
   },
   "warning_already_downloaded_screen": {
-    "Assets already downloaded": "Ressources déjà téléchargées",
+    "Assets already downloaded": "Fichiers déjà téléchargés",
     "Do you want to proceed with the same file or do you want to download it again?": "Voulez-vous continuer avec le même fichier ou souhaitez-vous le télécharger à nouveau?",
     "Download again": "Télécharger à nouveau",
     "Proceed with current file": "Passer au fichier actuel" 
   },  
   "download_stable_zip_screen": {
-    "Connecting": "Connectant",
+    "Connecting": "Connexion en cours",
     "Downloading": "Teléchargement de",
     "to": "dans le",
     "of": "de",
     "downloaded": "téléchargé"
   },
   "download_stable_zip_sha256_screen": {
-    "Connecting": "Connectant",
+    "Connecting": "Connexion en cours",
     "Downloading": "Teléchargement de",
     "to": "dans le",
     "of": "de",
     "downloaded": "téléchargé"
   },
   "download_stable_zip_sig_screen": {
-    "Connecting": "Connectant",
+    "Connecting": "Connexion en cours",
     "Downloading": "Teléchargement de",
     "to": "dans le",
     "of": "de",
     "downloaded": "téléchargé"
   },
   "download_selfcustody_pem_screen": {
-    "Connecting": "Connectant",
+    "Connecting": "Connexion en cours",
     "Downloading": "Teléchargement de",
     "to": "dans le",
     "of": "de",
@@ -109,7 +109,7 @@
   "flash_screen": {
     "DONE": "FAIT",
     "Back": "Retour",
-    "Quit": "Sors",
+    "Quit": "Fermer",
     "Flashing": "Réalisation du flash",
     "at": "à"
   },
@@ -117,7 +117,7 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "VEUILLEZ NE PAS DÉBRANCHER VOTRE APPAREIL",
     "DONE": "FAIT",
     "Back": "Retour",
-    "Quit": "Sors"
+    "Quit": "Fermer"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Vous êtes sur le point de lancer un EFFACEMENT COMPLET de cet appareil",

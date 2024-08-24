@@ -19,6 +19,13 @@ class TestTrigger(TestCase):
         trigger.warning("Hello World")
         mock_mro.assert_called_once()
 
+    @patch.dict(os.environ, {"LOGLEVEL": "warning"}, clear=True)
+    @patch("src.utils.trigger.mro", return_value="Mock")
+    def test_error(self, mock_mro):
+        trigger = Trigger()
+        trigger.error("Hello World")
+        mock_mro.assert_called_once()
+
     @patch.dict(os.environ, {"LOGLEVEL": "debug"}, clear=True)
     @patch("src.utils.trigger.mro", return_value="Mock")
     def test_debug(self, mock_mro):

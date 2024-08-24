@@ -124,7 +124,15 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 self.redirect_error(f"Invalid firmware: {value}")
 
         elif key == "device":
-            if value in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
+            if value in (
+                "m5stickv",
+                "amigo",
+                "dock",
+                "bit",
+                "yahboom",
+                "cube",
+                "wonder_mv",
+            ):
                 self.device = value
             else:
                 self.redirect_error(f'Invalid device: "{value}"')

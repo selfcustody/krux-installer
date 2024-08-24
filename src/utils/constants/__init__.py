@@ -49,6 +49,7 @@ VALID_DEVICES_VERSIONS = {
         "yahboom",
         "dock",
         "cube",
+        "wonder_mv",
     ],
 }
 

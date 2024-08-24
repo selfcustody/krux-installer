@@ -83,7 +83,7 @@ class BaseFlasher(Trigger):
         if value in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit", "cube"):
             vid = "0403"
 
-        elif value in ("dock", "yahboom"):
+        elif value in ("dock", "yahboom", "wonder_mv"):
             vid = "7523"
 
         else:
@@ -115,7 +115,7 @@ class BaseFlasher(Trigger):
             self._board = "goE"
             self.debug(f"board::setter={self._board}")
 
-        elif value == "dock":
+        elif value in ("dock", "wonder_mv"):
             self._board = "dan"
             self.debug(f"board::setter={self._board}")
 

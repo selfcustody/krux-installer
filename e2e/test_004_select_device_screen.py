@@ -61,13 +61,14 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
         buttons = grid.children
 
-        self.assertEqual(len(buttons), 6)
-        self.assertEqual(buttons[5].id, "select_device_m5stickv")
-        self.assertEqual(buttons[4].id, "select_device_amigo")
-        self.assertEqual(buttons[3].id, "select_device_dock")
-        self.assertEqual(buttons[2].id, "select_device_bit")
-        self.assertEqual(buttons[1].id, "select_device_yahboom")
-        self.assertEqual(buttons[0].id, "select_device_cube")
+        self.assertEqual(len(buttons), 7)
+        self.assertEqual(buttons[6].id, "select_device_m5stickv")
+        self.assertEqual(buttons[5].id, "select_device_amigo")
+        self.assertEqual(buttons[4].id, "select_device_dock")
+        self.assertEqual(buttons[3].id, "select_device_bit")
+        self.assertEqual(buttons[2].id, "select_device_yahboom")
+        self.assertEqual(buttons[1].id, "select_device_cube")
+        self.assertEqual(buttons[0].id, "select_device_wonder_mv")
         mock_get_running_app.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

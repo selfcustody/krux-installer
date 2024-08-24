@@ -26,7 +26,7 @@ Base class to be used accross project
 """
 import os
 from kivy.logger import Logger
-from ..info import mro
+from src.utils.info import mro
 
 
 class Trigger:

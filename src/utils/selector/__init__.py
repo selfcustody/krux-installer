@@ -39,6 +39,7 @@ VALID_DEVICES = (
     "bit",
     "yahboom",
     "cube",
+    "wonder_mv",
 )
 
 

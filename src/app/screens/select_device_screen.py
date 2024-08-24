@@ -41,10 +41,10 @@ class SelectDeviceScreen(BaseScreen):
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
         self.enabled_devices = []
-        self.make_grid(wid="select_device_screen_grid", rows=6)
+        self.make_grid(wid="select_device_screen_grid", rows=7)
 
         for row, device in enumerate(
-            ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube"]
+            ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"]
         ):
 
             def _on_press(instance):
@@ -99,7 +99,15 @@ class SelectDeviceScreen(BaseScreen):
             if value is not None:
                 self.enabled_devices = []
 
-                for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
+                for device in (
+                    "m5stickv",
+                    "amigo",
+                    "dock",
+                    "bit",
+                    "yahboom",
+                    "cube",
+                    "wonder_mv",
+                ):
                     cleanr = re.compile("\\[.*?\\]")
                     clean_text = re.sub(cleanr, "", value)
                     if device not in VALID_DEVICES_VERSIONS[clean_text]:

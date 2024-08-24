@@ -89,14 +89,23 @@ class FlashScreen(BaseFlashScreen):
             file_type: str, iteration: int, total: int, suffix: str
         ):
             percent = (iteration / total) * 100
+
+            if sys.platform in ("linux", "win32"):
+                sizes = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
+            else:
+                sizes = [self.SIZE_MM, self.SIZE_M, self.SIZE_MP]
+
+            please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
             flashing = self.translate("Flashing")
             at = self.translate("at")
 
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    f"[size=100sp]{percent:.2f} %[/size]",
+                    f"[size={sizes[1]}sp][b]{please}[/b][/size]",
                     "\n",
-                    "[size=28sp]",
+                    f"[size={sizes[0]}sp]{percent:.2f} %[/size]",
+                    "\n",
+                    f"[size={sizes[2]}sp]",
                     f"{flashing} ",
                     "[color=#efcc00]",
                     "[b]",

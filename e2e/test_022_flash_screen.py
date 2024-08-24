@@ -364,11 +364,21 @@ class TestFlashScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
+        if sys.platform in ("linux", "win32"):
+            sizes = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
+
+        else:
+            sizes = [screen.SIZE_MM, screen.SIZE_M, screen.SIZE_MP]
+
         text = "".join(
             [
-                "[size=100sp]4.76 %[/size]",
+                f"[size={sizes[1]}sp][b]PLEASE DO NOT UNPLUG YOUR DEVICE[/b][/size]",
                 "\n",
-                "[size=28sp]Flashing [color=#efcc00][b]firmware.bin[/b][/color] at ",
+                f"[size={sizes[0]}sp]4.76 %[/size]",
+                "\n",
+                f"[size={sizes[2]}sp]",
+                "Flashing ",
+                "[color=#efcc00][b]firmware.bin[/b][/color] at ",
                 "[color=#efcc00][b]21 KiB/s[/b][/color]",
                 "[/size]",
             ]

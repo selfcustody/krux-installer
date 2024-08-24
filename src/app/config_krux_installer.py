@@ -52,10 +52,13 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             self.info(f"Adding resources from {_meipass}")
             kv_resources.resource_add_path(_meipass)
             self.assets_path = os.path.join(_meipass, "assets")
+            self.i18n_path = os.path.join(_meipass, "src", "i18n")
         else:
             cwd_path = os.path.dirname(__file__)
             rel_assets_path = os.path.join(cwd_path, "..", "..", "assets")
+            rel_i18n_path = os.path.join(cwd_path, "..", "i18n")
             self.assets_path = os.path.abspath(rel_assets_path)
+            self.i18n_path = os.path.abspath(rel_i18n_path)
 
         self.info(f"Registering assets path={self.assets_path}")
 
@@ -153,8 +156,28 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
         self.debug(f"{config}.baudrate={baudrate}")
 
         lang = ConfigKruxInstaller.get_system_lang()
-        config.setdefaults("locale", {"lang": lang})
-        self.info(f"{config}.lang={lang}")
+
+        # Check if system lang is supported in src/i18n
+        # and if not, defaults to en_US
+        if sys.platform in ("linux", "darwin"):
+            lang_file = os.path.join(self.i18n_path, f"{lang}.json")
+            if os.path.isfile(lang_file):
+                config.setdefaults("locale", {"lang": lang})
+                self.info(f"{config}.lang={lang}")
+
+            else:
+                self.warning(f"{lang} not supported. Default {config}.lang=en_US.UTF-8")
+                config.setdefaults("locale", {"lang": "en_US.UTF-8"})
+
+        if sys.platform == "win32":
+            lang_file = os.path.join(self.i18n_path, f"{lang}.UTF-8.json")
+            if os.path.isfile(lang_file):
+                config.setdefaults("locale", {"lang": f"{lang}.UTF-8.json"})
+                self.info(f"{config}.lang={lang}")
+
+            else:
+                self.warning(f"{lang} not supported. Default {config}.lang=en_US.UTF-8")
+                config.setdefaults("locale", {"lang": "en_US.UTF-8"})
 
     def build_settings(self, settings):
         """Create settings panel"""

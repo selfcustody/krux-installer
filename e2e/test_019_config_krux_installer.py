@@ -363,7 +363,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         mock_create_app_dir.return_value = "mockdir"
         config = MagicMock()
         config.setdefaults = MagicMock()
-        mock_get_system_lang.return_value = "en_US.UTF8"
+        mock_get_system_lang.return_value = "en_US.UTF-8"
 
         app = ConfigKruxInstaller()
         app.build_config(config)
@@ -374,7 +374,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             [
                 call("destdir", {"assets": "mockdir"}),
                 call("flash", {"baudrate": 1500000}),
-                call("locale", {"lang": "en_US.UTF8"}),
+                call("locale", {"lang": "en_US.UTF-8"}),
             ]
         )
 

@@ -38,8 +38,8 @@
   "warning_beta_screen": {
     "WARNING": "ADVERTÊNCIA",
     "This is our test repository": "Este é nosso repositório de testes",
-    "These are unsigned binaries for the latest and most experimental features": "Estes são binários não assinados das últimas e mais experimentais características",
-    "and it's just for trying new things and providing feedback.": "e serve apenas para experimentar coisas novas e fornecer opiniões.",
+    "These are unsigned binaries for the latest and most experimental features": "Estes são binários não assinados dos recursos mais experimentais",
+    "and it's just for trying new things and providing feedback.": "e serve apenas para experimentar coisas novas e dar opiniões.",
     "Proceed": "Proceder",
     "Back": "Voltar"
   },

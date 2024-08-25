@@ -297,7 +297,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             [
                 f"[size={size[0]}sp]",
                 "[color=#333333]",
-                "Air-gapped update with",
+                "Air-gapped update with (soon)",
                 "[/color]",
                 "[/size]",
                 "\n",
@@ -420,7 +420,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             [
                 f"[size={size[0]}sp]",
                 "[color=#333333]",
-                "Air-gapped update with",
+                "Air-gapped update with (soon)",
                 "[/color]",
                 "[/size]",
                 "\n",
@@ -572,7 +572,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             [
                 f"[size={size[0]}sp]",
                 "[color=#333333]",
-                "Air-gapped update with",
+                "Air-gapped update with (soon)",
                 "[/color]",
                 "[/size]",
                 "\n",

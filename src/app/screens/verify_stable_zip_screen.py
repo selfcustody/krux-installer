@@ -307,9 +307,9 @@ class VerifyStableZipScreen(BaseScreen):
                 "\n",
                 "\n",
                 f"[size={size[0]}sp]",
-                f"[ref=UnzipStableScreen][color=#00ff00]{proceed}[/ref][/color]",
+                f"[ref=UnzipStableScreen][color=#00ff00][u]{proceed}[/u][/ref][/color]",
                 "             ",
-                f"[ref=MainScreen][color=#ff0000]{back}[/ref][/color]",
+                f"[ref=MainScreen][color=#ff0000][u]{back}[/u][/ref][/color]",
                 "[/b]",
                 "[/size]",
             ]

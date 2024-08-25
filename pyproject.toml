@@ -67,7 +67,7 @@ build-nix.sequence = [
 
 build-win.sequence = [
   { cmd = "python .ci/create-spec.py"},
-  { cmd = ".ci\\edit-spec.ps1"},
+  { interpreter = ["powershell", "pwsh"], shell = "& .ci/edit-spec.ps1"},
   { cmd = "python -m PyInstaller krux-installer.spec"}
 ]
 

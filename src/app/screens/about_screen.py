@@ -102,41 +102,28 @@ class AboutScreen(BaseScreen):
                 follow = self.translate("follow us on X")
                 back = self.translate("Back")
 
-                version = "".join(
+                self.ids[f"{self.id}_label"].text = "".join(
                     [
                         f"[size={self.SIZE_G}sp]",
-                        "[color=#00AABB]",
                         f"[ref=SourceCode][b]v{get_version()}[/b][/ref]",
-                        "[/color]",
                         "[/size]",
-                    ]
-                )
-
-                X = "".join(
-                    [
-                        f"[size={self.SIZE_M}sp]",
+                        "\n",
+                        "\n" f"[size={self.SIZE_M}sp]",
                         f"{follow}: ",
                         "[color=#00AABB]",
-                        "[ref=X]@selfcustodykrux[/ref]",
+                        "[ref=X][u]@selfcustodykrux[/u][/ref]",
                         "[/color]",
                         "[/size]",
-                    ]
-                )
-
-                back = "".join(
-                    [
+                        "\n",
+                        "\n",
                         f"[size={self.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
-                        back,
+                        f"[u]{back}[/u]",
                         "[/ref]",
                         "[/color]",
                         "[/size]",
                     ]
-                )
-
-                self.ids[f"{self.id}_label"].text = "\n".join(
-                    [version, "", "", X, "", "", back]
                 )
 
             else:

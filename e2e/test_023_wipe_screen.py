@@ -266,9 +266,13 @@ class TestWipeScreen(GraphicUnitTest):
                 f"[size={size}sp][b]DONE![/b][/size]",
                 "\n",
                 f"[size={size}sp]",
-                "[color=#00FF00][ref=Back]Back[/ref][/color]",
+                "[color=#00FF00]",
+                "[ref=Back][u]Back[/u][/ref]",
+                "[/color]",
                 "        ",
-                "[color=#EFCC00][ref=Quit]Quit[/ref][/color]",
+                "[color=#EFCC00]",
+                "[ref=Quit][u]Quit[/u][/ref]",
+                "[/color]",
             ]
         )
         on_trigger_callback = getattr(WipeScreen, "on_trigger_callback")

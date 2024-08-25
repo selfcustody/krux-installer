@@ -40,39 +40,28 @@ class TestAboutScreen(GraphicUnitTest):
         self.assertEqual(grid.id, "about_screen_grid")
         self.assertEqual(label.id, "about_screen_label")
 
-        text = "\n".join(
+        text = "".join(
             [
-                "".join(
-                    [
-                        f"[size={screen.SIZE_G}sp]",
-                        "[color=#00AABB]",
-                        "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                ),
-                "",
-                "",
-                "".join(
-                    [
-                        f"[size={screen.SIZE_M}sp]",
-                        "follow us on X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
-                        "[/size]",
-                    ]
-                ),
-                "",
-                "",
-                "".join(
-                    [
-                        f"[size={screen.SIZE_M}sp]",
-                        "[color=#00FF00]",
-                        "[ref=Back]",
-                        "Back",
-                        "[/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                ),
+                f"[size={screen.SIZE_G}sp]",
+                "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
+                "[/size]",
+                "\n",
+                "\n",
+                f"[size={screen.SIZE_M}sp]",
+                "follow us on X: ",
+                "[color=#00AABB]",
+                "[ref=X][u]@selfcustodykrux[/u][/ref]",
+                "[/color]",
+                "[/size]",
+                "\n",
+                "\n",
+                f"[size={screen.SIZE_M}sp]",
+                "[color=#00FF00]",
+                "[ref=Back]",
+                "[u]Back[/u]",
+                "[/ref]",
+                "[/color]",
+                "[/size]",
             ]
         )
 
@@ -95,41 +84,35 @@ class TestAboutScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
 
-        text = "\n".join(
+        text = "".join(
             [
-                "".join(
-                    [
-                        f"[size={screen.SIZE_G}sp]",
-                        "[color=#00AABB]",
-                        "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                ),
-                "",
-                "",
-                "".join(
-                    [
-                        f"[size={screen.SIZE_M}sp]",
-                        "siga-nos no X: [color=#00AABB][ref=X]@selfcustodykrux[/ref][/color]",
-                        "[/size]",
-                    ]
-                ),
-                "",
-                "",
-                "".join(
-                    [
-                        f"[size={screen.SIZE_M}sp]",
-                        "[color=#00FF00]",
-                        "[ref=Back]",
-                        "Voltar",
-                        "[/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                ),
+                f"[size={screen.SIZE_G}sp]",
+                "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
+                "[/size]",
+                "\n",
+                "\n",
+                f"[size={screen.SIZE_M}sp]",
+                "siga-nos no X: ",
+                "[color=#00AABB]",
+                "[ref=X][u]@selfcustodykrux[/u][/ref]",
+                "[/color]",
+                "[/size]",
+                "\n",
+                "\n",
+                f"[size={screen.SIZE_M}sp]",
+                "[color=#00FF00]",
+                "[ref=Back]",
+                "[u]Voltar[/u]",
+                "[/ref]",
+                "[/color]",
+                "[/size]",
             ]
         )
+
+        print(text)
+        print("=========")
+        print(label.text)
+
         self.assertEqual(label.text, text)
         mock_get_locale.assert_any_call()
 

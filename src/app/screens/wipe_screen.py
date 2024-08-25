@@ -116,9 +116,13 @@ class WipeScreen(BaseFlashScreen):
                     f"[size={size}sp][b]{done}![/b][/size]",
                     "\n",
                     f"[size={size}sp]",
-                    f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
+                    "[color=#00FF00]",
+                    f"[ref=Back][u]{back}[/u][/ref]",
+                    "[/color]",
                     "        ",
-                    f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
+                    "[color=#EFCC00]",
+                    f"[ref=Quit][u]{quit}[/u][/ref]",
+                    "[/color]",
                 ]
             )
             self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
@@ -194,10 +198,13 @@ class WipeScreen(BaseFlashScreen):
                         "[/size]",
                         "\n",
                         "\n",
-                        f"[size={sizes[0]}]"
-                        f"[color=#00FF00][ref=Back]{back}[/ref][/color]",
+                        f"[size={sizes[0]}]" "[color=#00FF00]",
+                        f"[ref=Back][u]{back}[/u][/ref]",
+                        "[/color]",
                         "        ",
-                        f"[color=#EFCC00][ref=Quit]{quit}[/ref][/color]",
+                        "[color=#EFCC00]",
+                        f"[ref=Quit][u]{quit}[/u][/ref]",
+                        "[/color]",
                         "[/size]",
                     ]
                 )

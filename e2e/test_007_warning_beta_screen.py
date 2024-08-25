@@ -34,20 +34,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[0]
-
-        fontsize_mm = 0
-        fontsize_m = 0
-        fontsize_mp = 0
-
-        if sys.platform in ("linux", "win32"):
-            fontsize_mm = window.size[0] // 24
-            fontsize_m = window.size[0] // 32
-            fontsize_mp = window.size[0] // 48
-
-        if sys.platform == "darwin":
-            fontsize_mm = window.size[0] // 48
-            fontsize_m = window.size[0] // 64
-            fontsize_mp = window.size[0] // 128
+        sizes = [screen.SIZE_MM, screen.SIZE_M, screen.SIZE_MP]
 
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "WarningBetaScreen")
@@ -57,18 +44,30 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                f"[size={fontsize_mm}sp][color=#efcc00][b]WARNING[/b][/color][/size]",
+                f"[size={sizes[0]}sp]",
+                "[color=#efcc00]",
+                "[b]WARNING[/b]",
+                "[/color]",
+                "[/size]",
                 "\n",
                 "\n",
-                f"[size={fontsize_m}sp][color=#efcc00]This is our test repository[/color][/size]",
+                f"[size={sizes[1]}sp]",
+                "[color=#efcc00]This is our test repository[/color]",
+                "[/size]",
                 "\n",
-                f"[size={fontsize_mp}sp]These are unsigned binaries for the latest and most experimental features[/size]",
+                f"[size={sizes[2]}sp]These are unsigned binaries for the latest and most experimental features[/size]",
                 "\n",
-                f"[size={fontsize_mp}sp]and it's just for trying new things and providing feedback.[/size]",
+                f"[size={sizes[2]}sp]and it's just for trying new things and providing feedback.[/size]",
                 "\n",
                 "\n",
-                f"[size={fontsize_mm}sp]",
-                "[color=#00ff00]Proceed[/color]        [color=#ff0000]Back[/color]",
+                f"[size={sizes[0]}sp]",
+                "[color=#00ff00]",
+                "[u]Proceed[/u]",
+                "[/color]",
+                "        ",
+                "[color=#ff0000]",
+                "[u]Back[/u]",
+                "[/color]",
                 "[/size]",
             ]
         )

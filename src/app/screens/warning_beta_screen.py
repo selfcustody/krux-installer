@@ -48,10 +48,16 @@ class WarningBetaScreen(BaseScreen):
 
         text = "".join(
             [
-                f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
+                f"[size={self.SIZE_MM}sp]",
+                "[color=#efcc00]",
+                f"[b]{warning}[/b]",
+                "[/color]",
+                "[/size]",
                 "\n",
                 "\n",
-                f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
+                f"[size={self.SIZE_M}sp]",
+                f"[color=#efcc00]{test_repo}[/color]",
+                "[/size]",
                 "\n",
                 f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
                 "\n",
@@ -59,7 +65,13 @@ class WarningBetaScreen(BaseScreen):
                 "\n",
                 "\n",
                 f"[size={self.SIZE_MM}sp]",
-                f"[color=#00ff00]{proceed}[/color]        [color=#ff0000]{back}[/color]"
+                "[color=#00ff00]",
+                f"[u]{proceed}[/u]",
+                "[/color]",
+                "        ",
+                "[color=#ff0000]",
+                f"[u]{back}[/u]",
+                "[/color]",
                 "[/size]",
             ]
         )

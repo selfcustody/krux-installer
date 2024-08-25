@@ -174,9 +174,13 @@ class WarningWipeScreen(BaseScreen):
                 "[/size]",
                 "\n",
                 "\n",
-                f"[size={sizes[0]}]"
-                f"[color=#00FF00][ref=WipeScreen]{proceed}[/ref][/color]",
+                f"[size={sizes[0]}]" "[color=#00FF00]",
+                f"[ref=WipeScreen][u]{proceed}[/u][/ref]",
+                "[/color]",
                 "        ",
-                f"[color=#FF0000][ref=MainScreen]{back}[/ref][/color]" "[/size]",
+                "[color=#FF0000]",
+                f"[ref=MainScreen][u]{back}[/u][/ref]",
+                "[/color]",
+                "[/size]",
             ]
         )

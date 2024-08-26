@@ -33,7 +33,7 @@ jobs:
       # ref: https://github.com/github/docs/blob/main/.github/workflows/triage-unallowed-contributions.yml
       - name: Comment About Changes We Can't Accept
         if: ${{ steps.filter_not_allowed.outputs.change == 'true' }}
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         with:
           script: |
             let workflowFailMessage = "It looks like you've modified some files that we can't accept as contributions."

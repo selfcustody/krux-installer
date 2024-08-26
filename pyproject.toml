@@ -29,7 +29,7 @@ black = "^24.1.1"
 pylint = "^3.0.3"
 pyinstaller = "^6.3.0"
 pytest-cov = "^4.1.0"
-poethepoet = "^0.25.1"
+poethepoet = "^0.27.0"
 demjson3 = "^3.0.6"
 
 [tool.poe.tasks]

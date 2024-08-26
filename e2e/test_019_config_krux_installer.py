@@ -370,11 +370,17 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
+
+        if sys.platform in ("linux", "darwin"):
+            lang = "en_US.UTF-8"
+        else:
+            lang = "en_US"
+
         config.setdefaults.assert_has_calls(
             [
                 call("destdir", {"assets": "mockdir"}),
                 call("flash", {"baudrate": 1500000}),
-                call("locale", {"lang": "en_US.UTF-8"}),
+                call("locale", {"lang": lang}),
             ]
         )
 

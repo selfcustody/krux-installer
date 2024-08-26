@@ -1,0 +1,135 @@
+{
+  "check_permissions_screen": {
+    "Setup": "Configuración",
+    "for": "para",
+    "Checking": "Comprobación",
+    "permissions for": "permissos para",
+    "WARNING": "ADVERTENCIA",
+    "This is the first run of KruxInstaller in": "Esta es la primera ejecución de KruxInstaller no",
+    "and it appears that you do not have privileged access to make flash procedures": "y parece que no tiene acceso privilegiado para realizar procedimientos flash",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "Para continuar, haga clic en el botón Permitir y un mensaje le pedirá su contraseña",
+    "to execute the following command": "para ejecutar el siguiente comando",
+    "You may need to logout (or even reboot)": "Es posible que deba cerrar la sesión (o incluso reiniciar)",
+    "and back in for the new group to take effect": "y volver de nuevo para que el nuevo grupo entre en vigor",
+    "Do not worry, this message won't appear again": "No te preocupes, este mensaje no volverá a aparecer",    
+    "Allow": "Permitir",
+    "Deny": "Negar"
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Comprobando tu conexión a Internet"
+  },
+  "main_screen": {
+    "Version": "Versión",
+    "Device": "Dispositivo",
+    "select a new one": "seleccione uno nuevo",
+    "Flash": "Flash el firmware",
+    "Wipe": "Limpiar dispositivo",
+    "Settings": "Ajustes",
+    "About": "Acerca de",    
+    "Fetching data from": "Obteniendo datos de"
+  },
+  "select_version_screen": {
+    "Old versions": "Versiones antiguas",
+    "Back": "Volver"
+  },
+  "select_old_version_screen": {
+    "Back": "Volver"
+  },
+  "warning_beta_screen": {
+    "WARNING": "ADVERTENCIA",
+    "This is our test repository": "Este es nuestro repositorio de pruebas",
+    "These are unsigned binaries for the latest and most experimental features": "Estos son binarios sin firmar para las funciones más recientes y experimentales",
+    "and it's just for trying new things and providing feedback.": "y es sólo para probar cosas nuevas y dar opinión.",
+    "Proceed": "Proceder",
+    "Back": "Volver"
+  },
+  "download_beta_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "Recursos ya descargados",
+    "Do you want to proceed with the same file or do you want to download it again?": "¿Quieres continuar con el mismo archivo o quieres descargarlo nuevamente?",
+    "Download again": "Descargar de nuevo",
+    "Proceed with current file": "Continuar con el archivo actual"
+  },  
+  "download_stable_zip_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Conectando a",
+    "Downloading": "Descargar",
+    "to": "a",
+    "of": "de",
+    "downloaded": "se descargó"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Verificación de la integridad y autenticidad",
+    "Integrity verification": "Verificación de integridad",
+    "computed hash from": "hash calculado a partir de",
+    "provided hash from": "hash proporcionado de",
+    "SUCCESS": "ÉXITO",
+    "FAILED": "FRACASADO",
+    "Authenticity verification": "Verificación de autenticidad",
+    "GOOD": "BUENA",
+    "BAD": "MALA",
+    "SIGNATURE": "FIRMA",
+    "If you have openssl installed on your system": "Si tiene openssl instalado en su sistema",
+    "you can check manually with the following command": "puede comprobarlo manualmente con el siguiente comando",
+    "Proceed": "Proceder",
+    "Back": "Volver"
+  },  
+  "unzip_stable_screen": {
+    "Flash with": "Flash con",
+    "Air-gapped update with": "Actualización aislada con (en breve)",
+    "Unziping": "Descomprimir",
+    "Unziped": "Descomprimido"
+  },
+  "flash_screen": {
+    "DONE": "HECHO",
+    "Back": "Volver",
+    "Quit": "Salir",
+    "Flashing": "Haciendo flash",
+    "at": "a"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR, NO DESCONECTE SU DISPOSITIVO",
+    "DONE": "HECHO",
+    "Back": "Volve",
+    "Quit": "Salir"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Está a punto de iniciar un BORRADO COMPLETO de este dispositivo",
+    "This operation will": "Esta operación",
+    "Permanently erase all saved data": "Borrar permanentemente todos los datos guardados",
+    "Remove the existing firmware": "Eliminar el firmware existente",
+    "Render the device non-functional until new firmware is re-flashed": "Hacer que el dispositivo no funcione hasta que se vuelva a actualizar el nuevo firmware",    
+    "Proceed": "Proceder",
+    "Back": "Volver"
+  },
+  "about_screen": {
+    "follow us on X": "síguenos en X",
+    "Back": "Volver"
+  }
+}

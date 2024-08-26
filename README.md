@@ -1,181 +1,231 @@
 # Krux Installer
 
 [![Build main branch](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/qlrd/krux-installer/tree/kivy/graph/badge.svg?token=KD41H20MYS)](https://codecov.io/gh/qlrd/krux-installer)
+[![created at](https://img.shields.io/github/created-at/selfcustody/krux-installer)](https://github.com/selfcustody/krux-installer/commit/5d177795fe3df380c54d424ccfd0f23fc7e62c41)
+[![downloads](https://img.shields.io/github/downloads/selfcustody/krux-installer/total)](https://github.com/selfcustody/krux-installer/releases)
+[![downloads (latest release)](https://img.shields.io/github/downloads/selfcustody/krux-installer/latest/total)](https://github.com/selfcustody/krux-installer/releases)
+[![commits (since latest release)](https://img.shields.io/github/commits-since/selfcustody/krux-installer/latest/main)](https://github.com/qlrd/krux-installer/compare/main...kivy)
 
-Krux Installer (alpha versions) aims to be a GUI based tool to build,
-flash and debug [Krux](https://github.com/selfcustody/krux)
+Krux Installer is a GUI based tool to flash [Krux](https://github.com/selfcustody/krux)
+without typing any command in terminal for [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
 
-As it now, the generated application execute,
-without typing any command in terminal.
+## Installing
 
-For more information, see [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
+There are pre-built
+[releases](https://github.com/selfcustody/krux-installer/releases) for:
 
-## Tested machines
+* Linux:
+  * Debian-like
+  * Fedora-like
+* Windows
+* MacOS:
+  * intel processors
+  * arm64 processors (M1/M2/M3)
+  
+To build it from the source, please follow the steps below:
 
-- Linux:
-  - Archlinux;
-  - Ubuntu;
-- Windows:
-  - Windows 10
+* [System setup](/#system-setup)
+  * [Linux](/#linux)
+  * [Windows](/#windows)
+  * [MacOS](/#macos)
+    * [Install brew package manager](/#install-brew-package-manager)
+    * [Install latest python](/#install-latest-python)
+    * [Ensure openssl have a correct link](/#ensure-openssl-have-a-correct-link)
+    * [Patch your zshrc](/#patch-your-zshrc)
+  * [Install poetry](/#install-poetry)
+* [Download sources](/#download-sources)
+* [Update code](/#update-code)
+* [Developing](/#developing)
+  * [Format code](/#format-code)
+  * [Lint](/#lint)
+  * [Test](/#test)
+  * [Build](/#build)
+  
+## System setup
 
-## Untested machines
-
-- MacOS
-
-## Install
-
-- See [releases page](https://github.com/selfcustody/krux-installer/releases);
-or
-
-- [Build from source](/#build-from-source)
-
-## Build from source
-
-### Download nodejs
-
-First of all, you will need [Node.js](https://nodejs.org)
-installed in you system. We recommend use the latest LTS version.
-
-#### Download from Node.js binaries
-
-You can install node.js in your system downloading it from official
-[nodejs website](https://nodejs.org/en/download) and following
-provided instructions.
-
-#### Download from NVM (Node Version Manager)
-
-Alternatively, if you have a linux or macos system,
-you can have multiple versions of Node.js using [nvm](https://github.com/nvm-sh/nvm).
-
-To install nvm,
-follow the [instructions](https://github.com/nvm-sh/nvm#installing-and-updating).
-
-Once installed,
-we recomend to install the latest LTS node:
+Make sure you have python:
 
 ```bash
-nvm install --lts
+python --version
 ```
 
-### Download repository
+### Linux
 
-Now you can download the source code:
+Generally, all Linux come with python.
+
+### Windows
+
+Follow the instructions at [python.org](https://www.python.org/downloads/windows/)
+
+### MacOS
+
+Before installing `krux-installer` source code, you will need prepare the system:
+
+#### Install `brew` package manager
 
 ```bash
-git clone https://github.com/qlrd/krux-installer.git
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-### Install dependencies
-
-Install all dependencies:
+#### Install latest `python`
 
 ```bash
-yarn install
+brew install python
 ```
 
-Additionaly, you can upgrade dependencies to its latest versions.
-Have some caution with this command, once that executing this command
-can broke some functionalities, mainly those related to the use of
-`google-chrome` and `chromiumdriver` in E2e tests.
-
-**TIP**: Before execute this command, always check the latest supported
-`chromium` version at
-[Electron Stable Releases page](https://releases.electronjs.org/releases/stable)
+and add this line to your `~/.zshrc`:
 
 ```bash
-yarn upgrade-interactive --latest
+alias python=python3
 ```
 
-### Live compile to development environment
+#### Ensure `openssl` have a correct link
 
-When a change is made, we recommend to execute `dev` subcommand:
+Python's `ssl` module relies on OpenSSL for cryptographic operations.
+Ensure that OpenSSL is installed on your system and is compatible with the
+Python version you're using.
+
+Since we expect that you're using the Python installed with Homebrew,
+it's recommended to install OpenSSL through Homebrew if it's not already
+installed:
 
 ```bash
-yarn run dev
+brew install openssl
 ```
 
-if you want to show some debug messages:
+After installing OpenSSL, make sure it's linked correctly:
 
 ```bash
-DEBUG=krux:* yarn run dev
+brew link --force openssl
 ```
 
-#### Debug development app with VSCode/VSCodium
+This ensures that the OpenSSL libraries are available in the expected
+locations that Python can find and use.
 
-If you're codding with VSCode/VSCodium, go to `Run and Debug`
-tab and select `Debug App`:
+#### Patch your zshrc
 
-![VScodium Debug](images/vscodium_debug.png)
+Library paths on MacOS involves verifying that the environment variables and system
+configurationsare correctyly set to find the necessary libraries, such as OpenSSL,
+which is crucial for the `ssl` module in Python.
+
+On MacOS, the dynamic linker tool `dyld` uses environment variabes to locate shared
+libraries. The primary environment variable for specifying library paths is
+`DYLD_LIBRARY_PATH`.
+
+Adding the lines below to your `~/.zshrc` (or similar) the `DYLD_LIBRARY_PATH`
+will be set each time you open a new terminal session (and therefore the OpenSSL
+libraries `libcrypto.dylib` and `libssl.dylib` will can be found):
+
+```bash
+OPENSSL_MAJOR_VERSION=`openssl --version | awk '{ print $2}' | cut -d . -f1`
+OPENSSL_FULL_VERSION=`openssl --version | awk ' { print $2}'`
+export DYLD_LIBRARY_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VERSION/$OPENSSL_FULL_VERSION/lib:$DYLD_LIBRARY_PATH"
+```
+
+### Install poetry
+
+Make sure you have `poetry` installed:
+
+```b̀ash
+python -m pipx install poetry
+````
+
+If you have problems with installation, make sure to
+properly [configure its options](https://pipx.pypa.io/latest/installation/#installation-options).
+
+## Download sources
+
+Clone the repository:
+
+```bash
+git clone --recurse-submodules https://github.com/krux-installer.git
+```
+
+Install python dependencies:
+
+```b̀ash
+poetry install
+```
+
+## Update code
+
+If already cloned the repo without using `--recurse-submodules`,
+use the command below to clone the needed submodules:
+
+```bash
+git submodule update --init
+```
+
+## Developing
+
+Krux-Installer uses `poe` task manager for formatting, linting,
+tests and coverage. To see all available tasks, run:
+
+```bash
+poetry run poe
+```
+
+### Format code
+
+```bash
+poetry run poe format
+```
+
+### Lint
+
+```bash
+poetry run poe lint
+```
 
 ### Test
 
-#### Prepare tests
-
-To test,
-you need to write `specification` tests under `pageobjects` definitions:
-
-- You can write your own [E2E](https://webdriver.io)
-specification test files on `test/e2e/specs` folder;
-
-- You can define the [PageObjects] on
-`test/e2e/pageobjects` folder.
-
-Before run tests,
-you will need to **build** the application.
-
-#### Build
-
-Before running build,
-verify [builder config](electron-builder.json5)
-to setup the build `target` on specific `os` (Operational System).
-
-The `<target>` depends depends on the running platform
-(i.e., `linux`, `darwin` -- MacOS, and `win32` -- Windows).
-
-For more information,
-see [Electron Builder](https://www.electron.build/configuration/configuration)
-page.
-
-#### Run all tests
-
-The `wdio.conf.mts` is configured to check
-if your system have `krux.zip.*` resources.
-
-- If not, it will, run all tests, including download tests;
-- If yes, it will skip tests that download resources.
-
 ```bash
-yarn run build
+poetry run poe test
 ```
 
-If you want to build a specific `target`
-to a specifi `os`, run
+For systems without a window manager:
 
 ```bash
-yarn run build --<os> <target>
+poetry run poe test --no-xvfb
 ```
 
-If you want to debug some messages, add the
-`DEBUG` environment variable.
+### Build
 
-In linux/mac:
+At the moment, you'll need to [patch some code on `kivy`](https://github.com/kivy/kivy/issues/8653#issuecomment-2028509695)
+to build the Graphical User Interface:
+
+#### Build for Debian, Fedora, MacOS
+
+Make sure you have the `wget` tool to download a
+[specific commit](https://raw.githubusercontent.com/ikus060/kivy/21c7110ee79f355d6a42da0a274d2426b1e18665/kivy/tools/packaging/pyinstaller_hooks/__init__.py).
+
+If you not have:
+
+* Debian: `sudo apt-get install wget`;
+* Fedora: `sudo dnf install wget`;
+* MacOS: `brew install wget`.
+
+Then you can patch PyInstaller hook for kivy and build an executable:
 
 ```bash
-DEBUG=krux:* yarn run build --<os> <target>
+poetry run poe patch-nix
+poetry run poe build-nix
 ```
 
-##### Run tests
-
-To run all tests in command line:
+#### Build for Windows
 
 ```bash
-NODE_ENV=test yarn run e2e
+poetry run poe patch-win
+poetry run poe build-win
 ```
 
-#### Debug test in VSCode/VSCodium
+It will export all project in a
+[`one-file`](https://pyinstaller.org/en/stable/usage.html#cmdoption-F) binary:
 
-If you're codding with VSCode/VSCodium, the `NODE_ENV`
-variable is already configured. To run, tests, go to `Run and Debug`
-tab and select `Test E2E App`:
+* linux: `./dist/krux-installer`
+* macOS: `./dist/krux-installer.app/Contents/MacOS/krux-installer`
+* windows: `./dist/krux-installer.exe`
 
-![VScodium E2E test](images/vscodium.png)
+To more options see [.ci/create-spec.py](./.ci/create-spec.py)
+against the PyInstaller [options](https://pyinstaller.org).

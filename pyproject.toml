@@ -1,0 +1,84 @@
+[tool.poetry]
+name = "krux-installer"
+version = "0.0.2-alpha"
+description = "A GUI based application to flash Krux firmware on K210 based devices"
+authors = [
+  "qlrd <qlrddev@gmail.com>"
+]
+license = "LICENSE"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.9,<3.13"
+kivy = "2.3.0"
+kivysome = "^0.2.1"
+tomli = { version = "^2.0.1", python = "<3.11" }
+pyserial = "^3.5"
+requests = "^2.31.0"
+pyzbar = "^0.1.9"
+opencv-python = "^4.9.0.80"
+cryptography = "^42.0.5"
+qrcode = "^7.4.2"
+easy-i18n = "^1.2.0"
+pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
+distro = "^1.9.0"
+pillow = "^10.4.0"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.1.1"
+pylint = "^3.0.3"
+pyinstaller = "^6.3.0"
+pytest-cov = "^4.1.0"
+poethepoet = "^0.25.1"
+demjson3 = "^3.0.6"
+
+[tool.poe.tasks]
+cli = "python src/krux-installer.py"
+format-src= "black ./src"
+format-tests= "black ./tests"
+format-e2e= "black ./e2e"
+format-installer = "black ./krux-installer.py"
+format = ["format-src", "format-tests", "format-e2e", "format-installer"]
+
+test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"
+test-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e"
+test = ["test-unit", "test-e2e"]
+
+coverage-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report xml ./tests"
+coverage-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report xml ./e2e"
+coverage = ["coverage-unit", "coverage-e2e"]
+
+patch-nix = "sh .ci/patch-pyinstaller-kivy-hook.sh"
+patch-win = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1"
+
+clean-mac = "find . -name '.DS_Store' -delete"
+
+lint.sequence = [
+  { cmd = "jsonlint src/i18n/*.json"},
+  { cmd = "pylint --rcfile .pylint/src ./src" },
+  { cmd = "pylint --rcfile .pylint/tests ./tests"},
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
+]
+
+build-nix.sequence = [
+  { cmd = "python .ci/create-spec.py"},
+  { cmd = "python -m PyInstaller krux-installer.spec"}
+]
+
+build-win.sequence = [
+  { cmd = "python .ci/create-spec.py"},
+  { interpreter = ["powershell", "pwsh"], shell = "& .ci/edit-spec.ps1"},
+  { cmd = "python -m PyInstaller krux-installer.spec"}
+]
+
+[tool.poe.tasks.dev-debug]
+env = { LOGLEVEL = "debug" }
+cmd = "python krux-installer.py"
+
+[tool.poe.tasks.dev]
+env = { LOGLEVEL = "info" }
+cmd = "python krux-installer.py"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

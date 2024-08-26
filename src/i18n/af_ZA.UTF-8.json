@@ -1,0 +1,134 @@
+{   
+  "check_permissions_screen": {
+    "Setup": "Stel",
+    "for": "vir",
+    "Checking": "Kontroleer",
+    "permissions for": "groeptoestemmings vir",
+    "WARNING": "WAARSKUWING",
+    "This is the first run of KruxInstaller in": "Dit is die eerste lopie van KruxInstaller in",
+    "and it appears that you do not have privileged access to make flash procedures": "en dit blyk dat u nie bevoorregte toegang het om flitsprosedures te maak nie",
+    "To proceed, click in the screen and a prompt will ask for your password": "Om voort te gaan, klik op die Laat toe-knoppie en 'n opdrag vra u wagwoord",
+    "to execute the following command": "om die volgende opdrag uit te voer",
+    "You may need to logout (or even reboot)": "Miskien moet u afmeld (of selfs weer begin)",
+    "and back in for the new group to take effect": "en terug vir die nuwe groep om in werking te tree",
+    "Do not worry, this message won't appear again": "Moenie bekommerd wees nie, hierdie boodskap sal nie weer verskyn nie",    
+    "Allow": "Laat",
+    "Deny": "Weier"
+  }, 
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Kontroleer jou internetverbinding"
+  },
+  "main_screen": {
+    "Version": "Weergawe",
+    "Device": "Toestel",
+    "select a new one": "kies 'n nuwe een",
+    "Flash": "Programmeer die firmware",
+    "Wipe": "Skakel toestel af",
+    "Settings": "Instellings",
+    "About": "Oor",     
+    "Fetching data from": "Haal tans data van"
+  },
+  "select_version_screen": {
+    "Old versions": "Ou weergawes",
+    "Back": "Terug"
+  },
+  "select_old_version_screen": {
+    "Back": "Terug"
+  },
+  "warning_beta_screen": {
+    "WARNING": "WAARSKUWING",
+    "This is our test repository": "Dit is ons toetsbewaarplek",
+    "These are unsigned binaries for the latest and most experimental features": "Dit is ongetekende binaries vir die nuutste en mees eksperimentele kenmerke",
+    "and it's just for trying new things and providing feedback.": "en dit is net om nuwe dinge te probeer en terugvoer te gee.",
+    "Proceed": "Voortgaan",
+    "Back": "Terug"
+  },
+  "download_beta_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "of": "van",
+    "downloaded": "afgelaai"
+  },
+  "warning_already_downloaded_screen": {   
+    "Assets already downloaded": "Bates wat reeds afgelaai is",
+    "Do you want to proceed with the same file or do you want to download it again?": "Wil jy voortgaan met dieselfde lêer of wil jy dit weer aflaai?",
+    "Download again": "Laai weer af",
+    "Proceed with current file": "Gaan voort met die huidige lêer"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "of": "van",
+    "downloaded": "afgelaai"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "of": "van",
+    "downloaded": "afgelaai"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "of": "van",
+    "downloaded": "afgelaai"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Koppel tans",
+    "Downloading": "Laai",
+    "to": "af na",
+    "downloaded": "afgelaai"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Verifieer integriteit en egtheid",
+    "Integrity verification": "Integriteit verifikasie",
+    "computed hash from": "berekende hash van",
+    "provided hash from": "verskaf hash van",
+    "SUCCESS": "SUKSES",
+    "FAILED": "HET MISLUK",
+    "Authenticity verification": "Verifikasie van egtheid",
+    "GOOD": "GOEIE",
+    "BAD": "SLEGTE",
+    "SIGNATURE": "HANDTEKENING",
+    "If you have openssl installed on your system": "As u openssl op u stelsel geïnstalleer het",
+    "you can check manually with the following command": "U kan handmatig met die volgende opdrag kyk",
+    "Proceed": "Voortgaan",
+    "Back": "Terug"
+  },  
+  "unzip_stable_screen": {
+    "Flash with": "Flits met",
+    "Air-gapped update with": "Air-gapped opdatering met (gou)",
+    "Unziping": "Uitpak",
+    "Unziped": "Uitgepak"
+  },  
+  "flash_screen": {
+    "DONE": "GEDOEN",
+    "Back": "Terug",
+    "Quit": "Sluit",
+    "Flashing": "Doen flash",
+    "at": "op"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "MOET ASSEBLIEF NIE U TOESTEL ONTKOPPEL NIE",
+    "DONE": "GEDOEN",
+    "Back": "Terug",
+    "Quit": "Sluit"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "U is op die punt om 'n VOLLEDIGE WIPE van hierdie toestel te begin",
+    "This operation will": "Hierdie operasie sal",
+    "Permanently erase all saved data": "Vee alle gestoorde data permanent uit",
+    "Remove the existing firmware": "Verwyder die bestaande firmware",
+    "Render the device non-functional until new firmware is re-flashed": "Maak die toestel nie funksioneel totdat nuwe firmware weer geflits is nie",    
+    "Proceed": "Voortgaan",
+    "Back": "Terug"
+  },
+  "about_screen": {
+    "follow us on X": "volg ons op X",
+    "Back": "Terug"
+  }
+}

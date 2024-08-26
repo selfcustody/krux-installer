@@ -1,0 +1,133 @@
+{
+  "check_permissions_screen": {
+    "Setup": "Installatie",
+    "for": "voor",
+    "Checking": "Controleren",
+    "permissions for": "Permissie voor",
+    "WARNING": "WAARSCHUWING",
+    "This is the first run of KruxInstaller in": "De eerste keer gebruikmaken van KruxInstaller in",
+    "and it appears that you do not have privileged access to make flash procedures": "en het blijkt dat er geen voldoende rechten zijn om te flashen",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "Om verder te gaan, klik op de knop 'Toestaan' en vul je wachtwoord in",
+    "to execute the following command": "om de volgende opdracht uit te voeren",
+    "You may need to logout (or even reboot)": "Mogelijk moet je je afmelden (of zelfs opnieuw opstarten)",
+    "and back in for the new group to take effect": "om de nieuw aangemaakte groep te activeren",
+    "Do not worry, this message won't appear again": "Maak je geen zorgen, dit bericht verschijnt niet meer",
+    "Allow": "Toestaan",
+    "Deny": "Annuleren"
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Je internetverbinding controleren"
+  },
+  "main_screen": {
+    "Version": "Versie",
+    "Device": "Apparaat",
+    "select a new one": "selecteer een nieuwe",
+    "Flash": "Flash de firmware",
+    "Wipe": "Apparaat wissen",
+    "Settings": "Instellingen",
+    "About": "Over",
+    "Fetching data from": "Gegevens ophalen van"
+  },
+  "select_version_screen": {
+    "Old versions": "Oude versies",
+    "Back": "Terug"
+  },
+  "select_old_version_screen": {
+    "Back": "Terug"
+  },
+  "warning_beta_screen": {
+    "WARNING": "WAARSCHUWING",
+    "This is our test repository": "Dit is onze test omgeving",
+    "These are unsigned binaries for the latest and most experimental features": "Dit zijn niet ondergetekende binaire bestanden voor\nde nieuwste en meest experimentele functies",
+    "and it's just for trying new things and providing feedback.": "om nieuwe dingen te proberen en feedback te geven.",
+    "Proceed": "Doorgaan",
+    "Back": "Terug"
+  },
+  "download_beta_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Downloaden van",
+    "to": "naar",
+    "of": "van",
+    "downloaded": "gedownload"
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "Eerder gedownloade items",
+    "Do you want to proceed with the same file or do you want to download it again?": "Wil je doorgaan met hetzelfde bestand of wil je het opnieuw downloaden?",
+    "Download again": "Opnieuw downloaden",
+    "Proceed with current file": "Ga verder met het huidige bestand"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Downloaden van",
+    "to": "naar",
+    "of": "van",
+    "downloaded": "gedownload"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Downloaden van",
+    "to": "naar",
+    "of": "van",
+    "downloaded": "gedownload"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Downloaden van",
+    "to": "naar",
+    "of": "van",
+    "downloaded": "gedownload"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Downloaden van",
+    "to": "naar",
+    "of": "van",
+    "downloaded": "gedownload"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Integriteit en authenticiteit verifiëren",
+    "Integrity verification": "Verificatie van de integriteit",
+    "computed hash from": "berekende hash van",
+    "provided hash from": "verstrekte hash van",
+    "SUCCESS": "SUCCES",
+    "FAILED": "MISLUKT",
+    "Authenticity verification": "Verificatie van echtheid",
+    "GOOD": "GOED",
+    "BAD": "SLECHT",
+    "SIGNATURE": "HANDTEKENING",
+    "If you have openssl installed on your system": "Als je openssl op je systeem hebt geïnstalleerd",
+    "you can check manually with the following command": "kan je dit controleren met de volgende commando",
+    "Proceed": "Doorgaan",
+    "Back": "Terug"
+  },
+  "unzip_stable_screen": {
+    "Flash with": "Flash met",
+    "Air-gapped update with": "Update zonder computer met (binnenkort)",
+    "Unziping": "Uitpakken",
+    "Unziped": "Uitgepakt"
+  },
+  "flash_screen": {
+    "DONE": "KLAAR",
+    "Back": "Terug",
+    "Quit": "Stoppen"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL HET APPARAAT NIET LOS",
+    "DONE": "KLAAR",
+    "Back": "Terug",
+    "Quit": "Stoppen"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Je staat op het punt om te starten met het VOLLEDIGE WISSEN van dit apparaat",
+    "This operation will": "Deze operatie is zal",
+    "Permanently erase all saved data": "Alle opgeslagen gegevens permanent wissen",
+    "Remove the existing firmware": "Verwijderen van de bestaande firmware",
+    "Render the device non-functional until new firmware is re-flashed": "Maakt het apparaat niet meer functioneel totdat de nieuwste firmware opnieuw geflasht is",    
+    "Proceed": "Doorgaan",
+    "Back": "Terug"
+  },
+  "about_screen": {
+    "follow us on X": "volg ons op X",
+    "Back": "Terug"
+  }
+}

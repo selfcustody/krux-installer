@@ -1,0 +1,135 @@
+{
+  "check_permissions_screen": {
+    "Setup": "Настройка",
+    "for": "для",
+    "Checking": "Проверка",
+    "permissions for": "Разрешения для",
+    "WARNING": "ПРЕДУПРЕЖДЕНИЕ",
+    "This is the first run of KruxInstaller in": "Это первый запуск KruxInstaller в",
+    "and it appears that you do not have privileged access to make flash procedures": "и оказывается, что у вас нет привилегированного доступа для выполнения процедур прошивки",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "Чтобы продолжить, нажмите кнопку «Разрешить», и появится запрос на ввод пароля",
+    "to execute the following command": ", чтобы выполнить следующую команду",
+    "You may need to logout (or even reboot)": "Возможно, потребуется перезагрузка (или даже перезагрузка)",
+    "and back in for the new group to take effect": "и возвращайтесь снова, чтобы новая группа вступила в силу",
+    "Do not worry, this message won't appear again": "Не волнуйтесь, это сообщение больше не появится",
+    "Allow": "Разрешать",
+    "Deny": "Отрицать"
+  }, 
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Проверка подключения к Интернету"
+  },
+  "main_screen": {
+    "Version": "Версия",
+    "Device": "Устройство",
+    "select a new one": "выберите новый",
+    "Flash": "Прошивка прошивки",
+    "Wipe": "Стереть устройство",
+    "Settings": "Настройки",
+    "About": "Об установщике",    
+    "Fetching data from": "Получение данных из"
+  },
+  "select_version_screen": {
+    "Old versions": "Старые версии",
+    "Back": "Вернуться"
+  },
+  "select_old_version_screen": {
+    "Back": "Вернуться"
+  },
+  "warning_beta_screen": {
+    "WARNING": "ПРЕДУПРЕЖДЕНИЕ",
+    "This is our test repository": "Это наш тестовый репозиторий",
+    "These are unsigned binaries for the latest and most experimental features": "Это неподписанные двоичные\nфайлы для новейших и наиболее экспериментальных функций",
+    "and it's just for trying new things and providing feedback.": "и это просто для того, чтобы попробовать\nчто-то новое и оставить отзыв",
+    "Proceed": "Продолжать",
+    "Back": "Вернуться"
+  },
+  "download_beta_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Скачивание",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "Ресурсы уже загружены",
+    "Do you want to proceed with the same file or do you want to download it again?": "Хотите продолжить с последним файлом или как загрузить новый файл?",    
+    "Download again": "Скачать еще раз",
+    "Proceed with current file": "Продолжить работу с текущим файлом"
+  },  
+  "download_stable_zip_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Соединительный",
+    "Downloading": "Загрузки",
+    "to": "в",
+    "of": "из",
+    "downloaded": "Загрузить"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Проверка целостности и подлинности",
+    "Integrity verification": "Проверка целостности",
+    "computed hash from": "вычисленный хеш из",
+    "provided hash from": "предоставленный хеш из",
+    "SUCCESS": "УСПЕХ",
+    "FAILED": "НЕУДАВШИЙСЯ",
+    "Authenticity verification": "Проверка подлинности",
+    "GOOD": "ХОРОШАЯ",
+    "BAD": "НЕПРАВИЛЬНАЯ",
+    "SIGNATURE": "ПОДПИСЬ",
+    "If you have openssl installed on your system": "Если в вашей системе установлен openssl",
+    "you can check manually with the following command": "Вы можете проверить вручную с помощью следующей команды",
+    "Proceed": "Продолжать",
+    "Back": "Вернись"
+  },  
+  "unzip_stable_screen": {
+    "Flash with": "Вспышка с",
+    "Air-gapped update with": "Изолированное обновление с (скоро будет)",
+    "Unziping": "Декомпрессия",
+    "Unziped": "Неупакованный"
+  },
+  "flash_screen": {
+    "DONE": "ДОГОВОРИЛИСЬ",
+    "Back": "Назад",
+    "Quit": "Покидать",
+    "Flashing": "Перепрошивка на",
+    "at": "на"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "ПОЖАЛУЙСТА, НЕ ОТКЛЮЧАЙТЕ УСТРОЙСТВО ОТ СЕТИ",
+    "DONE": "ДОГОВОРИЛИСЬ",
+    "Back": "Назад",
+    "Quit": "Покидать"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Вы собираетесь инициировать ПОЛНУЮ ОЧИСТКУ этого устройства",
+    "This operation will": "Эта операция позволит",
+    "Permanently erase all saved data": "Безвозвратное стирание всех сохраненных данных",
+    "Remove the existing firmware": "Удалите существующую прошивку",
+    "Render the device non-functional until new firmware is re-flashed": "Сделайте устройство неработоспособным до тех пор, пока не будет перепрошита новая прошивка",    
+    "Proceed": "Продолжать",
+    "Back": "Вернись"
+  },
+  "about_screen": {
+    "follow us on X": "следите за нами на X",
+    "Back": "Назад"
+  }
+}

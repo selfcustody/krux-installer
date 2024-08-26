@@ -172,12 +172,12 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
         if sys.platform == "win32":
             lang_file = os.path.join(self.i18n_path, f"{lang}.UTF-8.json")
             if os.path.isfile(lang_file):
-                config.setdefaults("locale", {"lang": f"{lang}.UTF-8.json"})
+                config.setdefaults("locale", {"lang": lang})
                 self.info(f"{config}.lang={lang}")
 
             else:
-                self.warning(f"{lang} not supported. Default {config}.lang=en_US.UTF-8")
-                config.setdefaults("locale", {"lang": "en_US.UTF-8"})
+                self.warning(f"{lang} not supported. Default {config}.lang=en_US")
+                config.setdefaults("locale", {"lang": "en_US"})
 
     def build_settings(self, settings):
         """Create settings panel"""

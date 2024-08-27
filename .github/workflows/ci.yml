@@ -18,7 +18,7 @@ jobs:
     steps:
 
       - name: Check Not Allowed File Changes
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         id: filter_not_allowed
         with:
           list-files: json
@@ -61,7 +61,7 @@ jobs:
 
       - name: Check Not Linted Markdown
         if: ${{ always() }}
-        uses: dorny/paths-filter@v2
+        uses: dorny/paths-filter@v3
         id: filter_markdown
         with:
           list-files: shell

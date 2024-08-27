@@ -27,7 +27,7 @@ pillow = "^10.4.0"
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
 pylint = "^3.0.3"
-pyinstaller = "^6.3.0"
+pyinstaller = "^6.10.0"
 pytest-cov = "^5.0.0"
 poethepoet = "^0.27.0"
 demjson3 = "^3.0.6"

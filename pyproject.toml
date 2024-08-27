@@ -25,7 +25,7 @@ distro = "^1.9.0"
 pillow = "^10.4.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^24.1.1"
+black = "^24.8.0"
 pylint = "^3.0.3"
 pyinstaller = "^6.3.0"
 pytest-cov = "^4.1.0"

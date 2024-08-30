@@ -1,21 +1,18 @@
 name: Build
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-
-  pull_request:
-    branches:
-      - main
-      
   workflow_run:
     workflows: 
       - Tests
     types:
       - success
       - completed
+    branches:
+      - main
+      - develop
+    pull_request:
+      branches:
+        - main
 
 jobs:
   

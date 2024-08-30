@@ -32,7 +32,7 @@ class TestStreamDownloader(TestCase):
 
         # strange hack to allow it be
         # registered as coveraged
-        s.on_data = MagicMock()
+        setattr(s, "on_data", MagicMock())
         on_data = getattr(s, "on_data")
 
         calls = []
@@ -52,6 +52,7 @@ class TestStreamDownloader(TestCase):
         mock_requests.get.return_value = mock_response
 
         sd = StreamDownloader(url=URL)
+        setattr(sd, "on_data", MagicMock())
         sd.download_file_stream(url="https://any.call/test.zip")
 
         mock_requests.get.assert_called_once_with(

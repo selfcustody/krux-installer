@@ -23,7 +23,6 @@
 stream_downloader.py
 """
 import os
-import typing
 import requests
 from .trigger_downloader import TriggerDownloader
 
@@ -33,22 +32,10 @@ class StreamDownloader(TriggerDownloader):
     Download files in a stream mode
     """
 
-    @property
-    def on_data(self) -> typing.Callable:
-        """Getter for callback to be used in each increment of downloaded stream"""
-        self.debug(f"on_data::getter={self._on_data}")
-        return self._on_data
-
-    @on_data.setter
-    def on_data(self, value: typing.Callable):
-        """Setter for the callback to be used in each increment of downloaded stream"""
-        self.debug(f"on_data::setter={value}")
-        self._on_data = value
-
     def download_file_stream(self, url: str):
         """
         Given a :attr:`url`, download a large file in a streaming manner to given
-        destination folder (:attr:`dest_dir`)
+        destination folder (:attr: `dest_dir`)
 
         When a chunk of received data is write to buffer, you can intercept
         some information with :attr:`on_data` as function (total_len, downloaded_len, start_time)
@@ -103,14 +90,16 @@ class StreamDownloader(TriggerDownloader):
         # Get the chunks of bytes data
         # and pass it to a post-processing
         # method defined as `on_data`
+        on_data = getattr(self, "on_data")
+
         for chunk in res.iter_content(chunk_size=self.chunk_size):
             self.downloaded_len += len(chunk)
             self.debug(f"download_file_stream::downloaded_len={self.downloaded_len}")
-            if self.on_data is not None:
-                self.on_data(data=chunk)  # pylint: disable=not-callable
-            else:
-                raise RuntimeError("on_data cannot be empty")
 
-        # Now you can close connection
-        self.debug("downloaded_file_stream::closing_connection")
+            # pylint: disable=not-callable
+            on_data(data=chunk)
+
+            # Now you can close connection
+            self.debug("downloaded_file_stream::closing_connection")
+
         res.close()

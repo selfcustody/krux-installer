@@ -5,14 +5,7 @@ on:
     workflows: 
       - Tests
     types:
-      - success
       - completed
-    branches:
-      - main
-      - develop
-    pull_request:
-      branches:
-        - main
 
 jobs:
   
@@ -34,6 +27,7 @@ jobs:
             arch: arm64
      
     runs-on: ${{ matrix.os }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     steps:
       

@@ -45,6 +45,8 @@ class FlashScreen(BaseFlashScreen):
     def on_pre_enter(self):
         self.ids[f"{self.id}_grid"].clear_widgets()
 
+        callback_trigger = getattr(self, "trigger")
+
         def on_print_callback(*args, **kwargs):
             text = " ".join(str(x) for x in args)
             self.info(text)
@@ -71,7 +73,7 @@ class FlashScreen(BaseFlashScreen):
             if "INFO" in text:
                 self.output.append(text)
                 if "Rebooting" in text:
-                    self.trigger()
+                    callback_trigger()
 
             elif "Programming BIN" in text:
                 self.output[-1] = text
@@ -180,7 +182,6 @@ class FlashScreen(BaseFlashScreen):
             wid=f"{self.id}_progress",
             text="",
             root_widget=f"{self.id}_subgrid",
-            markup=True,
             halign="center",
         )
 
@@ -188,7 +189,6 @@ class FlashScreen(BaseFlashScreen):
             wid=f"{self.id}_info",
             text="",
             root_widget=f"{self.id}_grid",
-            markup=True,
             halign="justify",
         )
 

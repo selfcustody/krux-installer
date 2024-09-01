@@ -175,6 +175,9 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 self.redirect_error("Downloader already initialized")
 
         elif key == "progress":
+            # trigger is defined in superclass
+            callback_trigger = getattr(self, "trigger")
+
             # calculate percentage of download
             if value is not None and self.downloader is not None:
                 lens = [value["downloaded_len"], value["content_len"]]
@@ -207,7 +210,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
                     # When finish, change the label, wait some seconds
                     # and then change screen
-                    self.trigger()
+                    callback_trigger()
 
         else:
             self.redirect_error(f'Invalid key: "{key}"')

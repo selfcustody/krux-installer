@@ -34,12 +34,10 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
 from kivy.uix.screenmanager import Screen
-from src.utils.trigger import Trigger
+from kivy.weakproxy import WeakProxy
 from src.i18n import T
-from src.utils.selector import VALID_DEVICES
+from src.utils.trigger import Trigger
 
 
 class BaseScreen(Screen, Trigger):
@@ -128,6 +126,7 @@ class BaseScreen(Screen, Trigger):
         self._locale = value
 
     def translate(self, key: str) -> str:
+        """Translate some message as key"""
         msg = T(key, locale=self.locale, module=self.id)
         self.debug(f"Translated '{key}' to '{msg}'")
         return msg
@@ -165,12 +164,10 @@ class BaseScreen(Screen, Trigger):
         self.ids[root_widget].add_widget(grid)
         self.ids[wid] = WeakProxy(grid)
 
-    def make_label(
-        self, wid: str, text: str, root_widget: str, markup: bool, halign: str
-    ):
+    def make_label(self, wid: str, text: str, root_widget: str, halign: str):
         """Build grid where buttons will be placed"""
         self.debug(f"Building GridLayout::{wid}")
-        label = Label(text=text, markup=markup, halign=halign)
+        label = Label(text=text, markup=True, halign=halign)
         label.id = wid
         self.ids[root_widget].add_widget(label)
         self.ids[wid] = WeakProxy(label)
@@ -191,30 +188,29 @@ class BaseScreen(Screen, Trigger):
     def make_button(
         self,
         root_widget: str,
-        id: str,
+        wid: str,
         text: str,
-        markup: bool,
         row: int,
         on_press: typing.Callable,
         on_release: typing.Callable,
     ):
         """Create buttons in a dynamic way"""
-        self.debug(f"{id} -> {root_widget}")
+        self.debug(f"{wid} -> {root_widget}")
 
         total = self.ids[root_widget].rows
         btn = Button(
             text=text,
-            markup=markup,
+            markup=True,
             halign="center",
             font_size=Window.size[0] // 25,
             background_color=(0, 0, 0, 1),
             color=(1, 1, 1, 1),
         )
-        btn.id = id
+        btn.id = wid
 
         # define button methods to be callable in classes
-        setattr(self, f"on_press_{id}", on_press)
-        setattr(self, f"on_release_{id}", on_release)
+        setattr(self, f"on_press_{wid}", on_press)
+        setattr(self, f"on_release_{wid}", on_release)
 
         btn.bind(on_press=on_press)
         btn.bind(on_release=on_release)
@@ -237,6 +233,7 @@ class BaseScreen(Screen, Trigger):
         on_release: typing.Callable,
         size_hint: typing.Tuple[float, float],
     ):
+        """Create a button on StackLayout"""
         btn = Button(
             markup=True,
             font_size=Window.size[0] // 30,
@@ -252,10 +249,12 @@ class BaseScreen(Screen, Trigger):
         setattr(self, f"on_release_{wid}", on_release)
 
     def redirect_error(self, msg: str):
+        """Create a RuntimeError and give it to redirect_exception"""
         exception = RuntimeError(msg)
         self.redirect_exception(exception=exception)
 
     def redirect_exception(self, exception: Exception):
+        """Get an exception and prepare a ErrorScreen rendering"""
         screen = self.manager.get_screen("ErrorScreen")
         fns = [
             partial(screen.update, name=self.name, key="error", value=exception),
@@ -269,16 +268,19 @@ class BaseScreen(Screen, Trigger):
 
     @staticmethod
     def get_destdir_assets() -> str:
+        """Return the current selected path of destination assets directory"""
         app = App.get_running_app()
         return app.config.get("destdir", "assets")
 
     @staticmethod
     def get_baudrate() -> int:
+        """Return the current selected baudrate"""
         app = App.get_running_app()
         return int(app.config.get("flash", "baudrate"))
 
     @staticmethod
     def get_locale() -> str:
+        """Return the current locale"""
         app = App.get_running_app()
         locale = app.config.get("locale", "lang")
 
@@ -286,18 +288,22 @@ class BaseScreen(Screen, Trigger):
             locale = locale.split(".")
             return f"{locale[0].replace("-", "_")}.{locale[1]}"
 
-        elif sys.platform == "win32":
+        if sys.platform == "win32":
             return f"{locale}.UTF-8"
 
-        else:
-            raise RuntimeError(f"Not implemented for '{sys.platform}'")
+        raise RuntimeError(f"Not implemented for '{sys.platform}'")
 
     @staticmethod
     def open_settings():
+        """Open the Settings screen"""
         app = App.get_running_app()
         app.open_settings()
 
     @staticmethod
     def sanitize_markup(msg: str) -> str:
+        """
+        Sanitize a message that come with [ ]
+        and clean it (used in FlashScreen and WipeScreen)
+        """
         cleanr = re.compile("\\[.*?\\]")
         return re.sub(cleanr, "", msg)

@@ -175,7 +175,9 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
 
                 # When finish, change the label, wait some seconds
                 # and then change screen
-                self.trigger()
+                # trigger is defined in superclass
+                callback_trigger = getattr(self, "trigger")
+                callback_trigger()
 
         else:
             self.redirect_error(f'Invalid key: "{key}"')

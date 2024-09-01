@@ -1,9 +1,5 @@
 {
   "check_permissions_screen": {
-    "Setup": "Setup",
-    "for": "for",
-    "Checking": "Checking",
-    "permissions for": "permissions for",
     "WARNING": "WARNING",
     "This is the first run of KruxInstaller in": "This is the first run of KruxInstaller in",
     "and it appears that you do not have privileged access to make flash procedures": "and it appears that you do not have privileged access to make flash procedures",

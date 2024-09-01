@@ -153,6 +153,7 @@ class DownloadStableZipScreen(BaseDownloadScreen):
 
         elif key == "progress":
             if value is not None:
+
                 # calculate percentage of download
                 lens = [value["downloaded_len"], value["content_len"]]
                 percent = lens[0] / lens[1]
@@ -194,7 +195,9 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                         )
                         # When finish, change the label, wait some seconds
                         # and then change screen
-                        self.trigger()
+                        # trigger is defined in superclass
+                        callback_trigger = getattr(self, "trigger")
+                        callback_trigger()
 
                     else:
                         self.redirect_error(f"Invalid downloader: {self.downloader}")

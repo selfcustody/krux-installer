@@ -76,10 +76,9 @@ class SelectOldVersionScreen(BaseScreen):
 
             self.make_button(
                 row=row,
-                id=wid,
+                wid=wid,
                 root_widget="select_old_version_screen_grid",
                 text=text,
-                markup=True,
                 on_press=_press,
                 on_release=_release,
             )
@@ -99,10 +98,9 @@ class SelectOldVersionScreen(BaseScreen):
         back = self.translate("Back")
         self.make_button(
             row=len(old_versions) + 1,
-            id="select_old_version_back",
+            wid="select_old_version_back",
             root_widget="select_old_version_screen_grid",
             text=back,
-            markup=True,
             on_press=_press_back,
             on_release=_release_back,
         )

@@ -154,7 +154,6 @@ class TestBaseScreen(GraphicUnitTest):
             root_widget="mock_grid",
             halign="center",
             text="mock",
-            markup=False,
         )
         self.render(screen)
 
@@ -175,10 +174,9 @@ class TestBaseScreen(GraphicUnitTest):
         screen_0.make_grid(wid="mock_grid", rows=1)
         screen_0.make_button(
             row=0,
-            id="mock_button",
+            wid="mock_button",
             root_widget="mock_grid",
             text="Mocked button",
-            markup=False,
             on_press=MagicMock(),
             on_release=MagicMock(),
         )
@@ -214,10 +212,9 @@ class TestBaseScreen(GraphicUnitTest):
         for i in range(0, 2):
             screen_0.make_button(
                 row=i,
-                id=f"mock_button_{i}",
+                wid=f"mock_button_{i}",
                 root_widget="mock_grid",
                 text="Mocked button",
-                markup=False,
                 on_press=MagicMock(),
                 on_release=MagicMock(),
             )

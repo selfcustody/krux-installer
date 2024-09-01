@@ -58,7 +58,6 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             wid=f"{self.id}_label",
             text="",
             root_widget=f"{self.id}_grid",
-            markup=True,
             halign="justify",
         )
 

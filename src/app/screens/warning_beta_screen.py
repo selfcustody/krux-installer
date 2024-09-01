@@ -91,10 +91,9 @@ class WarningBetaScreen(BaseScreen):
 
         self.make_button(
             row=0,
-            id="warning_beta_screen_warn",
+            wid="warning_beta_screen_warn",
             root_widget="warning_beta_screen_grid",
             text=text,
-            markup=True,
             on_press=_press,
             on_release=_release,
         )

@@ -194,10 +194,9 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         screen.make_button(
-            id=f"{screen.id}_mock_button",
+            wid=f"{screen.id}_mock_button",
             root_widget=f"{screen.id}_grid",
             text="Mock",
-            markup=True,
             row=0,
             on_press=MagicMock(),
             on_release=MagicMock(),

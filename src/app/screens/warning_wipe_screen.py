@@ -58,7 +58,6 @@ class WarningWipeScreen(BaseScreen):
             wid=f"{self.id}_label",
             text=self.make_label_text(),
             root_widget=f"{self.id}_grid",
-            markup=True,
             halign="justify",
         )
 

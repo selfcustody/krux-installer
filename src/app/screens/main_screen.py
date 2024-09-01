@@ -237,10 +237,9 @@ class MainScreen(BaseScreen):
 
             self.make_button(
                 row=row,
-                id=_tuple[0],
+                wid=_tuple[0],
                 root_widget="main_screen_grid",
                 text=_tuple[1],
-                markup=True,
                 on_press=_press,
                 on_release=_release,
             )

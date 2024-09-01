@@ -46,6 +46,7 @@ class WipeScreen(BaseFlashScreen):
 
     def on_pre_enter(self):
         self.ids[f"{self.id}_grid"].clear_widgets()
+        callback_trigger = getattr(self, "trigger")
 
         def on_print_callback(*args, **kwargs):
             text = " ".join(str(x) for x in args)
@@ -84,7 +85,7 @@ class WipeScreen(BaseFlashScreen):
                 del self.output[:1]
 
             if "SPI Flash erased." in text:
-                self.trigger()
+                callback_trigger()
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
 
@@ -144,7 +145,6 @@ class WipeScreen(BaseFlashScreen):
             wid=f"{self.id}_progress",
             text="",
             root_widget=f"{self.id}_subgrid",
-            markup=True,
             halign="center",
         )
 
@@ -152,7 +152,6 @@ class WipeScreen(BaseFlashScreen):
             wid=f"{self.id}_info",
             text="",
             root_widget=f"{self.id}_grid",
-            markup=True,
             halign="justify",
         )
 

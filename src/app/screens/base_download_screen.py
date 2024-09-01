@@ -153,8 +153,9 @@ class BaseDownloadScreen(BaseScreen):
             self.trigger = getattr(self.__class__, "on_trigger")
 
             # on progress should be defined on inherited classes
+            download = getattr(self.downloader, "download")
             on_progress = getattr(self.__class__, "on_progress")
-            _fn = partial(self.downloader.download, on_data=on_progress)
+            _fn = partial(download, on_data=on_progress)
 
             # Now run it as a partial function
             # on parallel thread to not block

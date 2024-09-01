@@ -119,19 +119,19 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
                     to = self.translate("to")
                     filepath = os.path.join(destdir, f"krux-{self.version}.zip.sig")
 
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={self.SIZE_MP}sp]",
-                        downloading,
-                        "\n",
-                        f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                        "\n",
-                        to,
-                        "\n",
-                        filepath,
-                        "[/size]",
-                    ]
-                )
+                    self.ids[f"{self.id}_info"].text = "".join(
+                        [
+                            f"[size={self.SIZE_MP}sp]",
+                            downloading,
+                            "\n",
+                            f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
+                            "\n",
+                            to,
+                            "\n",
+                            filepath,
+                            "[/size]",
+                        ]
+                    )
 
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
@@ -175,7 +175,9 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
 
                         # When finish, change the label, wait some seconds
                         # and then change screen
-                        self.trigger()
+                        # trigger is defined in superclass
+                        callback_trigger = getattr(self, "trigger")
+                        callback_trigger()
 
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")

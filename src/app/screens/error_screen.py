@@ -64,10 +64,9 @@ class ErrorScreen(BaseScreen):
 
         self.make_button(
             row=0,
-            id=f"{self.id}_button",
+            wid=f"{self.id}_button",
             root_widget=f"{self.id}_grid",
             text="",
-            markup=True,
             on_press=_press,
             on_release=_release,
         )
@@ -84,23 +83,7 @@ class ErrorScreen(BaseScreen):
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if name in (
-            "CheckPermissionsScreen",
-            "ConfigKruxInstaller",
-            "CheckInternetConnectionScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "DownloadBetaScreen",
-            "DownloadSelfcustodyPemScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "AboutScreen",
-            "ErrorScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            raise ValueError(f"Invalid screen: {name}")
+        self.debug(f"Updating {self.name} from {name}...")
 
         if key == "locale":
             self.locale = value

@@ -71,10 +71,9 @@ class SelectDeviceScreen(BaseScreen):
 
             self.make_button(
                 row=row,
-                id=f"select_device_{device}",
+                wid=f"select_device_{device}",
                 root_widget="select_device_screen_grid",
                 text="",
-                markup=True,
                 on_press=_on_press,
                 on_release=_on_release,
             )

@@ -28,7 +28,8 @@ from kivy.clock import Clock
 from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
 from kivy.uix.button import Button
-from kivy.graphics import Color, Line
+from kivy.graphics import Color
+from kivy.graphics import Rectangle
 from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
@@ -141,15 +142,15 @@ class SelectVersionScreen(BaseScreen):
                 # END of on_release buttons
                 self.make_button(
                     row=row,
-                    id=_tuple[0],
+                    wid=_tuple[0],
                     root_widget="select_version_screen_grid",
                     text=_tuple[1],
-                    markup=True,
                     on_press=_press,
                     on_release=_release,
                 )
 
         except Exception as exc:
+            self.error(str(exc))
             self.redirect_exception(exception=exc)
 
     def update(self, *args, **kwargs):
@@ -175,6 +176,12 @@ class SelectVersionScreen(BaseScreen):
                 if "select_version_back" in self.ids:
                     back = self.translate("Back")
                     self.ids["select_version_back"].text = back
+
+            elif key == "canvas":
+                # prepare background
+                with self.canvas.before:
+                    Color(0, 0, 0, 1)
+                    Rectangle(size=(Window.width, Window.height))
 
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")

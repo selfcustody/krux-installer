@@ -180,7 +180,7 @@ class UnzipStableScreen(BaseScreen):
 
         p = os.path.join(rel_path, "kboot.kfpkg")
         self.make_button(
-            id=f"{self.id}_flash_button",
+            wid=f"{self.id}_flash_button",
             root_widget=f"{self.id}_grid",
             text="".join(
                 [
@@ -195,7 +195,6 @@ class UnzipStableScreen(BaseScreen):
                     "[/size]",
                 ]
             ),
-            markup=True,
             row=0,
             on_press=getattr(UnzipStableScreen, f"on_press_{self.id}_flash_button"),
             on_release=getattr(UnzipStableScreen, f"on_release_{self.id}_flash_button"),
@@ -276,7 +275,7 @@ class UnzipStableScreen(BaseScreen):
 
         p = os.path.join(rel_path, "firmware.bin")
         self.make_button(
-            id=f"{self.id}_airgap_button",
+            wid=f"{self.id}_airgap_button",
             root_widget=f"{self.id}_grid",
             text="".join(
                 [
@@ -293,7 +292,6 @@ class UnzipStableScreen(BaseScreen):
                     "[/size]",
                 ]
             ),
-            markup=True,
             row=0,
             on_press=getattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button"),
             on_release=getattr(

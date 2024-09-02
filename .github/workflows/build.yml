@@ -78,41 +78,26 @@ jobs:
          
       - name: Install project and its dependencies
         run: poetry install
-
-      - name: Patch pyinstaller_hook for kivy in Unix
-        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
-        run: poetry run poe patch-nix
-
-      - name: Patch pyinstaller_hook for kivy in Windows
-        if: ${{ runner.os == 'Windows' }}
-        run: poetry run poe patch-win
-        
+     
       - name: Build dist (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
         with:
           run: |
             poetry add pytest-xvfb
-            poetry run python .ci/create-spec.py
-            poetry run python -m PyInstaller krux-installer.spec
+            poetry run poe build-linux
 
       - name: Build dist (MacOS)
         if: ${{ runner.os == 'macOS' }}
         env:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
-        run: |
-          poetry run poe clean-mac
-          poetry run python .ci/create-spec.py
-          poetry run python -m PyInstaller krux-installer.spec
+        run: poetry run poe build-macos
         
       - name: Build dist (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
-        run: |
-          poetry run python .ci/create-spec.py
-          .\.ci\edit-spec.ps1
-          poetry run python -m PyInstaller krux-installer.spec
+        run: poetry run poe build-win
           
       - name: Build release deb (Linux)
         if: ${{ runner.os == 'Linux' }}

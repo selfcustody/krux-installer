@@ -41,9 +41,9 @@ class BaseFlashScreen(BaseScreen):
         self._firmware = None
         self._baudrate = None
         self._thread = None
-        self._trigger = None
-        self._output = None
+        self._output = []
         self._progress = None
+        self._done = None
         self._is_done = False
 
     @property
@@ -91,16 +91,16 @@ class BaseFlashScreen(BaseScreen):
         self._thread = value
 
     @property
-    def trigger(self) -> ClockEvent:
+    def done(self) -> ClockEvent:
         """Trigger is a `ClockEvent` that should be triggered after download is done"""
-        self.debug(f"getter::trigger={self._thread}")
-        return self._trigger
+        self.debug(f"getter::done={self._done}")
+        return self._done
 
-    @trigger.setter
-    def trigger(self, value: typing.Callable):
+    @done.setter
+    def done(self, value: typing.Callable):
         """Create a `ClockEvent` given a callback"""
-        self.debug(f"getter::trigger={self._trigger}")
-        self._trigger = Clock.create_trigger(value)
+        self.debug(f"getter::trigger={self._done}")
+        self._done = Clock.create_trigger(value)
 
     @property
     def output(self) -> typing.List[str]:
@@ -113,3 +113,15 @@ class BaseFlashScreen(BaseScreen):
         """Setter for info"""
         self.debug(f"setter::output={value}")
         self._output = value
+
+    @property
+    def is_done(self) -> bool:
+        """Getter for is_done"""
+        self.debug(f"getter::is_done={self._is_done}")
+        return self._is_done
+
+    @is_done.setter
+    def is_done(self, value: bool):
+        """Setter for info"""
+        self.debug(f"setter::is_done={value}")
+        self._is_done = value

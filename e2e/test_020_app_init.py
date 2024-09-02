@@ -1,5 +1,5 @@
 import os
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.uix.screenmanager import ScreenManager

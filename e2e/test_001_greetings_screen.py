@@ -1,7 +1,6 @@
 import os
-import sys
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.greetings_screen import GreetingsScreen

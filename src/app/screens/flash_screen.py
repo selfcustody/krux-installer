@@ -42,38 +42,42 @@ class FlashScreen(BaseFlashScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    @staticmethod
+    def parse_output(text: str) -> str:
+        """Parses KTool.print_callback output to make it more readable on GUI"""
+        text = text.replace(
+            "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
+        )
+        text = text.replace("\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]")
+        text = text.replace(
+            "\x1b[33mInitialize K210 SPI Flash",
+            "[color=#efcc00]Initialize K210 SPI Flash[/color]",
+        )
+        text = text.replace("Flash ID: \x1b[33m", "Flash ID: [color=#efcc00]")
+        text = text.replace(
+            "\x1b[0m, unique ID: \x1b[33m", "[/color], unique ID: [color=#efcc00]"
+        )
+        text = text.replace("\x1b[0m, size: \x1b[33m", "[/color], size: ")
+        text = text.replace("\x1b[0m MB", "[/color] MB")
+        text = text.replace("\x1b[0m", "")
+        text = text.replace("\x1b[33m", "")
+        text = text.replace("\rProgramming", "Programming")
+        return text
+
     def on_pre_enter(self):
         self.ids[f"{self.id}_grid"].clear_widgets()
 
-        callback_trigger = getattr(self, "trigger")
-
-        def on_print_callback(*args, **kwargs):
+        def on_data(*args, **kwargs):
             text = " ".join(str(x) for x in args)
             self.info(text)
-            text = text.replace(
-                "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
-            )
-            text = text.replace(
-                "\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]"
-            )
-            text = text.replace(
-                "\x1b[33mInitialize K210 SPI Flash",
-                "[color=#efcc00]Initialize K210 SPI Flash[/color]",
-            )
-            text = text.replace("Flash ID: \x1b[33m", "Flash ID: [color=#efcc00]")
-            text = text.replace(
-                "\x1b[0m, unique ID: \x1b[33m", "[/color], unique ID: [color=#efcc00]"
-            )
-            text = text.replace("\x1b[0m, size: \x1b[33m", "[/color], size: ")
-            text = text.replace("\x1b[0m MB", "[/color] MB")
-            text = text.replace("\x1b[0m", "")
-            text = text.replace("\x1b[33m", "")
-            text = text.replace("\rProgramming", "Programming")
+            text = FlashScreen.parse_output(text)
 
             if "INFO" in text:
                 self.output.append(text)
                 if "Rebooting" in text:
-                    callback_trigger()
+                    self.is_done = True
+                    # pylint: disable=not-callable
+                    self.done()
 
             elif "Programming BIN" in text:
                 self.output[-1] = text
@@ -87,9 +91,7 @@ class FlashScreen(BaseFlashScreen):
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
 
-        def on_process_callback(
-            file_type: str, iteration: int, total: int, suffix: str
-        ):
+        def on_process(file_type: str, iteration: int, total: int, suffix: str):
             percent = (iteration / total) * 100
 
             if sys.platform in ("linux", "win32"):
@@ -134,7 +136,7 @@ class FlashScreen(BaseFlashScreen):
             else:
                 self.redirect_error(f"Invalid ref: {args[1]}")
 
-        def on_trigger_callback(dt):
+        def on_done(dt):
             del self.output[4:]
             self.ids[f"{self.id}_loader"].source = self.done_img
             self.ids[f"{self.id}_loader"].reload()
@@ -164,9 +166,9 @@ class FlashScreen(BaseFlashScreen):
             )
             self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
 
-        setattr(FlashScreen, "on_print_callback", on_print_callback)
-        setattr(FlashScreen, "on_process_callback", on_process_callback)
-        setattr(FlashScreen, "on_trigger_callback", on_trigger_callback)
+        setattr(FlashScreen, "on_data", on_data)
+        setattr(FlashScreen, "on_process", on_process)
+        setattr(FlashScreen, "on_done", on_done)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
@@ -196,30 +198,25 @@ class FlashScreen(BaseFlashScreen):
         """
         Event fired when the screen is displayed and the entering animation is complete.
         """
-        if hasattr(self, "flasher"):
-            self.output = []
-            self.trigger = getattr(self.__class__, "on_trigger_callback")
-            self.flasher.ktool.__class__.print_callback = getattr(
-                self.__class__, "on_print_callback"
-            )
-            on_process_callback = partial(
-                self.flasher.flash,
-                callback=getattr(self.__class__, "on_process_callback"),
-            )
-            self.thread = threading.Thread(name=self.name, target=on_process_callback)
+        self.done = getattr(FlashScreen, "on_done")
+        self.flasher.ktool.__class__.print_callback = getattr(FlashScreen, "on_data")
+        on_process = partial(
+            self.flasher.flash, callback=getattr(self.__class__, "on_process")
+        )
+        self.thread = threading.Thread(name=self.name, target=on_process)
 
-            if sys.platform in ("linux", "win32"):
-                sizes = [self.SIZE_M, self.SIZE_P]
-            else:
-                sizes = [self.SIZE_MM, self.SIZE_MP]
+        if sys.platform in ("linux", "win32"):
+            sizes = [self.SIZE_M, self.SIZE_P]
+        else:
+            sizes = [self.SIZE_MM, self.SIZE_MP]
 
-            # if anything wrong happen, show it
-            def hook(err):
-                msg = "".join(
-                    traceback.format_exception(
-                        err.exc_type, err.exc_value, err.exc_traceback
-                    )
+        # if anything wrong happen, show it
+        def hook(err):
+            if not self.is_done:
+                trace = traceback.format_exception(
+                    err.exc_type, err.exc_value, err.exc_traceback
                 )
+                msg = "".join(trace)
                 self.error(msg)
 
                 back = self.translate("Back")
@@ -246,13 +243,11 @@ class FlashScreen(BaseFlashScreen):
                     [f"[size={sizes[1]}]", msg, "[/size]"]
                 )
 
-            # hook what happened
-            threading.excepthook = hook
+        # hook what happened
+        threading.excepthook = hook
 
-            # start thread
-            self.thread.start()
-        else:
-            self.redirect_error("Flasher isnt configured")
+        # start thread
+        self.thread.start()
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""

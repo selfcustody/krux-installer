@@ -1,6 +1,6 @@
 import os
 import sys
-from unittest.mock import patch, MagicMock, call
+from unittest.mock import patch, MagicMock
 from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest

@@ -56,8 +56,8 @@ clean-mac = "find . -name '.DS_Store' -delete"
 lint.sequence = [
   { cmd = "jsonlint src/i18n/*.json"},
   { cmd = "pylint -E --rcfile .pylint/src ./src" },
-  { cmd = "pylint -E --rcfile .pylint/tests ./tests"},
-  { cmd = "pylint -E --rcfile=.pylint/tests ./e2e"}
+  { cmd = "pylint --rcfile .pylint/tests ./tests"},
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
 ]
 
 build-nix.sequence = [

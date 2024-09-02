@@ -166,13 +166,13 @@ class GreetingsScreen(BaseScreen):
                     partial(
                         ask_screen.update, name=self.name, key="distro", value=_distro
                     ),
-                    partial(ask_screen, name=self.name, key="screen"),
+                    partial(ask_screen.update, name=self.name, key="screen"),
                 ]
 
                 for fn in fns:
                     Clock.schedule_once(fn, 0)
 
-                self.set_screen(name="AskPermissionsDialoutScreen", direction="left")
+                self.set_screen(name="AskPermissionDialoutScreen", direction="left")
 
     def check_internet_connection(self):
         """

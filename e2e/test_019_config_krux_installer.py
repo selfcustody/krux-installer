@@ -455,7 +455,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             MagicMock(name="WarningBetaScreen"),
             MagicMock(name="VerifyStableZipScreen"),
             MagicMock(name="UnzipStableScreen"),
-            MagicMock(name="CheckPermissionsScreen"),
+            MagicMock(name="AskPermissionDialoutScreen"),
         ]
 
         # Do tests
@@ -470,7 +470,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
             call("WarningBetaScreen"),
             call("VerifyStableZipScreen"),
             call("UnzipStableScreen"),
-            call("CheckPermissionsScreen"),
+            call("AskPermissionDialoutScreen"),
         ]
 
         calls_partial = [

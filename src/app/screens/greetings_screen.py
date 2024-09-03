@@ -50,9 +50,6 @@ class GreetingsScreen(BaseScreen):
             wid=f"{self.id}_logo", root_widget=f"{self.id}_grid", source=self.logo_img
         )
 
-        fn = partial(self.update, name="KruxInstallerApp", key="canvas")
-        Clock.schedule_once(fn, 0)
-
     def on_enter(self):
         """
         When application start, after greeting user with the krux logo, it will need to check if
@@ -60,16 +57,8 @@ class GreetingsScreen(BaseScreen):
         redirect to CheckPermissionsScreen and then to MainScreen. Win32 and Mac will be
         redirect to MainScreen.
         """
-        # screen = self.screen_manager.get_screen("GreetingsScreen")
-        # print(screen)
-
-        fns = [
-            partial(self.update, name=self.name, key="check-permission-screen"),
-            partial(self.update, name=self.name, key="check-internet-connection"),
-        ]
-
-        for fn in fns:
-            Clock.schedule_once(fn, 2.1)
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn, 0)
 
     def update(self, *args, **kwargs):
         name = kwargs.get("name")
@@ -94,11 +83,11 @@ class GreetingsScreen(BaseScreen):
                 Color(0, 0, 0, 1)
                 Rectangle(size=(Window.width, Window.height))
 
+            fn = partial(self.update, name=self.name, key="check-permission-screen")
+            Clock.schedule_once(fn, 2.1)
+
         elif key == "check-permission-screen":
-            if sys.platform == "linux":
-                self.check_permissions_for_dialout_group()
-            else:
-                self.warning(f"Skipping permissions check for {sys.platform}")
+            self.check_permissions_for_dialout_group()
 
         elif key == "check-internet-connection":
             self.check_internet_connection()
@@ -137,42 +126,40 @@ class GreetingsScreen(BaseScreen):
                 self.redirect_error(msg=f"{distro.name(pretty=True)} not supported")
                 return
 
-            self.debug(f"Checking {_group} permissions for {_user}")
-
             # loop throug all linux groups and check
             # if the user is registered in the "dialout" group
-            for _group in grp.getgrall():
-                if _group == _group.gr_name:
-                    self.debug(f"Found {_group.gr_name}")
-                    for _grpuser in _group[3]:
+            for _grp in grp.getgrall():
+                if _group == _grp.gr_name:
+                    self.debug(f"Found {_grp.gr_name}")
+                    for _grpuser in _grp[3]:
+                        self.debug(_grpuser)
                         if _grpuser == _user:
                             self.debug(f"'{_user}' already in group '{_group}'")
                             _in_dialout = True
-
-            self.debug(f"user {_user} in dialout group={_in_dialout}")
 
             # if user is not in dialout group, warn user
             # and then redirect to a screen that will
             # proceed with the proper operation
             if not _in_dialout:
-                ask_screen = self.manager.get_screen("AskPermissionDialoutScreen")
+                ask = self.manager.get_screen("AskPermissionDialoutScreen")
                 _distro = distro.name(pretty=True)
 
                 fns = [
-                    partial(ask_screen.update, name=self.name, key="user", value=_user),
-                    partial(
-                        ask_screen.update, name=self.name, key="group", value=_group
-                    ),
-                    partial(
-                        ask_screen.update, name=self.name, key="distro", value=_distro
-                    ),
-                    partial(ask_screen.update, name=self.name, key="screen"),
+                    partial(ask.update, name=self.name, key="user", value=_user),
+                    partial(ask.update, name=self.name, key="group", value=_group),
+                    partial(ask.update, name=self.name, key="distro", value=_distro),
+                    partial(ask.update, name=self.name, key="screen"),
                 ]
 
                 for fn in fns:
                     Clock.schedule_once(fn, 0)
 
                 self.set_screen(name="AskPermissionDialoutScreen", direction="left")
+            else:
+                fn = partial(
+                    self.update, name=self.name, key="check-internet-connection"
+                )
+                Clock.schedule_once(fn, 0)
 
     def check_internet_connection(self):
         """

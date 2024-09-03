@@ -211,9 +211,12 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
         action("Allow")
 
         # patch assertions
+        on_permission_created = getattr(
+            AskPermissionDialoutScreen, "on_permission_created"
+        )
         mock_get_locale.assert_called_once()
         mock_exec.assert_called_once_with(
             cmd=["/usr/bin/usermod", "-a", "-G", "mockedgroup", "mockeduser"],
             env={},
-            callback=screen.on_permission_created,
+            callback=on_permission_created,
         )

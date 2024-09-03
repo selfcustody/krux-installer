@@ -164,7 +164,6 @@ class FlashScreen(BaseFlashScreen):
                     "[/color]",
                 ]
             )
-            self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
 
         setattr(FlashScreen, "on_data", on_data)
         setattr(FlashScreen, "on_process", on_process)
@@ -186,6 +185,7 @@ class FlashScreen(BaseFlashScreen):
             root_widget=f"{self.id}_subgrid",
             halign="center",
         )
+        self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
 
         self.make_label(
             wid=f"{self.id}_info",

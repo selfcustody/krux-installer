@@ -16,14 +16,7 @@ class TestAboutScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.greetings_screen.partial")
-    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
-    def test_init(
-        self,
-        mock_schedule_once,
-        mock_partial,
-        mock_get_locale,
-    ):
+    def test_init(self, mock_get_locale):
         screen = GreetingsScreen()
         self.render(screen)
 
@@ -40,11 +33,27 @@ class TestAboutScreen(GraphicUnitTest):
         self.assertEqual(screen.name, "GreetingsScreen")
         self.assertEqual(screen.id, "greetings_screen")
         self.assertEqual(image.source, asset)
+        mock_get_locale.assert_called()
 
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_partial.assert_called()
-        mock_schedule_once.assert_called()
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.greetings_screen.partial")
+    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
+    def test_on_enter(self, mock_schedule_once, mock_partial, mock_get_locale):
+        screen = GreetingsScreen()
+        self.render(screen)
+        screen.on_enter()
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        mock_get_locale.assert_called()
+        mock_partial.assert_called_once_with(
+            screen.update, name=screen.name, key="canvas"
+        )
+        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

@@ -53,6 +53,26 @@ class AskPermissionDialoutScreen(BaseScreen):
         self._bin = "/usr/bin/usermod"
         self._bin_args = ["-a", "-G"]
 
+        def on_permission_created(output: str):
+            logout_msg = self.translate("You may need to logout (or even reboot)")
+            backin_msg = self.translate("and back in for the new group to take effect")
+            not_worry_msg = self.translate(
+                "Do not worry, this message won't appear again"
+            )
+
+            self.ids[f"{self.id}_label"].text = "\n".join(
+                [
+                    f"[size={self.SIZE_M}sp]{logout_msg}",
+                    f"{backin_msg}.",
+                    "",
+                    f"{not_worry_msg}.[/size]",
+                ]
+            )
+
+        setattr(
+            AskPermissionDialoutScreen, "on_permission_created", on_permission_created
+        )
+
         def _on_ref_press(*args):
             if args[1] == "Allow":
                 # If user isnt in the dialout group,
@@ -68,9 +88,10 @@ class AskPermissionDialoutScreen(BaseScreen):
                 try:
                     self.debug(f"cmd={cmd}")
                     sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
-                    sudoer.exec(cmd=cmd, env={}, callback=self.on_permission_created)
+                    sudoer.exec(cmd=cmd, env={}, callback=on_permission_created)
                 except Exception as err:
-                    self.redirect_error(msg=str(err.__traceback__))
+                    self.error(str(err))
+                    self.redirect_exception(exception=err)
 
             if args[1] == "Deny":
                 App.get_running_app().stop()
@@ -167,9 +188,11 @@ class AskPermissionDialoutScreen(BaseScreen):
                         f"[size={self.SIZE_G}sp][color=#efcc00]{warn_msg}[/color][/size]",
                         "\n",
                         f'[size={self.SIZE_MP}sp]{first_msg} "{self.distro}"',
+                        "\n",
                         f"{access_msg}.",
+                        "\n",
                         proceed_msg,
-                        f"{exec_msg}:",
+                        "\n" f"{exec_msg}:",
                         "\n",
                         "[color=#00ff00]",
                         f"{self._bin} {" ".join(self._bin_args or [])} {self.group} {self.user}",
@@ -187,22 +210,3 @@ class AskPermissionDialoutScreen(BaseScreen):
 
         else:
             self.redirect_error(msg=f"Invalid key: '{key}'")
-
-    def on_permission_created(self):
-        """
-        When user is added to dialout group
-        ask for user to reboot to apply the changes
-        and the ability to flash take place
-        """
-        logout_msg = self.translate("You may need to logout (or even reboot)")
-        backin_msg = self.translate("and back in for the new group to take effect")
-        not_worry_msg = self.translate("Do not worry, this message won't appear again")
-
-        self.ids[f"{self.id}_label"].text = "\n".join(
-            [
-                f"[size={self.SIZE_M}sp]{logout_msg}",
-                f"{backin_msg}.",
-                "",
-                f"{not_worry_msg}.[/size]",
-            ]
-        )

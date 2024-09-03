@@ -151,6 +151,7 @@ class WipeScreen(BaseFlashScreen):
             root_widget=f"{self.id}_subgrid",
             halign="center",
         )
+        self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
 
         self.make_label(
             wid=f"{self.id}_info",

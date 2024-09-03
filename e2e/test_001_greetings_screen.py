@@ -147,7 +147,7 @@ class TestAboutScreen(GraphicUnitTest):
         mock_partial,
         mock_rectangle,
         mock_color,
-        mock_get_locale
+        mock_get_locale,
     ):
         screen = GreetingsScreen()
         self.render(screen)

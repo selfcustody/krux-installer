@@ -139,7 +139,16 @@ class TestAboutScreen(GraphicUnitTest):
     )
     @patch("src.app.screens.greetings_screen.Color")
     @patch("src.app.screens.greetings_screen.Rectangle")
-    def test_update_canvas(self, mock_rectangle, mock_color, mock_get_locale):
+    @patch("src.app.screens.greetings_screen.partial")
+    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
+    def test_update_canvas(
+        self,
+        mock_schedule_once,
+        mock_partial,
+        mock_rectangle,
+        mock_color,
+        mock_get_locale
+    ):
         screen = GreetingsScreen()
         self.render(screen)
 
@@ -153,3 +162,5 @@ class TestAboutScreen(GraphicUnitTest):
         mock_get_locale.assert_called_once()
         mock_color.assert_called()
         mock_rectangle.assert_called()
+        mock_partial.assert_called()
+        mock_schedule_once.assert_called()

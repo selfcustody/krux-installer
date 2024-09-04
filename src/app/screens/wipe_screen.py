@@ -41,6 +41,8 @@ class WipeScreen(BaseFlashScreen):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
         self.wiper = None
         self.success = False
+        self.progress = ""
+        self.device = None
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -73,7 +75,8 @@ class WipeScreen(BaseFlashScreen):
         )
         return text
 
-    def on_pre_enter(self):
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
         self.ids[f"{self.id}_grid"].clear_widgets()
 
         def on_data(*args, **kwargs):
@@ -109,7 +112,7 @@ class WipeScreen(BaseFlashScreen):
             self.ids[f"{self.id}_loader"].reload()
             done = self.translate("DONE")
             back = self.translate("Back")
-            quit = self.translate("Quit")
+            _quit = self.translate("Quit")
 
             if sys.platform in ("linux", "win32"):
                 size = self.SIZE_M
@@ -126,7 +129,7 @@ class WipeScreen(BaseFlashScreen):
                     "[/color]",
                     "        ",
                     "[color=#EFCC00]",
-                    f"[ref=Quit][u]{quit}[/u][/ref]",
+                    f"[ref=Quit][u]{_quit}[/u][/ref]",
                     "[/color]",
                 ]
             )
@@ -160,7 +163,8 @@ class WipeScreen(BaseFlashScreen):
             halign="justify",
         )
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
         """
         Event fired when the screen is displayed and the entering animation is complete.
         """
@@ -176,7 +180,6 @@ class WipeScreen(BaseFlashScreen):
             sizes = [self.SIZE_MM, self.SIZE_MP]
 
         self.ids[f"{self.id}_progress"].text = f"[size={sizes[0]}sp][b]{please}[/b]"
-        self.progress = ""
 
         # if anything wrong happen, show it
         def hook(err):
@@ -189,7 +192,7 @@ class WipeScreen(BaseFlashScreen):
 
                 done = self.translate("DONE")
                 back = self.translate("Back")
-                quit = self.translate("Quit")
+                _quit = self.translate("Quit")
 
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
@@ -203,7 +206,7 @@ class WipeScreen(BaseFlashScreen):
                         "[/color]",
                         "        ",
                         "[color=#EFCC00]",
-                        f"[ref=Quit][u]{quit}[/u][/ref]",
+                        f"[ref=Quit][u]{_quit}[/u][/ref]",
                         "[/color]",
                         "[/size]",
                     ]

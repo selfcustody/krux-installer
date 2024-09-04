@@ -27,12 +27,6 @@ from kivy.clock import Clock
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
 from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.button import Button
-from src.app.screens import main_screen
-from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -99,9 +93,12 @@ class WarningWipeScreen(BaseScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
+        """Invoke make_label_text"""
         self.ids[f"{self.id}_label"].text = self.make_label_text()
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
         name = kwargs.get("name")
@@ -136,6 +133,7 @@ class WarningWipeScreen(BaseScreen):
             self.redirect_error(f'Invalid key: "{key}"')
 
     def make_label_text(self):
+        """Make a warning message about wipe procedure"""
         full_wipe = self.translate(
             "You are about to initiate a FULL WIPE of this device"
         )
@@ -160,7 +158,8 @@ class WarningWipeScreen(BaseScreen):
                 f"[size={sizes[0]}]",
                 full_wipe,
                 "[/size]",
-                "[/color]" "\n",
+                "[/color]",
+                "\n",
                 "\n",
                 f"[size={sizes[1]}]",
                 f"{operation}:",

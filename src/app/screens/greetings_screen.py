@@ -31,6 +31,10 @@ from kivy.core.window import Window
 from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
+if sys.platform.startswith("linux"):
+    import distro
+    import grp
+
 
 class GreetingsScreen(BaseScreen):
     """GreetingsScreen show Krux logo"""
@@ -50,7 +54,8 @@ class GreetingsScreen(BaseScreen):
             wid=f"{self.id}_logo", root_widget=f"{self.id}_grid", source=self.logo_img
         )
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
         """
         When application start, after greeting user with the krux logo, it will need to check if
         user is running app in linux or non-linux. If running in linux, the user will be
@@ -60,7 +65,14 @@ class GreetingsScreen(BaseScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
+        """
+        After show krux logo, verify:
+        - in linux, if the current user is in dialout group to allow sudoless flash
+        - check the internet connection
+            - if have, update the firmware version to the latest
+        """
         name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
@@ -104,9 +116,6 @@ class GreetingsScreen(BaseScreen):
         group (in some distros, can be 'uucp')
         """
         if sys.platform.startswith("linux"):
-            import distro
-            import grp
-
             # get current user
             _user = os.environ.get("USER")
             _in_dialout = False
@@ -161,6 +170,10 @@ class GreetingsScreen(BaseScreen):
                 )
                 Clock.schedule_once(fn, 0)
 
+        else:
+            fn = partial(self.update, name=self.name, key="check-internet-connection")
+            Clock.schedule_once(fn, 0)
+
     def check_internet_connection(self):
         """
         In reality, this method get the latest version and set to
@@ -179,6 +192,7 @@ class GreetingsScreen(BaseScreen):
             Clock.schedule_once(fn, 0)
             self.set_screen(name="MainScreen", direction="left")
 
+        # pylint: disable=broad-exception-caught
         except Exception as exc:
             self.error(str(exc))
             self.redirect_exception(exception=exc)

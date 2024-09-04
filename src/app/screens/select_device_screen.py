@@ -24,11 +24,6 @@ select_device_screen.py
 import re
 from functools import partial
 from kivy.clock import Clock
-from kivy.cache import Cache
-from kivy.weakproxy import WeakProxy
-from kivy.core.window import Window
-from kivy.uix.button import Button
-from kivy.graphics import Color, Line
 from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.app.screens.base_screen import BaseScreen
 
@@ -78,6 +73,7 @@ class SelectDeviceScreen(BaseScreen):
                 on_release=_on_release,
             )
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons according the valid devices for each version"""
         name = kwargs.get("name")

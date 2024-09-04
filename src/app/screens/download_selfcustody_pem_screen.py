@@ -24,12 +24,10 @@ download_selfcustody_pem_screen.py
 import os
 import time
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from src.app.screens.base_screen import BaseScreen
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.pem_downloader import PemDownloader
 
@@ -48,11 +46,14 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
 
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
+        # pylint: disable=unused-argument
         def on_trigger(dt):
             time.sleep(2.1)
             self.set_screen(name=self.to_screen, direction="left")
 
         def on_progress(data: bytes):
+            self.debug(f"Chunck length: {len(data)}")
+
             # calculate downloaded percentage
             fn = partial(
                 self.update,
@@ -74,6 +75,7 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
         name = kwargs.get("name")
@@ -138,8 +140,7 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
             # for some unknow reason (yet)
             # the screen show that downloaded
             # 130B of 128B, so limit it to 128
-            if percent > 1.0:
-                percent = 1.0
+            percent = 1.0 if percent >= 1.0 else percent
 
             if lens[0] > lens[1]:
                 lens[0] = lens[1]

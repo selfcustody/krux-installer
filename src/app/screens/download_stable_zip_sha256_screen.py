@@ -24,12 +24,10 @@ download_stable_zip_sha256_screen.py
 import os
 import time
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from src.app.screens.base_screen import BaseScreen
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.sha256_downloader import Sha256Downloader
 
@@ -47,6 +45,7 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
 
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
+        # pylint: disable=unused-argument
         def on_trigger(dt):
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
@@ -56,6 +55,7 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
             Clock.schedule_once(fn, 0)
             self.set_screen(name=self.to_screen, direction="left")
 
+        # pylint: disable=unused-argument
         def on_progress(data: bytes):
             # calculate downloaded percentage
             fn = partial(
@@ -78,6 +78,7 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
         name = kwargs.get("name")

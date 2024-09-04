@@ -27,13 +27,7 @@ from kivy.clock import Clock
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
 from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.button import Button
-from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
-from src.i18n import T
 
 
 class WarningAlreadyDownloadedScreen(BaseScreen):
@@ -86,6 +80,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
         name = kwargs.get("name")

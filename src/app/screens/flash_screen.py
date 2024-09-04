@@ -39,6 +39,7 @@ class FlashScreen(BaseFlashScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
+        self.flasher = Flasher()
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -64,9 +65,16 @@ class FlashScreen(BaseFlashScreen):
         text = text.replace("\rProgramming", "Programming")
         return text
 
-    def on_pre_enter(self):
-        self.ids[f"{self.id}_grid"].clear_widgets()
+    def build_on_data(self):
+        """
+        Build a streaming IO static method using
+        some instance variables for flash procedure
+        when KTool.print_callback is called
 
+        (useful for to be used in tests)
+        """
+
+        # pylint: disable=unused-argument
         def on_data(*args, **kwargs):
             text = " ".join(str(x) for x in args)
             self.info(text)
@@ -90,6 +98,16 @@ class FlashScreen(BaseFlashScreen):
                 del self.output[:1]
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
+
+        setattr(FlashScreen, "on_data", on_data)
+
+    def build_on_process(self):
+        """
+        Build a streaming IO static method using
+        some instance variables for flash procedure
+
+        (useful for to be used in tests)
+        """
 
         def on_process(file_type: str, iteration: int, total: int, suffix: str):
             percent = (iteration / total) * 100
@@ -126,23 +144,24 @@ class FlashScreen(BaseFlashScreen):
                 ]
             )
 
-        def on_ref_press(*args):
-            if args[1] == "Back":
-                self.set_screen(name="MainScreen", direction="right")
+        setattr(FlashScreen, "on_process", on_process)
 
-            elif args[1] == "Quit":
-                App.get_running_app().stop()
+    def build_on_done(self):
+        """
+        Build a streaming IO static method using
+        some instance variables when flash procedure is done
 
-            else:
-                self.redirect_error(f"Invalid ref: {args[1]}")
+        (useful for to be used in tests)
+        """
 
+        # pylint: disable=unused-argument
         def on_done(dt):
             del self.output[4:]
             self.ids[f"{self.id}_loader"].source = self.done_img
             self.ids[f"{self.id}_loader"].reload()
             done = self.translate("DONE")
             back = self.translate("Back")
-            quit = self.translate("Quit")
+            _quit = self.translate("Quit")
 
             if sys.platform in ("linux", "win32"):
                 size = self.SIZE_M
@@ -160,14 +179,29 @@ class FlashScreen(BaseFlashScreen):
                     "[/color]",
                     "        ",
                     "[color=#EFCC00]",
-                    f"[ref=Quit][u]{quit}[/u][/ref]",
+                    f"[ref=Quit][u]{_quit}[/u][/ref]",
                     "[/color]",
                 ]
             )
 
-        setattr(FlashScreen, "on_data", on_data)
-        setattr(FlashScreen, "on_process", on_process)
         setattr(FlashScreen, "on_done", on_done)
+
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        self.ids[f"{self.id}_grid"].clear_widgets()
+        self.build_on_data()
+        self.build_on_process()
+        self.build_on_done()
+
+        def on_ref_press(*args):
+            if args[1] == "Back":
+                self.set_screen(name="MainScreen", direction="right")
+
+            elif args[1] == "Quit":
+                App.get_running_app().stop()
+
+            else:
+                self.redirect_error(f"Invalid ref: {args[1]}")
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
@@ -194,7 +228,8 @@ class FlashScreen(BaseFlashScreen):
             halign="justify",
         )
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
         """
         Event fired when the screen is displayed and the entering animation is complete.
         """
@@ -220,7 +255,7 @@ class FlashScreen(BaseFlashScreen):
                 self.error(msg)
 
                 back = self.translate("Back")
-                quit = self.translate("Quit")
+                _quit = self.translate("Quit")
                 self.ids[f"{self.id}_progress"].text = "".join(
                     [
                         f"[size={sizes[0]}]",
@@ -233,7 +268,7 @@ class FlashScreen(BaseFlashScreen):
                         f"[ref=Back][u]{back}[/u][/ref][/color]",
                         "        ",
                         "[color=#EFCC00]",
-                        f"[ref=Quit][u]{quit}[/u][/ref]",
+                        f"[ref=Quit][u]{_quit}[/u][/ref]",
                         "[/color]",
                         "[/size]",
                     ]
@@ -249,6 +284,7 @@ class FlashScreen(BaseFlashScreen):
         # start thread
         self.thread.start()
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
         name = kwargs.get("name")
@@ -293,7 +329,6 @@ class FlashScreen(BaseFlashScreen):
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "flasher":
-            self.flasher = Flasher()
             self.flasher.firmware = self.firmware
             self.flasher.baudrate = self.baudrate
 

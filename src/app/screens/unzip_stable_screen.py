@@ -22,18 +22,9 @@
 verify_stable_zip_screen.py
 """
 import os
-import sys
 import time
 from functools import partial
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from kivy.app import App
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.button import Button
-from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
 from src.utils.unzip.kboot_unzip import KbootUnzip
 from src.utils.unzip.firmware_unzip import FirmwareUnzip
@@ -49,6 +40,7 @@ class UnzipStableScreen(BaseScreen):
         self.device = None
         self.version = None
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update widget from other screens"""
 
@@ -99,6 +91,7 @@ class UnzipStableScreen(BaseScreen):
             self.redirect_error(f'Invalid key: "{key}"')
 
     def build_extract_to_flash_button(self):
+        """Builds an upper button for flash firmware"""
         self.debug("Building flash button")
         zip_file = os.path.join(self.assets_dir, f"krux-{self.version}.zip")
         base_path = os.path.join(f"krux-{self.version}", f"maixpy_{self.device}")
@@ -201,6 +194,7 @@ class UnzipStableScreen(BaseScreen):
         )
 
     def build_extract_to_airgap_button(self):
+        """Build a lower button to airgap update"""
         self.debug("Building airgap button")
         zip_file = os.path.join(self.assets_dir, f"krux-{self.version}.zip")
         base_path = os.path.join(f"krux-{self.version}", f"maixpy_{self.device}")

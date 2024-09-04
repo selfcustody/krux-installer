@@ -24,7 +24,6 @@ download_stable_zip_screen.py
 import os
 import time
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
@@ -50,6 +49,7 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         # This is a function that will be called
         # when the download thread is finished
         def on_trigger(dt):
+            self.debug(f"latter call timed {dt}ms")
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
             fn = partial(
@@ -61,6 +61,7 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         # This is a function that will be called
         # when a bunch of data are streamed from github
         def on_progress(data: bytes):
+            self.debug(f"Chunck size: {len(data)}")
             if self.downloader is not None:
                 fn = partial(
                     self.update,
@@ -87,6 +88,7 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
         name = kwargs.get("name")
@@ -118,89 +120,95 @@ class DownloadStableZipScreen(BaseDownloadScreen):
 
         elif key == "version":
             if value is not None:
-                self.version = value
-                self.downloader = ZipDownloader(
-                    version=self.version,
-                    destdir=DownloadStableZipScreen.get_destdir_assets(),
-                )
-
-                if self.downloader is not None:
-                    url = getattr(self.downloader, "url")
-                    destdir = getattr(self.downloader, "destdir")
-                    downloading = self.translate("Downloading")
-                    to = self.translate("to")
-                    filepath = os.path.join(destdir, f"krux-{self.version}.zip")
-
-                    self.ids[f"{self.id}_info"].text = "".join(
-                        [
-                            f"[size={self.SIZE_MP}sp]",
-                            downloading,
-                            "\n",
-                            f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                            "\n",
-                            to,
-                            "\n",
-                            filepath,
-                            "[/size]",
-                        ]
-                    )
-
-                else:
-                    self.redirect_error("Invalid downloader")
-
+                self.build_downloader(value)
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
         elif key == "progress":
             if value is not None:
-
-                # calculate percentage of download
-                lens = [value["downloaded_len"], value["content_len"]]
-                percent = lens[0] / lens[1]
-
-                # Format bytes (one liner) in MB
-                # https://stackoverflow.com/questions/
-                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-                downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-
-                of = self.translate("of")
-                self.ids[f"{self.id}_progress"].text = "".join(
-                    [
-                        f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                        "\n",
-                        f"[size={self.SIZE_MP}sp]",
-                        downs[0],
-                        f" {of} ",
-                        downs[1],
-                        " MB",
-                        "[/size]",
-                    ]
-                )
-
-                # When finish, change the label
-                # and then change screen
-                if percent == 1.00:
-                    if self.downloader is not None:
-                        destdir = getattr(self.downloader, "destdir")
-                        downloaded = self.translate("downloaded")
-                        filepath = os.path.join(destdir, f"krux-{self.version}.zip")
-                        self.ids[f"{self.id}_info"].text = "".join(
-                            [
-                                f"[size={self.SIZE_MP}sp]",
-                                filepath,
-                                "\n",
-                                downloaded,
-                                "[/size]",
-                            ]
-                        )
-                        # When finish, change the label, wait some seconds
-                        # and then change screen
-                        # trigger is defined in superclass
-                        callback_trigger = getattr(self, "trigger")
-                        callback_trigger()
-
-                    else:
-                        self.redirect_error(f"Invalid downloader: {self.downloader}")
+                self.on_download_progress(value)
 
         else:
             self.redirect_error(f'Invalid key: "{key}"')
+
+    def build_downloader(self, version: str):
+        """Creates a Downloader given a firmware version"""
+        self.version = version
+        self.downloader = ZipDownloader(
+            version=self.version,
+            destdir=DownloadStableZipScreen.get_destdir_assets(),
+        )
+
+        if self.downloader is not None:
+            url = getattr(self.downloader, "url")
+            destdir = getattr(self.downloader, "destdir")
+            downloading = self.translate("Downloading")
+            to = self.translate("to")
+            filepath = os.path.join(destdir, f"krux-{self.version}.zip")
+
+            self.ids[f"{self.id}_info"].text = "".join(
+                [
+                    f"[size={self.SIZE_MP}sp]",
+                    downloading,
+                    "\n",
+                    f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
+                    "\n",
+                    to,
+                    "\n",
+                    filepath,
+                    "[/size]",
+                ]
+            )
+
+        else:
+            self.redirect_error("Invalid downloader")
+
+    def on_download_progress(self, value: dict):
+        """update GUI given a ratio between what is downloaded and its total length"""
+        # calculate percentage of download
+        lens = [value["downloaded_len"], value["content_len"]]
+        percent = lens[0] / lens[1]
+
+        # Format bytes (one liner) in MB
+        # https://stackoverflow.com/questions/
+        # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+        downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
+
+        of = self.translate("of")
+        self.ids[f"{self.id}_progress"].text = "".join(
+            [
+                f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                "\n",
+                f"[size={self.SIZE_MP}sp]",
+                downs[0],
+                f" {of} ",
+                downs[1],
+                " MB",
+                "[/size]",
+            ]
+        )
+
+        # When finish, change the label
+        # and then change screen
+        if percent == 1.00:
+            if self.downloader is not None:
+                destdir = getattr(self.downloader, "destdir")
+                downloaded = self.translate("downloaded")
+                filepath = os.path.join(destdir, f"krux-{self.version}.zip")
+                self.ids[f"{self.id}_info"].text = "".join(
+                    [
+                        f"[size={self.SIZE_MP}sp]",
+                        filepath,
+                        "\n",
+                        downloaded,
+                        "[/size]",
+                    ]
+                )
+                # When finish, change the label, wait some seconds
+                # and then change screen
+                # trigger is defined in superclass
+                callback_trigger = getattr(self, "trigger")
+                callback_trigger()
+
+            else:
+                self.redirect_error(f"Invalid downloader: {self.downloader}")

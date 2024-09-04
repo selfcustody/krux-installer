@@ -24,7 +24,6 @@ main_screen.py
 import os
 import time
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
@@ -46,6 +45,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
+        # pylint: disable=unused-argument
         def on_trigger(dt):
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
@@ -91,6 +91,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
         name = kwargs.get("name")
@@ -140,77 +141,87 @@ class DownloadBetaScreen(BaseDownloadScreen):
         elif key == "downloader":
 
             if self.downloader is None:
-                destdir = DownloadBetaScreen.get_destdir_assets()
-                destdir = os.path.join(
-                    destdir, "krux_binaries", f"maixpy_{self.device}"
-                )
-
-                self.downloader = BetaDownloader(
-                    device=self.device,
-                    binary_type=self.firmware,
-                    destdir=destdir,
-                )
-
-                downloading = self.translate("Downloading")
-                to = self.translate("to")
-
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={self.SIZE_MP}sp]",
-                        downloading,
-                        "\n",
-                        "[color=#00AABB]",
-                        f"[ref={self.downloader.url}]{self.downloader.url}[/ref]",
-                        "[/color]",
-                        "\n",
-                        to,
-                        "\n",
-                        self.downloader.destdir,
-                        "\n",
-                        "[/size]",
-                    ]
-                )
-
+                self.build_downloader()
             else:
                 self.redirect_error("Downloader already initialized")
 
         elif key == "progress":
-            # trigger is defined in superclass
-            callback_trigger = getattr(self, "trigger")
-
-            # calculate percentage of download
-            if value is not None and self.downloader is not None:
-                lens = [value["downloaded_len"], value["content_len"]]
-                percent = lens[0] / lens[1]
-
-                # Format bytes (one liner) in MB
-                # https://stackoverflow.com/questions/
-                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-                downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-                self.ids[f"{self.id}_progress"].text = "".join(
-                    [
-                        f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                        "\n",
-                        f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
-                    ]
-                )
-
-                if percent == 1.0:
-                    downloaded = self.translate("downloaded")
-                    destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
-                    self.ids[f"{self.id}_info"].text = "".join(
-                        [
-                            f"[size={self.SIZE_MP}sp]",
-                            destdir,
-                            "\n",
-                            downloaded,
-                            "[/size]",
-                        ]
-                    )
-
-                    # When finish, change the label, wait some seconds
-                    # and then change screen
-                    callback_trigger()
+            if value is not None:
+                self.on_download_progress(value)
 
         else:
             self.redirect_error(f'Invalid key: "{key}"')
+
+    def build_downloader(self):
+        """Build the downloader for beta firmware before the download itself"""
+        destdir = DownloadBetaScreen.get_destdir_assets()
+        destdir = os.path.join(destdir, "krux_binaries", f"maixpy_{self.device}")
+
+        self.downloader = BetaDownloader(
+            device=self.device,
+            binary_type=self.firmware,
+            destdir=destdir,
+        )
+
+        downloading = self.translate("Downloading")
+        to = self.translate("to")
+
+        self.ids[f"{self.id}_info"].text = "".join(
+            [
+                f"[size={self.SIZE_MP}sp]",
+                downloading,
+                "\n",
+                "[color=#00AABB]",
+                f"[ref={self.downloader.url}]{self.downloader.url}[/ref]",
+                "[/color]",
+                "\n",
+                to,
+                "\n",
+                self.downloader.destdir,
+                "\n",
+                "[/size]",
+            ]
+        )
+
+    def on_download_progress(self, value):
+        """
+        In each iteration of downloaded chunks, update the GUI with a ratio between
+        it's downloaded length and content length
+        """
+        # trigger is defined in superclass
+
+        callback_trigger = getattr(self, "trigger")
+
+        # calculate percentage of download
+        if value is not None and self.downloader is not None:
+            lens = [value["downloaded_len"], value["content_len"]]
+            percent = lens[0] / lens[1]
+
+            # Format bytes (one liner) in MB
+            # https://stackoverflow.com/questions/
+            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+            downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
+            self.ids[f"{self.id}_progress"].text = "".join(
+                [
+                    f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                    "\n",
+                    f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
+                ]
+            )
+
+            if percent == 1.0:
+                downloaded = self.translate("downloaded")
+                destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
+                self.ids[f"{self.id}_info"].text = "".join(
+                    [
+                        f"[size={self.SIZE_MP}sp]",
+                        destdir,
+                        "\n",
+                        downloaded,
+                        "[/size]",
+                    ]
+                )
+
+                # When finish, change the label, wait some seconds
+                # and then change screen
+                callback_trigger()

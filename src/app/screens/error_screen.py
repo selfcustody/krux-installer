@@ -21,18 +21,12 @@
 """
 error_screen.py
 """
-import traceback
 from functools import partial
-from typing import Text
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from kivy.app import App
-from kivy.cache import Cache
 from src.app.screens.base_screen import BaseScreen
-from src.utils.selector import Selector
-from src.i18n import T
 
 
 class ErrorScreen(BaseScreen):
@@ -73,6 +67,7 @@ class ErrorScreen(BaseScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """
         In linux, will check for user permission on group
@@ -121,8 +116,3 @@ class ErrorScreen(BaseScreen):
             exc_info = ValueError(f"Invalid key: '{key}'")
             fn = partial(self.update, name=self.name, key="error", value=exc_info)
             Clock.schedule_once(fn, 0)
-
-    def on_enter(self):
-        """Simple update your canvas"""
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn, 0)

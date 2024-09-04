@@ -21,10 +21,7 @@
 """
 about_screen.py
 """
-
-from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
-from src.i18n import T
 
 
 class WarningBetaScreen(BaseScreen):
@@ -98,6 +95,7 @@ class WarningBetaScreen(BaseScreen):
             on_release=_release,
         )
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
         name = kwargs.get("name")
@@ -114,39 +112,46 @@ class WarningBetaScreen(BaseScreen):
         if key == "locale":
             if value is not None:
                 self.locale = value
-                warning = self.translate("WARNING")
-                test_repo = self.translate("This is our test repository")
-                unsg_bin = self.translate(
-                    "These are unsigned binaries for the latest and most experimental features"
-                )
-                just_try = self.translate(
-                    "and it's just for trying new things and providing feedback."
-                )
-                proceed = self.translate("Proceed")
-                back = self.translate("Back")
-
-                text = "".join(
-                    [
-                        f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
-                        "\n",
-                        "\n",
-                        f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
-                        "\n",
-                        f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
-                        "\n",
-                        f"[size={self.SIZE_MP}sp]{just_try}[/size]",
-                        "\n",
-                        "\n",
-                        f"[size={self.SIZE_MM}sp]",
-                        f"[color=#00ff00]{proceed}[/color]        [color=#ff0000]{back}[/color]",
-                        "[/size]",
-                    ]
-                )
-
-                self.ids["warning_beta_screen_warn"].text = text
+                self.show_warning()
 
             else:
                 self.redirect_error(f"Invalid value for key {key}: {value}")
 
         else:
             self.redirect_error(f'Invalid key: "{key}"')
+
+    def show_warning(self):
+        """
+        Create a warning message where it's content is about
+        the beta (and unsigned) firmware
+        """
+        warning = self.translate("WARNING")
+        test_repo = self.translate("This is our test repository")
+        unsg_bin = self.translate(
+            "These are unsigned binaries for the latest and most experimental features"
+        )
+        just_try = self.translate(
+            "and it's just for trying new things and providing feedback."
+        )
+        proceed = self.translate("Proceed")
+        back = self.translate("Back")
+
+        text = "".join(
+            [
+                f"[size={self.SIZE_MM}sp][color=#efcc00][b]{warning}[/b][/color][/size]",
+                "\n",
+                "\n",
+                f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
+                "\n",
+                f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
+                "\n",
+                f"[size={self.SIZE_MP}sp]{just_try}[/size]",
+                "\n",
+                "\n",
+                f"[size={self.SIZE_MM}sp]",
+                f"[color=#00ff00]{proceed}[/color]        [color=#ff0000]{back}[/color]",
+                "[/size]",
+            ]
+        )
+
+        self.ids["warning_beta_screen_warn"].text = text

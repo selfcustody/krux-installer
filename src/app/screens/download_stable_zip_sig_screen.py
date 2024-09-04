@@ -24,12 +24,10 @@ download_stable_zip_sig_screen.py
 import os
 import time
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from src.app.screens.base_screen import BaseScreen
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.sig_downloader import SigDownloader
 
@@ -48,6 +46,7 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
         def on_trigger(dt):
+            self.debug(f"latter call timed {dt}ms")
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
             fn = partial(screen.update, name=self.name, key="public-key-certificate")
@@ -56,6 +55,7 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
 
         def on_progress(data: bytes):
             # calculate downloaded percentage
+            self.debug(f"Chunck size: {len(data)}")
             fn = partial(
                 self.update,
                 name=self.name,
@@ -76,6 +76,7 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
         name = kwargs.get("name")

@@ -22,13 +22,9 @@
 main_screen.py
 """
 import os
-import math
 import typing
-from pathlib import Path
-from functools import partial
 from threading import Thread
 from kivy.clock import Clock, ClockEvent
-from src.utils.flasher import Flasher
 from src.app.screens.base_screen import BaseScreen
 
 

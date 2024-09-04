@@ -22,12 +22,9 @@
 select_version_screen.py
 """
 # pylint: disable=no-name-in-module
-import re
 from functools import partial
 from kivy.clock import Clock
-from kivy.weakproxy import WeakProxy
 from kivy.core.window import Window
-from kivy.uix.button import Button
 from kivy.graphics import Color
 from kivy.graphics import Rectangle
 from src.utils.selector import Selector
@@ -149,10 +146,12 @@ class SelectVersionScreen(BaseScreen):
                     on_release=_release,
                 )
 
+        # pylint: disable=broad-exception-caught
         except Exception as exc:
             self.error(str(exc))
             self.redirect_exception(exception=exc)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
         name = kwargs.get("name")

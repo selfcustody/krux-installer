@@ -81,11 +81,13 @@ class BaseDownloadScreen(BaseScreen):
 
     @property
     def to_screen(self) -> str:
+        """Get where the current screen will go"""
         self.debug(f"getter::to_screen={self._to_screen}")
         return self._to_screen
 
     @to_screen.setter
     def to_screen(self, value: str):
+        """Set where the current screen will go"""
         self.debug(f"setter::to_screen={value}")
         self._to_screen = value
 
@@ -109,6 +111,7 @@ class BaseDownloadScreen(BaseScreen):
 
     @property
     def thread(self) -> Thread | None:
+        """Return a Thread"""
         self.debug(f"getter::thread={self._thread}")
         return self._thread
 
@@ -141,7 +144,8 @@ class BaseDownloadScreen(BaseScreen):
         self.debug(f"deleter::trigger={self._trigger}")
         del self._trigger
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
         """
         Event fired when the screen is displayed and the entering animation is complete.
 

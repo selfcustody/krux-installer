@@ -29,7 +29,6 @@ from kivy.graphics.context_instructions import Color
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.core.window import Window
 from src.app.screens.base_screen import BaseScreen
-from src.i18n import T
 
 
 class AskPermissionDialoutScreen(BaseScreen):
@@ -45,6 +44,10 @@ class AskPermissionDialoutScreen(BaseScreen):
             **kwargs,
         )
 
+        self.user = ""
+        self.group = ""
+        self.distro = ""
+
         # Build grid where buttons will be placed
         self.make_grid(wid=f"{self.id}_grid", rows=1)
 
@@ -53,6 +56,7 @@ class AskPermissionDialoutScreen(BaseScreen):
         self._bin = "/usr/bin/usermod"
         self._bin_args = ["-a", "-G"]
 
+        # pylint: disable=unused-argument
         def on_permission_created(output: str):
             logout_msg = self.translate("You may need to logout (or even reboot)")
             backin_msg = self.translate("and back in for the new group to take effect")
@@ -78,17 +82,18 @@ class AskPermissionDialoutScreen(BaseScreen):
                 # If user isnt in the dialout group,
                 # but the configuration was done correctly
                 # create the command
-                cmd = (
-                    [self._bin]
-                    + [a for a in self._bin_args]
-                    + [self.group]
-                    + [self.user]
-                )
+                cmd = [self._bin]
+                for a in self._bin_args:
+                    cmd.append(a)
+                cmd.append(self.group)
+                cmd.append(self.user)
 
                 try:
                     self.debug(f"cmd={cmd}")
                     sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
                     sudoer.exec(cmd=cmd, env={}, callback=on_permission_created)
+
+                # pylint: disable=broad-exception-caught
                 except Exception as err:
                     self.error(str(err))
                     self.redirect_exception(exception=err)
@@ -111,6 +116,7 @@ class AskPermissionDialoutScreen(BaseScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """
         In linux, will check for user permission on group
@@ -173,40 +179,44 @@ class AskPermissionDialoutScreen(BaseScreen):
                 self.redirect_error("distro not defined")
 
             else:
-                warn_msg = self.translate("WARNING")
-                first_msg = self.translate("This is the first run of KruxInstaller in")
-                access_msg = self.translate(
-                    "and it appears that you do not have privileged access to make flash procedures"
-                )
-                proceed_msg = self.translate(
-                    "To proceed, click in the Allow button and a prompt will ask for your password"
-                )
-                exec_msg = self.translate("to execute the following command")
-
-                self.ids[f"{self.id}_label"].text = "".join(
-                    [
-                        f"[size={self.SIZE_G}sp][color=#efcc00]{warn_msg}[/color][/size]",
-                        "\n",
-                        f'[size={self.SIZE_MP}sp]{first_msg} "{self.distro}"',
-                        "\n",
-                        f"{access_msg}.",
-                        "\n",
-                        proceed_msg,
-                        "\n" f"{exec_msg}:",
-                        "\n",
-                        "[color=#00ff00]",
-                        f"{self._bin} {" ".join(self._bin_args or [])} {self.group} {self.user}",
-                        "[/color]",
-                        "[/size]",
-                        "\n",
-                        "\n",
-                        f"[size={self.SIZE_M}]",
-                        "[color=#00FF00][ref=Allow]Allow[/ref][/color]",
-                        "        ",
-                        "[color=#FF0000][ref=Deny]Deny[/ref][/color]",
-                        "[/size]",
-                    ]
-                )
+                self.show_warning()
 
         else:
             self.redirect_error(msg=f"Invalid key: '{key}'")
+
+    def show_warning(self):
+        """Show a warning in relation to operational system"""
+        warn_msg = self.translate("WARNING")
+        first_msg = self.translate("This is the first run of KruxInstaller in")
+        access_msg = self.translate(
+            "and it appears that you do not have privileged access to make flash procedures"
+        )
+        proceed_msg = self.translate(
+            "To proceed, click in the Allow button and a prompt will ask for your password"
+        )
+        exec_msg = self.translate("to execute the following command")
+
+        self.ids[f"{self.id}_label"].text = "".join(
+            [
+                f"[size={self.SIZE_G}sp][color=#efcc00]{warn_msg}[/color][/size]",
+                "\n",
+                f'[size={self.SIZE_MP}sp]{first_msg} "{self.distro}"',
+                "\n",
+                f"{access_msg}.",
+                "\n",
+                proceed_msg,
+                "\n" f"{exec_msg}:",
+                "\n",
+                "[color=#00ff00]",
+                f"{self._bin} {" ".join(self._bin_args or [])} {self.group} {self.user}",
+                "[/color]",
+                "[/size]",
+                "\n",
+                "\n",
+                f"[size={self.SIZE_M}]",
+                "[color=#00FF00][ref=Allow]Allow[/ref][/color]",
+                "        ",
+                "[color=#FF0000][ref=Deny]Deny[/ref][/color]",
+                "[/size]",
+            ]
+        )

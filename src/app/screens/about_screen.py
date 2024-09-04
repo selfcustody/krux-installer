@@ -27,7 +27,7 @@ from kivy.clock import Clock
 from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
-from src.utils.constants import get_name, get_version
+from src.utils.constants import get_version
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -76,6 +76,7 @@ class AboutScreen(BaseScreen):
         for fn in fns:
             Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
         name = kwargs.get("name")

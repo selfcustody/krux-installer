@@ -22,15 +22,9 @@
 select_old_version_screen.py
 """
 # pylint: disable=no-name-in-module
-import re
 import typing
 from functools import partial
 from kivy.clock import Clock
-from kivy.weakproxy import WeakProxy
-from kivy.core.window import Window
-from kivy.uix.button import Button
-from kivy.graphics import Color, Line
-from src.utils.selector import Selector
 from .base_screen import BaseScreen
 
 
@@ -105,6 +99,7 @@ class SelectOldVersionScreen(BaseScreen):
             on_release=_release_back,
         )
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
         name = kwargs.get("name")

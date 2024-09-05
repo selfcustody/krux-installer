@@ -59,65 +59,6 @@ class TestAboutScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.greetings_screen.GreetingsScreen.redirect_error")
-    def test_update_fail_invalid_name(self, mock_redirect_error, mock_get_locale):
-        screen = GreetingsScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name="Mock")
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with(msg="Invalid screen: 'Mock'")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.greetings_screen.GreetingsScreen.redirect_error")
-    def test_update_fail_invalid_key(self, mock_redirect_error, mock_get_locale):
-        screen = GreetingsScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        # Do the tests
-        screen.update(name="KruxInstallerApp", key="mock")
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with(msg='Invalid key: "mock"')
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.greetings_screen.GreetingsScreen.redirect_error")
-    def test_update_locale_fail_invalid_value(
-        self, mock_redirect_error, mock_get_locale
-    ):
-        screen = GreetingsScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name="GreetingsScreen", key="locale")
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with(
-            msg="Invalid value for key 'locale': 'None'"
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
     def test_update_locale(self, mock_get_locale):
         screen = GreetingsScreen()
         self.render(screen)
@@ -137,16 +78,12 @@ class TestAboutScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.greetings_screen.Color")
-    @patch("src.app.screens.greetings_screen.Rectangle")
     @patch("src.app.screens.greetings_screen.partial")
     @patch("src.app.screens.greetings_screen.Clock.schedule_once")
     def test_update_canvas(
         self,
         mock_schedule_once,
         mock_partial,
-        mock_rectangle,
-        mock_color,
         mock_get_locale,
     ):
         screen = GreetingsScreen()
@@ -160,7 +97,5 @@ class TestAboutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
-        mock_color.assert_called()
-        mock_rectangle.assert_called()
         mock_partial.assert_called()
         mock_schedule_once.assert_called()

@@ -25,9 +25,6 @@ import os
 import sys
 from functools import partial
 from kivy.clock import Clock
-from kivy.graphics import Color
-from kivy.graphics import Rectangle
-from kivy.core.window import Window
 from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
@@ -73,39 +70,19 @@ class GreetingsScreen(BaseScreen):
         - check the internet connection
             - if have, update the firmware version to the latest
         """
-        name = kwargs.get("name")
         key = kwargs.get("key")
-        value = kwargs.get("value")
+        kwargs["screens"] = ("KruxInstallerApp", "GreetingsScreen")
+        self.update_screen(**kwargs)
 
-        if name in ("KruxInstallerApp", "GreetingsScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(msg=f"Invalid screen: '{name}'")
-            return
-
-        if key == "locale":
-            if value is None or value.strip() == "":
-                self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
-            else:
-                self.locale = value
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
+        if key == "canvas":
             fn = partial(self.update, name=self.name, key="check-permission-screen")
             Clock.schedule_once(fn, 2.1)
 
-        elif key == "check-permission-screen":
+        if key == "check-permission-screen":
             self.check_permissions_for_dialout_group()
 
-        elif key == "check-internet-connection":
+        if key == "check-internet-connection":
             self.check_internet_connection()
-
-        else:
-            self.redirect_error(msg=f'Invalid key: "{key}"')
 
     def check_permissions_for_dialout_group(self):
         """

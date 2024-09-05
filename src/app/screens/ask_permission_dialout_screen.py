@@ -25,9 +25,6 @@ from functools import partial
 from pysudoer import SudoerLinux
 from kivy.clock import Clock
 from kivy.app import App
-from kivy.graphics.context_instructions import Color
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.core.window import Window
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -123,52 +120,36 @@ class AskPermissionDialoutScreen(BaseScreen):
         dialout (debian-li ke) and uucp (archlinux-like) and
         add user to that group to allow sudoless flash
         """
-        name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
 
-        if name in (
+        kwargs["screens"] = (
             "ConfigKruxInstaller",
             "GreetingsScreen",
             "AskPermissionDialoutScreen",
             "ErrorScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(msg=f"Invalid screen: '{name}'")
-            return
+        )
+        self.update_screen(**kwargs)
 
-        if key == "locale":
-            if value is None or value.strip() == "":
-                self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
-            else:
-                self.locale = value
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "user":
+        if key == "user":
             if value is None:
                 self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
             else:
                 self.user = value
 
-        elif key == "group":
+        if key == "group":
             if value is None:
                 self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
             else:
                 self.group = value
 
-        elif key == "distro":
+        if key == "distro":
             if value is None:
                 self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
             else:
                 self.distro = value
 
-        elif key == "screen":
+        if key == "screen":
             if self.user is None:
                 self.redirect_error("user not defined")
 
@@ -180,9 +161,6 @@ class AskPermissionDialoutScreen(BaseScreen):
 
             else:
                 self.show_warning()
-
-        else:
-            self.redirect_error(msg=f"Invalid key: '{key}'")
 
     def show_warning(self):
         """Show a warning in relation to operational system"""

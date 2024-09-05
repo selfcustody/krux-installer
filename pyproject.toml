@@ -51,7 +51,7 @@ coverage = ["coverage-unit", "coverage-e2e"]
 
 lint.sequence = [
   { cmd = "jsonlint src/i18n/*.json"},
-  { cmd = "pylint -E --rcfile=.pylint/src ./src" },
+  { cmd = "pylint --rcfile=.pylint/src ./src" },
   { cmd = "pylint --rcfile=.pylint/tests ./tests"},
   { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
 ]

@@ -25,9 +25,6 @@ import os
 import time
 from functools import partial
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.sha256_downloader import Sha256Downloader
 
@@ -81,113 +78,79 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-
-        if name in (
+        kwargs["screens"] = (
             "ConfigKruxInstaller",
             "DownloadStableZipScreen",
             "DownloadStableZipSha256Screen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
+        )
+        self.update_screen(**kwargs)
 
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error("Invalid value for 'key': '{value}'")
+    def build_downloader(self, value: str):
+        """Creates a downloader for sha256sum file for a given firmware version"""
+        self.version = value
+        self.downloader = Sha256Downloader(
+            version=value,
+            destdir=DownloadStableZipSha256Screen.get_destdir_assets(),
+        )
 
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
+        if self.downloader is not None:
+            url = getattr(self.downloader, "url")
+            destdir = getattr(self.downloader, "destdir")
 
-        elif key == "version":
-            if value is not None:
-                self.version = value
-                self.downloader = Sha256Downloader(
-                    version=value,
-                    destdir=DownloadStableZipSha256Screen.get_destdir_assets(),
-                )
-
-                if self.downloader is not None:
-                    url = getattr(self.downloader, "url")
-                    destdir = getattr(self.downloader, "destdir")
-                    downloading = self.translate("Downloading")
-                    to = self.translate("to")
-                    filepath = os.path.join(
+            self.ids[f"{self.id}_info"].text = (
+                DownloadStableZipSha256Screen.make_download_info(
+                    size=self.SIZE_MP,
+                    download_msg=self.translate("Downloading"),
+                    from_url=url,
+                    to_msg=self.translate("to"),
+                    to_path=os.path.join(
                         destdir, f"krux-{self.version}.zip.sha256.txt"
-                    )
+                    ),
+                )
+            )
 
-                    self.ids[f"{self.id}_info"].text = "".join(
-                        [
-                            f"[size={self.SIZE_MP}sp]",
-                            downloading,
-                            "\n",
-                            f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                            "\n",
-                            to,
-                            "\n",
-                            filepath,
-                            "[/size]",
-                        ]
-                    )
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+        else:
+            self.redirect_error("Invalid downloader")
 
-        elif key == "progress":
-            if value is not None:
-                # calculate percentage of download
-                lens = [value["downloaded_len"], value["content_len"]]
-                percent = lens[0] / lens[1]
+    def on_download_progress(self, value: dict):
+        """update GUI given a ratio between what is downloaded and its total length"""
+        # calculate percentage of download
+        downloaded_len = value["downloaded_len"]
+        content_len = value["content_len"]
+        percent = downloaded_len / content_len
 
-                of = self.translate("of")
-                self.ids[f"{self.id}_progress"].text = "".join(
+        self.ids[f"{self.id}_progress"].text = (
+            DownloadStableZipSha256Screen.make_progress_info(
+                sizes=(self.SIZE_G, self.SIZE_MP),
+                of_msg=self.translate("of"),
+                percent=percent,
+                downloaded_len=downloaded_len,
+                content_len=content_len,
+            )
+        )
+
+        # When finish, change the label
+        # and then change screen
+        if percent == 1.00:
+            if self.downloader is not None:
+                destdir = getattr(self.downloader, "destdir")
+                downloaded = self.translate("downloaded")
+                filepath = os.path.join(destdir, f"krux-{self.version}.zip.sha256.txt")
+                self.ids[f"{self.id}_info"].text = "".join(
                     [
-                        f"[size={self.SIZE_G}sp][b]{percent * 100:,.2f} %[/b][/size]",
-                        "\n",
                         f"[size={self.SIZE_MP}sp]",
-                        str(lens[0]),
-                        f" {of} ",
-                        str(lens[1]),
-                        " B",
+                        filepath,
+                        "\n",
+                        downloaded,
                         "[/size]",
                     ]
                 )
 
-                # When finish, change the label
+                # When finish, change the label, wait some seconds
                 # and then change screen
-                if percent == 1.00:
-                    if self.downloader is not None:
-                        destdir = getattr(self.downloader, "destdir")
-                        downloaded = self.translate("downloaded")
-                        filepath = os.path.join(
-                            destdir, f"krux-{self.version}.zip.sha256.txt"
-                        )
-                        self.ids[f"{self.id}_info"].text = "".join(
-                            [
-                                f"[size={self.SIZE_MP}sp]",
-                                filepath,
-                                "\n",
-                                downloaded,
-                                "[/size]",
-                            ]
-                        )
-                        # When finish, change the label, wait some seconds
-                        # and then change screen
-                        # trigger is defined in superclass
-                        callback_trigger = getattr(self, "trigger")
-                        callback_trigger()
+                # trigger is defined in superclass
+                callback_trigger = getattr(self, "trigger")
+                callback_trigger()
 
-                    else:
-                        self.redirect_error(f"Invalid downloader: {self.downloader}")
             else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+                self.redirect_error(f"Invalid downloader: {self.downloader}")

@@ -25,9 +25,6 @@ import os
 import time
 from functools import partial
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.zip_downloader import ZipDownloader
 
@@ -91,45 +88,13 @@ class DownloadStableZipScreen(BaseDownloadScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-
-        if name in (
+        kwargs["screens"] = (
             "ConfigKruxInstaller",
             "MainScreen",
             "WarningAlreadyDownloadedScreen",
             "DownloadStableZipScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "version":
-            if value is not None:
-                self.build_downloader(value)
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "progress":
-            if value is not None:
-                self.on_download_progress(value)
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+        )
+        self.update_screen(**kwargs)
 
     def build_downloader(self, version: str):
         """Creates a Downloader given a firmware version"""

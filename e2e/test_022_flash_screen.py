@@ -415,7 +415,6 @@ class TestFlashScreen(GraphicUnitTest):
             [
                 f"[size={size}sp][b]DONE![/b][/size]",
                 "\n",
-                "\n",
                 f"[size={size}sp]",
                 "[color=#00FF00]",
                 "[ref=Back][u]Back[/u][/ref]",
@@ -430,6 +429,9 @@ class TestFlashScreen(GraphicUnitTest):
         on_done = getattr(FlashScreen, "on_done")
         on_done(0)
 
+        print(text)
+        print("=============")
+        print(screen.ids[f"{screen.id}_progress"].text)
         self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
 
         # patch assertions

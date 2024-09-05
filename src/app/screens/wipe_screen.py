@@ -46,10 +46,16 @@ class WipeScreen(BaseFlashScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    # pylint: disable=unused-argument
-    def on_pre_enter(self, *args):
-        self.ids[f"{self.id}_grid"].clear_widgets()
+    def build_on_data(self):
+        """
+        Build a streaming IO static method using
+        some instance variables for flash procedure
+        when KTool.print_callback is called
 
+        (useful for to be used in tests)
+        """
+
+        # pylint: disable=unused-argument
         def on_data(*args, **kwargs):
             text = " ".join(str(x) for x in args)
             self.info(text)
@@ -78,6 +84,14 @@ class WipeScreen(BaseFlashScreen):
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
 
+        setattr(WipeScreen, "on_data", on_data)
+
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        self.ids[f"{self.id}_grid"].clear_widgets()
+        self.build_on_data()
+        self.build_on_done()
+
         def on_ref_press(*args):
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
@@ -87,39 +101,6 @@ class WipeScreen(BaseFlashScreen):
 
             else:
                 self.redirect_error(f"Invalid ref: {args[1]}")
-
-        def on_done(dt):
-            self.is_done = True
-            del self.output[4:]
-            self.ids[f"{self.id}_loader"].source = self.done_img
-            self.ids[f"{self.id}_loader"].reload()
-            done = self.translate("DONE")
-            back = self.translate("Back")
-            _quit = self.translate("Quit")
-
-            if sys.platform in ("linux", "win32"):
-                size = self.SIZE_M
-            else:
-                size = self.SIZE_M
-
-            self.ids[f"{self.id}_progress"].text = "".join(
-                [
-                    f"[size={size}sp][b]{done}![/b][/size]",
-                    "\n",
-                    f"[size={size}sp]",
-                    "[color=#00FF00]",
-                    f"[ref=Back][u]{back}[/u][/ref]",
-                    "[/color]",
-                    "        ",
-                    "[color=#EFCC00]",
-                    f"[ref=Quit][u]{_quit}[/u][/ref]",
-                    "[/color]",
-                ]
-            )
-            self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
-
-        setattr(WipeScreen, "on_data", on_data)
-        setattr(WipeScreen, "on_done", on_done)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=3, root_widget=f"{self.id}_grid"

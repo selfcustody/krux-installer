@@ -122,6 +122,42 @@ class BaseFlashScreen(BaseScreen):
         self.debug(f"setter::is_done={value}")
         self._is_done = value
 
+    def build_on_done(self):
+        """
+        Build a streaming IO static method using
+        some instance variables when flash procedure is done
+
+        (useful for to be used in tests)
+        """
+
+        # pylint: disable=unused-argument
+        def on_done(dt):
+            self.is_done = True
+            del self.output[4:]
+            self.ids[f"{self.id}_loader"].source = self.done_img
+            self.ids[f"{self.id}_loader"].reload()
+            done = self.translate("DONE")
+            back = self.translate("Back")
+            _quit = self.translate("Quit")
+            size = self.SIZE_M
+
+            self.ids[f"{self.id}_progress"].text = "".join(
+                [
+                    f"[size={size}sp][b]{done}![/b][/size]",
+                    "\n",
+                    f"[size={size}sp]",
+                    "[color=#00FF00]",
+                    f"[ref=Back][u]{back}[/u][/ref]",
+                    "[/color]",
+                    "        ",
+                    "[color=#EFCC00]",
+                    f"[ref=Quit][u]{_quit}[/u][/ref]",
+                    "[/color]",
+                ]
+            )
+
+        setattr(self.__class__, "on_done", on_done)
+
     @staticmethod
     def parse_general_output(text: str) -> str:
         """Parses KTool.print_callback output to make it more readable on GUI"""

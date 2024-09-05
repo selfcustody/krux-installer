@@ -62,7 +62,6 @@ class FlashScreen(BaseFlashScreen):
             if "INFO" in text:
                 self.output.append(text)
                 if "Rebooting" in text:
-                    self.is_done = True
                     # pylint: disable=not-callable
                     self.done()
 
@@ -124,46 +123,6 @@ class FlashScreen(BaseFlashScreen):
             )
 
         setattr(FlashScreen, "on_process", on_process)
-
-    def build_on_done(self):
-        """
-        Build a streaming IO static method using
-        some instance variables when flash procedure is done
-
-        (useful for to be used in tests)
-        """
-
-        # pylint: disable=unused-argument
-        def on_done(dt):
-            del self.output[4:]
-            self.ids[f"{self.id}_loader"].source = self.done_img
-            self.ids[f"{self.id}_loader"].reload()
-            done = self.translate("DONE")
-            back = self.translate("Back")
-            _quit = self.translate("Quit")
-
-            if sys.platform in ("linux", "win32"):
-                size = self.SIZE_M
-            else:
-                size = self.SIZE_M
-
-            self.ids[f"{self.id}_progress"].text = "".join(
-                [
-                    f"[size={size}sp][b]{done}![/b][/size]",
-                    "\n",
-                    "\n",
-                    f"[size={size}sp]",
-                    "[color=#00FF00]",
-                    f"[ref=Back][u]{back}[/u][/ref]",
-                    "[/color]",
-                    "        ",
-                    "[color=#EFCC00]",
-                    f"[ref=Quit][u]{_quit}[/u][/ref]",
-                    "[/color]",
-                ]
-            )
-
-        setattr(FlashScreen, "on_done", on_done)
 
     # pylint: disable=unused-argument
     def on_pre_enter(self, *args):

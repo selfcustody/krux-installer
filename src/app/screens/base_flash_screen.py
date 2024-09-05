@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-main_screen.py
+base_flash__screen.py
 """
 import os
 import typing
@@ -121,3 +121,24 @@ class BaseFlashScreen(BaseScreen):
         """Setter for info"""
         self.debug(f"setter::is_done={value}")
         self._is_done = value
+
+    @staticmethod
+    def parse_general_output(text: str) -> str:
+        """Parses KTool.print_callback output to make it more readable on GUI"""
+        text = text.replace(
+            "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
+        )
+        text = text.replace("\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]")
+        text = text.replace(
+            "\x1b[33mInitialize K210 SPI Flash",
+            "[color=#efcc00]Initialize K210 SPI Flash[/color]",
+        )
+        text = text.replace("Flash ID: \x1b[33m", "Flash ID: [color=#efcc00]")
+        text = text.replace(
+            "\x1b[0m, unique ID: \x1b[33m", "[/color], unique ID: [color=#efcc00]"
+        )
+        text = text.replace("\x1b[0m, size: \x1b[33m", "[/color], size: ")
+        text = text.replace("\x1b[0m MB", "[/color] MB")
+        text = text.replace("\x1b[0m", "")
+        text = text.replace("\x1b[33m", "")
+        return text

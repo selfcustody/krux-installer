@@ -43,28 +43,6 @@ class FlashScreen(BaseFlashScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    @staticmethod
-    def parse_output(text: str) -> str:
-        """Parses KTool.print_callback output to make it more readable on GUI"""
-        text = text.replace(
-            "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
-        )
-        text = text.replace("\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]")
-        text = text.replace(
-            "\x1b[33mInitialize K210 SPI Flash",
-            "[color=#efcc00]Initialize K210 SPI Flash[/color]",
-        )
-        text = text.replace("Flash ID: \x1b[33m", "Flash ID: [color=#efcc00]")
-        text = text.replace(
-            "\x1b[0m, unique ID: \x1b[33m", "[/color], unique ID: [color=#efcc00]"
-        )
-        text = text.replace("\x1b[0m, size: \x1b[33m", "[/color], size: ")
-        text = text.replace("\x1b[0m MB", "[/color] MB")
-        text = text.replace("\x1b[0m", "")
-        text = text.replace("\x1b[33m", "")
-        text = text.replace("\rProgramming", "Programming")
-        return text
-
     def build_on_data(self):
         """
         Build a streaming IO static method using
@@ -78,7 +56,8 @@ class FlashScreen(BaseFlashScreen):
         def on_data(*args, **kwargs):
             text = " ".join(str(x) for x in args)
             self.info(text)
-            text = FlashScreen.parse_output(text)
+            text = FlashScreen.parse_general_output(text)
+            text = text.replace("\rProgramming", "Programming")
 
             if "INFO" in text:
                 self.output.append(text)

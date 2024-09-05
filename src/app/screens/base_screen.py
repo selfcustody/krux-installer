@@ -30,6 +30,8 @@ from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
@@ -265,6 +267,30 @@ class BaseScreen(Screen, Trigger):
             Clock.schedule_once(fn, 0)
 
         self.set_screen(name="ErrorScreen", direction="left")
+
+    def update_screen(self, **kwargs):
+        """Update a screen in accord with the valid ones"""
+        name = kwargs.get("name")
+        key = kwargs.get("key")
+        value = kwargs.get("value")
+        screens = kwargs.get("screens")
+
+        if name in screens:
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            self.redirect_error(f"Invalid screen name: {name}")
+            return
+
+        if key == "locale":
+            if value is not None:
+                self.locale = value
+            else:
+                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+
+        if key == "canvas":
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
 
     @staticmethod
     def get_destdir_assets() -> str:

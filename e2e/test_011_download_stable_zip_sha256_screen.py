@@ -76,27 +76,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
-        screen = DownloadStableZipSha256Screen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        # do tests
-        screen.update(name="DownloadStableZipScreen", key="mock")
-
-        # default assertions
-        mock_redirect_error.assert_any_call('Invalid key: "mock"')
-
-        # patch assertions
-        mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
     def test_update_locale(self, mock_get_locale):
         screen = DownloadStableZipSha256Screen()
         self.render(screen)

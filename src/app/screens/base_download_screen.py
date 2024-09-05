@@ -27,9 +27,6 @@ from threading import Thread
 from kivy.clock import Clock, ClockEvent
 from kivy.weakproxy import WeakProxy
 from kivy.uix.label import Label
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.app.screens.base_screen import BaseScreen
 from src.utils.downloader.asset_downloader import AssetDownloader
 
@@ -172,46 +169,25 @@ class BaseDownloadScreen(BaseScreen):
         else:
             self.redirect_error("Downloader isnt configured. Use `update` method first")
 
-    def update_screen(self, **kwargs):
+    def update_download_screen(self, **kwargs):
         """Update a screen in accord with the valid ones"""
-        name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
-        screens = kwargs.get("screens")
+        self.update_screen(**kwargs)
 
-        if name in screens:
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "canvas":
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "version":
+        if key == "version":
             if value is not None:
                 build_downloader = getattr(self, "build_downloader")
                 build_downloader(value)
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
-        elif key == "progress":
+        if key == "progress":
             if value is not None:
                 on_download_progress = getattr(self, "on_download_progress")
                 on_download_progress(value)
             else:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
 
     @staticmethod
     def make_download_info(

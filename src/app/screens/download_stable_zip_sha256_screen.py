@@ -66,11 +66,8 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
             )
             Clock.schedule_once(fn, 0)
 
-        self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
-        setattr(self.__class__, "on_trigger", on_trigger)
-
-        self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
-        setattr(self.__class__, "on_progress", on_progress)
+        setattr(DownloadStableZipSha256Screen, "on_trigger", on_trigger)
+        setattr(DownloadStableZipSha256Screen, "on_progress", on_progress)
 
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
@@ -83,7 +80,7 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
             "DownloadStableZipScreen",
             "DownloadStableZipSha256Screen",
         )
-        self.update_screen(**kwargs)
+        self.update_download_screen(**kwargs)
 
     def build_downloader(self, value: str):
         """Creates a downloader for sha256sum file for a given firmware version"""

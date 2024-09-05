@@ -25,9 +25,6 @@ import os
 import time
 from functools import partial
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
 
@@ -94,29 +91,12 @@ class DownloadBetaScreen(BaseDownloadScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
         key = kwargs.get("key")
         value = kwargs.get("value")
+        kwargs["screens"] = ("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen")
+        self.update_screen(**kwargs)
 
-        if name in ("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen"):
-            self.debug(f"Updating {self.name} from {name}::{key}={value}")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "firmware":
+        if key == "firmware":
             if value is None:
                 self.redirect_error(f"Invalid value for key '{key}': '{value}'")
             elif value in ("kboot.kfpkg", "firmware.bin"):
@@ -124,7 +104,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
             else:
                 self.redirect_error(f"Invalid firmware: {value}")
 
-        elif key == "device":
+        if key == "device":
             if value in (
                 "m5stickv",
                 "amigo",
@@ -138,19 +118,16 @@ class DownloadBetaScreen(BaseDownloadScreen):
             else:
                 self.redirect_error(f'Invalid device: "{value}"')
 
-        elif key == "downloader":
+        if key == "downloader":
 
             if self.downloader is None:
                 self.build_downloader()
             else:
                 self.redirect_error("Downloader already initialized")
 
-        elif key == "progress":
+        if key == "progress":
             if value is not None:
                 self.on_download_progress(value)
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
 
     def build_downloader(self):
         """Build the downloader for beta firmware before the download itself"""

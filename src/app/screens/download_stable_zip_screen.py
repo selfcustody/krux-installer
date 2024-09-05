@@ -75,11 +75,8 @@ class DownloadStableZipScreen(BaseDownloadScreen):
                 self.redirect_error(f"Invalid downloader: {self.downloader}")
 
         # Now define the functions as staticmethods of class
-        self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
-        setattr(self.__class__, "on_trigger", on_trigger)
-
-        self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
-        setattr(self.__class__, "on_progress", on_progress)
+        setattr(DownloadStableZipScreen, "on_trigger", on_trigger)
+        setattr(DownloadStableZipScreen, "on_progress", on_progress)
 
         # Once finished, update canvas
         fn = partial(self.update, name=self.name, key="canvas")
@@ -94,7 +91,7 @@ class DownloadStableZipScreen(BaseDownloadScreen):
             "WarningAlreadyDownloadedScreen",
             "DownloadStableZipScreen",
         )
-        self.update_screen(**kwargs)
+        self.update_download_screen(**kwargs)
 
     def build_downloader(self, version: str):
         """Creates a Downloader given a firmware version"""

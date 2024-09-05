@@ -64,11 +64,8 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
             )
             Clock.schedule_once(fn, 0)
 
-        self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
-        setattr(self.__class__, "on_trigger", on_trigger)
-
-        self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
-        setattr(self.__class__, "on_progress", on_progress)
+        setattr(DownloadStableZipSigScreen, "on_trigger", on_trigger)
+        setattr(DownloadStableZipSigScreen, "on_progress", on_progress)
 
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
@@ -81,7 +78,7 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
             "DownloadStableZipSha256Screen",
             "DownloadStableZipSigScreen",
         )
-        self.update_screen(**kwargs)
+        self.update_download_screen(**kwargs)
 
     def build_downloader(self, value: str):
         """Creates a Downloader for signature file given a firmware version"""

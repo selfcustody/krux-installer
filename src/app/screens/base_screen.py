@@ -61,7 +61,6 @@ class BaseScreen(Screen, Trigger):
         self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
-        self._error_img = os.path.join(root_assets_path, "assets", "error.png")
 
         self.locale = BaseScreen.get_locale()
 
@@ -111,18 +110,12 @@ class BaseScreen(Screen, Trigger):
         return self._done_img
 
     @property
-    def error_img(self) -> str:
-        """Getter for logo_img"""
-        self.debug(f"getter::error_img={self._logo_img}")
-        return self._error_img
-
-    @property
     def locale(self) -> str:
         """Getter for locale property"""
         return self._locale
 
     @locale.setter
-    def locale(self, value: bool):
+    def locale(self, value: str):
         """Setter for locale property"""
         self.debug(f"locale = {value}")
         self._locale = value
@@ -226,29 +219,6 @@ class BaseScreen(Screen, Trigger):
         self.debug(
             f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
         )
-
-    def make_stack_button(
-        self,
-        root_widget: str,
-        wid: str,
-        on_press: typing.Callable,
-        on_release: typing.Callable,
-        size_hint: typing.Tuple[float, float],
-    ):
-        """Create a button on StackLayout"""
-        btn = Button(
-            markup=True,
-            font_size=Window.size[0] // 30,
-            background_color=(0, 0, 0, 1),
-            size_hint=size_hint,
-        )
-        btn.id = wid
-        self.ids[root_widget].add_widget(btn)
-        self.ids[btn.id] = WeakProxy(btn)
-        btn.bind(on_press=on_press)
-        btn.bind(on_release=on_release)
-        setattr(self, f"on_press_{wid}", on_press)
-        setattr(self, f"on_release_{wid}", on_release)
 
     def redirect_error(self, msg: str):
         """Create a RuntimeError and give it to redirect_exception"""

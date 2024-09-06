@@ -14,9 +14,107 @@ class TestBaseScreen(GraphicUnitTest):
     def teardown_class(cls):
         EventLoop.exit()
 
+    @patch("sys.platform", "linux")
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_static_get_locale_linux(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = ["en-US.UTF-8"]
+
+        # your asserts
+        self.assertEqual(BaseScreen.get_locale(), "en_US.UTF-8")
+
+    @patch("sys.platform", "darwin")
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_static_get_locale_darwin(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = ["en-US.UTF-8"]
+
+        # your asserts
+        self.assertEqual(BaseScreen.get_locale(), "en_US.UTF-8")
+
+    @patch("sys.platform", "win32")
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_static_get_locale_win32(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = ["en_US"]
+
+        # your asserts
+        self.assertEqual(BaseScreen.get_locale(), "en_US.UTF-8")
+
+    @patch("sys.platform", "mockos")
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_get_locale(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = ["en_US"]
+
+        with self.assertRaises(RuntimeError) as exc_info:
+            BaseScreen.get_locale()
+
+        self.assertEqual(str(exc_info.exception), "Not implemented for 'mockos'")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_static_get_destdir_assets(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = [
+            os.path.join("tmp", "mock")
+        ]
+
+        # your asserts
+        self.assertEqual(BaseScreen.get_destdir_assets(), os.path.join("tmp", "mock"))
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_static_get_baudrate(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = [15000000]
+
+        # your asserts
+        self.assertEqual(BaseScreen.get_baudrate(), 15000000)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_static_open_settings(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.open_settings = MagicMock()
+
+        BaseScreen.open_settings()
+        mock_get_ruunning_app.return_value.open_settings.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_init_linux(self, mock_get_locale):
+        screen = BaseScreen(wid="mock", name="Mock")
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+
+        # your asserts
+        self.assertEqual(window.children[0], screen)
+        self.assertEqual(window.children[0].height, window.height)
+
+        mock_get_locale.assert_called_once()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    def test_render(self, mock_get_locale):
+    def test_init_win32(self, mock_get_locale):
 
         screen = BaseScreen(wid="mock", name="Mock")
         self.render(screen)
@@ -228,4 +326,96 @@ class TestBaseScreen(GraphicUnitTest):
         screen.clear_grid(wid="mock_grid")
         self.assertFalse("mock_button_0" in grid.ids)
 
+        mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_screen_invalid_screen(
+        self, mock_redirect_error, mock_get_locale
+    ):
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.make_grid(wid="mock_grid", rows=1)
+        screen.make_button(
+            row=0,
+            wid="mock_button",
+            root_widget="mock_grid",
+            text="Mocked button",
+            on_press=MagicMock(),
+            on_release=MagicMock(),
+        )
+        self.render(screen)
+        screen.update_screen(name="NoMockedScreen", screens=["MockedScreen"])
+        mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with(
+            "Invalid screen name: NoMockedScreen"
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    def test_fail_update_screen_none_value_locale(
+        self, mock_redirect_error, mock_get_locale
+    ):
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.make_grid(wid="mock_grid", rows=1)
+        screen.make_button(
+            row=0,
+            wid="mock_button",
+            root_widget="mock_grid",
+            text="Mocked button",
+            on_press=MagicMock(),
+            on_release=MagicMock(),
+        )
+        self.render(screen)
+        screen.update_screen(
+            name="MockedScreen", screens=("MockedScreen"), key="locale"
+        )
+        mock_get_locale.assert_called_once()
+        mock_redirect_error.assert_called_once_with(
+            "Invalid value for key 'locale': 'None'"
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    def test_update_screen_locale(self, mock_get_locale):
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.make_grid(wid="mock_grid", rows=1)
+        screen.make_button(
+            row=0,
+            wid="mock_button",
+            root_widget="mock_grid",
+            text="Mocked button",
+            on_press=MagicMock(),
+            on_release=MagicMock(),
+        )
+        self.render(screen)
+        screen.update_screen(
+            name="MockedScreen", screens=("MockedScreen"), key="locale", value="mocked"
+        )
+        self.assertEqual(screen.locale, "mocked")
+        mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch("src.app.screens.base_screen.Color")
+    @patch("src.app.screens.base_screen.Rectangle")
+    def test_update_screen_canvas(self, mock_rectangle, mock_color, mock_get_locale):
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.make_grid(wid="mock_grid", rows=1)
+        screen.make_button(
+            row=0,
+            wid="mock_button",
+            root_widget="mock_grid",
+            text="Mocked button",
+            on_press=MagicMock(),
+            on_release=MagicMock(),
+        )
+        self.render(screen)
+        screen.update_screen(
+            name="MockedScreen", screens=("MockedScreen"), key="canvas"
+        )
+
+        mock_color.assert_called_once_with(0, 0, 0, 1)
+        mock_rectangle.assert_called_once()
         mock_get_locale.assert_called_once()

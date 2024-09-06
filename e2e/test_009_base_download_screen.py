@@ -166,4 +166,3 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         )
         mock_create_trigger.assert_called()
         mock_thread.assert_called_once()
-        # (name=screen.name, target=mock_partial())

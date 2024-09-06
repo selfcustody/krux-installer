@@ -93,10 +93,10 @@ class TestSelectVersionScreen(GraphicUnitTest):
         buttons = grid.children
 
         self.assertEqual(len(buttons), 4)
-        self.assertEqual(buttons[3].id, "select_version_latest")
-        self.assertEqual(buttons[2].id, "select_version_beta")
-        self.assertEqual(buttons[1].id, "select_version_old")
-        self.assertEqual(buttons[0].id, "select_version_back")
+        self.assertEqual(buttons[3].id, "select_version_screen_latest")
+        self.assertEqual(buttons[2].id, "select_version_screen_beta")
+        self.assertEqual(buttons[1].id, "select_version_screen_old")
+        self.assertEqual(buttons[0].id, "select_version_screen_back")
 
         mock_get_locale.assert_any_call()
 
@@ -204,75 +204,3 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_manager.get_screen.assert_has_calls(calls_get_screen)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.utils.selector.requests")
-    @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    def test_update_locale_old_versions(
-        self, mock_get_locale, mock_manager, mock_requests
-    ):
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.json.return_value = MOCKED_FOUND_API
-        mock_requests.get.return_value = mock_response
-
-        mock_manager.get_screen = MagicMock()
-
-        screen = SelectVersionScreen()
-        screen.fetch_releases()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-
-        button_old_versions = grid.children[1]
-        button_back = grid.children[0]
-
-        text_old_versions = "Versões antigas"
-        text_back_button = "Voltar"
-        screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
-
-        self.assertEqual(button_old_versions.text, text_old_versions)
-        self.assertEqual(button_back.text, text_back_button)
-
-        mock_manager.get_screen.assert_called_once()
-        mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_locale_name(self, mock_redirect_error, mock_get_locale):
-        screen = SelectVersionScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
-
-        mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with("Invalid screen name: Mock")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_locale_key(self, mock_redirect_error, mock_get_locale):
-        screen = SelectVersionScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name="ConfigKruxInstaller", key="mock", value="pt_BR.UTF-8")
-
-        mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')

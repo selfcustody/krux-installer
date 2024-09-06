@@ -1,4 +1,5 @@
 from unittest.mock import patch, call, MagicMock
+import requests
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.select_version_screen import SelectVersionScreen
@@ -146,10 +147,36 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_on_fetch_releases(
+        self,
+        mock_redirect_exception,
+        mock_get_locale,
+        mock_requests,
+    ):
+        # Configure mocks
+        mock_response = MagicMock(status_code=404)
+        mock_response.raise_for_status.side_effect = requests.exceptions.HTTPError(
+            "Mocked 404"
+        )
+        mock_requests.exceptions = requests.exceptions
+        mock_requests.get.return_value = mock_response
+
+        screen = SelectVersionScreen()
+        screen.fetch_releases()
+
+        mock_get_locale.assert_called_once()
+        mock_redirect_exception.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.utils.selector.requests")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.set_background")
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.set_screen")
     @patch("src.app.screens.select_version_screen.SelectVersionScreen.manager")
-    def test_on_release(
+    def test_on_fetch_releases(
         self,
         mock_manager,
         mock_set_screen,
@@ -204,3 +231,21 @@ class TestSelectVersionScreen(GraphicUnitTest):
         mock_manager.get_screen.assert_has_calls(calls_get_screen)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_get_locale.assert_any_call()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.update_screen")
+    def test_on_update(
+        self,
+        mock_update_screen,
+        mock_get_locale,
+    ):
+        screen = SelectVersionScreen()
+        self.render(screen)
+
+        screen.update(name=screen.name, key="locale", value="en_US")
+
+        mock_get_locale.assert_called_once()
+        mock_update_screen.assert_called_once()

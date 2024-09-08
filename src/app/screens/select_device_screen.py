@@ -76,44 +76,34 @@ class SelectDeviceScreen(BaseScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons according the valid devices for each version"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
 
         # Check if update to screen
-        if name in ("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
+        kwargs["screens"] = ("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen")
+        self.update_screen(**kwargs)
+        self.update_device(**kwargs)
 
+    def update_device(self, **kwargs):
+        """Check for each version which device is compatible"""
+        key = kwargs.get("key")
+        value = kwargs.get("value")
         if key == "version":
-            self.debug(
-                f"Updating buttons to fit {kwargs.get("key")} = {kwargs.get("version")}"
-            )
+            self.enabled_devices = []
 
-            if value is not None:
-                self.enabled_devices = []
-
-                for device in (
-                    "m5stickv",
-                    "amigo",
-                    "dock",
-                    "bit",
-                    "yahboom",
-                    "cube",
-                    "wonder_mv",
-                ):
-                    cleanr = re.compile("\\[.*?\\]")
-                    clean_text = re.sub(cleanr, "", value)
-                    if device not in VALID_DEVICES_VERSIONS[clean_text]:
-                        self.ids[f"select_device_{device}"].text = "".join(
-                            ["[color=#333333]", device, "[/color]"]
-                        )
-                    else:
-                        self.enabled_devices.append(f"select_device_{device}")
-                        self.ids[f"select_device_{device}"].text = device
-
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-        else:
-            self.redirect_error(f"Invalid key: {key}")
+            for device in (
+                "m5stickv",
+                "amigo",
+                "dock",
+                "bit",
+                "yahboom",
+                "cube",
+                "wonder_mv",
+            ):
+                cleanre = re.compile("\\[.*?\\]")
+                clean_text = re.sub(cleanre, "", value)
+                if device not in VALID_DEVICES_VERSIONS[clean_text]:
+                    self.ids[f"select_device_{device}"].text = "".join(
+                        ["[color=#333333]", device, "[/color]"]
+                    )
+                else:
+                    self.enabled_devices.append(f"select_device_{device}")
+                    self.ids[f"select_device_{device}"].text = device

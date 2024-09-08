@@ -72,22 +72,6 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update(self, mock_redirect_error, mock_get_locale):
-        screen = SelectDeviceScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        screen.update(name=screen.name, key="mock", value="mock")
-
-        mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with("Invalid key: mock")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     def test_on_press_with_latest_version(self, mock_set_background, mock_get_locale):
         screen = SelectDeviceScreen()

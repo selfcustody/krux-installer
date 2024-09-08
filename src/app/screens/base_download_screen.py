@@ -46,19 +46,8 @@ class BaseDownloadScreen(BaseScreen):
 
         # progress label, show a "Connecting"
         # before start the download to make
-        connecting = self.translate("Connecting")
-        text = "".join(
-            [
-                f"[size={self.SIZE_G}]",
-                f"{connecting}...",
-                "[/size]",
-                "[color=#efcc00]",
-                "[/color]",
-            ]
-        )
-
         progress = Label(
-            text=text,
+            text="",
             markup=True,
             valign="center",
             halign="center",
@@ -143,6 +132,21 @@ class BaseDownloadScreen(BaseScreen):
         """Delete a `ClockEvent`"""
         self.debug(f"deleter::trigger={self._trigger}")
         del self._trigger
+
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        """Before enter, reset text to show that its requesting github API"""
+        connecting = self.translate("Connecting")
+        text = "".join(
+            [
+                f"[size={self.SIZE_G}]",
+                f"{connecting}...",
+                "[/size]",
+                "[color=#efcc00]",
+                "[/color]",
+            ]
+        )
+        self.ids[f"{self.id}_progress"].text = text
 
     # pylint: disable=unused-argument
     def on_enter(self, *args):

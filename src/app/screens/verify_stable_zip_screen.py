@@ -211,7 +211,7 @@ class VerifyStableZipScreen(BaseScreen):
             hash_color = "#00FF00"
             hash_msg = self.translate("SUCCESS")
         else:
-            hash_color = "FF0000"
+            hash_color = "#FF0000"
             hash_msg = self.translate("FAILED")
 
         return "".join(
@@ -281,7 +281,7 @@ class VerifyStableZipScreen(BaseScreen):
             sig_color = "#00FF00"
             res_msg = good_msg
         else:
-            sig_color = "FF0000"
+            sig_color = "#FF0000"
             res_msg = bad_msg
 
         return "".join(
@@ -308,7 +308,7 @@ class VerifyStableZipScreen(BaseScreen):
                 "[/b]",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp][b][color=#{sig_color}]{res_msg} {sig_msg}[/b][/color][/size]",
+                f"[size={size[1]}sp][b][color={sig_color}]{res_msg} {sig_msg}[/b][/color][/size]",
                 "\n",
                 "\n",
                 f"[size={size[0]}sp]",

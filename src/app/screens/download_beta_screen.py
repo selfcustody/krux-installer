@@ -48,9 +48,9 @@ class DownloadBetaScreen(BaseDownloadScreen):
             screen = self.manager.get_screen(self.to_screen)
             baudrate = DownloadBetaScreen.get_baudrate()
             destdir = DownloadBetaScreen.get_destdir_assets()
-            firmware = os.path.join(
-                destdir, "krux_binaries", f"maixpy_{self.device}", self.firmware
-            )
+            maixpy = f"maixpy_{getattr(self, "device")}"
+            _firmware = getattr(self, "firmware")
+            firmware = os.path.join(destdir, "krux_binaries", f"{maixpy}", _firmware)
             partials = [
                 partial(screen.update, name=self.name, key="baudrate", value=baudrate),
                 partial(screen.update, name=self.name, key="firmware", value=firmware),
@@ -64,20 +64,15 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         def on_progress(data: bytes):
             # calculate downloaded percentage
-            if self.downloader is not None:
-                fn = partial(
-                    self.update,
-                    name=self.name,
-                    key="progress",
-                    value={
-                        "downloaded_len": self.downloader.downloaded_len,
-                        "content_len": self.downloader.content_len,
-                    },
-                )
-                Clock.schedule_once(fn, 0)
-
-            else:
-                self.redirect_error("Downloader isnt initialized")
+            dl_len = getattr(self.downloader, "downloaded_len")
+            ct_len = getattr(self.downloader, "content_len")
+            fn = partial(
+                self.update,
+                name=self.name,
+                key="progress",
+                value={"downloaded_len": dl_len, "content_len": ct_len},
+            )
+            Clock.schedule_once(fn, 0)
 
         self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
         setattr(self.__class__, "on_trigger", on_trigger)
@@ -173,37 +168,34 @@ class DownloadBetaScreen(BaseDownloadScreen):
         # trigger is defined in superclass
 
         callback_trigger = getattr(self, "trigger")
+        lens = [value["downloaded_len"], value["content_len"]]
+        percent = lens[0] / lens[1]
 
-        # calculate percentage of download
-        if value is not None and self.downloader is not None:
-            lens = [value["downloaded_len"], value["content_len"]]
-            percent = lens[0] / lens[1]
+        # Format bytes (one liner) in MB
+        # https://stackoverflow.com/questions/
+        # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+        downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
+        self.ids[f"{self.id}_progress"].text = "".join(
+            [
+                f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                "\n",
+                f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
+            ]
+        )
 
-            # Format bytes (one liner) in MB
-            # https://stackoverflow.com/questions/
-            # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-            downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-            self.ids[f"{self.id}_progress"].text = "".join(
+        if percent == 1.0:
+            downloaded = self.translate("downloaded")
+            destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
+            self.ids[f"{self.id}_info"].text = "".join(
                 [
-                    f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                    f"[size={self.SIZE_MP}sp]",
+                    destdir,
                     "\n",
-                    f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
+                    downloaded,
+                    "[/size]",
                 ]
             )
 
-            if percent == 1.0:
-                downloaded = self.translate("downloaded")
-                destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={self.SIZE_MP}sp]",
-                        destdir,
-                        "\n",
-                        downloaded,
-                        "[/size]",
-                    ]
-                )
-
-                # When finish, change the label, wait some seconds
-                # and then change screen
-                callback_trigger()
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            callback_trigger()

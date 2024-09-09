@@ -53,14 +53,13 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
         def on_progress(data: bytes):
             # calculate downloaded percentage
             self.debug(f"Chunck size: {len(data)}")
+            dl_len = getattr(self.downloader, "downloaded_len")
+            ct_len = getattr(self.downloader, "content_len")
             fn = partial(
                 self.update,
                 name=self.name,
                 key="progress",
-                value={
-                    "downloaded_len": self.downloader.downloaded_len,
-                    "content_len": self.downloader.content_len,
-                },
+                value={"downloaded_len": dl_len, "content_len": ct_len},
             )
             Clock.schedule_once(fn, 0)
 
@@ -101,22 +100,18 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
             destdir=DownloadStableZipSigScreen.get_destdir_assets(),
         )
 
-        if self.downloader is not None:
-            url = getattr(self.downloader, "url")
-            destdir = getattr(self.downloader, "destdir")
+        url = getattr(self.downloader, "url")
+        destdir = getattr(self.downloader, "destdir")
 
-            self.ids[f"{self.id}_info"].text = (
-                DownloadStableZipSigScreen.make_download_info(
-                    size=self.SIZE_MP,
-                    download_msg=self.translate("Downloading"),
-                    from_url=url,
-                    to_msg=self.translate("to"),
-                    to_path=os.path.join(destdir, f"krux-{self.version}.zip.sig"),
-                )
+        self.ids[f"{self.id}_info"].text = (
+            DownloadStableZipSigScreen.make_download_info(
+                size=self.SIZE_MP,
+                download_msg=self.translate("Downloading"),
+                from_url=url,
+                to_msg=self.translate("to"),
+                to_path=os.path.join(destdir, f"krux-{self.version}.zip.sig"),
             )
-
-        else:
-            self.redirect_error("Invalid downloader")
+        )
 
     def on_download_progress(self, value: dict):
         """update GUI given a ration between what is downloaded and its total length"""
@@ -138,25 +133,21 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
         # When finish, change the label
         # and then change screen
         if percent == 1.00:
-            if self.downloader is not None:
-                destdir = getattr(self.downloader, "destdir")
-                downloaded = self.translate("downloaded")
-                filepath = os.path.join(destdir, f"krux-{self.version}.zip.sig")
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={self.SIZE_MP}sp]",
-                        filepath,
-                        "\n",
-                        downloaded,
-                        "[/size]",
-                    ]
-                )
+            destdir = getattr(self.downloader, "destdir")
+            downloaded = self.translate("downloaded")
+            filepath = os.path.join(destdir, f"krux-{self.version}.zip.sig")
+            self.ids[f"{self.id}_info"].text = "".join(
+                [
+                    f"[size={self.SIZE_MP}sp]",
+                    filepath,
+                    "\n",
+                    downloaded,
+                    "[/size]",
+                ]
+            )
 
-                # When finish, change the label, wait some seconds
-                # and then change screen
-                # trigger is defined in superclass
-                callback_trigger = getattr(self, "trigger")
-                callback_trigger()
-
-            else:
-                self.redirect_error("Invalid downloader")
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            # trigger is defined in superclass
+            callback_trigger = getattr(self, "trigger")
+            callback_trigger()

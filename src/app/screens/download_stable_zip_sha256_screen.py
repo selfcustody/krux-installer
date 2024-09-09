@@ -55,13 +55,15 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
         # pylint: disable=unused-argument
         def on_progress(data: bytes):
             # calculate downloaded percentage
+            dl_len = getattr(self.downloader, "downloaded_len")
+            ct_len = getattr(self.downloader, "content_len")
             fn = partial(
                 self.update,
                 name=self.name,
                 key="progress",
                 value={
-                    "downloaded_len": self.downloader.downloaded_len,
-                    "content_len": self.downloader.content_len,
+                    "downloaded_len": dl_len,
+                    "content_len": ct_len,
                 },
             )
             Clock.schedule_once(fn, 0)
@@ -103,24 +105,19 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
             destdir=DownloadStableZipSha256Screen.get_destdir_assets(),
         )
 
-        if self.downloader is not None:
-            url = getattr(self.downloader, "url")
-            destdir = getattr(self.downloader, "destdir")
+        url = getattr(self.downloader, "url")
+        destdir = getattr(self.downloader, "destdir")
+        to_path = os.path.join(destdir, f"krux-{self.version}.zip.sha256.txt")
 
-            self.ids[f"{self.id}_info"].text = (
-                DownloadStableZipSha256Screen.make_download_info(
-                    size=self.SIZE_MP,
-                    download_msg=self.translate("Downloading"),
-                    from_url=url,
-                    to_msg=self.translate("to"),
-                    to_path=os.path.join(
-                        destdir, f"krux-{self.version}.zip.sha256.txt"
-                    ),
-                )
+        self.ids[f"{self.id}_info"].text = (
+            DownloadStableZipSha256Screen.make_download_info(
+                size=self.SIZE_MP,
+                download_msg=self.translate("Downloading"),
+                from_url=url,
+                to_msg=self.translate("to"),
+                to_path=to_path,
             )
-
-        else:
-            self.redirect_error("Invalid downloader")
+        )
 
     def on_download_progress(self, value: dict):
         """update GUI given a ratio between what is downloaded and its total length"""
@@ -142,25 +139,21 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
         # When finish, change the label
         # and then change screen
         if percent == 1.00:
-            if self.downloader is not None:
-                destdir = getattr(self.downloader, "destdir")
-                downloaded = self.translate("downloaded")
-                filepath = os.path.join(destdir, f"krux-{self.version}.zip.sha256.txt")
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={self.SIZE_MP}sp]",
-                        filepath,
-                        "\n",
-                        downloaded,
-                        "[/size]",
-                    ]
-                )
+            destdir = getattr(self.downloader, "destdir")
+            downloaded = self.translate("downloaded")
+            filepath = os.path.join(destdir, f"krux-{self.version}.zip.sha256.txt")
+            self.ids[f"{self.id}_info"].text = "".join(
+                [
+                    f"[size={self.SIZE_MP}sp]",
+                    filepath,
+                    "\n",
+                    downloaded,
+                    "[/size]",
+                ]
+            )
 
-                # When finish, change the label, wait some seconds
-                # and then change screen
-                # trigger is defined in superclass
-                callback_trigger = getattr(self, "trigger")
-                callback_trigger()
-
-            else:
-                self.redirect_error(f"Invalid downloader: {self.downloader}")
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            # trigger is defined in superclass
+            callback_trigger = getattr(self, "trigger")
+            callback_trigger()

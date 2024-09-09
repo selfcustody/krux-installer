@@ -51,16 +51,14 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
 
         def on_progress(data: bytes):
             self.debug(f"Chunck length: {len(data)}")
-
+            dl_len = getattr(self.downloader, "downloaded_len")
+            ct_len = getattr(self.downloader, "content_len")
             # calculate downloaded percentage
             fn = partial(
                 self.update,
                 name=self.name,
                 key="progress",
-                value={
-                    "downloaded_len": self.downloader.downloaded_len,
-                    "content_len": self.downloader.content_len,
-                },
+                value={"downloaded_len": dl_len, "content_len": ct_len},
             )
             Clock.schedule_once(fn, 0)
 
@@ -70,32 +68,31 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    def on_update_pem(self, value: Any):
+    def on_update_pem(self):
         """Update public key certificate on GUI"""
-        if value is None:
-            self.downloader = PemDownloader(
-                destdir=DownloadSelfcustodyPemScreen.get_destdir_assets()
-            )
+        self.downloader = PemDownloader(
+            destdir=DownloadSelfcustodyPemScreen.get_destdir_assets()
+        )
 
-            url = getattr(self.downloader, "url")
-            destdir = getattr(self.downloader, "destdir")
-            downloading = self.translate("Downloading")
-            to = self.translate("to")
-            filepath = os.path.join(destdir, "selfcustody.pem")
+        url = getattr(self.downloader, "url")
+        destdir = getattr(self.downloader, "destdir")
+        downloading = self.translate("Downloading")
+        to = self.translate("to")
+        filepath = os.path.join(destdir, "selfcustody.pem")
 
-            self.ids[f"{self.id}_info"].text = "".join(
-                [
-                    f"[size={self.SIZE_MP}sp]",
-                    downloading,
-                    "\n",
-                    f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                    "\n",
-                    to,
-                    "\n",
-                    filepath,
-                    "[/size]",
-                ]
-            )
+        self.ids[f"{self.id}_info"].text = "".join(
+            [
+                f"[size={self.SIZE_MP}sp]",
+                downloading,
+                "\n",
+                f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
+                "\n",
+                to,
+                "\n",
+                filepath,
+                "[/size]",
+            ]
+        )
 
     def on_update_progress(self, value: Any):
         """Update the progress on GUI"""
@@ -156,7 +153,7 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         def on_update():
             if key == "public-key-certificate":
                 on_update_pem = getattr(self, "on_update_pem")
-                on_update_pem(value)
+                on_update_pem()
 
             if key == "progress":
                 on_progress = getattr(self, "on_update_progress")

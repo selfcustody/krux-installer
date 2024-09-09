@@ -27,9 +27,6 @@ import traceback
 from functools import partial
 from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.app.screens.base_flash_screen import BaseFlashScreen
 from src.utils.flasher import Flasher
 
@@ -225,52 +222,31 @@ class FlashScreen(BaseFlashScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in (
-            "ConfigKruxInstaller",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "FlashScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            raise ValueError(f"Invalid screen name: {name}")
+        def on_update():
+            if key == "baudrate":
+                setattr(self, "baudrate", value)
 
-        key = kwargs.get("key")
-        value = kwargs.get("value")
+            if key == "firmware":
+                setattr(self, "firmware", value)
 
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+            elif key == "flasher":
+                self.flasher.firmware = getattr(self, "firmware")
+                self.flasher.baudrate = getattr(self, "baudrate")
 
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "baudrate":
-            if value is not None:
-                self.baudrate = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "firmware":
-            if value is not None:
-                self.firmware = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "flasher":
-            self.flasher.firmware = self.firmware
-            self.flasher.baudrate = self.baudrate
-
-        elif key == "exception":
-            self.redirect_error("")
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+        setattr(FlashScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "UnzipStableScreen",
+                "DownloadBetaScreen",
+                "FlashScreen",
+            ),
+            on_update=getattr(FlashScreen, "on_update"),
+        )

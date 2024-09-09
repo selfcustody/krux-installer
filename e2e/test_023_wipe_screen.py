@@ -70,23 +70,6 @@ class TestWipeScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    def test_fail_update_wrong_key(self, mock_get_locale):
-        screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name=screen.name, key="mock")
-
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
     def test_update_locale(self, mock_get_locale):
         screen = WipeScreen()
         self.render(screen)
@@ -99,29 +82,6 @@ class TestWipeScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    @patch("src.app.screens.wipe_screen.Rectangle")
-    @patch("src.app.screens.wipe_screen.Color")
-    def test_update_canvas(self, mock_color, mock_rectangle, mock_get_locale):
-        screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_color.assert_called_once_with(0, 0, 0, 1)
-
-        # Check why the below happens: In linux, it will set window
-        # dimension to 640, 800. In Mac, it will set window 1280, 1600
-        args, kwargs = mock_rectangle.call_args_list[-1]
-        self.assertTrue("size" in kwargs)
-        self.assertEqual(len(args), 0)
-        mock_rectangle.assert_called_once_with(size=window.size)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

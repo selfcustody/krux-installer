@@ -22,6 +22,7 @@
 about_screen.py
 """
 import sys
+from typing import Any
 from functools import partial
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
@@ -77,18 +78,8 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    # pylint: disable=unused-argument
-    def update(self, *args, **kwargs):
-        """Update buttons on related screen"""
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-        kwargs["screens"] = (
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "WarningAlreadyDownloadedScreen",
-        )
-        self.update_screen(**kwargs)
-
+    def on_warning(self, key: str, value: Any):
+        """Update a warning message on GUI"""
         if key == "version":
             warning_msg = self.translate("Assets already downloaded")
             ask_proceed = self.translate(
@@ -133,3 +124,26 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                     "[/size]",
                 ]
             )
+
+    # pylint: disable=unused-argument
+    def update(self, *args, **kwargs):
+        """Update buttons on related screen"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
+
+        def on_update():
+            self.on_warning(key, value)
+
+        setattr(WarningAlreadyDownloadedScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "WarningAlreadyDownloadedScreen",
+            ),
+            on_update=getattr(WarningAlreadyDownloadedScreen, "on_update"),
+        )

@@ -27,9 +27,6 @@ import traceback
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.utils.flasher.wiper import Wiper
 from src.app.screens.base_flash_screen import BaseFlashScreen
 
@@ -190,48 +187,28 @@ class WipeScreen(BaseFlashScreen):
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in (
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "WarningWipeScreen",
-            "WipeScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
+        def on_update():
+            if key == "device":
+                setattr(self, "device", value)
 
-        key = kwargs.get("key")
-        value = kwargs.get("value")
+            if key == "wiper":
+                setattr(self, "wiper", Wiper())
+                setattr(getattr(self, "wiper"), "baudrate", value)
 
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': {value}")
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "device":
-            if value is not None:
-                self.device = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': {value}")
-
-        elif key == "wiper":
-            if value is not None:
-                self.wiper = Wiper()
-                self.wiper.baudrate = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': {value}")
-
-        else:
-            raise ValueError(f'Invalid key: "{key}"')
+        setattr(WipeScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "WarningWipeScreen",
+                "WipeScreen",
+            ),
+            on_update=getattr(WipeScreen, "on_update"),
+        )

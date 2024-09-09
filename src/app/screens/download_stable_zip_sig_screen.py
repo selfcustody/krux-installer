@@ -73,12 +73,25 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
-        kwargs["screens"] = (
-            "ConfigKruxInstaller",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
+
+        def on_update():
+            self.update_download_screen(key=key, value=value)
+
+        setattr(DownloadStableZipSigScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "DownloadStableZipSha256Screen",
+                "DownloadStableZipSigScreen",
+            ),
+            on_update=getattr(DownloadStableZipSigScreen, "on_update"),
         )
-        self.update_download_screen(**kwargs)
 
     def build_downloader(self, value: str):
         """Creates a Downloader for signature file given a firmware version"""

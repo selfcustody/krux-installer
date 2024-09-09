@@ -238,14 +238,18 @@ class BaseScreen(Screen, Trigger):
 
         self.set_screen(name="ErrorScreen", direction="left")
 
-    def update_screen(self, **kwargs):
-        """Update a screen in accord with the valid ones"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-        screens = kwargs.get("screens")
-
-        if name in screens:
+    def update_screen(
+        self,
+        name: str,
+        key: str,
+        value: typing.Any,
+        allowed_screens: typing.Tuple,
+        on_update: typing.Callable | None,
+    ):
+        """
+        Update a screen in accord with the valid ones, here or in on_update callback
+        """
+        if name in allowed_screens:
             self.debug(f"Updating {self.name} from {name}...")
         else:
             self.redirect_error(f"Invalid screen name: {name}")
@@ -261,6 +265,9 @@ class BaseScreen(Screen, Trigger):
             with self.canvas.before:
                 Color(0, 0, 0, 1)
                 Rectangle(size=(Window.width, Window.height))
+
+        if on_update is not None:
+            on_update()
 
     @staticmethod
     def get_destdir_assets() -> str:

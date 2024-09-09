@@ -75,35 +75,39 @@ class SelectDeviceScreen(BaseScreen):
 
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
-        """Update buttons according the valid devices for each version"""
-
-        # Check if update to screen
-        kwargs["screens"] = ("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen")
-        self.update_screen(**kwargs)
-        self.update_device(**kwargs)
-
-    def update_device(self, **kwargs):
-        """Check for each version which device is compatible"""
-        key = kwargs.get("key")
+        """Update buttons according the valid devices for each compatible version"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
-        if key == "version":
-            self.enabled_devices = []
 
-            for device in (
-                "m5stickv",
-                "amigo",
-                "dock",
-                "bit",
-                "yahboom",
-                "cube",
-                "wonder_mv",
-            ):
-                cleanre = re.compile("\\[.*?\\]")
-                clean_text = re.sub(cleanre, "", value)
-                if device not in VALID_DEVICES_VERSIONS[clean_text]:
-                    self.ids[f"select_device_{device}"].text = "".join(
-                        ["[color=#333333]", device, "[/color]"]
-                    )
-                else:
-                    self.enabled_devices.append(f"select_device_{device}")
-                    self.ids[f"select_device_{device}"].text = device
+        def on_update():
+            if key == "version":
+                self.enabled_devices = []
+
+                for device in (
+                    "m5stickv",
+                    "amigo",
+                    "dock",
+                    "bit",
+                    "yahboom",
+                    "cube",
+                    "wonder_mv",
+                ):
+                    cleanre = re.compile("\\[.*?\\]")
+                    clean_text = re.sub(cleanre, "", value)
+                    if device not in VALID_DEVICES_VERSIONS[clean_text]:
+                        self.ids[f"select_device_{device}"].text = "".join(
+                            ["[color=#333333]", device, "[/color]"]
+                        )
+                    else:
+                        self.enabled_devices.append(f"select_device_{device}")
+                        self.ids[f"select_device_{device}"].text = device
+
+        setattr(SelectDeviceScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen"),
+            on_update=getattr(SelectDeviceScreen, "on_update"),
+        )

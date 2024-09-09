@@ -173,12 +173,8 @@ class BaseDownloadScreen(BaseScreen):
         else:
             self.redirect_error("Downloader isnt configured. Use `update` method first")
 
-    def update_download_screen(self, **kwargs):
+    def update_download_screen(self, key: str, value: typing.Any):
         """Update a screen in accord with the valid ones"""
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-        self.update_screen(**kwargs)
-
         if key == "version":
             if value is not None:
                 build_downloader = getattr(self, "build_downloader")

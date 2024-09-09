@@ -120,47 +120,36 @@ class AskPermissionDialoutScreen(BaseScreen):
         dialout (debian-li ke) and uucp (archlinux-like) and
         add user to that group to allow sudoless flash
         """
-        key = kwargs.get("key")
+        name = str(kwargs.get("key"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        kwargs["screens"] = (
-            "ConfigKruxInstaller",
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "ErrorScreen",
-        )
-        self.update_screen(**kwargs)
+        def on_update():
+            if key == "user":
+                setattr(self, "user", value)
 
-        if key == "user":
-            if value is None:
-                self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
-            else:
-                self.user = value
+            if key == "group":
+                setattr(self, "group", value)
 
-        if key == "group":
-            if value is None:
-                self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
-            else:
-                self.group = value
+            if key == "distro":
+                setattr(self, "distro", value)
 
-        if key == "distro":
-            if value is None:
-                self.redirect_error(msg=f"Invalid value for key '{key}': '{value}'")
-            else:
-                self.distro = value
-
-        if key == "screen":
-            if self.user is None:
-                self.redirect_error("user not defined")
-
-            elif self.group is None:
-                self.redirect_error("group not defined")
-
-            elif self.distro is None:
-                self.redirect_error("distro not defined")
-
-            else:
+            if key == "screen":
                 self.show_warning()
+
+        setattr(self, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "GreetingsScreen",
+                "AskPermissionDialoutScreen",
+                "ErrorScreen",
+            ),
+            on_update=getattr(self, "on_update"),
+        )
 
     def show_warning(self):
         """Show a warning in relation to operational system"""

@@ -168,15 +168,14 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
     def test_on_release_with_latest_version(
-        self, mock_set_screen, mock_manager, mock_set_background, mock_get_locale
+        self, mock_set_screen, mock_manager, mock_get_locale
     ):
         mock_manager.get_screen = MagicMock()
         screen = SelectDeviceScreen()
-        screen.update(key="version", value="v24.03.0")
+        screen.update(name=screen.name, key="version", value="v24.03.0")
         self.render(screen)
 
         # get your Window instance safely
@@ -203,7 +202,6 @@ class TestSelectDeviceScreen(GraphicUnitTest):
                 calls_manager.append(call("MainScreen"))
                 calls_set_screen.append(call(name="MainScreen", direction="right"))
 
-        mock_set_background.assert_has_calls(calls_set_background)
         mock_manager.get_screen.assert_has_calls(calls_manager)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_get_locale.assert_called_once()
@@ -212,15 +210,14 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
     def test_on_release_with_beta_version(
-        self, mock_set_screen, mock_manager, mock_set_background, mock_get_locale
+        self, mock_set_screen, mock_manager, mock_get_locale
     ):
         mock_manager.get_screen = MagicMock()
         screen = SelectDeviceScreen()
-        screen.update(key="version", value="odudex/krux_binaries")
+        screen.update(name=screen.name, key="version", value="odudex/krux_binaries")
         self.render(screen)
 
         # get your Window instance safely
@@ -248,7 +245,6 @@ class TestSelectDeviceScreen(GraphicUnitTest):
                 calls_manager.append(call("MainScreen"))
                 calls_set_screen.append(call(name="MainScreen", direction="right"))
 
-        mock_set_background.assert_has_calls(calls_set_background)
         mock_manager.get_screen.assert_has_calls(calls_manager)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_get_locale.assert_called_once()
@@ -257,15 +253,14 @@ class TestSelectDeviceScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_background")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.manager")
     @patch("src.app.screens.select_device_screen.SelectDeviceScreen.set_screen")
     def test_on_release_with_v22_03_0_version(
-        self, mock_set_screen, mock_manager, mock_set_background, mock_get_locale
+        self, mock_set_screen, mock_manager, mock_get_locale
     ):
         mock_manager.get_screen = MagicMock()
         screen = SelectDeviceScreen()
-        screen.update(key="version", value="v22.03.0")
+        screen.update(name=screen.name, key="version", value="v22.03.0")
         self.render(screen)
 
         # get your Window instance safely
@@ -286,7 +281,6 @@ class TestSelectDeviceScreen(GraphicUnitTest):
                 calls_manager.append(call("MainScreen"))
                 calls_set_screen.append(call(name="MainScreen", direction="right"))
 
-        mock_set_background.assert_has_calls(calls_set_background)
         mock_manager.get_screen.assert_has_calls(calls_manager)
         mock_set_screen.assert_has_calls(calls_set_screen)
         mock_get_locale.assert_called_once()

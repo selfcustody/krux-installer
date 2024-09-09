@@ -26,9 +26,6 @@ import sys
 from functools import partial
 import typing
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from kivy.core.window import Window
 from kivy.weakproxy import WeakProxy
 from kivy.uix.label import Label
 from src.app.screens.base_screen import BaseScreen
@@ -91,32 +88,16 @@ class VerifyStableZipScreen(BaseScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update widget from other screens"""
-
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
-
-        # Check if update to screen
-        if name in ("ConfigKruxInstaller", "VerifyStableZipScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        # Check locale
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "canvas":
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", "VerifyStableZipScreen"),
+            on_update=None,
+        )
 
     # pylint: disable=unused-argument
     def on_pre_enter(self, *args):
@@ -306,9 +287,6 @@ class VerifyStableZipScreen(BaseScreen):
                 f"-sigfile [color=#777777]{filepath}.sig[/color]",
                 "[/size]",
                 "[/b]",
-                "\n",
-                "\n",
-                f"[size={size[1]}sp][b][color={sig_color}]{res_msg} {sig_msg}[/b][/color][/size]",
                 "\n",
                 "\n",
                 f"[size={size[0]}sp]",

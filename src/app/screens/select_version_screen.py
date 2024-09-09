@@ -203,5 +203,14 @@ class SelectVersionScreen(BaseScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
-        kwargs["screens"] = ("ConfigKruxInstaller", "SelectVersionScreen")
-        self.update_screen(**kwargs)
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
+
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", "SelectVersionScreen"),
+            on_update=None,
+        )

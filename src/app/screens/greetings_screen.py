@@ -70,19 +70,29 @@ class GreetingsScreen(BaseScreen):
         - check the internet connection
             - if have, update the firmware version to the latest
         """
-        key = kwargs.get("key")
-        kwargs["screens"] = ("KruxInstallerApp", "GreetingsScreen")
-        self.update_screen(**kwargs)
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
 
-        if key == "canvas":
-            fn = partial(self.update, name=self.name, key="check-permission-screen")
-            Clock.schedule_once(fn, 2.1)
+        def on_update():
+            if key == "canvas":
+                fn = partial(self.update, name=self.name, key="check-permission-screen")
+                Clock.schedule_once(fn, 2.1)
 
-        if key == "check-permission-screen":
-            self.check_permissions_for_dialout_group()
+            if key == "check-permission-screen":
+                self.check_permissions_for_dialout_group()
 
-        if key == "check-internet-connection":
-            self.check_internet_connection()
+            if key == "check-internet-connection":
+                self.check_internet_connection()
+
+        setattr(GreetingsScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("KruxInstallerApp", "GreetingsScreen"),
+            on_update=getattr(GreetingsScreen, "on_update"),
+        )
 
     def check_permissions_for_dialout_group(self):
         """

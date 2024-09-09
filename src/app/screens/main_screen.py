@@ -406,64 +406,62 @@ class MainScreen(BaseScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        # Check if update to screen
-        if name in (
-            "KruxInstallerApp",
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(msg=f"Invalid screen name: {name}")
+        def on_update():
+            # Check if update to given key
+            if key == "version":
+                if value is not None:
+                    self.update_version(value)
+                else:
+                    error = RuntimeError(f"Invalid value for key '{key}': {value}")
+                    self.error(str(error))
+                    self.redirect_exception(exception=error)
 
-        # Check locale
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key {key}: {value}")
+            if key == "device":
+                if value is not None:
+                    self.update_device(value)
+                else:
+                    error = RuntimeError(f"Invalid value for key '{key}': {value}")
+                    self.error(str(error))
+                    self.redirect_exception(exception=error)
 
-        # Check if update to given key
-        elif key == "version":
-            if value is not None:
-                self.update_version(value)
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+            if key == "flash":
+                if not self.will_flash:
+                    self.ids["main_flash"].text = "".join(
+                        ["[color=#333333]", self.translate("Flash"), "[/color]"]
+                    )
+                else:
+                    self.ids["main_flash"].text = self.translate("Flash")
 
-        elif key == "device":
-            if value is not None:
-                self.update_device(value)
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+            if key == "wipe":
+                if not self.will_wipe:
+                    self.ids["main_wipe"].text = "".join(
+                        ["[color=#333333]", self.translate("Wipe"), "[/color]"]
+                    )
+                else:
+                    self.ids["main_wipe"].text = self.translate("Wipe")
 
-        elif key == "flash":
-            if not self.will_flash:
-                self.ids["main_flash"].text = "".join(
-                    ["[color=#333333]", self.translate("Flash"), "[/color]"]
-                )
-            else:
-                self.ids["main_flash"].text = self.translate("Flash")
+            if key == "settings":
+                self.ids["main_settings"].text = self.translate("Settings")
 
-        elif key == "wipe":
-            if not self.will_wipe:
-                self.ids["main_wipe"].text = "".join(
-                    ["[color=#333333]", self.translate("Wipe"), "[/color]"]
-                )
-            else:
-                self.ids["main_wipe"].text = self.translate("Wipe")
+            if key == "about":
+                self.ids["main_about"].text = self.translate("About")
 
-        elif key == "settings":
-            self.ids["main_settings"].text = self.translate("Settings")
-
-        elif key == "about":
-            self.ids["main_about"].text = self.translate("About")
-
-        else:
-            self.redirect_error(msg=f'Invalid key: "{key}"')
+        setattr(MainScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "KruxInstallerApp",
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "SelectDeviceScreen",
+                "SelectVersionScreen",
+                "SelectOldVersionScreen",
+            ),
+            on_update=getattr(MainScreen, "on_update"),
+        )

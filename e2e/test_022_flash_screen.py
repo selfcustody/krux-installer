@@ -47,38 +47,19 @@ class TestFlashScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_fail_update_wrong_name(self, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_wrong_name(self, mock_redirect_exception, mock_get_locale):
         screen = FlashScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="MockScreen")
-
-        self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
+        screen.update(name="MockScreen")
 
         # patch assertions
         mock_get_locale.assert_called()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_wrong_key(self, mock_redirect_error, mock_get_locale):
-        screen = FlashScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name=screen.name, key="mock")
-
-        # patch assertions
-        mock_get_locale.assert_any_call()
-        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -96,31 +77,6 @@ class TestFlashScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.flash_screen.Rectangle")
-    @patch("src.app.screens.flash_screen.Color")
-    def test_update_canvas(self, mock_color, mock_rectangle, mock_get_locale):
-        screen = FlashScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-
-        # patch assertions
-        mock_get_locale.assert_called()
-        mock_color.assert_called_once_with(0, 0, 0, 1)
-
-        # Check why the below happens: In linux, it will set window
-        # dimension to 640, 800. In Mac, it will set window 1280, 1600
-        args, kwargs = mock_rectangle.call_args_list[-1]
-        self.assertTrue("size" in kwargs)
-        self.assertEqual(len(args), 0)
-        mock_rectangle.assert_called_once_with(size=window.size)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

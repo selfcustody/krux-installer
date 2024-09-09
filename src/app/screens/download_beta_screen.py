@@ -91,43 +91,48 @@ class DownloadBetaScreen(BaseDownloadScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
-        kwargs["screens"] = ("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen")
-        self.update_screen(**kwargs)
 
-        if key == "firmware":
-            if value is None:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-            elif value in ("kboot.kfpkg", "firmware.bin"):
-                self.firmware = value
-            else:
-                self.redirect_error(f"Invalid firmware: {value}")
+        def on_update():
+            if key == "firmware":
+                if value in ("kboot.kfpkg", "firmware.bin"):
+                    self.firmware = value
+                else:
+                    error = RuntimeError(f"Invalid value for key '{key}': {value}")
+                    self.error(str(error))
+                    self.redirect_exception(exception=error)
 
-        if key == "device":
-            if value in (
-                "m5stickv",
-                "amigo",
-                "dock",
-                "bit",
-                "yahboom",
-                "cube",
-                "wonder_mv",
-            ):
-                self.device = value
-            else:
-                self.redirect_error(f'Invalid device: "{value}"')
+            if key == "device":
+                if value in (
+                    "m5stickv",
+                    "amigo",
+                    "dock",
+                    "bit",
+                    "yahboom",
+                    "cube",
+                    "wonder_mv",
+                ):
+                    self.device = value
+                else:
+                    error = RuntimeError(f"Invalid value for key '{key}': {value}")
+                    self.error(str(error))
+                    self.redirect_exception(exception=error)
 
-        if key == "downloader":
-
-            if self.downloader is None:
+            if key == "downloader":
                 self.build_downloader()
-            else:
-                self.redirect_error("Downloader already initialized")
 
-        if key == "progress":
-            if value is not None:
+            if key == "progress":
                 self.on_download_progress(value)
+
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen"),
+            on_update=on_update,
+        )
 
     def build_downloader(self):
         """Build the downloader for beta firmware before the download itself"""

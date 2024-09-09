@@ -345,39 +345,22 @@ class TestBaseScreen(GraphicUnitTest):
             on_release=MagicMock(),
         )
         self.render(screen)
-        screen.update_screen(name="NoMockedScreen", screens=["MockedScreen"])
+        screen.update_screen(
+            name="NoMockedScreen",
+            key="",
+            value="",
+            allowed_screens=("MockedScreen",),
+            on_update=MagicMock(),
+        )
         mock_get_locale.assert_called_once()
         mock_redirect_error.assert_called_once_with(
             "Invalid screen name: NoMockedScreen"
         )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_screen_none_value_locale(
-        self, mock_redirect_error, mock_get_locale
-    ):
-        screen = BaseScreen(wid="mock", name="Mock")
-        screen.make_grid(wid="mock_grid", rows=1)
-        screen.make_button(
-            row=0,
-            wid="mock_button",
-            root_widget="mock_grid",
-            text="Mocked button",
-            on_press=MagicMock(),
-            on_release=MagicMock(),
-        )
-        self.render(screen)
-        screen.update_screen(
-            name="MockedScreen", screens=("MockedScreen"), key="locale"
-        )
-        mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with(
-            "Invalid value for key 'locale': 'None'"
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     def test_update_screen_locale(self, mock_get_locale):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.make_grid(wid="mock_grid", rows=1)
@@ -390,8 +373,14 @@ class TestBaseScreen(GraphicUnitTest):
             on_release=MagicMock(),
         )
         self.render(screen)
+        self.assertEqual(screen.locale, "en_US.UTF-8")
+
         screen.update_screen(
-            name="MockedScreen", screens=("MockedScreen"), key="locale", value="mocked"
+            name="MockedScreen",
+            key="locale",
+            value="mocked",
+            allowed_screens=("MockedScreen",),
+            on_update=MagicMock(),
         )
         self.assertEqual(screen.locale, "mocked")
         mock_get_locale.assert_called_once()
@@ -413,7 +402,11 @@ class TestBaseScreen(GraphicUnitTest):
         )
         self.render(screen)
         screen.update_screen(
-            name="MockedScreen", screens=("MockedScreen"), key="canvas"
+            name="MockedScreen",
+            key="canvas",
+            value="",
+            allowed_screens=("MockedScreen",),
+            on_update=MagicMock(),
         )
 
         mock_color.assert_called_once_with(0, 0, 0, 1)

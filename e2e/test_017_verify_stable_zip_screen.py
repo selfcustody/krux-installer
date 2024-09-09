@@ -155,24 +155,6 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
-        screen = VerifyStableZipScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name=screen.name, key="mock")
-
-        # patch assertions
-        mock_get_locale.assert_called()
-        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
     def test_update_locale(self, mock_get_locale):
         screen = VerifyStableZipScreen()
         old_loc = screen.locale

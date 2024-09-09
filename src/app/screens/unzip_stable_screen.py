@@ -43,52 +43,41 @@ class UnzipStableScreen(BaseScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update widget from other screens"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = str(kwargs.get("value"))
 
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-
-        # Check if update to screen
-        if name in (
-            "ConfigKruxInstaller",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            raise ValueError(f"Invalid screen name: {name}")
-
-        # Check locale
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "version":
-            if value is not None:
+        def on_update():
+            if key == "version":
                 self.version = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
-        elif key == "device":
-            if value is not None:
+            if key == "device":
                 self.device = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
-        elif key == "clear":
-            self.debug(f"Clearing '{self.id}_grid'")
-            self.ids[f"{self.id}_grid"].clear_widgets()
+            if key == "clear":
+                self.debug(f"Clearing '{self.id}_grid'")
+                self.ids[f"{self.id}_grid"].clear_widgets()
 
-        elif key == "flash-button":
-            self.build_extract_to_flash_button()
+            if key == "flash-button":
+                build = getattr(self, "build_extract_to_flash_button")
+                build()
 
-        elif key == "airgap-button":
-            self.build_extract_to_airgap_button()
+            if key == "airgap-button":
+                build = getattr(self, "build_extract_to_airgap_button")
+                build()
 
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+        setattr(UnzipStableScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "VerifyStableZipScreen",
+                "UnzipStableScreen",
+            ),
+            on_update=getattr(UnzipStableScreen, "on_update"),
+        )
 
     def build_extract_to_flash_button(self):
         """Builds an upper button for flash firmware"""

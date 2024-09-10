@@ -501,19 +501,19 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
-    @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
+    # @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.manager")
     @patch("src.app.screens.unzip_stable_screen.time.sleep")
     def test_on_release_airgapped_button(
         self,
         mock_sleep,
         mock_manager,
-        mock_firmware_unzip,
+        #    mock_firmware_unzip,
         mock_set_background,
         mock_get_destdir_assets,
         mock_get_locale,
     ):
-        mock_firmware_unzip.load = MagicMock()
+        #    mock_firmware_unzip.load = MagicMock()
         mock_manager.get_screen = MagicMock()
 
         screen = UnzipStableScreen()
@@ -562,7 +562,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         # patch assertions
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
-        mock_firmware_unzip.assert_not_called()
+        #    mock_firmware_unzip.assert_not_called()
         mock_set_background.assert_not_called()
         mock_manager.get_screen.assert_not_called()
         mock_sleep.assert_not_called()

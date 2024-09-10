@@ -24,9 +24,6 @@ about_screen.py
 import sys
 from functools import partial
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from kivy.core.window import Window
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -43,14 +40,14 @@ class WarningWipeScreen(BaseScreen):
         self.make_grid(wid=f"{self.id}_grid", rows=2)
 
         self.make_image(
-            wid=f"{self.id}_loader",
+            wid=f"{self.id}_warn",
             source=self.warn_img,
             root_widget=f"{self.id}_grid",
         )
 
         self.make_label(
             wid=f"{self.id}_label",
-            text=self.make_label_text(),
+            text="",
             root_widget=f"{self.id}_grid",
             halign="justify",
         )
@@ -79,6 +76,7 @@ class WarningWipeScreen(BaseScreen):
                 )
 
                 for fn in partials:
+                    print(fn)
                     Clock.schedule_once(fn, 0)
 
                 self.set_screen(name=args[1], direction="left")
@@ -101,36 +99,26 @@ class WarningWipeScreen(BaseScreen):
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons on related screen"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in (
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "WarningWipeScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        # Check locale
-        if key == "locale":
-            if value is not None:
-                self.locale = value
+        def on_update():
+            if key == "locale":
                 self.ids[f"{self.id}_label"].text = self.make_label_text()
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
 
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+        setattr(WarningWipeScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "WarningWipeScreen",
+            ),
+            on_update=getattr(WarningWipeScreen, "on_update"),
+        )
 
     def make_label_text(self):
         """Make a warning message about wipe procedure"""
@@ -172,7 +160,8 @@ class WarningWipeScreen(BaseScreen):
                 "[/size]",
                 "\n",
                 "\n",
-                f"[size={sizes[0]}]" "[color=#00FF00]",
+                f"[size={sizes[0]}]",
+                "[color=#00FF00]",
                 f"[ref=WipeScreen][u]{proceed}[/u][/ref]",
                 "[/color]",
                 "        ",

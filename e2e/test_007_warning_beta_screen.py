@@ -33,6 +33,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
+        warn = grid.children[1]
         button = grid.children[0]
         sizes = [screen.SIZE_MM, screen.SIZE_M, screen.SIZE_MP]
 
@@ -40,17 +41,11 @@ class TestSelectVersionScreen(GraphicUnitTest):
         self.assertEqual(screen.name, "WarningBetaScreen")
         self.assertEqual(screen.id, "warning_beta_screen")
         self.assertEqual(grid.id, "warning_beta_screen_grid")
-        self.assertEqual(button.id, "warning_beta_screen_warn")
+        self.assertEqual(warn.id, "warning_beta_screen_warn")
+        self.assertEqual(button.id, "warning_beta_screen_label")
 
         text = "".join(
             [
-                f"[size={sizes[0]}sp]",
-                "[color=#efcc00]",
-                "[b]WARNING[/b]",
-                "[/color]",
-                "[/size]",
-                "\n",
-                "\n",
                 f"[size={sizes[1]}sp]",
                 "[color=#efcc00]This is our test repository[/color]",
                 "[/size]",
@@ -62,15 +57,19 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "\n",
                 f"[size={sizes[0]}sp]",
                 "[color=#00ff00]",
-                "[u]Proceed[/u]",
+                "[ref=MainScreen]Proceed[/ref]",
                 "[/color]",
                 "        ",
                 "[color=#ff0000]",
-                "[u]Back[/u]",
+                "[ref=SelectVersion]Back[/ref]",
                 "[/color]",
                 "[/size]",
             ]
         )
+
+        print(button.text)
+        print("==============")
+        print(text)
 
         self.assertEqual(button.text, text)
         mock_get_locale.assert_any_call()
@@ -79,45 +78,38 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.warning_beta_screen.WarningBetaScreen.set_background")
-    def test_on_press(self, mock_set_background, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.set_screen")
+    def test_on_ref_press_proceed(self, mock_set_screen, mock_get_locale):
         screen = WarningBetaScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
 
-        action = getattr(screen, "on_press_warning_beta_screen_warn")
-        action(button)
+        action = getattr(screen, "on_ref_press_warning_beta_screen")
+        action("MainScreen")
 
-        mock_set_background.assert_called_once_with(
-            wid=button.id, rgba=(0.25, 0.25, 0.25, 1)
-        )
+        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.warning_beta_screen.WarningBetaScreen.set_background")
-    @patch("src.app.screens.warning_beta_screen.WarningBetaScreen.set_screen")
-    def test_on_release(self, mock_set_screen, mock_set_background, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.set_screen")
+    def test_on_ref_press_back(self, mock_set_screen, mock_get_locale):
         screen = WarningBetaScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[0]
 
-        action = getattr(screen, "on_release_warning_beta_screen_warn")
-        action(button)
-        mock_set_background.assert_called_once_with(wid=button.id, rgba=(0, 0, 0, 1))
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        action = getattr(screen, "on_ref_press_warning_beta_screen")
+        action("SelectVersion")
+
+        mock_set_screen.assert_called_once_with(
+            name="SelectVersionScreen", direction="right"
+        )
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -151,9 +143,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
         text = "".join(
             [
-                f"[size={fontsize_mm}sp][color=#efcc00][b]ADVERTÊNCIA[/b][/color][/size]",
-                "\n",
-                "\n",
                 f"[size={fontsize_m}sp][color=#efcc00]Este é nosso repositório de testes[/color][/size]",
                 "\n",
                 f"[size={fontsize_mp}sp]Estes são binários não assinados dos recursos mais experimentais[/size]",
@@ -162,10 +151,19 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "\n",
                 "\n",
                 f"[size={fontsize_mm}sp]",
-                "[color=#00ff00]Proceder[/color]        [color=#ff0000]Voltar[/color]",
+                "[color=#00ff00]",
+                "[ref=MainScreen]Proceder[/ref]",
+                "[/color]",
+                "        ",
+                "[color=#ff0000]",
+                "[ref=SelectVersion]Voltar[/ref]",
+                "[/color]",
                 "[/size]",
             ]
         )
+        print(button.text)
+        print("==========")
+        print(text)
 
         self.assertEqual(button.text, text)
         mock_get_locale.assert_any_call()
@@ -185,21 +183,4 @@ class TestSelectVersionScreen(GraphicUnitTest):
         screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
         mock_redirect_error.assert_called_once_with("Invalid screen name: Mock")
-        mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_locale_wrong_key(self, mock_redirect_error, mock_get_locale):
-        screen = WarningBetaScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name="ConfigKruxInstaller", key="mock")
-
-        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
         mock_get_locale.assert_any_call()

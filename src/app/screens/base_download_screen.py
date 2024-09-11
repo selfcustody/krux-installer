@@ -179,24 +179,12 @@ class BaseDownloadScreen(BaseScreen):
     def update_download_screen(self, key: str, value: typing.Any):
         """Update a screen in accord with the valid ones"""
         if key == "version":
-            if value is not None:
-                build_downloader = getattr(self, "build_downloader")
-                build_downloader(value)
-            else:
-                msg = f"Invalid value for key '{key}': '{value}'"
-                exc = RuntimeError(msg)
-                self.error(msg)
-                self.redirect_exception(exception=exc)
+            build_downloader = getattr(self, "build_downloader")
+            build_downloader(value)
 
         if key == "progress":
-            if value is not None:
-                on_download_progress = getattr(self, "on_download_progress")
-                on_download_progress(value)
-            else:
-                msg = f"Invalid value for key '{key}': '{value}'"
-                exc = RuntimeError(msg)
-                self.error(msg)
-                self.redirect_exception(exception=exc)
+            on_download_progress = getattr(self, "on_download_progress")
+            on_download_progress(value)
 
     @staticmethod
     def make_download_info(

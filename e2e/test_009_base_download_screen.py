@@ -98,6 +98,33 @@ class TestBaseDownloadScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    def test_on_pre_enter(self, mock_get_locale):
+        screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        screen.on_pre_enter()
+        text = "".join(
+            [
+                f"[size={screen.SIZE_G}]",
+                "Connecting...",
+                "[/size]",
+                "[color=#efcc00]",
+                "[/color]",
+            ]
+        )
+
+        self.assertTrue("mock_screen_progress" in screen.ids)
+        self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
+        mock_get_locale.assert_any_call()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
     def test_fail_on_enter(self, mock_redirect_exception, mock_get_locale):
 
@@ -164,3 +191,43 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         )
         mock_create_trigger.assert_called()
         mock_thread.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_download_screen_version(self, mock_get_locale):
+        screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
+        build_downloader = MagicMock()
+        setattr(screen, "build_downloader", build_downloader)
+
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        screen.update_download_screen(key="version", value="0.0.1")
+
+        mock_get_locale.assert_any_call()
+        build_downloader.assert_called_once_with("0.0.1")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_update_download_screen_progress(self, mock_get_locale):
+        screen = BaseDownloadScreen(wid="mock_screen", name="MockScreen")
+        on_download_progress = MagicMock()
+        setattr(screen, "on_download_progress", on_download_progress)
+
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # do tests
+        screen.update_download_screen(key="progress", value="mock")
+
+        mock_get_locale.assert_any_call()
+        on_download_progress.assert_called_once_with("mock")

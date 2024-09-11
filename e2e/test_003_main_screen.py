@@ -260,8 +260,8 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_invalid_screen(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_invalid_screen(self, mock_redirect_exception, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -270,7 +270,7 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="MockedScreen", key="device", value="v24.03.0")
 
         mock_get_locale.assert_any_call()
-        mock_redirect_error.assert_called_once_with("Invalid screen name: MockedScreen")
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

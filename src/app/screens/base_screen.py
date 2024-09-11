@@ -220,17 +220,12 @@ class BaseScreen(Screen, Trigger):
             f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
         )
 
-    def redirect_error(self, msg: str):
-        """Create a RuntimeError and give it to redirect_exception"""
-        exception = RuntimeError(msg)
-        self.redirect_exception(exception=exception)
-
     def redirect_exception(self, exception: Exception):
         """Get an exception and prepare a ErrorScreen rendering"""
         screen = self.manager.get_screen("ErrorScreen")
         fns = [
-            partial(screen.update, name=self.name, key="error", value=exception),
             partial(screen.update, name=self.name, key="canvas"),
+            partial(screen.update, name=self.name, key="error", value=exception),
         ]
 
         for fn in fns:
@@ -252,14 +247,16 @@ class BaseScreen(Screen, Trigger):
         if name in allowed_screens:
             self.debug(f"Updating {self.name} from {name}...")
         else:
-            self.redirect_error(f"Invalid screen name: {name}")
+            exc = RuntimeError(f"Invalid screen name: {name}")
+            self.redirect_exception(exception=exc)
             return
 
         if key == "locale":
             if value is not None:
                 self.locale = value
             else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+                exc = RuntimeError(f"Invalid value for key '{key}': '{value}'")
+                self.redirect_exception(exception=exc)
 
         if key == "canvas":
             with self.canvas.before:
@@ -268,6 +265,12 @@ class BaseScreen(Screen, Trigger):
 
         if on_update is not None:
             on_update()
+
+    @staticmethod
+    def quit_app():
+        """Stop the kivy process"""
+        app = App.get_running_app()
+        app.stop()
 
     @staticmethod
     def get_destdir_assets() -> str:

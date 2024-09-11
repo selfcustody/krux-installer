@@ -97,7 +97,10 @@ class WipeScreen(BaseFlashScreen):
                 App.get_running_app().stop()
 
             else:
-                self.redirect_error(f"Invalid ref: {args[1]}")
+                msg = f"Invalid ref: {args[1]}"
+                exc = RuntimeError(msg)
+                self.error(msg)
+                self.redirect_exception(exception=exc)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=3, root_widget=f"{self.id}_grid"

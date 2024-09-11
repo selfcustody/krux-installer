@@ -136,7 +136,8 @@ class FlashScreen(BaseFlashScreen):
                 App.get_running_app().stop()
 
             else:
-                self.redirect_error(f"Invalid ref: {args[1]}")
+                exc = RuntimeError(f"Invalid ref: {args[1]}")
+                self.redirect_exception(exception=exc)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"

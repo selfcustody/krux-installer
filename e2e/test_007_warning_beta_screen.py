@@ -172,8 +172,10 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_locale_wrong_name(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_locale_wrong_name(
+        self, mock_redirect_exception, mock_get_locale
+    ):
         screen = WarningBetaScreen()
         self.render(screen)
 
@@ -182,5 +184,5 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
         screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
-        mock_redirect_error.assert_called_once_with("Invalid screen name: Mock")
+        mock_redirect_exception.assert_called_once()
         mock_get_locale.assert_any_call()

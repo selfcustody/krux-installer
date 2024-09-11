@@ -330,9 +330,9 @@ class TestBaseScreen(GraphicUnitTest):
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
     def test_fail_update_screen_invalid_screen(
-        self, mock_redirect_error, mock_get_locale
+        self, mock_redirect_exception, mock_get_locale
     ):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.make_grid(wid="mock_grid", rows=1)
@@ -353,9 +353,7 @@ class TestBaseScreen(GraphicUnitTest):
             on_update=MagicMock(),
         )
         mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with(
-            "Invalid screen name: NoMockedScreen"
-        )
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

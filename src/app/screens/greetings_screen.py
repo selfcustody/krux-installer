@@ -119,8 +119,8 @@ class GreetingsScreen(BaseScreen):
                 _group = "uucp"
 
             else:
-                self.redirect_error(msg=f"{distro.name(pretty=True)} not supported")
-                return
+                exc = RuntimeError(f"{distro.name(pretty=True)} not supported")
+                self.redirect_exception(exception=exc)
 
             # loop throug all linux groups and check
             # if the user is registered in the "dialout" group

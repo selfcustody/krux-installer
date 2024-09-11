@@ -164,8 +164,8 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_locale(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_locale(self, mock_redirect_exception, mock_get_locale):
         screen = SelectOldVersionScreen()
         screen.make_grid(
             wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
@@ -178,5 +178,5 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
-        mock_redirect_error.assert_called_once_with("Invalid screen name: Mock")
         mock_get_locale.assert_any_call()
+        mock_redirect_exception.assert_called_once()

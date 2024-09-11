@@ -51,10 +51,10 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
     def test_fail_update_invalid_name(
         self,
-        mock_redirect_error,
+        mock_redirect_excpetion,
         mock_get_locale,
     ):
         screen = DownloadStableZipScreen()
@@ -68,7 +68,7 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_any_call()
-        mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
+        mock_redirect_excpetion.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

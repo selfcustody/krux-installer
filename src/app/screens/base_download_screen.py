@@ -171,7 +171,10 @@ class BaseDownloadScreen(BaseScreen):
             self.thread = Thread(name=self.name, target=_fn)
             self.thread.start()
         else:
-            self.redirect_error("Downloader isnt configured. Use `update` method first")
+            msg = "Downloader isnt configured. Use `update` method first"
+            exc = RuntimeError(msg)
+            self.error(msg)
+            self.redirect_exception(exception=exc)
 
     def update_download_screen(self, key: str, value: typing.Any):
         """Update a screen in accord with the valid ones"""
@@ -180,14 +183,20 @@ class BaseDownloadScreen(BaseScreen):
                 build_downloader = getattr(self, "build_downloader")
                 build_downloader(value)
             else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+                msg = f"Invalid value for key '{key}': '{value}'"
+                exc = RuntimeError(msg)
+                self.error(msg)
+                self.redirect_exception(exception=exc)
 
         if key == "progress":
             if value is not None:
                 on_download_progress = getattr(self, "on_download_progress")
                 on_download_progress(value)
             else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+                msg = f"Invalid value for key '{key}': '{value}'"
+                exc = RuntimeError(msg)
+                self.error(msg)
+                self.redirect_exception(exception=exc)
 
     @staticmethod
     def make_download_info(

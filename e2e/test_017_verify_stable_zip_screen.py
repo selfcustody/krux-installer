@@ -1,3 +1,4 @@
+import os
 import sys
 from unittest.mock import MagicMock, patch, call
 from kivy.base import EventLoop, EventLoopBase
@@ -208,6 +209,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         else:
             size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
 
+        p = os.path.join("mock", "krux-v0.0.1.zip")
         expected = "".join(
             [
                 f"[size={size[0]}sp]",
@@ -217,14 +219,14 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
                 "\n",
                 "\n",
                 f"[size={size[1]}sp]",
-                "[b]computed hash from [color=#777777]mock/krux-v0.0.1.zip[/color][/b]",
+                f"[b]computed hash from [color=#777777]{p}[/color][/b]",
                 "[/size]",
                 "\n",
                 f"[size={size[1]}sp]mo   ck   ha   sh[/size]",
                 "\n",
                 "\n",
                 f"[size={size[1]}sp]",
-                "[b]provided hash from [color=#777777]mock/krux-v0.0.1.zip.sha256.txt[/color][/b]",
+                f"[b]provided hash from [color=#777777]{p}.sha256.txt[/color][/b]",
                 "[/size]",
                 "\n",
                 f"[size={size[1]}sp]mo   ck   ha   sh[/size]",
@@ -261,6 +263,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         else:
             size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
 
+        p = os.path.join("mock", "krux-v0.0.1.zip")
         expected = "".join(
             [
                 f"[size={size[0]}sp]",
@@ -270,14 +273,14 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
                 "\n",
                 "\n",
                 f"[size={size[1]}sp]",
-                "[b]computed hash from [color=#777777]mock/krux-v0.0.1.zip[/color][/b]",
+                f"[b]computed hash from [color=#777777]{p}[/color][/b]",
                 "[/size]",
                 "\n",
                 f"[size={size[1]}sp]mo   ck   ha   sh[/size]",
                 "\n",
                 "\n",
                 f"[size={size[1]}sp]",
-                "[b]provided hash from [color=#777777]mock/krux-v0.0.1.zip.sha256.txt[/color][/b]",
+                f"[b]provided hash from [color=#777777]{p}.sha256.txt[/color][/b]",
                 "[/size]",
                 "\n",
                 f"[size={size[1]}sp]no   mo   ck   ha   sh[/size]",
@@ -313,6 +316,8 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         else:
             size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
 
+        p = os.path.join("mock", "krux-v0.0.1.zip")
+        s = os.path.join("mock", "selfcustody.pem")
         expected = "".join(
             [
                 f"[size={size[0]}sp]",
@@ -329,11 +334,11 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
                 "\n",
                 f"[size={size[1]}sp]",
                 "[b]",
-                "openssl sha256< [color=#777777]mock/krux-v0.0.1.zip[/color] -binary | \\",
+                f"openssl sha256< [color=#777777]{p}[/color] -binary | \\",
                 "\n",
-                "openssl pkeyutl -verify -pubin -inkey [color=#777777]mock/selfcustody.pem[/color] \\",
+                f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{s}[/color] \\",
                 "\n",
-                "-sigfile [color=#777777]mock/krux-v0.0.1.zip.sig[/color]",
+                f"-sigfile [color=#777777]{p}.sig[/color]",
                 "[/size]",
                 "[/b]",
                 "\n",
@@ -378,6 +383,8 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         else:
             size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
 
+        p = os.path.join("mock", "krux-v0.0.1.zip")
+        s = os.path.join("mock", "selfcustody.pem")
         expected = "".join(
             [
                 f"[size={size[0]}sp]",
@@ -394,11 +401,11 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
                 "\n",
                 f"[size={size[1]}sp]",
                 "[b]",
-                "openssl sha256< [color=#777777]mock/krux-v0.0.1.zip[/color] -binary | \\",
+                f"openssl sha256< [color=#777777]{p}[/color] -binary | \\",
                 "\n",
-                "openssl pkeyutl -verify -pubin -inkey [color=#777777]mock/selfcustody.pem[/color] \\",
+                f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{s}[/color] \\",
                 "\n",
-                "-sigfile [color=#777777]mock/krux-v0.0.1.zip.sig[/color]",
+                f"-sigfile [color=#777777]{p}.sig[/color]",
                 "[/size]",
                 "[/b]",
                 "\n",

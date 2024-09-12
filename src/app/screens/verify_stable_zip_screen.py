@@ -50,10 +50,7 @@ class VerifyStableZipScreen(BaseScreen):
         # create a ref text that instead redirect
         # to a web page, redirect to a screen
         def _on_ref_press(*args):
-            self.debug(f"Calling ref::{args[0]}::on_ref_press")
-            self.debug(f"Opening {args[1]}")
-
-            if args[1] == "UnzipStableScreen":
+            if args[1] == "Proceed":
                 main_screen = self.manager.get_screen("MainScreen")
                 u = self.manager.get_screen("UnzipStableScreen")
 
@@ -77,7 +74,7 @@ class VerifyStableZipScreen(BaseScreen):
 
                 self.set_screen(name="UnzipStableScreen", direction="left")
 
-            elif args[1] == "MainScreen":
+            if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
         setattr(VerifyStableZipScreen, f"on_ref_press_{self.id}", _on_ref_press)
@@ -275,7 +272,8 @@ class VerifyStableZipScreen(BaseScreen):
                 "\n",
                 "\n",
                 f"[size={size[1]}sp]{installed_msg}[/size]",
-                "\n" f"[size={size[1]}sp]{check_msg}:[/size]",
+                "\n",
+                f"[size={size[1]}sp]{check_msg}:[/size]",
                 "\n",
                 "\n",
                 f"[size={size[1]}sp]",
@@ -290,9 +288,9 @@ class VerifyStableZipScreen(BaseScreen):
                 "\n",
                 "\n",
                 f"[size={size[0]}sp]",
-                f"[ref=UnzipStableScreen][color=#00ff00][u]{proceed}[/u][/ref][/color]",
+                f"[ref=Proceed][color=#00ff00][u]{proceed}[/u][/ref][/color]",
                 "             ",
-                f"[ref=MainScreen][color=#ff0000][u]{back}[/u][/ref][/color]",
+                f"[ref=Back][color=#ff0000][u]{back}[/u][/ref][/color]",
                 "[/b]",
                 "[/size]",
             ]

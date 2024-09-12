@@ -24,7 +24,6 @@ check_permissions_screen.py
 from functools import partial
 from pysudoer import SudoerLinux
 from kivy.clock import Clock
-from kivy.app import App
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -61,12 +60,16 @@ class AskPermissionDialoutScreen(BaseScreen):
                 "Do not worry, this message won't appear again"
             )
 
-            self.ids[f"{self.id}_label"].text = "\n".join(
+            self.ids[f"{self.id}_label"].text = "".join(
                 [
-                    f"[size={self.SIZE_M}sp]{logout_msg}",
+                    f"[size={self.SIZE_M}sp]",
+                    logout_msg,
+                    "\n",
                     f"{backin_msg}.",
-                    "",
-                    f"{not_worry_msg}.[/size]",
+                    "\n",
+                    "\n",
+                    f"{not_worry_msg}.",
+                    "[/size]",
                 ]
             )
 
@@ -96,7 +99,7 @@ class AskPermissionDialoutScreen(BaseScreen):
                     self.redirect_exception(exception=err)
 
             if args[1] == "Deny":
-                App.get_running_app().stop()
+                AskPermissionDialoutScreen.quit_app()
 
         self.make_label(
             wid=f"{self.id}_label",
@@ -120,7 +123,7 @@ class AskPermissionDialoutScreen(BaseScreen):
         dialout (debian-li ke) and uucp (archlinux-like) and
         add user to that group to allow sudoless flash
         """
-        name = str(kwargs.get("key"))
+        name = str(kwargs.get("name"))
         key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
@@ -137,7 +140,7 @@ class AskPermissionDialoutScreen(BaseScreen):
             if key == "screen":
                 self.show_warning()
 
-        setattr(self, "on_update", on_update)
+        setattr(AskPermissionDialoutScreen, "on_update", on_update)
         self.update_screen(
             name=name,
             key=key,
@@ -148,7 +151,7 @@ class AskPermissionDialoutScreen(BaseScreen):
                 "AskPermissionDialoutScreen",
                 "ErrorScreen",
             ),
-            on_update=getattr(self, "on_update"),
+            on_update=getattr(AskPermissionDialoutScreen, "on_update"),
         )
 
     def show_warning(self):

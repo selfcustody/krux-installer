@@ -43,7 +43,7 @@ class TestAboutScreen(GraphicUnitTest):
         text = "".join(
             [
                 f"[size={screen.SIZE_G}sp]",
-                "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
+                "[ref=SourceCode][b]v0.0.20-alpha-2[/b][/ref]",
                 "[/size]",
                 "\n",
                 "\n",
@@ -87,7 +87,7 @@ class TestAboutScreen(GraphicUnitTest):
         text = "".join(
             [
                 f"[size={screen.SIZE_G}sp]",
-                "[ref=SourceCode][b]v0.0.2-alpha[/b][/ref]",
+                "[ref=SourceCode][b]v0.0.20-alpha-2[/b][/ref]",
                 "[/size]",
                 "\n",
                 "\n",

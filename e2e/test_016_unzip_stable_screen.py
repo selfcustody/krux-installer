@@ -30,7 +30,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_init(self, mock_get_locale, mock_get_destdir_assets):
+    def test_init(self, mock_get_destdir_assets, mock_get_locale):
         screen = UnzipStableScreen()
         self.render(screen)
 
@@ -59,35 +59,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
-    def test_fail_update_invalid_name(self, mock_get_locale, mock_get_destdir_assets):
-        screen = UnzipStableScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        # do tests
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name="MockScreen")
-
-        # default assertions
-        self.assertEqual(str(exc_info.exception), "Invalid screen name: MockScreen")
-
-        # patch assertions
-        mock_get_destdir_assets.assert_any_call()
-        mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_key(
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_invalid_name(
         self,
-        mock_redirect_error,
+        mock_redirect_exception,
         mock_get_destdir_assets,
         mock_get_locale,
     ):
@@ -98,14 +73,12 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         # do tests
-        screen.update(name=screen.name, key="mock")
-
-        # default assertions
+        screen.update(name="MockScreen")
 
         # patch assertions
         mock_get_destdir_assets.assert_any_call()
         mock_get_locale.assert_any_call()
-        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -194,10 +167,9 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         screen.make_button(
-            id=f"{screen.id}_mock_button",
+            wid=f"{screen.id}_mock_button",
             root_widget=f"{screen.id}_grid",
             text="Mock",
-            markup=True,
             row=0,
             on_press=MagicMock(),
             on_release=MagicMock(),
@@ -529,19 +501,19 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
-    @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
+    # @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.manager")
     @patch("src.app.screens.unzip_stable_screen.time.sleep")
     def test_on_release_airgapped_button(
         self,
         mock_sleep,
         mock_manager,
-        mock_firmware_unzip,
+        #    mock_firmware_unzip,
         mock_set_background,
         mock_get_destdir_assets,
         mock_get_locale,
     ):
-        mock_firmware_unzip.load = MagicMock()
+        #    mock_firmware_unzip.load = MagicMock()
         mock_manager.get_screen = MagicMock()
 
         screen = UnzipStableScreen()
@@ -590,7 +562,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         # patch assertions
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
-        mock_firmware_unzip.assert_not_called()
+        #    mock_firmware_unzip.assert_not_called()
         mock_set_background.assert_not_called()
         mock_manager.get_screen.assert_not_called()
         mock_sleep.assert_not_called()

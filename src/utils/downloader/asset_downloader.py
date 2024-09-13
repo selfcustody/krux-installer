@@ -76,11 +76,19 @@ class AssetDownloader(StreamDownloader):
         # Before the download the file stream,
         # you can define some method to be called
         # after the buffer is wrote
+        # it will need to be a local defined function
+        # because it will need a different behaviour
+        # for different assets.
+        # For example, a kboot.kfpkg will need a different
+        # to update different graphical definition (in app/screens)
+        # if compared to a zip file
         def local_on_data(data: bytes):
             self.buffer.write(data)
             on_data(data)
 
-        self.on_data = local_on_data
+        setattr(self, "on_data", local_on_data)
+
+        # Now you can start the download process
         self.download_file_stream(url=self.url)
 
         # Once the data is downloaded, you can
@@ -89,11 +97,15 @@ class AssetDownloader(StreamDownloader):
         self.debug(f"download::destfile={destfile}")
         self.debug(f"download::write::{self.write_mode}={self.buffer.getvalue()}")
 
+        # If its a binary file (a zip in our case)
+        # open the file in wb mode
         if self.write_mode == "wb":
             # pylint: disable=unspecified-encoding
             with open(destfile, self.write_mode) as file:
                 file.write(self.buffer.getvalue())
 
+        # If its a text file (a txt or sig file in our case)
+        # open the file in w mode with utf8 encode
         if self._write_mode == "w":
             with open(destfile, self.write_mode, encoding="utf8") as file:
                 value = self.buffer.getvalue()

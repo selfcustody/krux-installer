@@ -21,18 +21,8 @@
 """
 error_screen.py
 """
-import traceback
-from functools import partial
-from typing import Text
-from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from kivy.app import App
-from kivy.cache import Cache
+import webbrowser
 from src.app.screens.base_screen import BaseScreen
-from src.utils.selector import Selector
-from src.i18n import T
 
 
 class ErrorScreen(BaseScreen):
@@ -53,93 +43,95 @@ class ErrorScreen(BaseScreen):
         self.make_grid(wid=f"{self.id}_grid", rows=1)
 
         # START of on_press buttons
-        def _press(instance):
-            self.debug(f"Calling Button::{instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+        def on_ref_press(*args):
+            if args[1] == "Back":
+                self.set_screen(name="GreetingsScreen", direction="right")
 
-        def _release(instance):
-            self.debug(f"Calling Button::{instance.id}::on_release")
-            self.set_background(wid=f"{instance.id}", rgba=(0, 0, 0, 1))
-            self.set_screen(name="GreetingsScreen", direction="right")
+            if args[1] == "Quit":
+                ErrorScreen.quit_app()
 
-        self.make_button(
-            row=0,
-            id=f"{self.id}_button",
+            if args[1] == "ReportIssue":
+                webbrowser.open(f"{self.src_code}/issues")
+
+        self.make_label(
+            wid=f"{self.id}_label",
             root_widget=f"{self.id}_grid",
             text="",
-            markup=True,
-            on_press=_press,
-            on_release=_release,
+            halign="center",
         )
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn, 0)
 
+        setattr(ErrorScreen, f"on_ref_press_{self.id}", on_ref_press)
+        self.ids[f"{self.id}_label"].bind(on_ref_press=on_ref_press)
+
+    @staticmethod
+    def chunkstring(string, length):
+        """Split a long string into multiline string with equal lengths"""
+        return (string[0 + i : length + i] for i in range(0, len(string), length))
+
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """
         In linux, will check for user permission on group
         dialout (debian-li ke) and uucp (archlinux-like) and
         add user to that group to allow sudoless flash
         """
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in (
-            "CheckPermissionsScreen",
-            "ConfigKruxInstaller",
-            "CheckInternetConnectionScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "DownloadBetaScreen",
-            "DownloadSelfcustodyPemScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "AboutScreen",
-            "ErrorScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            raise ValueError(f"Invalid screen: {name}")
+        def on_update():
+            if key == "error":
+                self.error(str(value))
+                stack = str(value).split(":")
+                title = stack[0]
+                reason = []
 
-        if key == "locale":
-            self.locale = value
+                for r in stack[1:]:
+                    c = list(ErrorScreen.chunkstring(r, 80))
+                    d = "\n".join(c)
+                    reason.append(d)
 
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
+                self.ids[f"{self.id}_label"].text = "".join(
+                    [
+                        f"[size={self.SIZE_M}sp]",
+                        f"[color=#ff0000]{title}[/color]",
+                        "[/size]",
+                        "\n",
+                        "\n",
+                        "\n".join(reason),
+                        "[/size]",
+                        "\n",
+                        "\n",
+                        f"[size={self.SIZE_P}sp]",
+                        "Report issue at ",
+                        "[color=#00aabb]",
+                        "[ref=ReportIssue]",
+                        f"{self.src_code}/issues",
+                        "[/ref]",
+                        "[/color]",
+                        "[/size]",
+                        "\n",
+                        "\n",
+                        f"[size={self.SIZE_MP}sp]",
+                        "[color=#00FF00]",
+                        "[ref=Back]",
+                        "[u]Back[/u]",
+                        "[/ref]",
+                        "[/color]",
+                        "        ",
+                        "[color=#FF0000]",
+                        "[ref=Quit]",
+                        "[u]Quit[/u]",
+                        "[/ref]",
+                        "[/size]",
+                    ]
+                )
 
-        elif key == "error":
-            self.error(str(value.__context__))
-            stack = [msg for msg in str(value.__context__).split(":") if len(msg) < 120]
-
-            self.ids[f"{self.id}_button"].text = "\n".join(
-                [
-                    f"[size={self.SIZE_M}sp][color=#ff0000]{stack[0]}[/color][/size]",
-                    f"[size={self.SIZE_MP}sp][color=#efcc00]{"\n".join(stack[1:])}[/color][/size]",
-                    "",
-                    "",
-                    f"[size={self.SIZE_P}sp]Report issue at",
-                    "".join(
-                        [
-                            "[color=#00aabb]",
-                            f"[ref={self.src_code}/issues/]",
-                            f"{self.src_code}/issues",
-                            "[/ref]",
-                            "[/color]",
-                        ]
-                    ),
-                    "[/size]",
-                ]
-            )
-        else:
-            exc_info = ValueError(f"Invalid key: '{key}'")
-            fn = partial(self.update, name=self.name, key="error", value=exc_info)
-            Clock.schedule_once(fn, 0)
-
-    def on_enter(self):
-        """Simple update your canvas"""
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn, 0)
+        setattr(ErrorScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=tuple(self.manager.screen_names),
+            on_update=getattr(ErrorScreen, "on_update"),
+        )

@@ -14,15 +14,23 @@ PYHOOK_PATH="site-packages/kivy/tools/packaging/pyinstaller_hooks/__init__.py"
 FULL_PATH=$PYENV_PATH/lib/python$PYENV_VERSION/$PYHOOK_PATH
 echo "env FULL_PATH=$FULL_PATH"
 
-wget $PATCHURL -O pyinstaller_hook_patch.py
-echo "RUN wget $PATCHURL -O pyinstaller_hook_patch.py"
+if which curl >/dev/null ; then
+    echo "RUN curl --output pyinstaller_hook_patch.py $PATCHURL"
+    curl --output pyinstaller_hook_patch.py $PATCHURL
+elif which wget >/dev/null ; then
+    echo "RUN wget $PATCHURL -O pyinstaller_hook_patch.py"
+    wget $PATCHURL -O pyinstaller_hook_patch.py
+else
+    echo "Cannot download, neither wget nor curl is available."
+fi
+
 
 echo "RUN diff -u $FULL_PATH pyinstaller_hook_patch.py > pyinstaller_hook.patch"
 diff -u $FULL_PATH pyinstaller_hook_patch.py > pyinstaller_hook.patch
 
 # patch it
 echo "RUN patch $FULL_PATH < pyinstaller_hook.patch"
-patch $FULL_PATH < pyinstaller_hook.patch
+patch --verbose $FULL_PATH < pyinstaller_hook.patch
 
 # remove remaining files
 rm pyinstaller_hook_patch.py

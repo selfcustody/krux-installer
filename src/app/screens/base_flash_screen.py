@@ -19,16 +19,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-main_screen.py
+base_flash__screen.py
 """
 import os
-import math
 import typing
-from pathlib import Path
-from functools import partial
 from threading import Thread
 from kivy.clock import Clock, ClockEvent
-from src.utils.flasher import Flasher
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -41,9 +37,9 @@ class BaseFlashScreen(BaseScreen):
         self._firmware = None
         self._baudrate = None
         self._thread = None
-        self._trigger = None
-        self._output = None
+        self._output = []
         self._progress = None
+        self._done = None
         self._is_done = False
 
     @property
@@ -91,16 +87,16 @@ class BaseFlashScreen(BaseScreen):
         self._thread = value
 
     @property
-    def trigger(self) -> ClockEvent:
+    def done(self) -> ClockEvent:
         """Trigger is a `ClockEvent` that should be triggered after download is done"""
-        self.debug(f"getter::trigger={self._thread}")
-        return self._trigger
+        self.debug(f"getter::done={self._done}")
+        return self._done
 
-    @trigger.setter
-    def trigger(self, value: typing.Callable):
+    @done.setter
+    def done(self, value: typing.Callable):
         """Create a `ClockEvent` given a callback"""
-        self.debug(f"getter::trigger={self._trigger}")
-        self._trigger = Clock.create_trigger(value)
+        self.debug(f"getter::trigger={self._done}")
+        self._done = Clock.create_trigger(value)
 
     @property
     def output(self) -> typing.List[str]:
@@ -113,3 +109,72 @@ class BaseFlashScreen(BaseScreen):
         """Setter for info"""
         self.debug(f"setter::output={value}")
         self._output = value
+
+    @property
+    def is_done(self) -> bool:
+        """Getter for is_done"""
+        self.debug(f"getter::is_done={self._is_done}")
+        return self._is_done
+
+    @is_done.setter
+    def is_done(self, value: bool):
+        """Setter for info"""
+        self.debug(f"setter::is_done={value}")
+        self._is_done = value
+
+    def build_on_done(self):
+        """
+        Build a streaming IO static method using
+        some instance variables when flash procedure is done
+
+        (useful for to be used in tests)
+        """
+
+        # pylint: disable=unused-argument
+        def on_done(dt):
+            self.is_done = True
+            del self.output[4:]
+            self.ids[f"{self.id}_loader"].source = self.done_img
+            self.ids[f"{self.id}_loader"].reload()
+            done = self.translate("DONE")
+            back = self.translate("Back")
+            _quit = self.translate("Quit")
+            size = self.SIZE_M
+
+            self.ids[f"{self.id}_progress"].text = "".join(
+                [
+                    f"[size={size}sp][b]{done}![/b][/size]",
+                    "\n",
+                    f"[size={size}sp]",
+                    "[color=#00FF00]",
+                    f"[ref=Back][u]{back}[/u][/ref]",
+                    "[/color]",
+                    "        ",
+                    "[color=#EFCC00]",
+                    f"[ref=Quit][u]{_quit}[/u][/ref]",
+                    "[/color]",
+                ]
+            )
+
+        setattr(self.__class__, "on_done", on_done)
+
+    @staticmethod
+    def parse_general_output(text: str) -> str:
+        """Parses KTool.print_callback output to make it more readable on GUI"""
+        text = text.replace(
+            "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
+        )
+        text = text.replace("\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]")
+        text = text.replace(
+            "\x1b[33mInitialize K210 SPI Flash",
+            "[color=#efcc00]Initialize K210 SPI Flash[/color]",
+        )
+        text = text.replace("Flash ID: \x1b[33m", "Flash ID: [color=#efcc00]")
+        text = text.replace(
+            "\x1b[0m, unique ID: \x1b[33m", "[/color], unique ID: [color=#efcc00]"
+        )
+        text = text.replace("\x1b[0m, size: \x1b[33m", "[/color], size: ")
+        text = text.replace("\x1b[0m MB", "[/color] MB")
+        text = text.replace("\x1b[0m", "")
+        text = text.replace("\x1b[33m", "")
+        return text

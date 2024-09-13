@@ -1,11 +1,11 @@
 # Krux Installer
 
-[![Build main branch](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml)
-[![codecov](https://codecov.io/gh/qlrd/krux-installer/tree/kivy/graph/badge.svg?token=KD41H20MYS)](https://codecov.io/gh/qlrd/krux-installer)
+[![Build](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml/badge.svg)](https://github.com/selfcustody/krux-installer/actions/workflows/build.yml)
+[![codecov](https://codecov.io/gh/selfcustody/krux-installer/graph/badge.svg?token=T4LMZtPa5H)](https://codecov.io/gh/selfcustody/krux-installer)
 [![created at](https://img.shields.io/github/created-at/selfcustody/krux-installer)](https://github.com/selfcustody/krux-installer/commit/5d177795fe3df380c54d424ccfd0f23fc7e62c41)
 [![downloads](https://img.shields.io/github/downloads/selfcustody/krux-installer/total)](https://github.com/selfcustody/krux-installer/releases)
 [![downloads (latest release)](https://img.shields.io/github/downloads/selfcustody/krux-installer/latest/total)](https://github.com/selfcustody/krux-installer/releases)
-[![commits (since latest release)](https://img.shields.io/github/commits-since/selfcustody/krux-installer/latest/main)](https://github.com/qlrd/krux-installer/compare/main...kivy)
+[![commits (since latest release)](https://img.shields.io/github/commits-since/selfcustody/krux-installer/latest/main)](https://github.com/qlrd/krux-installer/compare/main...develop)
 
 Krux Installer is a GUI based tool to flash [Krux](https://github.com/selfcustody/krux)
 without typing any command in terminal for [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
@@ -16,12 +16,12 @@ There are pre-built
 [releases](https://github.com/selfcustody/krux-installer/releases) for:
 
 * Linux:
-  * Debian-like
-  * Fedora-like
-* Windows
+  * Debian-like;
+  * Fedora-like;
+* Windows;
 * MacOS:
-  * intel processors
-  * arm64 processors (M1/M2/M3)
+  * intel processors;
+  * arm64 processors (M1/M2/M3).
   
 To build it from the source, please follow the steps below:
 
@@ -29,18 +29,10 @@ To build it from the source, please follow the steps below:
   * [Linux](/#linux)
   * [Windows](/#windows)
   * [MacOS](/#macos)
-    * [Install brew package manager](/#install-brew-package-manager)
-    * [Install latest python](/#install-latest-python)
-    * [Ensure openssl have a correct link](/#ensure-openssl-have-a-correct-link)
-    * [Patch your zshrc](/#patch-your-zshrc)
   * [Install poetry](/#install-poetry)
 * [Download sources](/#download-sources)
 * [Update code](/#update-code)
 * [Developing](/#developing)
-  * [Format code](/#format-code)
-  * [Lint](/#lint)
-  * [Test](/#test)
-  * [Build](/#build)
   
 ## System setup
 
@@ -62,13 +54,17 @@ Follow the instructions at [python.org](https://www.python.org/downloads/windows
 
 Before installing `krux-installer` source code, you will need prepare the system:
 
-#### Install `brew` package manager
+<details>
+<summary>Install `brew` package manager</summary>
 
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
 
-#### Install latest `python`
+</details>
+
+<details>
+<summary>Install latest python</summary>
 
 ```bash
 brew install python
@@ -80,7 +76,10 @@ and add this line to your `~/.zshrc`:
 alias python=python3
 ```
 
-#### Ensure `openssl` have a correct link
+</details>
+
+<details>
+<summary> Ensure openssl have a correct link</summary>
 
 Python's `ssl` module relies on OpenSSL for cryptographic operations.
 Ensure that OpenSSL is installed on your system and is compatible with the
@@ -102,8 +101,10 @@ brew link --force openssl
 
 This ensures that the OpenSSL libraries are available in the expected
 locations that Python can find and use.
+</details>
 
-#### Patch your zshrc
+<details>
+<summary>Patch your zshrc</summary>
 
 Library paths on MacOS involves verifying that the environment variables and system
 configurationsare correctyly set to find the necessary libraries, such as OpenSSL,
@@ -122,6 +123,8 @@ OPENSSL_MAJOR_VERSION=`openssl --version | awk '{ print $2}' | cut -d . -f1`
 OPENSSL_FULL_VERSION=`openssl --version | awk ' { print $2}'`
 export DYLD_LIBRARY_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VERSION/$OPENSSL_FULL_VERSION/lib:$DYLD_LIBRARY_PATH"
 ```
+
+</details>
 
 ### Install poetry
 
@@ -159,26 +162,38 @@ git submodule update --init
 
 ## Developing
 
-Krux-Installer uses `poe` task manager for formatting, linting,
-tests and coverage. To see all available tasks, run:
+Krux-Installer uses `poe` task manager for formatting, linting, tests,
+coverage and build.
+
+<details>
+<summary>See all available tasks</summary>
 
 ```bash
 poetry run poe
 ```
 
-### Format code
+</details>
+
+<details>
+<summary>Format code</summary>
 
 ```bash
 poetry run poe format
 ```
 
-### Lint
+</details>
+
+<details>
+<summary>Lint</summary>
 
 ```bash
 poetry run poe lint
 ```
 
-### Test
+</details>
+
+<details>
+<summary>Test and coverage</summary>
 
 ```bash
 poetry run poe test
@@ -187,36 +202,37 @@ poetry run poe test
 For systems without a window manager:
 
 ```bash
+# Linux only
 poetry run poe test --no-xvfb
 ```
 
-### Build
+You can see all coverage results opening you browser and type
+`file:///<folder>/krux-installer/htmlcov/index.html` (assuming
+`folder` is where you placed the `krux-installer` project).
+</details>
 
-At the moment, you'll need to [patch some code on `kivy`](https://github.com/kivy/kivy/issues/8653#issuecomment-2028509695)
-to build the Graphical User Interface:
-
-#### Build for Debian, Fedora, MacOS
-
-Make sure you have the `wget` tool to download a
-[specific commit](https://raw.githubusercontent.com/ikus060/kivy/21c7110ee79f355d6a42da0a274d2426b1e18665/kivy/tools/packaging/pyinstaller_hooks/__init__.py).
-
-If you not have:
-
-* Debian: `sudo apt-get install wget`;
-* Fedora: `sudo dnf install wget`;
-* MacOS: `brew install wget`.
-
-Then you can patch PyInstaller hook for kivy and build an executable:
+<details>
+<summary>Build for any Linux distribution</summary>
 
 ```bash
-poetry run poe patch-nix
-poetry run poe build-nix
+poetry run poe build-linux
 ```
 
-#### Build for Windows
+</details>
+
+<details>
+<summary>Build for MacOS</summary>
 
 ```bash
-poetry run poe patch-win
+poetry run poe build-macos
+```
+
+</details>
+
+<details>
+<summary>Build for Windows</summary>
+
+```bash
 poetry run poe build-win
 ```
 
@@ -227,5 +243,6 @@ It will export all project in a
 * macOS: `./dist/krux-installer.app/Contents/MacOS/krux-installer`
 * windows: `./dist/krux-installer.exe`
 
-To more options see [.ci/create-spec.py](./.ci/create-spec.py)
-against the PyInstaller [options](https://pyinstaller.org).
+To more options see [.ci/create-spec.py](./.ci/create-spec.py) against the PyInstaller
+[options](https://pyinstaller.org).
+</details>

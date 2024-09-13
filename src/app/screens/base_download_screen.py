@@ -46,19 +46,8 @@ class BaseDownloadScreen(BaseScreen):
 
         # progress label, show a "Connecting"
         # before start the download to make
-        connecting = self.translate("Connecting")
-        text = "".join(
-            [
-                f"[size={self.SIZE_G}]",
-                f"{connecting}...",
-                "[/size]",
-                "[color=#efcc00]",
-                "[/color]",
-            ]
-        )
-
         progress = Label(
-            text=text,
+            text="",
             markup=True,
             valign="center",
             halign="center",
@@ -81,11 +70,13 @@ class BaseDownloadScreen(BaseScreen):
 
     @property
     def to_screen(self) -> str:
+        """Get where the current screen will go"""
         self.debug(f"getter::to_screen={self._to_screen}")
         return self._to_screen
 
     @to_screen.setter
     def to_screen(self, value: str):
+        """Set where the current screen will go"""
         self.debug(f"setter::to_screen={value}")
         self._to_screen = value
 
@@ -109,6 +100,7 @@ class BaseDownloadScreen(BaseScreen):
 
     @property
     def thread(self) -> Thread | None:
+        """Return a Thread"""
         self.debug(f"getter::thread={self._thread}")
         return self._thread
 
@@ -141,7 +133,23 @@ class BaseDownloadScreen(BaseScreen):
         self.debug(f"deleter::trigger={self._trigger}")
         del self._trigger
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        """Before enter, reset text to show that its requesting github API"""
+        connecting = self.translate("Connecting")
+        text = "".join(
+            [
+                f"[size={self.SIZE_G}]",
+                f"{connecting}...",
+                "[/size]",
+                "[color=#efcc00]",
+                "[/color]",
+            ]
+        )
+        self.ids[f"{self.id}_progress"].text = text
+
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
         """
         Event fired when the screen is displayed and the entering animation is complete.
 
@@ -153,8 +161,9 @@ class BaseDownloadScreen(BaseScreen):
             self.trigger = getattr(self.__class__, "on_trigger")
 
             # on progress should be defined on inherited classes
+            download = getattr(self.downloader, "download")
             on_progress = getattr(self.__class__, "on_progress")
-            _fn = partial(self.downloader.download, on_data=on_progress)
+            _fn = partial(download, on_data=on_progress)
 
             # Now run it as a partial function
             # on parallel thread to not block
@@ -162,4 +171,64 @@ class BaseDownloadScreen(BaseScreen):
             self.thread = Thread(name=self.name, target=_fn)
             self.thread.start()
         else:
-            self.redirect_error("Downloader isnt configured. Use `update` method first")
+            msg = "Downloader isnt configured. Use `update` method first"
+            exc = RuntimeError(msg)
+            self.error(msg)
+            self.redirect_exception(exception=exc)
+
+    def update_download_screen(self, key: str, value: typing.Any):
+        """Update a screen in accord with the valid ones"""
+        if key == "version":
+            build_downloader = getattr(self, "build_downloader")
+            build_downloader(value)
+
+        if key == "progress":
+            on_download_progress = getattr(self, "on_download_progress")
+            on_download_progress(value)
+
+    @staticmethod
+    def make_download_info(
+        size: int, download_msg: str, from_url: str, to_msg: str, to_path: str
+    ) -> str:
+        """
+        download_stable_zip_sha256_screen and download_stable_zip_sig_screen
+        use same procedure to update informational content of downloaded file
+        """
+        return "".join(
+            [
+                f"[size={size}sp]",
+                download_msg,
+                "\n",
+                f"[color=#00AABB][ref={from_url}]{from_url}[/ref][/color]",
+                "\n",
+                to_msg,
+                "\n",
+                to_path,
+                "[/size]",
+            ]
+        )
+
+    @staticmethod
+    def make_progress_info(
+        sizes: typing.Tuple[str, str],
+        of_msg: str,
+        percent: float,
+        downloaded_len: float,
+        content_len: float,
+    ) -> str:
+        """
+        download_stable_zip_sha256_screen and download_stable_zip_sig_screen
+        use same procedure to update its progress content of downloaded file
+        """
+        return "".join(
+            [
+                f"[size={sizes[0]}sp][b]{percent * 100:,.2f} %[/b][/size]",
+                "\n",
+                f"[size={sizes[1]}sp]",
+                str(downloaded_len),
+                f" {of_msg} ",
+                str(content_len),
+                " B",
+                "[/size]",
+            ]
+        )

@@ -24,11 +24,7 @@ main_screen.py
 import os
 import time
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
 
@@ -46,14 +42,15 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
+        # pylint: disable=unused-argument
         def on_trigger(dt):
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
             baudrate = DownloadBetaScreen.get_baudrate()
             destdir = DownloadBetaScreen.get_destdir_assets()
-            firmware = os.path.join(
-                destdir, "krux_binaries", f"maixpy_{self.device}", self.firmware
-            )
+            maixpy = f"maixpy_{getattr(self, "device")}"
+            _firmware = getattr(self, "firmware")
+            firmware = os.path.join(destdir, "krux_binaries", f"{maixpy}", _firmware)
             partials = [
                 partial(screen.update, name=self.name, key="baudrate", value=baudrate),
                 partial(screen.update, name=self.name, key="firmware", value=firmware),
@@ -67,20 +64,15 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         def on_progress(data: bytes):
             # calculate downloaded percentage
-            if self.downloader is not None:
-                fn = partial(
-                    self.update,
-                    name=self.name,
-                    key="progress",
-                    value={
-                        "downloaded_len": self.downloader.downloaded_len,
-                        "content_len": self.downloader.content_len,
-                    },
-                )
-                Clock.schedule_once(fn, 0)
-
-            else:
-                self.redirect_error("Downloader isnt initialized")
+            dl_len = getattr(self.downloader, "downloaded_len")
+            ct_len = getattr(self.downloader, "content_len")
+            fn = partial(
+                self.update,
+                name=self.name,
+                key="progress",
+                value={"downloaded_len": dl_len, "content_len": ct_len},
+            )
+            Clock.schedule_once(fn, 0)
 
         self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
         setattr(self.__class__, "on_trigger", on_trigger)
@@ -91,123 +83,119 @@ class DownloadBetaScreen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in ("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen"):
-            self.debug(f"Updating {self.name} from {name}::{key}={value}")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
+        def on_update():
+            if key == "firmware":
+                if value in ("kboot.kfpkg", "firmware.bin"):
+                    self.firmware = value
+                else:
+                    error = RuntimeError(f"Invalid value for key '{key}': {value}")
+                    self.error(str(error))
+                    self.redirect_exception(exception=error)
 
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+            if key == "device":
+                if value in (
+                    "m5stickv",
+                    "amigo",
+                    "dock",
+                    "bit",
+                    "yahboom",
+                    "cube",
+                    "wonder_mv",
+                ):
+                    self.device = value
+                else:
+                    error = RuntimeError(f"Invalid value for key '{key}': {value}")
+                    self.error(str(error))
+                    self.redirect_exception(exception=error)
 
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
+            if key == "downloader":
+                self.build_downloader()
 
-        elif key == "firmware":
-            if value is None:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-            elif value in ("kboot.kfpkg", "firmware.bin"):
-                self.firmware = value
-            else:
-                self.redirect_error(f"Invalid firmware: {value}")
+            if key == "progress":
+                self.on_download_progress(value)
 
-        elif key == "device":
-            if value in (
-                "m5stickv",
-                "amigo",
-                "dock",
-                "bit",
-                "yahboom",
-                "cube",
-                "wonder_mv",
-            ):
-                self.device = value
-            else:
-                self.redirect_error(f'Invalid device: "{value}"')
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", "MainScreen", "DownloadBetaScreen"),
+            on_update=on_update,
+        )
 
-        elif key == "downloader":
+    def build_downloader(self):
+        """Build the downloader for beta firmware before the download itself"""
+        destdir = DownloadBetaScreen.get_destdir_assets()
+        destdir = os.path.join(destdir, "krux_binaries", f"maixpy_{self.device}")
 
-            if self.downloader is None:
-                destdir = DownloadBetaScreen.get_destdir_assets()
-                destdir = os.path.join(
-                    destdir, "krux_binaries", f"maixpy_{self.device}"
-                )
+        self.downloader = BetaDownloader(
+            device=self.device,
+            binary_type=self.firmware,
+            destdir=destdir,
+        )
 
-                self.downloader = BetaDownloader(
-                    device=self.device,
-                    binary_type=self.firmware,
-                    destdir=destdir,
-                )
+        downloading = self.translate("Downloading")
+        to = self.translate("to")
 
-                downloading = self.translate("Downloading")
-                to = self.translate("to")
+        self.ids[f"{self.id}_info"].text = "".join(
+            [
+                f"[size={self.SIZE_MP}sp]",
+                downloading,
+                "\n",
+                "[color=#00AABB]",
+                f"[ref={self.downloader.url}]{self.downloader.url}[/ref]",
+                "[/color]",
+                "\n",
+                to,
+                "\n",
+                self.downloader.destdir,
+                "\n",
+                "[/size]",
+            ]
+        )
 
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={self.SIZE_MP}sp]",
-                        downloading,
-                        "\n",
-                        "[color=#00AABB]",
-                        f"[ref={self.downloader.url}]{self.downloader.url}[/ref]",
-                        "[/color]",
-                        "\n",
-                        to,
-                        "\n",
-                        self.downloader.destdir,
-                        "\n",
-                        "[/size]",
-                    ]
-                )
+    def on_download_progress(self, value):
+        """
+        In each iteration of downloaded chunks, update the GUI with a ratio between
+        it's downloaded length and content length
+        """
+        # trigger is defined in superclass
 
-            else:
-                self.redirect_error("Downloader already initialized")
+        callback_trigger = getattr(self, "trigger")
+        lens = [value["downloaded_len"], value["content_len"]]
+        percent = lens[0] / lens[1]
 
-        elif key == "progress":
-            # calculate percentage of download
-            if value is not None and self.downloader is not None:
-                lens = [value["downloaded_len"], value["content_len"]]
-                percent = lens[0] / lens[1]
+        # Format bytes (one liner) in MB
+        # https://stackoverflow.com/questions/
+        # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+        downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
+        self.ids[f"{self.id}_progress"].text = "".join(
+            [
+                f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                "\n",
+                f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
+            ]
+        )
 
-                # Format bytes (one liner) in MB
-                # https://stackoverflow.com/questions/
-                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-                downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-                self.ids[f"{self.id}_progress"].text = "".join(
-                    [
-                        f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                        "\n",
-                        f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
-                    ]
-                )
+        if percent == 1.0:
+            downloaded = self.translate("downloaded")
+            destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
+            self.ids[f"{self.id}_info"].text = "".join(
+                [
+                    f"[size={self.SIZE_MP}sp]",
+                    destdir,
+                    "\n",
+                    downloaded,
+                    "[/size]",
+                ]
+            )
 
-                if percent == 1.0:
-                    downloaded = self.translate("downloaded")
-                    destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
-                    self.ids[f"{self.id}_info"].text = "".join(
-                        [
-                            f"[size={self.SIZE_MP}sp]",
-                            destdir,
-                            "\n",
-                            downloaded,
-                            "[/size]",
-                        ]
-                    )
-
-                    # When finish, change the label, wait some seconds
-                    # and then change screen
-                    self.trigger()
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            callback_trigger()

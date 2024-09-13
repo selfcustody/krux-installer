@@ -21,13 +21,10 @@
 """
 about_screen.py
 """
-from functools import partial
 import webbrowser
+from functools import partial
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from src.utils.constants import get_name, get_version
+from src.utils.constants import get_version
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -46,7 +43,6 @@ class AboutScreen(BaseScreen):
             wid=f"{self.id}_label",
             text="",
             root_widget=f"{self.id}_grid",
-            markup=True,
             halign="justify",
         )
 
@@ -57,14 +53,11 @@ class AboutScreen(BaseScreen):
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-            elif args[1] == "X":
+            if args[1] == "X":
                 webbrowser.open("https://x.com/selfcustodykrux")
 
-            elif args[1] == "SourceCode":
+            if args[1] == "SourceCode":
                 webbrowser.open(self.src_code)
-
-            else:
-                self.redirect_error(f"Invalid ref: {args[1]}")
 
         setattr(self, f"on_ref_press_{self.id}_label", _on_ref_press)
         self.ids[f"{self.id}_label"].bind(on_ref_press=_on_ref_press)
@@ -77,28 +70,16 @@ class AboutScreen(BaseScreen):
         for fn in fns:
             Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        # Check if update to screen
-        if name in ("KruxInstallerApp", "ConfigKruxInstaller", "AboutScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(msg=f"Invalid screen name: {name}")
-
-        if key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        # Check locale
-        elif key == "locale":
-            if value is not None:
-                self.locale = value
+        def on_update():
+            if key == "locale":
+                setattr(self, "locale", value)
                 follow = self.translate("follow us on X")
                 back = self.translate("Back")
 
@@ -126,8 +107,11 @@ class AboutScreen(BaseScreen):
                     ]
                 )
 
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        else:
-            self.redirect_error(msg=f'Invalid key: "{key}"')
+        setattr(AboutScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("KruxInstallerApp", "ConfigKruxInstaller", "AboutScreen"),
+            on_update=getattr(AboutScreen, "on_update"),
+        )

@@ -30,16 +30,16 @@ from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
 from kivy.uix.screenmanager import Screen
-from src.utils.trigger import Trigger
+from kivy.weakproxy import WeakProxy
 from src.i18n import T
-from src.utils.selector import VALID_DEVICES
+from src.utils.trigger import Trigger
 
 
 class BaseScreen(Screen, Trigger):
@@ -61,7 +61,6 @@ class BaseScreen(Screen, Trigger):
         self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
-        self._error_img = os.path.join(root_assets_path, "assets", "error.png")
 
         self.locale = BaseScreen.get_locale()
 
@@ -111,23 +110,18 @@ class BaseScreen(Screen, Trigger):
         return self._done_img
 
     @property
-    def error_img(self) -> str:
-        """Getter for logo_img"""
-        self.debug(f"getter::error_img={self._logo_img}")
-        return self._error_img
-
-    @property
     def locale(self) -> str:
         """Getter for locale property"""
         return self._locale
 
     @locale.setter
-    def locale(self, value: bool):
+    def locale(self, value: str):
         """Setter for locale property"""
         self.debug(f"locale = {value}")
         self._locale = value
 
     def translate(self, key: str) -> str:
+        """Translate some message as key"""
         msg = T(key, locale=self.locale, module=self.id)
         self.debug(f"Translated '{key}' to '{msg}'")
         return msg
@@ -165,12 +159,10 @@ class BaseScreen(Screen, Trigger):
         self.ids[root_widget].add_widget(grid)
         self.ids[wid] = WeakProxy(grid)
 
-    def make_label(
-        self, wid: str, text: str, root_widget: str, markup: bool, halign: str
-    ):
+    def make_label(self, wid: str, text: str, root_widget: str, halign: str):
         """Build grid where buttons will be placed"""
         self.debug(f"Building GridLayout::{wid}")
-        label = Label(text=text, markup=markup, halign=halign)
+        label = Label(text=text, markup=True, halign=halign)
         label.id = wid
         self.ids[root_widget].add_widget(label)
         self.ids[wid] = WeakProxy(label)
@@ -191,30 +183,29 @@ class BaseScreen(Screen, Trigger):
     def make_button(
         self,
         root_widget: str,
-        id: str,
+        wid: str,
         text: str,
-        markup: bool,
         row: int,
         on_press: typing.Callable,
         on_release: typing.Callable,
     ):
         """Create buttons in a dynamic way"""
-        self.debug(f"{id} -> {root_widget}")
+        self.debug(f"{wid} -> {root_widget}")
 
         total = self.ids[root_widget].rows
         btn = Button(
             text=text,
-            markup=markup,
+            markup=True,
             halign="center",
             font_size=Window.size[0] // 25,
             background_color=(0, 0, 0, 1),
             color=(1, 1, 1, 1),
         )
-        btn.id = id
+        btn.id = wid
 
         # define button methods to be callable in classes
-        setattr(self, f"on_press_{id}", on_press)
-        setattr(self, f"on_release_{id}", on_release)
+        setattr(self, f"on_press_{wid}", on_press)
+        setattr(self, f"on_release_{wid}", on_release)
 
         btn.bind(on_press=on_press)
         btn.bind(on_release=on_release)
@@ -229,37 +220,12 @@ class BaseScreen(Screen, Trigger):
             f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
         )
 
-    def make_stack_button(
-        self,
-        root_widget: str,
-        wid: str,
-        on_press: typing.Callable,
-        on_release: typing.Callable,
-        size_hint: typing.Tuple[float, float],
-    ):
-        btn = Button(
-            markup=True,
-            font_size=Window.size[0] // 30,
-            background_color=(0, 0, 0, 1),
-            size_hint=size_hint,
-        )
-        btn.id = wid
-        self.ids[root_widget].add_widget(btn)
-        self.ids[btn.id] = WeakProxy(btn)
-        btn.bind(on_press=on_press)
-        btn.bind(on_release=on_release)
-        setattr(self, f"on_press_{wid}", on_press)
-        setattr(self, f"on_release_{wid}", on_release)
-
-    def redirect_error(self, msg: str):
-        exception = RuntimeError(msg)
-        self.redirect_exception(exception=exception)
-
     def redirect_exception(self, exception: Exception):
+        """Get an exception and prepare a ErrorScreen rendering"""
         screen = self.manager.get_screen("ErrorScreen")
         fns = [
-            partial(screen.update, name=self.name, key="error", value=exception),
             partial(screen.update, name=self.name, key="canvas"),
+            partial(screen.update, name=self.name, key="error", value=exception),
         ]
 
         for fn in fns:
@@ -267,18 +233,60 @@ class BaseScreen(Screen, Trigger):
 
         self.set_screen(name="ErrorScreen", direction="left")
 
+    def update_screen(
+        self,
+        name: str,
+        key: str,
+        value: typing.Any,
+        allowed_screens: typing.Tuple,
+        on_update: typing.Callable | None,
+    ):
+        """
+        Update a screen in accord with the valid ones, here or in on_update callback
+        """
+        if name in allowed_screens:
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            exc = RuntimeError(f"Invalid screen name: {name}")
+            self.redirect_exception(exception=exc)
+            return
+
+        if key == "locale":
+            if value is not None:
+                self.locale = value
+            else:
+                exc = RuntimeError(f"Invalid value for key '{key}': '{value}'")
+                self.redirect_exception(exception=exc)
+
+        if key == "canvas":
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width, Window.height))
+
+        if on_update is not None:
+            on_update()
+
+    @staticmethod
+    def quit_app():
+        """Stop the kivy process"""
+        app = App.get_running_app()
+        app.stop()
+
     @staticmethod
     def get_destdir_assets() -> str:
+        """Return the current selected path of destination assets directory"""
         app = App.get_running_app()
         return app.config.get("destdir", "assets")
 
     @staticmethod
     def get_baudrate() -> int:
+        """Return the current selected baudrate"""
         app = App.get_running_app()
         return int(app.config.get("flash", "baudrate"))
 
     @staticmethod
     def get_locale() -> str:
+        """Return the current locale"""
         app = App.get_running_app()
         locale = app.config.get("locale", "lang")
 
@@ -286,18 +294,22 @@ class BaseScreen(Screen, Trigger):
             locale = locale.split(".")
             return f"{locale[0].replace("-", "_")}.{locale[1]}"
 
-        elif sys.platform == "win32":
+        if sys.platform == "win32":
             return f"{locale}.UTF-8"
 
-        else:
-            raise RuntimeError(f"Not implemented for '{sys.platform}'")
+        raise RuntimeError(f"Not implemented for '{sys.platform}'")
 
     @staticmethod
     def open_settings():
+        """Open the Settings screen"""
         app = App.get_running_app()
         app.open_settings()
 
     @staticmethod
     def sanitize_markup(msg: str) -> str:
+        """
+        Sanitize a message that come with [ ]
+        and clean it (used in FlashScreen and WipeScreen)
+        """
         cleanr = re.compile("\\[.*?\\]")
         return re.sub(cleanr, "", msg)

@@ -54,8 +54,8 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_invalid_name(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_invalid_name(self, mock_redirect_exception, mock_get_locale):
         screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
@@ -66,15 +66,14 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
         screen.update(name="MockScreen")
 
         # patch assertions
-        mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
+        mock_redirect_exception.assert_called_once()
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
+    def test_fail_update_key(self, mock_get_locale):
         screen = DownloadSelfcustodyPemScreen()
         self.render(screen)
 
@@ -85,7 +84,6 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
         screen.update(name=screen.name, key="mock")
 
         # patch assertions
-        mock_redirect_error.assert_called_once_with('Invalid key: "mock"')
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

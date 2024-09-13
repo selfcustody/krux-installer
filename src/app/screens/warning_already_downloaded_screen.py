@@ -22,18 +22,10 @@
 about_screen.py
 """
 import sys
+from typing import Any
 from functools import partial
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.button import Button
-from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
-from src.i18n import T
 
 
 class WarningAlreadyDownloadedScreen(BaseScreen):
@@ -58,7 +50,6 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             wid=f"{self.id}_label",
             text="",
             root_widget=f"{self.id}_grid",
-            markup=True,
             halign="justify",
         )
 
@@ -87,36 +78,9 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    def update(self, *args, **kwargs):
-        """Update buttons on related screen"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-
-        if name in (
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "WarningAlreadyDownloadedScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        # Check locale
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "version":
+    def on_warning(self, key: str, value: Any):
+        """Update a warning message on GUI"""
+        if key == "version":
             warning_msg = self.translate("Assets already downloaded")
             ask_proceed = self.translate(
                 "Do you want to proceed with the same file or do you want to download it again?"
@@ -161,5 +125,25 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                 ]
             )
 
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+    # pylint: disable=unused-argument
+    def update(self, *args, **kwargs):
+        """Update buttons on related screen"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
+
+        def on_update():
+            self.on_warning(key, value)
+
+        setattr(WarningAlreadyDownloadedScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "WarningAlreadyDownloadedScreen",
+            ),
+            on_update=getattr(WarningAlreadyDownloadedScreen, "on_update"),
+        )

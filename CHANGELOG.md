@@ -1,5 +1,21 @@
 # CHANGELOG
 
+## 0.0.20-alpha-2
+
+- Changed the version from `0.0.2-alpha` to `0.0.20-alpha-2` as suggested by @odudex;
+- Removed startup messages as suggested by @tadeubas:
+  * On linux the `GreetingsScreen` class will check:
+    * if user is on `dialout`/`uucp` group;
+    * internet connection
+  * On MacOS an Windows the `GreetingsScreen` class will check:
+    * internet connection
+- Added a line on `.ci/create-deb` for add user to `input` on debian-based systems where
+  require permissions for `/dev/input/eventX` (thanks to @theautumnbridge);
+- Refactored the code a little bit to be more pythonic one;
+- Added more tests:
+  - ask_permissions_dialout_screen;
+  - error_screen.
+
 ## 0.0.2-alpha
 
 - code refactoration from `nodejs` to `python`;

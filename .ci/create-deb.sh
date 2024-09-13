@@ -168,7 +168,7 @@ elif [ -n "\$USER" ] && [ "\$USER" != "root"]; then
   echo "Adding user \$USER to 'dialout' and 'input' groups to enable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
   usermod -a -G dialout \$USER
-  usermod -a -G input \$SUDO_USER
+  usermod -a -G input \$USER
 fi
 echo ""
 echo ""

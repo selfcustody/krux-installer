@@ -60,6 +60,7 @@ Before installing `krux-installer` source code, you will need prepare the system
 ```bash
 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 ```
+
 </details>
 
 <details>
@@ -74,6 +75,7 @@ and add this line to your `~/.zshrc`:
 ```bash
 alias python=python3
 ```
+
 </details>
 
 <details>
@@ -160,8 +162,8 @@ git submodule update --init
 
 ## Developing
 
-Krux-Installer uses `poe` task manager for formatting, linting,
-tests, coverage and build. 
+Krux-Installer uses `poe` task manager for formatting, linting, tests,
+coverage and build.
 
 <details>
 <summary>See all available tasks</summary>
@@ -169,6 +171,7 @@ tests, coverage and build.
 ```bash
 poetry run poe
 ```
+
 </details>
 
 <details>
@@ -177,6 +180,7 @@ poetry run poe
 ```bash
 poetry run poe format
 ```
+
 </details>
 
 <details>
@@ -185,6 +189,7 @@ poetry run poe format
 ```bash
 poetry run poe lint
 ```
+
 </details>
 
 <details>
@@ -194,7 +199,6 @@ poetry run poe lint
 poetry run poe test
 ```
 
-
 For systems without a window manager:
 
 ```bash
@@ -202,9 +206,9 @@ For systems without a window manager:
 poetry run poe test --no-xvfb
 ```
 
-You can see all coverage results opening you browser and type 
-`file:///<folder>/krux-installer/htmlcov/index.html` (assuming `folder` is where you placed the
-`krux-installer` project).
+You can see all coverage results opening you browser and type
+`file:///<folder>/krux-installer/htmlcov/index.html` (assuming
+`folder` is where you placed the `krux-installer` project).
 </details>
 
 <details>
@@ -213,6 +217,7 @@ You can see all coverage results opening you browser and type
 ```bash
 poetry run poe build-linux
 ```
+
 </details>
 
 <details>
@@ -221,6 +226,7 @@ poetry run poe build-linux
 ```bash
 poetry run poe build-macos
 ```
+
 </details>
 
 <details>

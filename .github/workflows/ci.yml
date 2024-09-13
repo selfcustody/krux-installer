@@ -82,4 +82,4 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Lint markdown
-        run: npx markdownlint-cli ${{ needs.job1.outputs.markdown_files }} --ignore node_modules
+        run: npx markdownlint-cli --disable MD033 --ignore node_modules ${{ needs.job1.outputs.markdown_files }}

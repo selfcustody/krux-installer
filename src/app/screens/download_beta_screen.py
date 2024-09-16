@@ -80,9 +80,6 @@ class DownloadBetaScreen(BaseDownloadScreen):
         self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
         setattr(self.__class__, "on_progress", on_progress)
 
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn, 0)
-
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
@@ -145,7 +142,6 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
         self.ids[f"{self.id}_info"].text = "".join(
             [
-                f"[size={self.SIZE_MP}sp]",
                 downloading,
                 "\n",
                 "[color=#00AABB]",
@@ -156,7 +152,6 @@ class DownloadBetaScreen(BaseDownloadScreen):
                 "\n",
                 self.downloader.destdir,
                 "\n",
-                "[/size]",
             ]
         )
 
@@ -177,9 +172,9 @@ class DownloadBetaScreen(BaseDownloadScreen):
         downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
         self.ids[f"{self.id}_progress"].text = "".join(
             [
-                f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
+                f"[b]{ percent * 100:,.2f} %[/b]",
                 "\n",
-                f"[size={self.SIZE_MP}sp]{downs[0]} of {downs[1]} MB[/size]",
+                f"{downs[0]} of {downs[1]} MB",
             ]
         )
 
@@ -188,11 +183,9 @@ class DownloadBetaScreen(BaseDownloadScreen):
             destdir = os.path.join(self.downloader.destdir, "kboot.kfpkg")
             self.ids[f"{self.id}_info"].text = "".join(
                 [
-                    f"[size={self.SIZE_MP}sp]",
                     destdir,
                     "\n",
                     downloaded,
-                    "[/size]",
                 ]
             )
 

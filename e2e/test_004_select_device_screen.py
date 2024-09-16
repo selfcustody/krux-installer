@@ -86,7 +86,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         calls = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_press_{button.id}")
+            action = getattr(screen.__class__, f"on_press_{button.id}")
             action(button)
             if button.id in (
                 "select_device_m5stickv",
@@ -118,7 +118,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         calls = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_press_{button.id}")
+            action = getattr(screen.__class__, f"on_press_{button.id}")
             action(button)
             if button.id in (
                 "select_device_m5stickv",
@@ -149,7 +149,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         calls = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_press_{button.id}")
+            action = getattr(screen.__class__, f"on_press_{button.id}")
             action(button)
             if button.id in (
                 "select_device_m5stickv",
@@ -188,7 +188,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         calls_set_screen = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_release_{button.id}")
+            action = getattr(screen.__class__, f"on_release_{button.id}")
             action(button)
 
             if button.id in (
@@ -230,7 +230,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         calls_set_screen = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_release_{button.id}")
+            action = getattr(screen.__class__, f"on_release_{button.id}")
             action(button)
 
             if button.id in (
@@ -273,7 +273,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         calls_set_screen = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_release_{button.id}")
+            action = getattr(screen.__class__, f"on_release_{button.id}")
             action(button)
 
             if button.id in ("select_device_m5stickv"):

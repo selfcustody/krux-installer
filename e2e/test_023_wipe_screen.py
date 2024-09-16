@@ -1,4 +1,3 @@
-import sys
 import os
 from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
@@ -171,10 +170,10 @@ class TestWipeScreen(GraphicUnitTest):
 
         on_data = getattr(WipeScreen, "on_data")
 
-        for i in range(19):
+        for i in range(4):
             on_data(f"[color=#00ff00] INFO [/color] mock test message {i}")
 
-        self.assertEqual(len(screen.output), 18)
+        self.assertEqual(len(screen.output), 4)
 
         # patch assertions
         mock_get_locale.assert_any_call()
@@ -215,18 +214,10 @@ class TestWipeScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-
-        if sys.platform in ("linux", "win32"):
-            size = screen.SIZE_M
-
-        else:
-            size = screen.SIZE_M
-
         text = "".join(
             [
-                f"[size={size}sp][b]DONE![/b][/size]",
+                "[b]DONE![/b]",
                 "\n",
-                f"[size={size}sp]",
                 "[color=#00FF00]",
                 "[ref=Back][u]Back[/u][/ref]",
                 "[/color]",

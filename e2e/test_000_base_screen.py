@@ -275,8 +275,10 @@ class TestBaseScreen(GraphicUnitTest):
             wid="mock_button",
             root_widget="mock_grid",
             text="Mocked button",
+            halign=None,
             on_press=MagicMock(),
             on_release=MagicMock(),
+            on_ref_press=MagicMock(),
         )
         self.render(screen_0)
 
@@ -313,8 +315,10 @@ class TestBaseScreen(GraphicUnitTest):
                 wid=f"mock_button_{i}",
                 root_widget="mock_grid",
                 text="Mocked button",
+                halign=None,
                 on_press=MagicMock(),
                 on_release=MagicMock(),
+                on_ref_press=MagicMock(),
             )
         self.render(screen_0)
 
@@ -341,8 +345,10 @@ class TestBaseScreen(GraphicUnitTest):
             wid="mock_button",
             root_widget="mock_grid",
             text="Mocked button",
+            halign=None,
             on_press=MagicMock(),
             on_release=MagicMock(),
+            on_ref_press=MagicMock(),
         )
         self.render(screen)
         screen.update_screen(
@@ -367,8 +373,10 @@ class TestBaseScreen(GraphicUnitTest):
             wid="mock_button",
             root_widget="mock_grid",
             text="Mocked button",
+            halign=None,
             on_press=MagicMock(),
             on_release=MagicMock(),
+            on_ref_press=MagicMock(),
         )
         self.render(screen)
         self.assertEqual(screen.locale, "en_US.UTF-8")
@@ -395,8 +403,10 @@ class TestBaseScreen(GraphicUnitTest):
             wid="mock_button",
             root_widget="mock_grid",
             text="Mocked button",
+            halign=None,
             on_press=MagicMock(),
             on_release=MagicMock(),
+            on_ref_press=MagicMock(),
         )
         self.render(screen)
         screen.update_screen(

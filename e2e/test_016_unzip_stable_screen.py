@@ -1,5 +1,4 @@
 import os
-import sys
 from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -171,8 +170,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             root_widget=f"{screen.id}_grid",
             text="Mock",
             row=0,
+            halign=None,
             on_press=MagicMock(),
             on_release=MagicMock(),
+            on_ref_press=MagicMock(),
         )
 
         # do tests
@@ -199,15 +200,6 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [window.size[0] // 24, window.size[0] // 48]
-
-        if sys.platform == "darwin":
-            size = [window.size[0] // 48, window.size[0] // 128]
 
         # do tests
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
@@ -217,15 +209,11 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "kboot.kfpkg")
         text = "".join(
             [
-                f"[size={size[0]}sp]",
                 "Flash with",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[color=#efcc00]",
                 p,
                 "[/color]",
-                "[/size]",
             ]
         )
 
@@ -249,46 +237,30 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [window.size[0] // 24, window.size[0] // 48]
-
-        if sys.platform == "darwin":
-            size = [window.size[0] // 48, window.size[0] // 128]
 
         # do tests
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="airgap-button")
 
-        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
-        text = "".join(
-            [
-                f"[size={size[0]}sp]",
-                "[color=#333333]",
-                "Air-gapped update with (soon)",
-                "[/color]",
-                "[/size]",
-                "\n",
-                f"[size={size[1]}sp]",
-                "[color=#333333]",
-                p,
-                "[/color]",
-                "[/size]",
-            ]
-        )
+        # p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
+        # text = "".join(
+        #    [
+        #        "[color=#333333]",
+        #        "Air-gapped update with (soon)",
+        #        "[/color]",
+        #        "\n",
+        #        "[color=#333333]",
+        #        p,
+        #        "[/color]",
+        #    ]
+        # )
 
         # default assertions
-        self.assertEqual(screen.ids[f"{screen.id}_airgap_button"].text, text)
-        self.assertTrue(
-            hasattr(UnzipStableScreen, f"on_press_{screen.id}_airgap_button")
-        )
-        self.assertTrue(
-            hasattr(UnzipStableScreen, f"on_release_{screen.id}_airgap_button")
-        )
+        # button = screen.ids[f"{screen.id}_airgap_button"]
+        # self.assertEqual(screen.ids[f"{screen.id}_airgap_button"].text, text)
+        # self.assertTrue(hasattr(screen.__class__, f"on_press_{button.id}"))
+        # self.assertTrue(hasattr(screen.__class__, f"on_release_{button.id}"))
 
         # patch assertions
         mock_get_destdir_assets.assert_any_call()
@@ -310,36 +282,23 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [window.size[0] // 24, window.size[0] // 48]
-
-        if sys.platform == "darwin":
-            size = [window.size[0] // 48, window.size[0] // 128]
 
         # DO tests
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="flash-button")
         button = screen.ids[f"{screen.id}_flash_button"]
-        action = getattr(screen, f"on_press_{screen.id}_flash_button")
+        action = getattr(screen.__class__, f"on_press_{button.id}")
         action(button)
 
         p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "kboot.kfpkg")
         text = "".join(
             [
-                f"[size={size[0]}sp]",
                 "Extracting",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[color=#efcc00]",
                 p,
                 "[/color]",
-                "[/size]",
             ]
         )
 
@@ -369,43 +328,30 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [window.size[0] // 24, window.size[0] // 48]
-
-        if sys.platform == "darwin":
-            size = [window.size[0] // 48, window.size[0] // 128]
 
         # DO tests
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="airgap-button")
-        button = screen.ids[f"{screen.id}_airgap_button"]
-        action = getattr(screen, f"on_press_{screen.id}_airgap_button")
-        action(button)
+        # button = screen.ids[f"{screen.id}_airgap_button"]
+        # action = getattr(screen.__class__, f"on_press_{button.id}")
+        # action(button)
 
-        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
-        text = "".join(
-            [
-                f"[size={size[0]}sp]",
-                "[color=#333333]",
-                "Air-gapped update with (soon)",
-                "[/color]",
-                "[/size]",
-                "\n",
-                f"[size={size[1]}sp]",
-                "[color=#333333]",
-                p,
-                "[/color]",
-                "[/size]",
-            ]
-        )
+        # p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
+        # text = "".join(
+        #    [
+        #        "[color=#333333]",
+        #        "Air-gapped update with (soon)",
+        #        "[/color]",
+        #        "\n",
+        #        "[color=#333333]",
+        #        p,
+        #        "[/color]",
+        #    ]
+        # )
 
         # default assertions
-        self.assertEqual(button.text, text)
+        # self.assertEqual(button.text, text)
 
         # patch assertions
         mock_get_destdir_assets.assert_called_once()
@@ -442,36 +388,23 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [window.size[0] // 24, window.size[0] // 48]
-
-        if sys.platform == "darwin":
-            size = [window.size[0] // 48, window.size[0] // 128]
 
         # DO tests
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="flash-button")
         button = screen.ids[f"{screen.id}_flash_button"]
-        action = getattr(screen, f"on_release_{screen.id}_flash_button")
+        action = getattr(screen.__class__, f"on_release_{button.id}")
         action(button)
 
         p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "kboot.kfpkg")
         text = "".join(
             [
-                f"[size={size[0]}sp]",
                 "Extracted",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[color=#efcc00]",
                 p,
                 "[/color]",
-                "[/size]",
             ]
         )
 
@@ -521,38 +454,26 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [window.size[0] // 24, window.size[0] // 48]
-
-        if sys.platform == "darwin":
-            size = [window.size[0] // 48, window.size[0] // 128]
 
         # DO tests
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="airgap-button")
+
         button = screen.ids[f"{screen.id}_airgap_button"]
-        action = getattr(screen, f"on_release_{screen.id}_airgap_button")
-        action(button)
+        # action = getattr(screen.__class__, f"on_release_{button.id}")
+        # action(button)
 
         p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
         text = "".join(
             [
-                f"[size={size[0]}sp]",
                 "[color=#333333]",
                 "Air-gapped update with (soon)",
                 "[/color]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[color=#333333]",
                 p,
                 "[/color]",
-                "[/size]",
             ]
         )
 

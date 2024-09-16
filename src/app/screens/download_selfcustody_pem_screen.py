@@ -82,7 +82,6 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
 
         self.ids[f"{self.id}_info"].text = "".join(
             [
-                f"[size={self.SIZE_MP}sp]",
                 downloading,
                 "\n",
                 f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
@@ -90,7 +89,6 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
                 to,
                 "\n",
                 filepath,
-                "[/size]",
             ]
         )
 
@@ -112,14 +110,12 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         of = self.translate("of")
         self.ids[f"{self.id}_progress"].text = "".join(
             [
-                f"[size={self.SIZE_G}sp][b]{percent * 100:,.2f} %[/b][/size]",
+                f"[b]{percent * 100:,.2f} %[/b]",
                 "\n",
-                f"[size={self.SIZE_MP}sp]",
                 str(lens[0]),
                 f" {of} ",
                 str(lens[1]),
                 " B",
-                "[/size]",
             ]
         )
 
@@ -129,11 +125,9 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
             filepath = os.path.join(destdir, "selfcustody.pem")
             self.ids[f"{self.id}_info"].text = "".join(
                 [
-                    f"[size={self.SIZE_MP}sp]",
                     filepath,
                     "\n",
                     downloaded,
-                    "[/size]",
                 ]
             )
 

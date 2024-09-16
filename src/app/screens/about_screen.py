@@ -39,14 +39,7 @@ class AboutScreen(BaseScreen):
 
         self.make_grid(wid="about_screen_grid", rows=1)
 
-        self.make_label(
-            wid=f"{self.id}_label",
-            text="",
-            root_widget=f"{self.id}_grid",
-            halign="justify",
-        )
-
-        def _on_ref_press(*args):
+        def on_ref_press(*args):
             self.debug(f"Calling Button::{args[0]}::on_ref_press")
             self.debug(f"Opening {args[1]}")
 
@@ -59,8 +52,18 @@ class AboutScreen(BaseScreen):
             if args[1] == "SourceCode":
                 webbrowser.open(self.src_code)
 
-        setattr(self, f"on_ref_press_{self.id}_label", _on_ref_press)
-        self.ids[f"{self.id}_label"].bind(on_ref_press=_on_ref_press)
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_label",
+            text="",
+            root_widget=f"{self.id}_grid",
+            halign=None,
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
+        )
+
+        self.ids[f"{self.id}_label"].halign = "justify"
 
         fns = [
             partial(self.update, name=self.name, key="canvas"),
@@ -85,25 +88,20 @@ class AboutScreen(BaseScreen):
 
                 self.ids[f"{self.id}_label"].text = "".join(
                     [
-                        f"[size={self.SIZE_G}sp]",
                         f"[ref=SourceCode][b]v{get_version()}[/b][/ref]",
-                        "[/size]",
                         "\n",
-                        "\n" f"[size={self.SIZE_M}sp]",
+                        "\n",
                         f"{follow}: ",
                         "[color=#00AABB]",
                         "[ref=X][u]@selfcustodykrux[/u][/ref]",
                         "[/color]",
-                        "[/size]",
                         "\n",
                         "\n",
-                        f"[size={self.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
                         f"[u]{back}[/u]",
                         "[/ref]",
                         "[/color]",
-                        "[/size]",
                     ]
                 )
 

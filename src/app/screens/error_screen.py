@@ -53,15 +53,16 @@ class ErrorScreen(BaseScreen):
             if args[1] == "ReportIssue":
                 webbrowser.open(f"{self.src_code}/issues")
 
-        self.make_label(
+        self.make_button(
+            row=0,
             wid=f"{self.id}_label",
             root_widget=f"{self.id}_grid",
             text="",
             halign="center",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
-
-        setattr(ErrorScreen, f"on_ref_press_{self.id}", on_ref_press)
-        self.ids[f"{self.id}_label"].bind(on_ref_press=on_ref_press)
 
     @staticmethod
     def chunkstring(string, length):
@@ -93,26 +94,17 @@ class ErrorScreen(BaseScreen):
 
                 self.ids[f"{self.id}_label"].text = "".join(
                     [
-                        f"[size={self.SIZE_M}sp]",
                         f"[color=#ff0000]{title}[/color]",
-                        "[/size]",
-                        "\n",
                         "\n",
                         "\n".join(reason),
-                        "[/size]",
                         "\n",
-                        "\n",
-                        f"[size={self.SIZE_P}sp]",
                         "Report issue at ",
                         "[color=#00aabb]",
                         "[ref=ReportIssue]",
                         f"{self.src_code}/issues",
                         "[/ref]",
                         "[/color]",
-                        "[/size]",
                         "\n",
-                        "\n",
-                        f"[size={self.SIZE_MP}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
                         "[u]Back[/u]",
@@ -123,15 +115,13 @@ class ErrorScreen(BaseScreen):
                         "[ref=Quit]",
                         "[u]Quit[/u]",
                         "[/ref]",
-                        "[/size]",
                     ]
                 )
 
-        setattr(ErrorScreen, "on_update", on_update)
         self.update_screen(
             name=name,
             key=key,
             value=value,
             allowed_screens=tuple(self.manager.screen_names),
-            on_update=getattr(ErrorScreen, "on_update"),
+            on_update=on_update,
         )

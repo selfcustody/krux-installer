@@ -103,23 +103,20 @@ class MainScreen(BaseScreen):
         wid = "main_select_version"
         msg = self.translate("Version")
 
-        def on_press_select_version(instance):
+        def on_press(instance):
             self.debug(f"Calling {instance.id}::on_press")
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
             self.ids[instance.id].text = "".join(
                 [
-                    f"[size={self.SIZE_M}sp]",
                     "[color=#efcc00]",
                     f"[b]{self.translate("Fetching data from")}[/b]",
                     "\n",
-                    f"[size={self.SIZE_MP}sp]",
                     url,
-                    "[/size]",
                     "[/color]",
                 ]
             )
 
-        def on_release_select_version(instance):
+        def on_release(instance):
             self.debug(f"Calling {instance.id}::on_release")
             select_version = self.manager.get_screen("SelectVersionScreen")
             select_version.clear()
@@ -127,9 +124,6 @@ class MainScreen(BaseScreen):
             self.set_background(wid="main_select_version", rgba=(0, 0, 0, 1))
             self.set_screen(name="SelectVersionScreen", direction="left")
             self.update(name=self.name, key="version", value=self.version)
-
-        setattr(MainScreen, "on_press_select_version", on_press_select_version)
-        setattr(MainScreen, "on_release_select_version", on_release_select_version)
 
         self.make_button(
             row=0,
@@ -143,8 +137,10 @@ class MainScreen(BaseScreen):
                     "[/color]",
                 ]
             ),
-            on_press=getattr(MainScreen, "on_press_select_version"),
-            on_release=getattr(MainScreen, "on_release_select_version"),
+            halign=None,
+            on_press=on_press,
+            on_release=on_release,
+            on_ref_press=None,
         )
 
     def build_select_device_button(self):
@@ -184,9 +180,12 @@ class MainScreen(BaseScreen):
                     "[/color]",
                 ]
             ),
+            halign=None,
             on_press=getattr(MainScreen, "on_press_select_device"),
             on_release=getattr(MainScreen, "on_release_select_device"),
+            on_ref_press=None,
         )
+        self.ids[wid].size_hint = (1, 1)
 
     def build_flash_button(self):
         """Create staticmethods using instance variables to control the flash button"""
@@ -226,6 +225,13 @@ class MainScreen(BaseScreen):
                         partial(
                             screen.update,
                             name=self.name,
+                            key="canvas",
+                        )
+                    )
+                    partials.append(
+                        partial(
+                            screen.update,
+                            name=self.name,
                             key="version",
                             value=self.version,
                         )
@@ -235,6 +241,13 @@ class MainScreen(BaseScreen):
                 elif re.findall("^odudex/krux_binaries", self.version):
                     to_screen = "DownloadBetaScreen"
                     screen = self.manager.get_screen(to_screen)
+                    partials.append(
+                        partial(
+                            screen.update,
+                            name=self.name,
+                            key="canvas",
+                        )
+                    )
                     partials.append(
                         partial(
                             screen.update,
@@ -270,8 +283,10 @@ class MainScreen(BaseScreen):
             wid=wid,
             root_widget="main_screen_grid",
             text=f"[color=#333333]{self.translate("Flash")}[/color]",
+            halign=None,
             on_press=getattr(MainScreen, "on_press_flash"),
             on_release=getattr(MainScreen, "on_release_flash"),
+            on_ref_press=None,
         )
 
     def build_wipe_button(self):
@@ -301,8 +316,10 @@ class MainScreen(BaseScreen):
             wid=wid,
             root_widget="main_screen_grid",
             text=f"[color=#333333]{self.translate("Wipe")}[/color]",
+            halign=None,
             on_press=getattr(MainScreen, "on_press_wipe"),
             on_release=getattr(MainScreen, "on_release_wipe"),
+            on_ref_press=None,
         )
 
     def build_settings_button(self):
@@ -326,8 +343,10 @@ class MainScreen(BaseScreen):
             wid=wid,
             root_widget="main_screen_grid",
             text=self.translate("Settings"),
+            halign=None,
             on_press=getattr(MainScreen, "on_press_settings"),
             on_release=getattr(MainScreen, "on_release_settings"),
+            on_ref_press=None,
         )
 
     def build_about_button(self):
@@ -351,8 +370,10 @@ class MainScreen(BaseScreen):
             wid=wid,
             root_widget="main_screen_grid",
             text=self.translate("About"),
+            halign=None,
             on_press=getattr(MainScreen, "on_press_about"),
             on_release=getattr(MainScreen, "on_release_about"),
+            on_ref_press=None,
         )
 
     def update_version(self, value: str):

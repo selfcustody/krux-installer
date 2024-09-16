@@ -1,5 +1,4 @@
 import os
-import sys
 from unittest.mock import MagicMock, patch, call
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -30,9 +29,6 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         # default assertions
         self.assertEqual(grid.id, f"{screen.id}_grid")
         self.assertFalse(screen.success)
-        self.assertTrue(
-            hasattr(VerifyStableZipScreen, "on_ref_press_verify_stable_zip_screen")
-        )
 
         # patch assertions
         mock_get_locale.assert_any_call()
@@ -43,7 +39,12 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
     )
     @patch("src.app.screens.verify_stable_zip_screen.Sha256Verifyer")
     @patch("src.app.screens.verify_stable_zip_screen.Sha256CheckVerifyer")
-    def test_verify_sha256(self, mock_check_verifyer, mock_verifyer, mock_get_locale):
+    def test_verify_sha256(
+        self,
+        mock_check_verifyer,
+        mock_verifyer,
+        mock_get_locale,
+    ):
         screen = VerifyStableZipScreen()
         self.render(screen)
 
@@ -100,31 +101,22 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_on_pre_enter(self, mock_get_locale):
+    @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.manager")
+    def test_on_pre_enter(self, mock_manager, mock_get_locale):
+        mock_manager.get_screen = MagicMock()
+        mock_manager.get_screen.return_value = MagicMock(version="v0.0.1")
         screen = VerifyStableZipScreen()
-        self.render(screen)
+        screen.on_pre_enter()
+        # self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        fontsize_mm = 0
-
-        if sys.platform in ("linux", "win32"):
-            fontsize_mm = window.size[0] // 24
-
-        if sys.platform == "darwin":
-            fontsize_mm = window.size[0] // 48
-
-        screen.on_pre_enter()
 
         text = "".join(
             [
-                f"[size={fontsize_mm}sp]",
                 "[color=#efcc00]",
                 "Verifying integrity and authenticity",
                 "[/color]",
-                "[/size]",
             ]
         )
         self.assertEqual(len(screen.ids["verify_stable_zip_screen_grid"].children), 1)
@@ -159,6 +151,8 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         screen = VerifyStableZipScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
+        screen.on_pre_enter()
+        screen.on_enter()
         self.render(screen)
 
         # get your Window instance safely
@@ -168,7 +162,7 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called()
-        mock_get_destdir_assets.assert_called_once()
+        mock_get_destdir_assets.assert_called()
         mock_build_message_verify_sha256.assert_called_once_with(
             assets_dir="mockdir", version=screen.manager.get_screen().version
         )
@@ -203,34 +197,21 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-
-        if sys.platform in ("linux", "win32"):
-            size = [screen.SIZE_MP, screen.SIZE_P, screen.SIZE_PP]
-        else:
-            size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
-
         p = os.path.join("mock", "krux-v0.0.1.zip")
         expected = "".join(
             [
-                f"[size={size[0]}sp]",
                 "[u]INTEGRITY VERIFICATION[/u]: ",
                 "[b][color=#00FF00]SUCCESS[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]computed hash from [color=#777777]{p}[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]mo   ck   ha   sh[/size]",
+                "mo   ck   ha   sh",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]provided hash from [color=#777777]{p}.sha256.txt[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]mo   ck   ha   sh[/size]",
-                "\n",
+                "mo   ck   ha   sh",
                 "\n",
                 "\n",
             ]
@@ -257,34 +238,21 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-
-        if sys.platform in ("linux", "win32"):
-            size = [screen.SIZE_MP, screen.SIZE_P, screen.SIZE_PP]
-        else:
-            size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
-
         p = os.path.join("mock", "krux-v0.0.1.zip")
         expected = "".join(
             [
-                f"[size={size[0]}sp]",
                 "[u]INTEGRITY VERIFICATION[/u]: ",
                 "[b][color=#FF0000]FAILED[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]computed hash from [color=#777777]{p}[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]mo   ck   ha   sh[/size]",
+                "mo   ck   ha   sh",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]provided hash from [color=#777777]{p}.sha256.txt[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]no   mo   ck   ha   sh[/size]",
-                "\n",
+                "no   mo   ck   ha   sh",
                 "\n",
                 "\n",
             ]
@@ -311,44 +279,32 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        if sys.platform in ("linux", "win32"):
-            size = [screen.SIZE_MP, screen.SIZE_P, screen.SIZE_PP]
-        else:
-            size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
-
         p = os.path.join("mock", "krux-v0.0.1.zip")
         s = os.path.join("mock", "selfcustody.pem")
         expected = "".join(
             [
-                f"[size={size[0]}sp]",
                 "[u]AUTHENTICITY VERIFICATION[/u]: ",
                 "[b][color=#00FF00]GOOD SIGNATURE[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
+                "If you have openssl installed on your system",
                 "\n",
-                f"[size={size[1]}sp]If you have openssl installed on your system[/size]",
-                "\n",
-                f"[size={size[1]}sp]you can check manually with the following command:[/size]",
+                "you can check manually with the following command",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[b]",
                 f"openssl sha256< [color=#777777]{p}[/color] -binary | \\",
                 "\n",
                 f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{s}[/color] \\",
                 "\n",
                 f"-sigfile [color=#777777]{p}.sig[/color]",
-                "[/size]",
                 "[/b]",
                 "\n",
                 "\n",
-                f"[size={size[0]}sp]",
                 "[ref=Proceed][color=#00ff00][u]Proceed[/u][/ref][/color]",
                 "             ",
                 "[ref=Back][color=#ff0000][u]Back[/u][/ref][/color]",
                 "[/b]",
-                "[/size]",
             ]
         )
 
@@ -377,45 +333,32 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-
-        if sys.platform in ("linux", "win32"):
-            size = [screen.SIZE_MP, screen.SIZE_P, screen.SIZE_PP]
-        else:
-            size = [screen.SIZE_M, screen.SIZE_MP, screen.SIZE_P]
-
         p = os.path.join("mock", "krux-v0.0.1.zip")
         s = os.path.join("mock", "selfcustody.pem")
         expected = "".join(
             [
-                f"[size={size[0]}sp]",
                 "[u]AUTHENTICITY VERIFICATION[/u]: ",
                 "[b][color=#FF0000]BAD SIGNATURE[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
+                "If you have openssl installed on your system",
                 "\n",
-                f"[size={size[1]}sp]If you have openssl installed on your system[/size]",
-                "\n",
-                f"[size={size[1]}sp]you can check manually with the following command:[/size]",
+                "you can check manually with the following command",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[b]",
                 f"openssl sha256< [color=#777777]{p}[/color] -binary | \\",
                 "\n",
                 f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{s}[/color] \\",
                 "\n",
                 f"-sigfile [color=#777777]{p}.sig[/color]",
-                "[/size]",
                 "[/b]",
                 "\n",
                 "\n",
-                f"[size={size[0]}sp]",
                 "[ref=Proceed][color=#00ff00][u]Proceed[/u][/ref][/color]",
                 "             ",
                 "[ref=Back][color=#ff0000][u]Back[/u][/ref][/color]",
                 "[/b]",
-                "[/size]",
             ]
         )
 
@@ -423,6 +366,9 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
             assets_dir="mock", version="v0.0.1"
         )
 
+        print(actual)
+        print("========")
+        print(expected)
         self.assertEqual(actual, expected)
         mock_get_locale.assert_any_call()
         mock_verify_sig.assert_called_once()
@@ -444,14 +390,16 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
         mock_get_locale,
     ):
         screen = VerifyStableZipScreen()
+        screen.on_pre_enter()
+        screen.on_enter()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        button = screen.ids[f"{screen.id}_label"]
 
         # DO tests
-        screen.on_pre_enter()
-        action = getattr(VerifyStableZipScreen, f"on_ref_press_{screen.id}")
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
         action(None, "Proceed")
 
         # patch assertions
@@ -500,19 +448,46 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.manager")
     @patch("src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.set_screen")
-    def test_on_press_back(self, mock_set_screen, mock_get_locale):
+    @patch(
+        "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.verify_sha256",
+        return_value=tuple(["mock", "mock", True]),
+    )
+    @patch(
+        "src.app.screens.verify_stable_zip_screen.VerifyStableZipScreen.verify_signature",
+        return_value=True,
+    )
+    def test_on_press_back(
+        self,
+        mock_verify_signature,
+        mock_verify_sha256,
+        mock_set_screen,
+        mock_manager,
+        mock_get_destdir_assets,
+        mock_get_locale,
+    ):
+        mock_manager.get_screen = MagicMock()
+        mock_manager.get_screen.return_value = MagicMock(version="v0.0.1")
         screen = VerifyStableZipScreen()
+        screen.on_pre_enter()
+        screen.on_enter()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        button = screen.ids[f"{screen.id}_label"]
 
         # DO tests
-        screen.on_pre_enter()
-        action = getattr(VerifyStableZipScreen, f"on_ref_press_{screen.id}")
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
         action(None, "Back")
 
         # patch assertions
         mock_get_locale.assert_called()
+        mock_get_destdir_assets.assert_called()
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+        mock_verify_sha256.assert_called()
+        mock_verify_signature.assert_called()

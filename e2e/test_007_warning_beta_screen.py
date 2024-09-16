@@ -1,5 +1,4 @@
 import os
-import sys
 from unittest.mock import patch
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -35,7 +34,6 @@ class TestSelectVersionScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
         warn = grid.children[1]
         button = grid.children[0]
-        sizes = [screen.SIZE_MM, screen.SIZE_M, screen.SIZE_MP]
 
         self.assertEqual(window.children[0], screen)
         self.assertEqual(screen.name, "WarningBetaScreen")
@@ -46,16 +44,13 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                f"[size={sizes[1]}sp]",
                 "[color=#efcc00]This is our test repository[/color]",
-                "[/size]",
                 "\n",
-                f"[size={sizes[2]}sp]These are unsigned binaries for the latest and most experimental features[/size]",
+                "These are unsigned binaries for the latest and most experimental features",
                 "\n",
-                f"[size={sizes[2]}sp]and it's just for trying new things and providing feedback.[/size]",
+                "and it's just for trying new things and providing feedback.",
                 "\n",
                 "\n",
-                f"[size={sizes[0]}sp]",
                 "[color=#00ff00]",
                 "[ref=MainScreen]Proceed[/ref]",
                 "[/color]",
@@ -63,13 +58,8 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "[color=#ff0000]",
                 "[ref=SelectVersion]Back[/ref]",
                 "[/color]",
-                "[/size]",
             ]
         )
-
-        print(button.text)
-        print("==============")
-        print(text)
 
         self.assertEqual(button.text, text)
         mock_get_locale.assert_any_call()
@@ -126,31 +116,16 @@ class TestSelectVersionScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
         button = grid.children[0]
 
-        fontsize_mm = 0
-        fontsize_m = 0
-        fontsize_mp = 0
-
-        if sys.platform in ("linux", "win32"):
-            fontsize_mm = window.size[0] // 24
-            fontsize_m = window.size[0] // 32
-            fontsize_mp = window.size[0] // 48
-
-        if sys.platform == "darwin":
-            fontsize_mm = window.size[0] // 48
-            fontsize_m = window.size[0] // 64
-            fontsize_mp = window.size[0] // 128
-
         screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
         text = "".join(
             [
-                f"[size={fontsize_m}sp][color=#efcc00]Este é nosso repositório de testes[/color][/size]",
+                "[color=#efcc00]Este é nosso repositório de testes[/color]",
                 "\n",
-                f"[size={fontsize_mp}sp]Estes são binários não assinados dos recursos mais experimentais[/size]",
+                "Estes são binários não assinados dos recursos mais experimentais",
                 "\n",
-                f"[size={fontsize_mp}sp]e serve apenas para experimentar coisas novas e dar opiniões.[/size]",
+                "e serve apenas para experimentar coisas novas e dar opiniões.",
                 "\n",
                 "\n",
-                f"[size={fontsize_mm}sp]",
                 "[color=#00ff00]",
                 "[ref=MainScreen]Proceder[/ref]",
                 "[/color]",
@@ -158,12 +133,8 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "[color=#ff0000]",
                 "[ref=SelectVersion]Voltar[/ref]",
                 "[/color]",
-                "[/size]",
             ]
         )
-        print(button.text)
-        print("==========")
-        print(text)
 
         self.assertEqual(button.text, text)
         mock_get_locale.assert_any_call()

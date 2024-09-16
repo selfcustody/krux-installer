@@ -1,5 +1,4 @@
 import os
-import sys
 from unittest.mock import patch, call
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -142,18 +141,6 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        fontsize_g = 0
-        fontsize_mp = 0
-
-        if sys.platform in ("linux", "win32"):
-            fontsize_g = window.size[0] // 16
-            fontsize_mp = window.size[0] // 48
-
-        if sys.platform == "darwin":
-            fontsize_g = window.size[0] // 32
-            fontsize_mp = window.size[0] // 128
 
         # do tests
         screen.update(
@@ -165,14 +152,12 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
         # do tests
         text = "".join(
             [
-                f"[size={fontsize_g}sp][b]1.00 %[/b][/size]",
+                "[b]1.00 %[/b]",
                 "\n",
-                f"[size={fontsize_mp}sp]",
                 "210000",
                 " of ",
                 "21000000",
                 " B",
-                "[/size]",
             ]
         )
 
@@ -240,18 +225,6 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        fontsize_g = 0
-        fontsize_mp = 0
-
-        if sys.platform in ("linux", "win32"):
-            fontsize_g = window.size[0] // 16
-            fontsize_mp = window.size[0] // 48
-
-        if sys.platform == "darwin":
-            fontsize_g = window.size[0] // 32
-            fontsize_mp = window.size[0] // 128
 
         # do tests
         with patch.object(screen, "trigger") as mock_trigger, patch.object(
@@ -268,25 +241,21 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
             # do tests
             text_progress = "".join(
                 [
-                    f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
+                    "[b]100.00 %[/b]",
                     "\n",
-                    f"[size={fontsize_mp}sp]",
                     "21",
                     " of ",
                     "21",
                     " B",
-                    "[/size]",
                 ]
             )
 
             filepath = os.path.join("mockdir", "selfcustody.pem")
             text_info = "".join(
                 [
-                    f"[size={fontsize_mp}sp]",
                     filepath,
                     "\n",
                     "downloaded",
-                    "[/size]",
                 ]
             )
 

@@ -144,11 +144,9 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
             filepath = os.path.join(destdir, f"krux-{self.version}.zip.sha256.txt")
             self.ids[f"{self.id}_info"].text = "".join(
                 [
-                    f"[size={self.SIZE_MP}sp]",
                     filepath,
                     "\n",
                     downloaded,
-                    "[/size]",
                 ]
             )
 

@@ -139,13 +139,11 @@ class BaseFlashScreen(BaseScreen):
             done = self.translate("DONE")
             back = self.translate("Back")
             _quit = self.translate("Quit")
-            size = self.SIZE_M
 
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    f"[size={size}sp][b]{done}![/b][/size]",
+                    f"[b]{done}![/b]",
                     "\n",
-                    f"[size={size}sp]",
                     "[color=#00FF00]",
                     f"[ref=Back][u]{back}[/u][/ref]",
                     "[/color]",

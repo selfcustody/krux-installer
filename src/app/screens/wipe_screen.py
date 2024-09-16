@@ -21,7 +21,6 @@
 """
 wipe_screen.py
 """
-import sys
 import threading
 import traceback
 from functools import partial
@@ -71,7 +70,7 @@ class WipeScreen(BaseFlashScreen):
             )
             self.output.append(text)
 
-            if len(self.output) > 18:
+            if len(self.output) > 4:
                 del self.output[:1]
 
             if "SPI Flash erased." in text:
@@ -112,19 +111,26 @@ class WipeScreen(BaseFlashScreen):
             root_widget=f"{self.id}_subgrid",
         )
 
-        self.make_label(
+        self.make_button(
+            row=1,
             wid=f"{self.id}_progress",
             text="",
-            root_widget=f"{self.id}_subgrid",
             halign="center",
+            root_widget=f"{self.id}_subgrid",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
-        self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
 
-        self.make_label(
+        self.make_button(
+            row=2,
             wid=f"{self.id}_info",
             text="",
             root_widget=f"{self.id}_grid",
             halign="justify",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
 
     # pylint: disable=unused-argument
@@ -138,12 +144,7 @@ class WipeScreen(BaseFlashScreen):
         self.thread = threading.Thread(name=self.name, target=on_process)
 
         please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
-        if sys.platform in ("linux", "win32"):
-            sizes = [self.SIZE_M, self.SIZE_PP]
-        else:
-            sizes = [self.SIZE_MM, self.SIZE_MP]
-
-        self.ids[f"{self.id}_progress"].text = f"[size={sizes[0]}sp][b]{please}[/b]"
+        self.ids[f"{self.id}_progress"].text = please
 
         # if anything wrong happen, show it
         def hook(err):
@@ -151,38 +152,9 @@ class WipeScreen(BaseFlashScreen):
                 trace = traceback.format_exception(
                     err.exc_type, err.exc_value, err.exc_traceback
                 )
-                msg = "".join(trace)
+                msg = "".join(trace[-2:])
                 self.error(msg)
-
-                done = self.translate("DONE")
-                back = self.translate("Back")
-                _quit = self.translate("Quit")
-
-                self.ids[f"{self.id}_progress"].text = "".join(
-                    [
-                        f"[size={sizes[0]}]",
-                        f"[color=#FF0000]{"Wipe failed" if not self.success else done}[/color]",
-                        "[/size]",
-                        "\n",
-                        "\n",
-                        f"[size={sizes[0]}]" "[color=#00FF00]",
-                        f"[ref=Back][u]{back}[/u][/ref]",
-                        "[/color]",
-                        "        ",
-                        "[color=#EFCC00]",
-                        f"[ref=Quit][u]{_quit}[/u][/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                )
-
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={sizes[1]}]",
-                        msg,
-                        "[/size]",
-                    ]
-                )
+                self.redirect_exception(exception=RuntimeError(f"Wipe failed: {msg}"))
 
         # hook what happened
         threading.excepthook = hook

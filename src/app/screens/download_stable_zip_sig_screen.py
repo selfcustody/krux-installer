@@ -138,11 +138,9 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
             filepath = os.path.join(destdir, f"krux-{self.version}.zip.sig")
             self.ids[f"{self.id}_info"].text = "".join(
                 [
-                    f"[size={self.SIZE_MP}sp]",
                     filepath,
                     "\n",
                     downloaded,
-                    "[/size]",
                 ]
             )
 

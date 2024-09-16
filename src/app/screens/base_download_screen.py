@@ -25,8 +25,6 @@ import typing
 from functools import partial
 from threading import Thread
 from kivy.clock import Clock, ClockEvent
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
 from src.app.screens.base_screen import BaseScreen
 from src.utils.downloader.asset_downloader import AssetDownloader
 
@@ -46,27 +44,30 @@ class BaseDownloadScreen(BaseScreen):
 
         # progress label, show a "Connecting"
         # before start the download to make
-        progress = Label(
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_progress",
+            root_widget=f"{self.id}_grid",
+            halign=None,
             text="",
-            markup=True,
-            valign="center",
-            halign="center",
+            on_press=None,
+            on_release=None,
+            on_ref_press=None,
         )
 
         # information label
         # it has data about url
         # and downloaded paths
-        asset_label = Label(markup=True, valign="center", halign="center")
-
-        # setup progress label
-        progress.id = f"{self.id}_progress"
-        self.ids[f"{self.id}_grid"].add_widget(progress)
-        self.ids[progress.id] = WeakProxy(progress)
-
-        # setup information label
-        asset_label.id = f"{self.id}_info"
-        self.ids[f"{self.id}_grid"].add_widget(asset_label)
-        self.ids[asset_label.id] = WeakProxy(asset_label)
+        self.make_button(
+            row=1,
+            wid=f"{self.id}_info",
+            root_widget=f"{self.id}_grid",
+            halign=None,
+            text="",
+            on_press=None,
+            on_release=None,
+            on_ref_press=None,
+        )
 
     @property
     def to_screen(self) -> str:
@@ -196,7 +197,6 @@ class BaseDownloadScreen(BaseScreen):
         """
         return "".join(
             [
-                f"[size={size}sp]",
                 download_msg,
                 "\n",
                 f"[color=#00AABB][ref={from_url}]{from_url}[/ref][/color]",
@@ -204,7 +204,6 @@ class BaseDownloadScreen(BaseScreen):
                 to_msg,
                 "\n",
                 to_path,
-                "[/size]",
             ]
         )
 
@@ -222,13 +221,11 @@ class BaseDownloadScreen(BaseScreen):
         """
         return "".join(
             [
-                f"[size={sizes[0]}sp][b]{percent * 100:,.2f} %[/b][/size]",
+                f"[b]{percent * 100:,.2f} %[/b]",
                 "\n",
-                f"[size={sizes[1]}sp]",
                 str(downloaded_len),
                 f" {of_msg} ",
                 str(content_len),
                 " B",
-                "[/size]",
             ]
         )

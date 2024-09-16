@@ -21,7 +21,6 @@
 """
 main_screen.py
 """
-import sys
 import threading
 import traceback
 from functools import partial
@@ -69,7 +68,7 @@ class FlashScreen(BaseFlashScreen):
                 self.output.append("*")
                 self.output.append("")
 
-            if len(self.output) > 18:
+            if len(self.output) > 4:
                 del self.output[:1]
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
@@ -86,23 +85,16 @@ class FlashScreen(BaseFlashScreen):
 
         def on_process(file_type: str, iteration: int, total: int, suffix: str):
             percent = (iteration / total) * 100
-
-            if sys.platform in ("linux", "win32"):
-                sizes = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
-            else:
-                sizes = [self.SIZE_MM, self.SIZE_M, self.SIZE_MP]
-
             please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
             flashing = self.translate("Flashing")
             at = self.translate("at")
 
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    f"[size={sizes[1]}sp][b]{please}[/b][/size]",
+                    f"[b]{please}[/b]",
                     "\n",
-                    f"[size={sizes[0]}sp]{percent:.2f} %[/size]",
+                    f"{percent:.2f} %",
                     "\n",
-                    f"[size={sizes[2]}sp]",
                     f"{flashing} ",
                     "[color=#efcc00]",
                     "[b]",
@@ -115,7 +107,6 @@ class FlashScreen(BaseFlashScreen):
                     suffix,
                     "[/b]",
                     "[/color]",
-                    "[/size]",
                 ]
             )
 
@@ -149,19 +140,26 @@ class FlashScreen(BaseFlashScreen):
             root_widget=f"{self.id}_subgrid",
         )
 
-        self.make_label(
+        self.make_button(
+            row=1,
             wid=f"{self.id}_progress",
             text="",
             root_widget=f"{self.id}_subgrid",
             halign="center",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
-        self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
 
-        self.make_label(
+        self.make_button(
+            row=2,
             wid=f"{self.id}_info",
             text="",
             root_widget=f"{self.id}_grid",
             halign="justify",
+            on_press=None,
+            on_release=None,
+            on_ref_press=None,
         )
 
     # pylint: disable=unused-argument
@@ -176,43 +174,15 @@ class FlashScreen(BaseFlashScreen):
         )
         self.thread = threading.Thread(name=self.name, target=on_process)
 
-        if sys.platform in ("linux", "win32"):
-            sizes = [self.SIZE_M, self.SIZE_P]
-        else:
-            sizes = [self.SIZE_MM, self.SIZE_MP]
-
         # if anything wrong happen, show it
         def hook(err):
             if not self.is_done:
                 trace = traceback.format_exception(
                     err.exc_type, err.exc_value, err.exc_traceback
                 )
-                msg = "".join(trace)
+                msg = "".join(trace[-2:])
                 self.error(msg)
-
-                back = self.translate("Back")
-                _quit = self.translate("Quit")
-                self.ids[f"{self.id}_progress"].text = "".join(
-                    [
-                        f"[size={sizes[0]}]",
-                        "[color=#FF0000]Flash failed[/color]",
-                        "[/size]",
-                        "\n",
-                        "\n",
-                        f"[size={sizes[0]}]",
-                        "[color=#00FF00]",
-                        f"[ref=Back][u]{back}[/u][/ref][/color]",
-                        "        ",
-                        "[color=#EFCC00]",
-                        f"[ref=Quit][u]{_quit}[/u][/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                )
-
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [f"[size={sizes[1]}]", msg, "[/size]"]
-                )
+                self.redirect_exception(exception=RuntimeError(f"Flash failed: {msg}"))
 
         # hook what happened
         threading.excepthook = hook

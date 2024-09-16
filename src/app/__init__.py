@@ -58,10 +58,9 @@ class KruxInstallerApp(ConfigKruxInstaller):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        Window.maximize()
+        # Window.maximize()
         # Window.fullscreen = 'auto'
-        print(Window.size)
-        # Window.size = (640, 800)
+        Window.size = (1000, 800)
         self.debug(f"Window.size={Window.size}")
         Window.clearcolor = (0.9, 0.9, 0.9, 1)
 

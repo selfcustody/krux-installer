@@ -1,4 +1,3 @@
-import sys
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -84,33 +83,20 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        size = [0, 0]
-
-        if sys.platform in ("linux", "win32"):
-            size = [window.size[0] // 32, window.size[0] // 48, window.size[0] // 64]
-
-        if sys.platform == "darwin":
-            size = [window.size[0] // 48, window.size[0] // 128, window.size[0] // 128]
-
         label_text = "".join(
             [
-                f"[size={size[0]}sp][b]Assets already downloaded[/b][/size]",
+                "[color=#efcc00][b]Assets already downloaded[/b][/color]",
                 "\n",
-                f"[size={size[2]}sp]* krux-v0.0.1.zip[/size]",
+                "* krux-v0.0.1.zip",
                 "\n",
-                f"[size={size[2]}sp]* krux-v0.0.1.zip.sha256.txt[/size]",
+                "* krux-v0.0.1.zip.sha256.txt",
                 "\n",
-                f"[size={size[2]}sp]* krux-v0.0.1.zip.sig[/size]",
+                "* krux-v0.0.1.zip.sig",
                 "\n",
-                f"[size={size[2]}sp]* selfcustody.pem[/size]",
-                "\n",
-                "\n",
-                f"[size={size[1]}sp]Do you want to proceed with the same file or do you want to download it again?[/size]",
+                "* selfcustody.pem",
                 "\n",
                 "\n",
-                f"[size={size[0]}]" f"[color=#00ff00]",
+                "[color=#00ff00]",
                 "[ref=DownloadStableZipScreen]",
                 "[u]Download again[/u]",
                 "[/ref]",
@@ -121,7 +107,6 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
                 "[u]Proceed with current file[/u]",
                 "[/ref]",
                 "[/color]",
-                "[/size]",
             ]
         )
 
@@ -155,9 +140,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        button = screen.ids[f"{screen.id}_label"]
 
-        action = getattr(WarningAlreadyDownloadedScreen, f"on_ref_press_{screen.id}")
-        action("Mock", "DownloadStableZipScreen")
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
+        action(button, "DownloadStableZipScreen")
 
         mock_get_locale.assert_any_call()
         mock_manager.get_screen.assert_has_calls(
@@ -194,9 +180,10 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
+        button = screen.ids[f"{screen.id}_label"]
 
-        action = getattr(WarningAlreadyDownloadedScreen, f"on_ref_press_{screen.id}")
-        action("Mock", "VerifyStableZipScreen")
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
+        action(button, "VerifyStableZipScreen")
 
         mock_get_locale.assert_any_call()
         mock_set_screen.assert_called_once_with(

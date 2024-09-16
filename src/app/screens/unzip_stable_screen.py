@@ -89,27 +89,22 @@ class UnzipStableScreen(BaseScreen):
         flash_msg = self.translate("Flash with")
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
-        size = [self.SIZE_MM, self.SIZE_MP]
 
-        def _press(instance):
+        def on_press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
             file_path = os.path.join(rel_path, "kboot.kfpkg")
             self.ids[instance.id].text = "".join(
                 [
-                    f"[size={size[0]}sp]",
                     extract_msg,
-                    "[/size]",
                     "\n",
-                    f"[size={size[1]}sp]",
                     "[color=#efcc00]",
                     file_path,
                     "[/color]",
-                    "[/size]",
                 ]
             )
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
-        def _release(instance):
+        def on_release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
             file_path = os.path.join(base_path, "kboot.kfpkg")
             full_path = os.path.join(self.assets_dir, file_path)
@@ -140,44 +135,35 @@ class UnzipStableScreen(BaseScreen):
             p = os.path.join(rel_path, "kboot.kfpkg")
             self.ids[instance.id].text = "".join(
                 [
-                    f"[size={size[0]}sp]",
                     extracted_msg,
-                    "[/size]",
                     "\n",
-                    f"[size={size[1]}sp]",
                     "[color=#efcc00]",
                     p,
                     "[/color]",
-                    "[/size]",
                 ]
             )
 
             time.sleep(2.1)
             self.set_screen(name="FlashScreen", direction="left")
 
-        setattr(UnzipStableScreen, f"on_press_{self.id}_flash_button", _press)
-        setattr(UnzipStableScreen, f"on_release_{self.id}_flash_button", _release)
-
         p = os.path.join(rel_path, "kboot.kfpkg")
         self.make_button(
+            row=0,
             wid=f"{self.id}_flash_button",
             root_widget=f"{self.id}_grid",
             text="".join(
                 [
-                    f"[size={size[0]}sp]",
                     flash_msg,
-                    "[/size]",
                     "\n",
-                    f"[size={size[1]}sp]",
                     "[color=#efcc00]",
                     p,
                     "[/color]",
-                    "[/size]",
                 ]
             ),
-            row=0,
-            on_press=getattr(UnzipStableScreen, f"on_press_{self.id}_flash_button"),
-            on_release=getattr(UnzipStableScreen, f"on_release_{self.id}_flash_button"),
+            halign=None,
+            on_press=on_press,
+            on_release=on_release,
+            on_ref_press=None,
         )
 
     def build_extract_to_airgap_button(self):
@@ -189,17 +175,6 @@ class UnzipStableScreen(BaseScreen):
         airgap_msg = self.translate("Air-gapped update with")
         # extract_msg = self.translate("Unziping")
         # extracted_msg = self.translate("Unziped")
-
-        size = [self.SIZE_MM, self.SIZE_MP]
-
-        # activated = False
-
-        def _press(instance):
-            pass
-
-        def _release(instance):
-            pass
-
         # def _press(instance):
         #    if activated:
         #        self.debug(f"Calling Button::{instance.id}::on_press")
@@ -257,31 +232,24 @@ class UnzipStableScreen(BaseScreen):
         #            time.sleep(2.1)
         #            self.set_screen(name="AirgapScreen", direction="left")
 
-        setattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button", _press)
-        setattr(UnzipStableScreen, f"on_release_{self.id}_airgap_button", _release)
-
         p = os.path.join(rel_path, "firmware.bin")
         self.make_button(
+            row=1,
             wid=f"{self.id}_airgap_button",
             root_widget=f"{self.id}_grid",
             text="".join(
                 [
-                    f"[size={size[0]}sp]",
                     "[color=#333333]",
                     airgap_msg,
                     "[/color]",
-                    "[/size]",
                     "\n",
-                    f"[size={size[1]}sp]",
                     "[color=#333333]",
                     p,
                     "[/color]",
-                    "[/size]",
                 ]
             ),
-            row=0,
-            on_press=getattr(UnzipStableScreen, f"on_press_{self.id}_airgap_button"),
-            on_release=getattr(
-                UnzipStableScreen, f"on_release_{self.id}_airgap_button"
-            ),
+            halign=None,
+            on_press=None,
+            on_release=None,
+            on_ref_press=None,
         )

@@ -1,4 +1,3 @@
-import sys
 import os
 from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
@@ -64,25 +63,15 @@ class TestWarningWipeScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         label = grid.children[0]
-
-        if sys.platform in ("linux", "win32"):
-            sizes = [screen.SIZE_MP, screen.SIZE_P]
-
-        else:
-            sizes = [screen.SIZE_MM, screen.SIZE_M]
-
         screen.update(name=screen.name, key="locale", value="en_US.UTF-8")
 
         text = "".join(
             [
                 "[color=#EFCC00]",
-                f"[size={sizes[0]}]",
                 "You are about to initiate a FULL WIPE of this device",
-                "[/size]",
                 "[/color]",
                 "\n",
                 "\n",
-                f"[size={sizes[1]}]",
                 "This operation will:",
                 "\n",
                 "* Permanently erase all saved data",
@@ -90,10 +79,8 @@ class TestWarningWipeScreen(GraphicUnitTest):
                 "* Remove the existing firmware",
                 "\n",
                 "* Render the device non-functional until new firmware is re-flashed",
-                "[/size]",
                 "\n",
                 "\n",
-                f"[size={sizes[0]}]",
                 "[color=#00FF00]",
                 "[ref=WipeScreen][u]Proceed[/u][/ref]",
                 "[/color]",
@@ -101,7 +88,6 @@ class TestWarningWipeScreen(GraphicUnitTest):
                 "[color=#FF0000]",
                 "[ref=MainScreen][u]Back[/u][/ref]",
                 "[/color]",
-                "[/size]",
             ]
         )
 
@@ -173,8 +159,9 @@ class TestWarningWipeScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         label = grid.children[0]
+        button = screen.ids[f"{screen.id}_label"]
 
-        action = getattr(WarningWipeScreen, f"on_ref_press_{screen.id}")
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
         action(label, "WipeScreen")
 
         mock_get_locale.assert_any_call()
@@ -220,8 +207,8 @@ class TestWarningWipeScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         label = grid.children[0]
-
-        action = getattr(WarningWipeScreen, f"on_ref_press_{screen.id}")
+        button = screen.ids[f"{screen.id}_label"]
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
         action(label, "MainScreen")
 
         mock_get_locale.assert_any_call()

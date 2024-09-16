@@ -129,7 +129,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
 
         calls = []
         for button in grid.children:
-            action = getattr(screen, f"on_press_{button.id}")
+            action = getattr(screen.__class__, f"on_press_{button.id}")
             action(button)
             if button.id in (
                 "main_select_device",
@@ -205,7 +205,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         calls_get_screen = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_release_{button.id}")
+            action = getattr(screen.__class__, f"on_release_{button.id}")
             action(button)
             calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
 

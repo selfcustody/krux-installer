@@ -69,8 +69,10 @@ class SelectOldVersionScreen(BaseScreen):
             wid=wid,
             root_widget="select_old_version_screen_grid",
             text=text,
+            halign=None,
             on_press=on_press,
             on_release=on_release,
+            on_ref_press=None,
         )
 
     def build_back_button(self, text: str, row: int):
@@ -93,8 +95,10 @@ class SelectOldVersionScreen(BaseScreen):
             wid="select_old_version_back",
             root_widget="select_old_version_screen_grid",
             text=text,
+            halign=None,
             on_press=on_press,
             on_release=on_release,
+            on_ref_press=None,
         )
 
     def fetch_releases(self, old_versions: typing.List[str]):

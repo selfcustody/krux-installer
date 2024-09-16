@@ -61,28 +61,19 @@ class TestErrorScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                f"[size={screen.SIZE_M}sp]",
                 "[color=#ff0000]Error[/color]",
-                "[/size]",
-                "\n",
                 "\n",
                 " mocked error",
                 "\n",
                 " at test",
-                "[/size]",
                 "\n",
-                "\n",
-                f"[size={screen.SIZE_P}sp]",
                 "Report issue at ",
                 "[color=#00aabb]",
                 "[ref=ReportIssue]",
                 f"{screen.src_code}/issues",
                 "[/ref]",
                 "[/color]",
-                "[/size]",
                 "\n",
-                "\n",
-                f"[size={screen.SIZE_MP}sp]",
                 "[color=#00FF00]",
                 "[ref=Back]",
                 "[u]Back[/u]",
@@ -93,13 +84,9 @@ class TestErrorScreen(GraphicUnitTest):
                 "[ref=Quit]",
                 "[u]Quit[/u]",
                 "[/ref]",
-                "[/size]",
             ]
         )
 
-        print(label.text)
-        print("============")
-        print(text)
         self.assertEqual(label.text, text)
 
         # patch assertions
@@ -120,8 +107,9 @@ class TestErrorScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         label = grid.children[0]
+        button = screen.ids[f"{screen.id}_label"]
 
-        action = getattr(ErrorScreen, f"on_ref_press_{screen.id}")
+        action = getattr(ErrorScreen, f"on_ref_press_{button.id}")
         action(label, "Back")
 
         mock_get_locale.assert_any_call()
@@ -146,8 +134,9 @@ class TestErrorScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         label = grid.children[0]
+        button = screen.ids[f"{screen.id}_label"]
 
-        action = getattr(ErrorScreen, f"on_ref_press_{screen.id}")
+        action = getattr(ErrorScreen, f"on_ref_press_{button.id}")
         action(label, "Quit")
 
         mock_get_locale.assert_any_call()
@@ -170,8 +159,9 @@ class TestErrorScreen(GraphicUnitTest):
         window = EventLoop.window
         grid = window.children[0].children[0]
         label = grid.children[0]
+        button = screen.ids[f"{screen.id}_label"]
 
-        action = getattr(ErrorScreen, f"on_ref_press_{screen.id}")
+        action = getattr(ErrorScreen, f"on_ref_press_{button.id}")
         action(label, "ReportIssue")
 
         mock_get_locale.assert_any_call()

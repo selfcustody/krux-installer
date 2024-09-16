@@ -140,9 +140,9 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                f"[size={screen.SIZE_G}sp][color=#efcc00]WARNING[/color][/size]",
+                "[color=#efcc00]WARNING[/color]",
                 "\n",
-                f'[size={screen.SIZE_MP}sp]This is the first run of KruxInstaller in "mockos"',
+                'This is the first run of KruxInstaller in "mockos"',
                 "\n",
                 "and it appears that you do not have privileged access to make flash procedures.",
                 "\n",
@@ -153,14 +153,11 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
                 "[color=#00ff00]",
                 "/usr/bin/usermod -a -G group user",
                 "[/color]",
-                "[/size]",
                 "\n",
                 "\n",
-                f"[size={screen.SIZE_M}]",
                 "[color=#00FF00][ref=Allow]Allow[/ref][/color]",
                 "        ",
                 "[color=#FF0000][ref=Deny]Deny[/ref][/color]",
-                "[/size]",
             ]
         )
 
@@ -227,8 +224,9 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        action = getattr(screen, f"on_ref_press_{screen.id}_label")
-        action("Allow")
+        button = screen.ids[f"{screen.id}_label"]
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
+        action(button, "Allow")
 
         # patch assertions
         on_permission_created = getattr(
@@ -261,8 +259,9 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        action = getattr(screen, f"on_ref_press_{screen.id}_label")
-        action("Deny")
+        button = screen.ids[f"{screen.id}_label"]
+        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
+        action(button, "Deny")
 
         mock_get_locale.assert_called_once()
         mock_quit_app.assert_called_once()

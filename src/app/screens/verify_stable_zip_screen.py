@@ -22,12 +22,9 @@
 verify_stable_zip_screen.py
 """
 import os
-import sys
 from functools import partial
 import typing
 from kivy.clock import Clock
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
 from src.app.screens.base_screen import BaseScreen
 from src.utils.verifyer.sha256_check_verifyer import Sha256CheckVerifyer
 from src.utils.verifyer.sha256_verifyer import Sha256Verifyer
@@ -46,10 +43,44 @@ class VerifyStableZipScreen(BaseScreen):
         self.success = False
         self.make_grid(wid=f"{self.id}_grid", rows=1)
 
-        # instead make a button
-        # create a ref text that instead redirect
-        # to a web page, redirect to a screen
-        def _on_ref_press(*args):
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn)
+
+    # pylint: disable=unused-argument
+    def update(self, *args, **kwargs):
+        """Update widget from other screens"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
+
+        def on_update():
+            if key == "verify":
+                assets_dir = VerifyStableZipScreen.get_destdir_assets()
+                main_screen = self.manager.get_screen("MainScreen")
+
+                verified = self.build_message_verify_sha256(
+                    assets_dir=assets_dir, version=main_screen.version
+                )
+
+                verified += self.build_message_verify_signature(
+                    assets_dir=assets_dir, version=main_screen.version
+                )
+
+                self.ids[f"{self.id}_label"].text = verified
+
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", self.name),
+            on_update=on_update,
+        )
+
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        self.ids[f"{self.id}_grid"].clear_widgets()
+
+        def on_ref_press(*args):
             if args[1] == "Proceed":
                 main_screen = self.manager.get_screen("MainScreen")
                 u = self.manager.get_screen("UnzipStableScreen")
@@ -77,63 +108,22 @@ class VerifyStableZipScreen(BaseScreen):
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-        setattr(VerifyStableZipScreen, f"on_ref_press_{self.id}", _on_ref_press)
-
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn)
-
-    # pylint: disable=unused-argument
-    def update(self, *args, **kwargs):
-        """Update widget from other screens"""
-        name = str(kwargs.get("name"))
-        key = str(kwargs.get("key"))
-        value = kwargs.get("value")
-        self.update_screen(
-            name=name,
-            key=key,
-            value=value,
-            allowed_screens=("ConfigKruxInstaller", "VerifyStableZipScreen"),
-            on_update=None,
-        )
-
-    # pylint: disable=unused-argument
-    def on_pre_enter(self, *args):
-        self.ids[f"{self.id}_grid"].clear_widgets()
         verifying_msg = self.translate("Verifying integrity and authenticity")
-
-        warning = Label(
-            text="".join(
-                [
-                    f"[size={self.SIZE_MM}sp]",
-                    "[color=#efcc00]",
-                    verifying_msg,
-                    "[/color]",
-                    "[/size]",
-                ]
-            ),
-            markup=True,
-            valign="center",
-            halign="left",
-        )
-        warning.id = f"{self.id}_label"
-        self.ids[f"{self.id}_grid"].add_widget(warning)
-        self.ids[warning.id] = WeakProxy(warning)
-        self.ids[warning.id].bind(
-            on_ref_press=getattr(VerifyStableZipScreen, f"on_ref_press_{self.id}")
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_label",
+            root_widget=f"{self.id}_grid",
+            text=f"[color=#efcc00]{verifying_msg}[/color]",
+            halign="justify",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
 
     # pylint: disable=unused-argument
-    def on_enter(self, *args):
-        assets_dir = VerifyStableZipScreen.get_destdir_assets()
-        main_screen = self.manager.get_screen("MainScreen")
-
-        self.ids[f"{self.id}_label"].text = self.build_message_verify_sha256(
-            assets_dir=assets_dir, version=main_screen.version
-        )
-
-        self.ids[f"{self.id}_label"].text += self.build_message_verify_signature(
-            assets_dir=assets_dir, version=main_screen.version
-        )
+    def on_enter(self, *args, **kwargs):
+        fn = partial(self.update, name=self.name, key="verify")
+        Clock.schedule_once(fn)
 
     def verify_sha256(
         self, assets_dir: str, version: str
@@ -176,12 +166,6 @@ class VerifyStableZipScreen(BaseScreen):
         provided_msg = self.translate("provided hash from")
         hash_color = ""
         hash_msg = ""
-
-        if sys.platform in ("linux", "win32"):
-            size = [self.SIZE_MP, self.SIZE_P, self.SIZE_PP]
-        else:
-            size = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
-
         sha_0 = VerifyStableZipScreen.prettyfy_hash(hash_0)
         sha_1 = VerifyStableZipScreen.prettyfy_hash(hash_1)
 
@@ -194,25 +178,18 @@ class VerifyStableZipScreen(BaseScreen):
 
         return "".join(
             [
-                f"[size={size[0]}sp]",
                 f"[u]{integrity_msg.upper()}[/u]: ",
                 f"[b][color={hash_color}]{hash_msg}[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]{computed_msg} [color=#777777]{filepath}[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]{sha_0}[/size]",
+                sha_0,
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]{provided_msg} [color=#777777]{filepath}.sha256.txt[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]{sha_1}[/size]",
-                "\n",
+                sha_1,
                 "\n",
                 "\n",
             ]
@@ -250,11 +227,6 @@ class VerifyStableZipScreen(BaseScreen):
         filepath = os.path.join(assets_dir, f"krux-{version}.zip")
         pempath = os.path.join(assets_dir, "selfcustody.pem")
 
-        if sys.platform in ("linux", "win32"):
-            size = [self.SIZE_MP, self.SIZE_P]
-        else:
-            size = [self.SIZE_M, self.SIZE_MP]
-
         if checksig:
             sig_color = "#00FF00"
             res_msg = good_msg
@@ -264,34 +236,27 @@ class VerifyStableZipScreen(BaseScreen):
 
         return "".join(
             [
-                f"[size={size[0]}sp]",
                 f"[u]{authenticity_msg.upper()}[/u]: ",
                 f"[b][color={sig_color}]{res_msg} {sig_msg}[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
+                installed_msg,
                 "\n",
-                f"[size={size[1]}sp]{installed_msg}[/size]",
-                "\n",
-                f"[size={size[1]}sp]{check_msg}:[/size]",
+                check_msg,
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[b]",
                 f"openssl sha256< [color=#777777]{filepath}[/color] -binary | \\",
                 "\n"
                 f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{pempath}[/color] \\",
                 "\n",
                 f"-sigfile [color=#777777]{filepath}.sig[/color]",
-                "[/size]",
                 "[/b]",
                 "\n",
                 "\n",
-                f"[size={size[0]}sp]",
                 f"[ref=Proceed][color=#00ff00][u]{proceed}[/u][/ref][/color]",
                 "             ",
                 f"[ref=Back][color=#ff0000][u]{back}[/u][/ref][/color]",
                 "[/b]",
-                "[/size]",
             ]
         )

@@ -39,11 +39,15 @@ class WarningBetaScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
         )
 
-        self.make_label(
+        self.make_button(
+            row=0,
             wid=f"{self.id}_label",
             text=self.make_label_text(),
+            halign=None,
             root_widget=f"{self.id}_grid",
-            halign="justify",
+            on_press=None,
+            on_release=None,
+            on_ref_press=None,
         )
 
         # START of on_press buttons
@@ -55,6 +59,7 @@ class WarningBetaScreen(BaseScreen):
                 self.set_screen(name="SelectVersionScreen", direction="right")
 
         setattr(WarningBetaScreen, f"on_ref_press_{self.id}", on_ref_press)
+        self.ids[f"{self.id}_label"].halign = "justify"
         self.ids[f"{self.id}_label"].bind(on_ref_press=on_ref_press)
 
         fn = partial(self.update, name=self.name, key="canvas")
@@ -99,14 +104,13 @@ class WarningBetaScreen(BaseScreen):
 
         return "".join(
             [
-                f"[size={self.SIZE_M}sp][color=#efcc00]{test_repo}[/color][/size]",
+                f"[color=#efcc00]{test_repo}[/color]",
                 "\n",
-                f"[size={self.SIZE_MP}sp]{unsg_bin}[/size]",
+                unsg_bin,
                 "\n",
-                f"[size={self.SIZE_MP}sp]{just_try}[/size]",
+                just_try,
                 "\n",
                 "\n",
-                f"[size={self.SIZE_MM}sp]",
                 "[color=#00ff00]",
                 f"[ref=MainScreen]{proceed}[/ref]",
                 "[/color]",
@@ -114,6 +118,5 @@ class WarningBetaScreen(BaseScreen):
                 "[color=#ff0000]",
                 f"[ref=SelectVersion]{back}[/ref]",
                 "[/color]",
-                "[/size]",
             ]
         )

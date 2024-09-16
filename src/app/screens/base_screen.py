@@ -25,6 +25,7 @@ import os
 import re
 import sys
 import typing
+from math import sqrt
 from pathlib import Path
 from functools import partial
 from kivy.clock import Clock
@@ -66,24 +67,18 @@ class BaseScreen(Screen, Trigger):
 
         # Setup the correct font size
         if sys.platform in ("linux", "win32"):
-            self.SIZE_XG = Window.size[0] // 4
-            self.SIZE_GG = Window.size[0] // 8
             self.SIZE_G = Window.size[0] // 16
             self.SIZE_MM = Window.size[0] // 24
             self.SIZE_M = Window.size[0] // 32
             self.SIZE_MP = Window.size[0] // 48
             self.SIZE_P = Window.size[0] // 64
-            self.SIZE_PP = Window.size[0] // 128
 
         elif sys.platform == "darwin":
-            self.SIZE_XG = Window.size[0] // 16
-            self.SIZE_GG = Window.size[0] // 24
             self.SIZE_G = Window.size[0] // 32
             self.SIZE_MM = Window.size[0] // 48
             self.SIZE_M = Window.size[0] // 64
             self.SIZE_MP = Window.size[0] // 128
             self.SIZE_P = Window.size[0] // 192
-            self.SIZE_PP = Window.size[0] // 256
 
     @property
     def logo_img(self) -> str:
@@ -159,11 +154,18 @@ class BaseScreen(Screen, Trigger):
         self.ids[root_widget].add_widget(grid)
         self.ids[wid] = WeakProxy(grid)
 
-    def make_label(self, wid: str, text: str, root_widget: str, halign: str):
+    def make_label(
+        self,
+        wid: str,
+        text: str,
+        root_widget: str,
+        halign: str,
+    ):
         """Build grid where buttons will be placed"""
-        self.debug(f"Building GridLayout::{wid}")
+        self.debug(f"Building Label::{wid}")
         label = Label(text=text, markup=True, halign=halign)
         label.id = wid
+        label.bind(texture_size=label.setter("size"))
         self.ids[root_widget].add_widget(label)
         self.ids[wid] = WeakProxy(label)
 
@@ -186,11 +188,13 @@ class BaseScreen(Screen, Trigger):
         wid: str,
         text: str,
         row: int,
-        on_press: typing.Callable,
-        on_release: typing.Callable,
+        halign: str | None,
+        on_press: typing.Callable | None,
+        on_release: typing.Callable | None,
+        on_ref_press: typing.Callable | None,
     ):
         """Create buttons in a dynamic way"""
-        self.debug(f"{wid} -> {root_widget}")
+        self.debug(f"button::{wid} row={row}")
 
         total = self.ids[root_widget].rows
         btn = Button(
@@ -203,22 +207,30 @@ class BaseScreen(Screen, Trigger):
         )
         btn.id = wid
 
-        # define button methods to be callable in classes
-        setattr(self, f"on_press_{wid}", on_press)
-        setattr(self, f"on_release_{wid}", on_release)
+        if halign is not None:
+            btn.halign = halign
 
-        btn.bind(on_press=on_press)
-        btn.bind(on_release=on_release)
+        # define button methods to be callable in classes
+        if on_press is not None:
+            btn.bind(on_press=on_press)
+            setattr(self.__class__, f"on_press_{wid}", on_press)
+
+        if on_release is not None:
+            btn.bind(on_release=on_release)
+            setattr(self.__class__, f"on_release_{wid}", on_release)
+
+        if on_ref_press is not None:
+            btn.bind(on_ref_press=on_ref_press)
+            setattr(self.__class__, f"on_ref_press_{wid}", on_ref_press)
+
+        btn.bind(size=BaseScreen.on_resize)
+
         btn.x = 0
         btn.y = (Window.size[1] / total) * row
         btn.width = Window.size[0]
         btn.height = Window.size[1] / total
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
-
-        self.debug(
-            f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
-        )
 
     def redirect_exception(self, exception: Exception):
         """Get an exception and prepare a ErrorScreen rendering"""
@@ -265,6 +277,18 @@ class BaseScreen(Screen, Trigger):
 
         if on_update is not None:
             on_update()
+
+    @staticmethod
+    def get_half_diagonal_screen_size(factor: int):
+        """Get half of diagonal size"""
+        w_width, w_height = Window.size
+        return int(sqrt((w_width**2 + w_height**2) / 2)) // factor
+
+    @staticmethod
+    # pylint: disable=unused-argument
+    def on_resize(instance, value):
+        """Redefine font size of a button when size changes"""
+        instance.font_size = BaseScreen.get_half_diagonal_screen_size(38)
 
     @staticmethod
     def quit_app():

@@ -45,7 +45,7 @@ class AskPermissionDialoutScreen(BaseScreen):
         self.distro = ""
 
         # Build grid where buttons will be placed
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
+        self.make_grid(wid=f"{self.id}_grid", rows=1, resize_canvas=True)
 
         # These variables will setup the inclusion
         # in dialout group, if necessary

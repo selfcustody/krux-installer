@@ -36,7 +36,7 @@ class WarningWipeScreen(BaseScreen):
             **kwargs,
         )
 
-        self.make_grid(wid=f"{self.id}_grid", rows=2)
+        self.make_grid(wid=f"{self.id}_grid", rows=2, resize_canvas=True)
 
         self.make_image(
             wid=f"{self.id}_warn",

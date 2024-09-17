@@ -44,7 +44,7 @@ class GreetingsScreen(BaseScreen):
         )
 
         # Build grid where buttons will be placed
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
+        self.make_grid(wid=f"{self.id}_grid", rows=1, resize_canvas=True)
 
         # Build logo
         self.make_image(
@@ -59,8 +59,10 @@ class GreetingsScreen(BaseScreen):
         redirect to CheckPermissionsScreen and then to MainScreen. Win32 and Mac will be
         redirect to MainScreen.
         """
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn, 0)
+        fn_0 = partial(self.update, name=self.name, key="canvas")
+        fn_1 = partial(self.update, name=self.name, key="check-permission-screen")
+        Clock.schedule_once(fn_0, 0)
+        Clock.schedule_once(fn_1, 2.1)
 
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
@@ -75,10 +77,6 @@ class GreetingsScreen(BaseScreen):
         value = kwargs.get("value")
 
         def on_update():
-            if key == "canvas":
-                fn = partial(self.update, name=self.name, key="check-permission-screen")
-                Clock.schedule_once(fn, 2.1)
-
             if key == "check-permission-screen":
                 self.check_permissions_for_dialout_group()
 
@@ -90,7 +88,7 @@ class GreetingsScreen(BaseScreen):
             name=name,
             key=key,
             value=value,
-            allowed_screens=("KruxInstallerApp", "GreetingsScreen"),
+            allowed_screens=("KruxInstallerApp", self.name),
             on_update=getattr(GreetingsScreen, "on_update"),
         )
 

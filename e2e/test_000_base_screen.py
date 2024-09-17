@@ -213,8 +213,8 @@ class TestBaseScreen(GraphicUnitTest):
     def test_make_grid(self, mock_get_locale):
         screen_0 = BaseScreen(wid="mock", name="Mock")
         screen_0.make_grid(wid="mock_grid", rows=1)
+        setattr(screen_0, "update", MagicMock())
         self.render(screen_0)
-
         EventLoop.ensure_window()
         window = EventLoop.window
         screen = window.children[0]
@@ -231,8 +231,8 @@ class TestBaseScreen(GraphicUnitTest):
         screen = BaseScreen(wid="mock", name="Mock")
         screen.make_grid(wid="mock_grid", rows=1)
         screen.make_subgrid(wid="mock_subgrid", rows=1, root_widget="mock_grid")
+        setattr(screen, "update", MagicMock())
         self.render(screen)
-
         EventLoop.ensure_window()
 
         self.assertTrue("mock_grid" in screen.ids)
@@ -253,6 +253,7 @@ class TestBaseScreen(GraphicUnitTest):
             halign="center",
             text="mock",
         )
+        setattr(screen, "update", MagicMock())
         self.render(screen)
 
         EventLoop.ensure_window()
@@ -281,6 +282,7 @@ class TestBaseScreen(GraphicUnitTest):
             on_release=MagicMock(),
             on_ref_press=MagicMock(),
         )
+        setattr(screen_0, "update", MagicMock())
         self.render(screen_0)
 
         EventLoop.ensure_window()
@@ -322,6 +324,7 @@ class TestBaseScreen(GraphicUnitTest):
                 on_release=MagicMock(),
                 on_ref_press=MagicMock(),
             )
+            setattr(screen_0, "update", MagicMock())
         self.render(screen_0)
 
         EventLoop.ensure_window()
@@ -353,6 +356,8 @@ class TestBaseScreen(GraphicUnitTest):
             on_release=MagicMock(),
             on_ref_press=MagicMock(),
         )
+        setattr(screen, "update", MagicMock())
+
         self.render(screen)
         screen.update_screen(
             name="NoMockedScreen",
@@ -382,6 +387,7 @@ class TestBaseScreen(GraphicUnitTest):
             on_release=MagicMock(),
             on_ref_press=MagicMock(),
         )
+        setattr(screen, "update", MagicMock())
         self.render(screen)
         self.assertEqual(screen.locale, "en_US.UTF-8")
 
@@ -413,6 +419,7 @@ class TestBaseScreen(GraphicUnitTest):
             on_release=MagicMock(),
             on_ref_press=MagicMock(),
         )
+        setattr(screen, "update", MagicMock())
         self.render(screen)
         screen.update_screen(
             name="MockedScreen",

@@ -41,7 +41,7 @@ class VerifyStableZipScreen(BaseScreen):
             wid="verify_stable_zip_screen", name="VerifyStableZipScreen", **kwargs
         )
         self.success = False
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
+        self.make_grid(wid=f"{self.id}_grid", rows=1, resize_screen=True)
 
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn)

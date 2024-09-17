@@ -34,7 +34,7 @@ class BaseDownloadScreen(BaseScreen):
 
     def __init__(self, wid: str, name: str, **kwargs):
         super().__init__(wid=wid, name=name, **kwargs)
-        self.make_grid(wid=f"{self.id}_grid", rows=2)
+        self.make_grid(wid=f"{self.id}_grid", rows=2, resize_screen=True)
 
         self._downloader = None
         self._thread = None
@@ -42,8 +42,6 @@ class BaseDownloadScreen(BaseScreen):
         self.version = None
         self._to_screen = ""
 
-        # progress label, show a "Connecting"
-        # before start the download to make
         self.make_button(
             row=0,
             wid=f"{self.id}_progress",
@@ -59,6 +57,7 @@ class BaseDownloadScreen(BaseScreen):
         # information label
         # it has data about url
         # and downloaded paths
+        # pylint: disable=unused-argument
         self.make_button(
             row=1,
             wid=f"{self.id}_info",

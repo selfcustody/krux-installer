@@ -63,7 +63,6 @@ class AboutScreen(BaseScreen):
             on_release=None,
             on_ref_press=on_ref_press,
         )
-
         self.ids[f"{self.id}_label"].halign = "justify"
 
         fns = [

@@ -115,6 +115,11 @@ class BaseScreen(Screen, Trigger):
         self.debug(f"locale = {value}")
         self._locale = value
 
+    # pylint: disable=unused-argument
+    def update(self, *args, **kwargs):
+        """Function to be implemented on classes"""
+        pass  # pylint: disable=unnecessary-pass
+
     def translate(self, key: str) -> str:
         """Translate some message as key"""
         msg = T(key, locale=self.locale, module=self.id)
@@ -135,12 +140,27 @@ class BaseScreen(Screen, Trigger):
         self.manager.transition.direction = direction
         self.manager.current = name
 
-    def make_grid(self, wid: str, rows: int):
+    def make_grid(self, wid: str, rows: int, **kwargs):
         """Build grid where buttons will be placed"""
         if wid not in self.ids:
+
             self.debug(f"Building GridLayout::{wid}")
             grid = GridLayout(cols=1, rows=rows)
             grid.id = wid
+
+            # define a default resize event
+            # with same value of defined font
+            resize_canvas = kwargs.get("resize_canvas")
+
+            if resize_canvas:
+                # pylint: disable=unused-argument
+                def on_size(instance, value):
+                    update = getattr(self, "update")
+                    fn = partial(update, name=self.name, key="canvas")
+                    Clock.schedule_once(fn, 0)
+
+                grid.bind(size=on_size)
+
             self.add_widget(grid)
             self.ids[wid] = WeakProxy(grid)
         else:
@@ -225,13 +245,14 @@ class BaseScreen(Screen, Trigger):
             btn.bind(on_ref_press=on_ref_press)
             setattr(self.__class__, f"on_ref_press_{wid}", on_ref_press)
 
-        # define dynamically a resize event with same value of defined font
+        # define a default resize event
+        # with same value of defined font
         # pylint: disable=unused-argument
-        def on_resize(instance, value):
+        def on_size(instance, value):
             instance.font_size = BaseScreen.get_half_diagonal_screen_size(font_factor)
 
-        btn.bind(size=on_resize)
-        setattr(self.__class__, f"on_resize_{wid}", on_ref_press)
+        btn.bind(size=on_size)
+        setattr(self.__class__, f"on_resize_{wid}", on_size)
 
         # configure button dimensions and positions
         btn.x = 0
@@ -284,7 +305,7 @@ class BaseScreen(Screen, Trigger):
         if key == "canvas":
             with self.canvas.before:
                 Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
+                Rectangle(size=(Window.width + 1, Window.height + 1))
 
         if on_update is not None:
             on_update()

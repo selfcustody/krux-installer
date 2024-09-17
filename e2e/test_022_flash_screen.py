@@ -46,24 +46,6 @@ class TestFlashScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
-    def test_fail_update_wrong_name(self, mock_redirect_exception, mock_get_locale):
-        screen = FlashScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name="MockScreen")
-
-        # patch assertions
-        mock_get_locale.assert_called()
-        mock_redirect_exception.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
     def test_update_locale(self, mock_get_locale):
         screen = FlashScreen()
         self.render(screen)

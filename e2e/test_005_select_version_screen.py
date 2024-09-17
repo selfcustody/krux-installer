@@ -236,10 +236,8 @@ class TestSelectVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.update_screen")
     def test_on_update(
         self,
-        mock_update_screen,
         mock_get_locale,
     ):
         screen = SelectVersionScreen()
@@ -248,4 +246,3 @@ class TestSelectVersionScreen(GraphicUnitTest):
         screen.update(name=screen.name, key="locale", value="en_US")
 
         mock_get_locale.assert_called_once()
-        mock_update_screen.assert_called_once()

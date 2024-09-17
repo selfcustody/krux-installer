@@ -31,24 +31,12 @@ class WarningBetaScreen(BaseScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="warning_beta_screen", name="WarningBetaScreen", **kwargs)
-        self.make_grid(wid="warning_beta_screen_grid", rows=2)
+        self.make_grid(wid="warning_beta_screen_grid", rows=2, resize_canvas=True)
 
         self.make_image(
             wid=f"{self.id}_warn",
             source=self.warn_img,
             root_widget=f"{self.id}_grid",
-        )
-
-        self.make_button(
-            row=0,
-            wid=f"{self.id}_label",
-            text=self.make_label_text(),
-            font_factor=36,
-            halign=None,
-            root_widget=f"{self.id}_grid",
-            on_press=None,
-            on_release=None,
-            on_ref_press=None,
         )
 
         # START of on_press buttons
@@ -59,10 +47,20 @@ class WarningBetaScreen(BaseScreen):
             if args[1] == "SelectVersion":
                 self.set_screen(name="SelectVersionScreen", direction="right")
 
-        setattr(WarningBetaScreen, f"on_ref_press_{self.id}", on_ref_press)
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_label",
+            text=self.make_label_text(),
+            font_factor=36,
+            halign=None,
+            root_widget=f"{self.id}_grid",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
+        )
         self.ids[f"{self.id}_label"].halign = "justify"
-        self.ids[f"{self.id}_label"].bind(on_ref_press=on_ref_press)
 
+        # load canvas
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 

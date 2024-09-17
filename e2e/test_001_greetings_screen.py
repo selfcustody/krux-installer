@@ -50,10 +50,8 @@ class TestAboutScreen(GraphicUnitTest):
         EventLoop.ensure_window()
 
         mock_get_locale.assert_called()
-        mock_partial.assert_called_once_with(
-            screen.update, name=screen.name, key="canvas"
-        )
-        mock_schedule_once.assert_called_once_with(mock_partial(), 0)
+        mock_partial.assert_called()
+        mock_schedule_once.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -78,12 +76,8 @@ class TestAboutScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.greetings_screen.partial")
-    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
     def test_update_canvas(
         self,
-        mock_schedule_once,
-        mock_partial,
         mock_get_locale,
     ):
         screen = GreetingsScreen()
@@ -97,5 +91,3 @@ class TestAboutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
-        mock_partial.assert_called()
-        mock_schedule_once.assert_called()

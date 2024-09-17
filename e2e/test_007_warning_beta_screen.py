@@ -76,7 +76,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        action = getattr(screen, "on_ref_press_warning_beta_screen")
+        action = getattr(screen, "on_ref_press_warning_beta_screen_label")
         action("MainScreen")
 
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
@@ -94,7 +94,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        action = getattr(screen, "on_ref_press_warning_beta_screen")
+        action = getattr(screen, "on_ref_press_warning_beta_screen_label")
         action("SelectVersion")
 
         mock_set_screen.assert_called_once_with(

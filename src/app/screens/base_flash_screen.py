@@ -33,7 +33,7 @@ class BaseFlashScreen(BaseScreen):
 
     def __init__(self, wid: str, name: str, **kwargs):
         super().__init__(wid=wid, name=name, **kwargs)
-        self.make_grid(wid=f"{self.id}_grid", rows=2)
+        self.make_grid(wid=f"{self.id}_grid", rows=2, resize_canvas=True)
         self._firmware = None
         self._baudrate = None
         self._thread = None

@@ -160,15 +160,13 @@ echo "                                   !!!WARNING!!!"
 echo "                                   -------------"
 echo ""
 if [ -n "\$SUDO_USER" ] && [ "\$SUDO_USER" != "root" ]; then
-  echo "Adding user \$SUDO_USER to 'dialout' and 'input' groups to enable flash procedure..."
+  echo "Adding user \$SUDO_USER to 'dialout' group to enable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
   usermod -a -G dialout \$SUDO_USER
-  usermod -a -G input \$SUDO_USER
 elif [ -n "\$USER" ] && [ "\$USER" != "root"]; then
-  echo "Adding user \$USER to 'dialout' and 'input' groups to enable flash procedure..."
+  echo "Adding user \$USER to 'dialout' group to enable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
   usermod -a -G dialout \$USER
-  usermod -a -G input \$USER
 fi
 echo ""
 echo ""

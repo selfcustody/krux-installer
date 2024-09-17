@@ -58,6 +58,7 @@ class ErrorScreen(BaseScreen):
             wid=f"{self.id}_label",
             root_widget=f"{self.id}_grid",
             text="",
+            font_factor=48,
             halign="center",
             on_press=None,
             on_release=None,

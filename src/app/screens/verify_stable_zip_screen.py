@@ -114,6 +114,7 @@ class VerifyStableZipScreen(BaseScreen):
             wid=f"{self.id}_label",
             root_widget=f"{self.id}_grid",
             text=f"[color=#efcc00]{verifying_msg}[/color]",
+            font_factor=48,
             halign="justify",
             on_press=None,
             on_release=None,

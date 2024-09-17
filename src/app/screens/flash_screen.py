@@ -68,7 +68,7 @@ class FlashScreen(BaseFlashScreen):
                 self.output.append("*")
                 self.output.append("")
 
-            if len(self.output) > 4:
+            if len(self.output) > 18:
                 del self.output[:1]
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
@@ -144,6 +144,7 @@ class FlashScreen(BaseFlashScreen):
             row=1,
             wid=f"{self.id}_progress",
             text="",
+            font_factor=32,
             root_widget=f"{self.id}_subgrid",
             halign="center",
             on_press=None,
@@ -155,6 +156,7 @@ class FlashScreen(BaseFlashScreen):
             row=2,
             wid=f"{self.id}_info",
             text="",
+            font_factor=72,
             root_widget=f"{self.id}_grid",
             halign="justify",
             on_press=None,

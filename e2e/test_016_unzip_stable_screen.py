@@ -171,6 +171,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
             text="Mock",
             row=0,
             halign=None,
+            font_factor=32,
             on_press=MagicMock(),
             on_release=MagicMock(),
             on_ref_press=MagicMock(),

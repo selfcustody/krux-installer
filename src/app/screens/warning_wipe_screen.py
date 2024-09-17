@@ -80,6 +80,7 @@ class WarningWipeScreen(BaseScreen):
             row=0,
             wid=f"{self.id}_label",
             text="",
+            font_factor=48,
             halign=None,
             root_widget=f"{self.id}_grid",
             on_press=None,

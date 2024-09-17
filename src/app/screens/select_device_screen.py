@@ -69,6 +69,7 @@ class SelectDeviceScreen(BaseScreen):
                 wid=f"select_device_{device}",
                 root_widget="select_device_screen_grid",
                 text="",
+                font_factor=28,
                 halign=None,
                 on_press=on_press,
                 on_release=on_release,

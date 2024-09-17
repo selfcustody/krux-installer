@@ -30,7 +30,7 @@ from src.app.screens.base_screen import BaseScreen
 
 if sys.platform.startswith("linux"):
     import distro
-    import grp
+    import grp  # pylint: disable=import-error
 
 
 class GreetingsScreen(BaseScreen):

@@ -189,6 +189,7 @@ class BaseScreen(Screen, Trigger):
         text: str,
         row: int,
         halign: str | None,
+        font_factor: int | None,
         on_press: typing.Callable | None,
         on_release: typing.Callable | None,
         on_ref_press: typing.Callable | None,
@@ -196,12 +197,13 @@ class BaseScreen(Screen, Trigger):
         """Create buttons in a dynamic way"""
         self.debug(f"button::{wid} row={row}")
 
+        # define how many rows we have to distribute them on screen
         total = self.ids[root_widget].rows
         btn = Button(
             text=text,
             markup=True,
             halign="center",
-            font_size=Window.size[0] // 25,
+            font_size=BaseScreen.get_half_diagonal_screen_size(font_factor),
             background_color=(0, 0, 0, 1),
             color=(1, 1, 1, 1),
         )
@@ -223,12 +225,21 @@ class BaseScreen(Screen, Trigger):
             btn.bind(on_ref_press=on_ref_press)
             setattr(self.__class__, f"on_ref_press_{wid}", on_ref_press)
 
-        btn.bind(size=BaseScreen.on_resize)
+        # define dynamically a resize event with same value of defined font
+        # pylint: disable=unused-argument
+        def on_resize(instance, value):
+            instance.font_size = BaseScreen.get_half_diagonal_screen_size(font_factor)
 
+        btn.bind(size=on_resize)
+        setattr(self.__class__, f"on_resize_{wid}", on_ref_press)
+
+        # configure button dimensions and positions
         btn.x = 0
         btn.y = (Window.size[1] / total) * row
         btn.width = Window.size[0]
         btn.height = Window.size[1] / total
+
+        # register button
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
 
@@ -283,12 +294,6 @@ class BaseScreen(Screen, Trigger):
         """Get half of diagonal size"""
         w_width, w_height = Window.size
         return int(sqrt((w_width**2 + w_height**2) / 2)) // factor
-
-    @staticmethod
-    # pylint: disable=unused-argument
-    def on_resize(instance, value):
-        """Redefine font size of a button when size changes"""
-        instance.font_size = BaseScreen.get_half_diagonal_screen_size(38)
 
     @staticmethod
     def quit_app():

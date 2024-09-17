@@ -43,6 +43,7 @@ class WarningBetaScreen(BaseScreen):
             row=0,
             wid=f"{self.id}_label",
             text=self.make_label_text(),
+            font_factor=36,
             halign=None,
             root_widget=f"{self.id}_grid",
             on_press=None,

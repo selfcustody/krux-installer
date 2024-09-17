@@ -70,7 +70,7 @@ class WipeScreen(BaseFlashScreen):
             )
             self.output.append(text)
 
-            if len(self.output) > 4:
+            if len(self.output) > 18:
                 del self.output[:1]
 
             if "SPI Flash erased." in text:
@@ -116,6 +116,7 @@ class WipeScreen(BaseFlashScreen):
             wid=f"{self.id}_progress",
             text="",
             halign="center",
+            font_factor=32,
             root_widget=f"{self.id}_subgrid",
             on_press=None,
             on_release=None,
@@ -126,6 +127,7 @@ class WipeScreen(BaseFlashScreen):
             row=2,
             wid=f"{self.id}_info",
             text="",
+            font_factor=72,
             root_widget=f"{self.id}_grid",
             halign="justify",
             on_press=None,

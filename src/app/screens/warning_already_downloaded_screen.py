@@ -66,6 +66,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             wid=f"{self.id}_label",
             text="",
             halign=None,
+            font_factor=32,
             root_widget=f"{self.id}_grid",
             on_press=None,
             on_release=None,

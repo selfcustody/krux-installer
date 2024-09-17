@@ -160,6 +160,7 @@ class UnzipStableScreen(BaseScreen):
                     "[/color]",
                 ]
             ),
+            font_factor=32,
             halign=None,
             on_press=on_press,
             on_release=on_release,
@@ -248,6 +249,7 @@ class UnzipStableScreen(BaseScreen):
                     "[/color]",
                 ]
             ),
+            font_factor=32,
             halign=None,
             on_press=None,
             on_release=None,

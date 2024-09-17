@@ -106,6 +106,7 @@ class AskPermissionDialoutScreen(BaseScreen):
             wid=f"{self.id}_label",
             text="",
             root_widget=f"{self.id}_grid",
+            font_factor=32,
             halign="justify",
             on_press=None,
             on_release=None,

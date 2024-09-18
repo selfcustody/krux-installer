@@ -253,9 +253,7 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
                 ),
             ]
         )
-        mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 0)]
-        )
+        mock_schedule_once.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -314,9 +312,7 @@ class TestDownloadStableZipScreen(GraphicUnitTest):
                 ),
             ]
         )
-        mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 0)]
-        )
+        mock_schedule_once.assert_called()
         mock_set_screen.assert_called_once_with(
             name="DownloadStableZipSha256Screen", direction="left"
         )

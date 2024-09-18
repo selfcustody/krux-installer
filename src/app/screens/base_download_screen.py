@@ -34,7 +34,7 @@ class BaseDownloadScreen(BaseScreen):
 
     def __init__(self, wid: str, name: str, **kwargs):
         super().__init__(wid=wid, name=name, **kwargs)
-        self.make_grid(wid=f"{self.id}_grid", rows=2, resize_screen=True)
+        self.make_grid(wid=f"{self.id}_grid", rows=2)
 
         self._downloader = None
         self._thread = None
@@ -53,6 +53,22 @@ class BaseDownloadScreen(BaseScreen):
             on_release=None,
             on_ref_press=None,
         )
+
+        # A little ugly hacky way to join
+        # the methods: (1) resize the font;
+        # (2) resize canvas. This is needed because
+        # when more than one buttons are used, the
+        # canvas wasnt properly updated.
+        # the bind method is needed only in one
+        # of the buttons
+        # pylint: disable=unused-argument
+        def on_resize(instance, value):
+            instance.font_size = BaseScreen.get_half_diagonal_screen_size(18)
+            update = getattr(self, "update")
+            fn = partial(update, name=self.name, key="canvas")
+            Clock.schedule_once(fn, 0)
+
+        self.ids[f"{self.id}_progress"].bind(size=on_resize)
 
         # information label
         # it has data about url

@@ -68,7 +68,7 @@ class FlashScreen(BaseFlashScreen):
                 self.output.append("*")
                 self.output.append("")
 
-            if len(self.output) > 18:
+            if len(self.output) > 10:
                 del self.output[:1]
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)

@@ -70,7 +70,7 @@ class WipeScreen(BaseFlashScreen):
             )
             self.output.append(text)
 
-            if len(self.output) > 18:
+            if len(self.output) > 10:
                 del self.output[:1]
 
             if "SPI Flash erased." in text:

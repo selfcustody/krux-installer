@@ -187,7 +187,7 @@ Type=Application
 Terminal=false
 Exec=/usr/local/bin/${app_name}
 Name=${app_name}
-Icon=/usr/share/icons/highcolor/512x512/apps/${app_name}.png
+Icon=/usr/share/icons/hicolor/512x512/apps/${app_name}.png
 EOF
 
 echo ""

@@ -106,10 +106,11 @@ class MainScreen(BaseScreen):
         def on_press(instance):
             self.debug(f"Calling {instance.id}::on_press")
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+            fetch_msg = self.translate("Fetching data from")
             self.ids[instance.id].text = "".join(
                 [
                     "[color=#efcc00]",
-                    f"[b]{self.translate("Fetching data from")}[/b]",
+                    f"[b]{fetch_msg}[/b]",
                     "\n",
                     url,
                     "[/color]",
@@ -280,11 +281,12 @@ class MainScreen(BaseScreen):
         setattr(MainScreen, "on_press_flash", on_press_flash)
         setattr(MainScreen, "on_release_flash", on_release_flash)
 
+        flash_msg = self.translate("Flash")
         self.make_button(
             row=2,
             wid=wid,
             root_widget="main_screen_grid",
-            text=f"[color=#333333]{self.translate("Flash")}[/color]",
+            text=f"[color=#333333]{flash_msg}[/color]",
             font_factor=28,
             halign=None,
             on_press=getattr(MainScreen, "on_press_flash"),
@@ -314,11 +316,12 @@ class MainScreen(BaseScreen):
         setattr(MainScreen, "on_press_wipe", on_press_wipe)
         setattr(MainScreen, "on_release_wipe", on_release_wipe)
 
+        wipe_msg = self.translate("Wipe")
         self.make_button(
             row=3,
             wid=wid,
             root_widget="main_screen_grid",
-            text=f"[color=#333333]{self.translate("Wipe")}[/color]",
+            text=f"[color=#333333]{wipe_msg}[/color]",
             font_factor=28,
             halign=None,
             on_press=getattr(MainScreen, "on_press_wipe"),
@@ -384,10 +387,11 @@ class MainScreen(BaseScreen):
 
     def update_version(self, value: str):
         """Update the version shown in button. To be used on update method"""
+        version_msg = self.translate("Version")
         self.version = MainScreen.sanitize_markup(value)
         self.ids["main_select_version"].text = "".join(
             [
-                f"{self.translate("Version")}: ",
+                f"{version_msg}: ",
                 "[color=#00AABB]",
                 self.version,
                 "[/color]",
@@ -421,9 +425,10 @@ class MainScreen(BaseScreen):
             if value == "select a new one":
                 self.device = self.translate("select a new one")
 
+        device_msg = self.translate("Device")
         self.ids["main_select_device"].text = "".join(
             [
-                f"{self.translate("Device")}: ",
+                f"{device_msg}: ",
                 "[color=#00AABB]",
                 self.device,
                 "[/color]",

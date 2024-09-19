@@ -1,3 +1,6 @@
+[virtualenvs]
+prefer-active-python = true
+
 [tool.poetry]
 name = "krux-installer"
 version = "0.0.20-alpha-2"

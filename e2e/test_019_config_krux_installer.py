@@ -390,6 +390,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app = ConfigKruxInstaller()
         app.build_settings(settings)
 
+        utf = ".UTF-8" if sys.platform in ("linux", "darwin") else ""
         json_data = [
             {
                 "type": "path",
@@ -412,16 +413,16 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 "section": "locale",
                 "key": "lang",
                 "options": [
-                    f"af_ZA{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"en_US{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"es_ES{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"fr_FR{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"it_IT{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"ko_KR{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"nl_NL{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"pt_BR{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"ru_RU{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
-                    f"zh_CN{".UTF-8" if sys.platform in ("linux", "darwin") else ""}",
+                    f"af_ZA{utf}",
+                    f"en_US{utf}",
+                    f"es_ES{utf}",
+                    f"fr_FR{utf}",
+                    f"it_IT{utf}",
+                    f"ko_KR{utf}",
+                    f"nl_NL{utf}",
+                    f"pt_BR{utf}",
+                    f"ru_RU{utf}",
+                    f"zh_CN{utf}",
                 ],
             },
         ]

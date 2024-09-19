@@ -61,16 +61,7 @@ class AskPermissionDialoutScreen(BaseScreen):
             )
 
             self.ids[f"{self.id}_label"].text = "".join(
-                [
-                    f"[size={self.SIZE_M}sp]",
-                    logout_msg,
-                    "\n",
-                    f"{backin_msg}.",
-                    "\n",
-                    "\n",
-                    f"{not_worry_msg}.",
-                    "[/size]",
-                ]
+                [logout_msg, "\n", f"{backin_msg}.", "\n", "\n", f"{not_worry_msg}."]
             )
 
         setattr(
@@ -166,6 +157,7 @@ class AskPermissionDialoutScreen(BaseScreen):
         )
         exec_msg = self.translate("to execute the following command")
 
+        command_list_bins = " ".join(self._bin_args or [])
         self.ids[f"{self.id}_label"].text = "".join(
             [
                 f"[color=#efcc00]{warn_msg}[/color]",
@@ -179,7 +171,7 @@ class AskPermissionDialoutScreen(BaseScreen):
                 f"{exec_msg}:",
                 "\n",
                 "[color=#00ff00]",
-                f"{self._bin} {" ".join(self._bin_args or [])} {self.group} {self.user}",
+                f"{self._bin} {command_list_bins} {self.group} {self.user}",
                 "[/color]",
                 "\n",
                 "\n",

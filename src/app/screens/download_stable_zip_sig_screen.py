@@ -105,7 +105,6 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
 
         self.ids[f"{self.id}_info"].text = (
             DownloadStableZipSigScreen.make_download_info(
-                size=self.SIZE_MP,
                 download_msg=self.translate("Downloading"),
                 from_url=url,
                 to_msg=self.translate("to"),
@@ -122,7 +121,6 @@ class DownloadStableZipSigScreen(BaseDownloadScreen):
 
         self.ids[f"{self.id}_progress"].text = (
             DownloadStableZipSigScreen.make_progress_info(
-                sizes=(self.SIZE_G, self.SIZE_MP),
                 of_msg=self.translate("of"),
                 percent=percent,
                 downloaded_len=downloaded_len,

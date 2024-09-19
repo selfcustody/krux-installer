@@ -289,14 +289,12 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                f"[size={screen.SIZE_M}sp]",
                 "You may need to logout (or even reboot)",
                 "\n",
                 "and back in for the new group to take effect.",
                 "\n",
                 "\n",
                 "Do not worry, this message won't appear again.",
-                "[/size]",
             ]
         )
 

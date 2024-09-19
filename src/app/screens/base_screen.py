@@ -65,21 +65,6 @@ class BaseScreen(Screen, Trigger):
 
         self.locale = BaseScreen.get_locale()
 
-        # Setup the correct font size
-        if sys.platform in ("linux", "win32"):
-            self.SIZE_G = Window.size[0] // 16
-            self.SIZE_MM = Window.size[0] // 24
-            self.SIZE_M = Window.size[0] // 32
-            self.SIZE_MP = Window.size[0] // 48
-            self.SIZE_P = Window.size[0] // 64
-
-        elif sys.platform == "darwin":
-            self.SIZE_G = Window.size[0] // 32
-            self.SIZE_MM = Window.size[0] // 48
-            self.SIZE_M = Window.size[0] // 64
-            self.SIZE_MP = Window.size[0] // 128
-            self.SIZE_P = Window.size[0] // 192
-
     @property
     def logo_img(self) -> str:
         """Getter for logo_img"""
@@ -342,7 +327,9 @@ class BaseScreen(Screen, Trigger):
 
         if sys.platform in ("linux", "darwin"):
             locale = locale.split(".")
-            return f"{locale[0].replace("-", "_")}.{locale[1]}"
+            sanitized = locale[0].replace("-", "_")
+            encoding = locale[1]
+            return f"{sanitized}.{encoding}"
 
         if sys.platform == "win32":
             return f"{locale}.UTF-8"

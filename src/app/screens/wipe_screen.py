@@ -84,6 +84,7 @@ class WipeScreen(BaseFlashScreen):
 
     # pylint: disable=unused-argument
     def on_pre_enter(self, *args):
+        """When pre-enter the screen, clear widgets and build texts"""
         self.ids[f"{self.id}_grid"].clear_widgets()
         self.build_on_data()
         self.build_on_done()

@@ -112,11 +112,7 @@ class TestBaseDownloadScreen(GraphicUnitTest):
         screen.on_pre_enter()
         text = "".join(
             [
-                f"[size={screen.SIZE_G}]",
                 "Connecting...",
-                "[/size]",
-                "[color=#efcc00]",
-                "[/color]",
             ]
         )
 

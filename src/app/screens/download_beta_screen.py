@@ -48,7 +48,8 @@ class DownloadBetaScreen(BaseDownloadScreen):
             screen = self.manager.get_screen(self.to_screen)
             baudrate = DownloadBetaScreen.get_baudrate()
             destdir = DownloadBetaScreen.get_destdir_assets()
-            maixpy = f"maixpy_{getattr(self, "device")}"
+            _device = getattr(self, "device")
+            maixpy = f"maixpy_{_device}"
             _firmware = getattr(self, "firmware")
             firmware = os.path.join(destdir, "krux_binaries", f"{maixpy}", _firmware)
             partials = [

@@ -155,15 +155,7 @@ class BaseDownloadScreen(BaseScreen):
     def on_pre_enter(self, *args):
         """Before enter, reset text to show that its requesting github API"""
         connecting = self.translate("Connecting")
-        text = "".join(
-            [
-                f"[size={self.SIZE_G}]",
-                f"{connecting}...",
-                "[/size]",
-                "[color=#efcc00]",
-                "[/color]",
-            ]
-        )
+        text = "".join([f"{connecting}..."])
         self.ids[f"{self.id}_progress"].text = text
 
     # pylint: disable=unused-argument
@@ -206,7 +198,7 @@ class BaseDownloadScreen(BaseScreen):
 
     @staticmethod
     def make_download_info(
-        size: int, download_msg: str, from_url: str, to_msg: str, to_path: str
+        download_msg: str, from_url: str, to_msg: str, to_path: str
     ) -> str:
         """
         download_stable_zip_sha256_screen and download_stable_zip_sig_screen
@@ -226,7 +218,6 @@ class BaseDownloadScreen(BaseScreen):
 
     @staticmethod
     def make_progress_info(
-        sizes: typing.Tuple[str, str],
         of_msg: str,
         percent: float,
         downloaded_len: float,

@@ -60,7 +60,7 @@ class GreetingsScreen(BaseScreen):
         redirect to MainScreen.
         """
         fn_0 = partial(self.update, name=self.name, key="canvas")
-        fn_1 = partial(self.update, name=self.name, key="check-permission-screen")
+        fn_1 = partial(self.update, name=self.name, key="check-permission")
         Clock.schedule_once(fn_0, 0)
         Clock.schedule_once(fn_1, 2.1)
 
@@ -78,7 +78,7 @@ class GreetingsScreen(BaseScreen):
 
         def on_update():
             if key == "check-permission":
-                self.check_permissions_for_dialout_group()
+                self.check_dialout_permission()
 
             if key == "check-internet-connection":
                 self.check_internet_connection()
@@ -92,7 +92,7 @@ class GreetingsScreen(BaseScreen):
             on_update=getattr(GreetingsScreen, "on_update"),
         )
 
-    def check_permissions_for_dialout_group(self):
+    def check_dialout_permission(self):
         """
         Here's where the check process start
         first get the current user, then verify
@@ -107,10 +107,10 @@ class GreetingsScreen(BaseScreen):
             _group = None
 
             # detect linux distro
-            if distro.id() in ("ubuntu", "fedora", "linuxmint"):
-                _group = "dialout"
-
-            elif distro.like() == "debian":
+            if (
+                distro.id() in ("ubuntu", "fedora", "linuxmint")
+                or distro.like() == "debian"
+            ):
                 _group = "dialout"
 
             elif distro.id() in ("arch", "manjaro", "slackware", "gentoo"):
@@ -119,22 +119,22 @@ class GreetingsScreen(BaseScreen):
             else:
                 exc = RuntimeError(f"{distro.name(pretty=True)} not supported")
                 self.redirect_exception(exception=exc)
+                return
 
             # loop throug all linux groups and check
             # if the user is registered in the "dialout" group
             for _grp in grp.getgrall():
                 if _group == _grp.gr_name:
-                    self.debug(f"Found {_grp.gr_name}")
                     for _grpuser in _grp[3]:
-                        self.debug(_grpuser)
                         if _grpuser == _user:
-                            self.debug(f"'{_user}' already in group '{_group}'")
+                            self.info(f"'{_user}' already in group '{_group}'")
                             _in_dialout = True
 
             # if user is not in dialout group, warn user
             # and then redirect to a screen that will
             # proceed with the proper operation
             if not _in_dialout:
+                print("NOT")
                 ask = self.manager.get_screen("AskPermissionDialoutScreen")
                 _distro = distro.name(pretty=True)
 

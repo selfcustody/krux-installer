@@ -490,6 +490,7 @@ class MainScreen(BaseScreen):
             allowed_screens=(
                 "KruxInstallerApp",
                 "ConfigKruxInstaller",
+                "GreetingsScreen",
                 "MainScreen",
                 "SelectDeviceScreen",
                 "SelectVersionScreen",

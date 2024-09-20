@@ -161,17 +161,17 @@ ${description}
 %{_bindir}/%{name}
 %{_datadir}/doc/%{name}/README
 %{_datarootdir}/applications/%{name}.desktop
-%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png
+%{_datarootdir}/icons/hicolor/512x512/apps/%{name}.png
 
 %install
 mkdir -p %{buildroot}
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_datadir}/doc/%{name}
 mkdir -p %{buildroot}%{_datarootdir}/applications/%{name}
-mkdir -p %{buildroot}%{_datarootdir}/icons/highcolor/512x512/apps
+mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/512x512/apps
 cp %{name} %{buildroot}%{_bindir}
 cp README %{buildroot}%{_datadir}/doc/%{name}/README
-cp %{name}.png %{buildroot}%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png
+cp %{name}.png %{buildroot}%{_datarootdir}/icons/hicolor/512x512/apps/%{name}.png
 echo "[Desktop Entry]" > %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 echo "Encoding=UTF-8" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 echo "Version=%{version}" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
@@ -179,7 +179,7 @@ echo "Type=Application" >> %{buildroot}%{_datarootdir}/applications/%{name}.desk
 echo "Terminal=false" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 echo "Exec=%{_bindir}/%{name}" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 echo "Name=%{name}" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
-echo "Icon=%{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
+echo "Icon=%{_datarootdir}/icons/hicolor/512x512/apps/%{name}.png" >> %{buildroot}%{_datarootdir}/applications/%{name}.desktop
 
 %clean
 rm -rf %{buildroot}
@@ -208,7 +208,7 @@ echo ""
 
 %postun
 rm -v %{_datarootdir}/applications/%{name}.desktop
-rm -v %{_datarootdir}/icons/highcolor/512x512/apps/%{name}.png
+rm -v %{_datarootdir}/icons/hicolor/512x512/apps/%{name}.png
 echo ""
 echo "                                   -------------"
 echo "                                   !!!WARNING!!!"

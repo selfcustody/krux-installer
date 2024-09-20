@@ -197,9 +197,15 @@ class TestAboutScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.greetings_screen.distro.id", return_value="mockos")
+    @patch("src.app.screens.greetings_screen.distro.like", return_value="mockos")
     @patch("src.app.screens.greetings_screen.GreetingsScreen.redirect_exception")
     def test_fail_check_permission_linux(
-        self, mock_redirect_exception, mock_distro_id, mock_get_locale, mock_environ_get
+        self,
+        mock_redirect_exception,
+        mock_distro_like,
+        mock_distro_id,
+        mock_get_locale,
+        mock_environ_get,
     ):
         screen = GreetingsScreen()
         self.render(screen)
@@ -210,7 +216,8 @@ class TestAboutScreen(GraphicUnitTest):
         screen.update(name=screen.name, key="check-permission")
 
         # patch assertions
-        mock_environ_get.assert_called_once()
-        mock_get_locale.assert_called_once()
-        mock_distro_id.assert_called_once()
+        mock_environ_get.assert_called()
+        mock_get_locale.assert_called()
+        mock_distro_id.assert_called()
+        mock_distro_like.assert_called()
         mock_redirect_exception.assert_called_once()

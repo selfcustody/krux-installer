@@ -77,7 +77,7 @@ class GreetingsScreen(BaseScreen):
         value = kwargs.get("value")
 
         def on_update():
-            if key == "check-permission-screen":
+            if key == "check-permission":
                 self.check_permissions_for_dialout_group()
 
             if key == "check-internet-connection":
@@ -170,7 +170,7 @@ class GreetingsScreen(BaseScreen):
             main_screen = self.manager.get_screen("MainScreen")
             fn = partial(
                 main_screen.update,
-                name="KruxInstallerApp",
+                name=self.name,
                 key="version",
                 value=selector.releases[0],
             )

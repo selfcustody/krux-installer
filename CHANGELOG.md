@@ -1,24 +1,5 @@
 # CHANGELOG
 
-## 0.0.20-alpha-2
-
-- Changed the version from `0.0.2-alpha` to `0.0.20-alpha-2` as suggested by @odudex;
-- Refactored the code a little bit to be more pythonic;
-- Removed startup messages as suggested by @tadeubas:
-  - On linux the `GreetingsScreen` class will check:
-    - if user is on `dialout`/`uucp` group (debian and fedora based / archlinux);
-    - internet connection
-  - On MacOS an Windows the `GreetingsScreen` class will check:
-    - internet connection
-- Added the window resize behaviour;
-- Removed fullscreen on startup;
-- Fedora and Ubuntu:
-  - fixed desktop icon entry on `.ci/create-deb`;
-  - fixed desktop icon entry on `.ci/create-rpm`;
-- Added more tests:
-  - ask_permissions_dialout_screen;
-  - error_screen.
-  
 ## 0.0.2-alpha
 
 - code refactoration from `nodejs` to `python`;

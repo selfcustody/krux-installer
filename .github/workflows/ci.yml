@@ -24,9 +24,6 @@ jobs:
           list-files: json
           filters: |
             change:
-              - '.gitignore'
-              - '.pylintrc'
-              - 'TODO.md'
               - 'CHANGELOG.md'
               - 'LICENSE'
             
@@ -39,14 +36,11 @@ jobs:
             let workflowFailMessage = "It looks like you've modified some files that we can't accept as contributions."
             try {
               const badFilesArr = [
-                '.gitignore',
-                '.pylintrc',
-                'TODO.md',
                 'CHANGELOG.md',
                 'LICENSE'  
               ]
               const badFiles = badFilesArr.join('\n- ')
-              const reviewMessage = `👋 Hey there kruxer. It looks like you've modified some files that we can't accept as contributions. The complete list of files we can't accept are:\n- ${badFiles}\n\nYou'll need to revert all of the files you changed in that list using [GitHub Desktop](https://docs.github.com/en/free-pro-team@latest/desktop/contributing-and-collaborating-using-github-desktop/managing-commits/reverting-a-commit) or \`git checkout origin/main <file name>\`. Once you get those files reverted, we can continue with the review process. :octocat:\n\nMore discussion:\n- https://github.com/electron-vite/electron-vite-vue/issues/192`
+              const reviewMessage = `👋 Hey there kruxer. It looks like you've modified some files that we can't accept as contributions. The complete list of files we can't accept are:\n- ${badFiles}\n\nYou'll need to revert all of the files you changed in that list using [GitHub Desktop](https://docs.github.com/en/free-pro-team@latest/desktop/contributing-and-collaborating-using-github-desktop/managing-commits/reverting-a-commit) or \`git checkout origin/main <file name>\`. Once you get those files reverted, we can continue with the review process. :octocat:`
               createdComment = await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
@@ -82,4 +76,4 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Lint markdown
-        run: npx markdownlint-cli ${{ needs.job1.outputs.markdown_files }} --ignore node_modules
+        run: npx markdownlint-cli --disable MD033 --ignore node_modules ${{ needs.job1.outputs.markdown_files }}

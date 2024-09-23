@@ -295,10 +295,10 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             ]
 
             if sys.platform == "linux":
-                check = self.screen_manager.get_screen("CheckPermissionsScreen")
+                ask = self.screen_manager.get_screen("AskPermissionDialoutScreen")
                 partials.append(
                     partial(
-                        check.update,
+                        ask.update,
                         name="ConfigKruxInstaller",
                         key="locale",
                         value=value,

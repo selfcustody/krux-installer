@@ -105,7 +105,7 @@ class Selector(Trigger):
         self.debug(f"releases::setter={value}")
         self._releases = value
 
-    def _fetch_releases(self, timeout: int = 10) -> HTTPResponse:
+    def _fetch_releases(self, timeout: int = 10) -> typing.List[str]:
         """
         Get the all available releases at
         https://github.com/selfcustody/krux/releases
@@ -143,7 +143,6 @@ class Selector(Trigger):
 
             obj.append(data["tag_name"])
 
-        self.debug(f"releases::getter={obj}")
-        self.debug("releases::getter::append=odudex/krux_binaries")
         obj.append("odudex/krux_binaries")
+        self.debug(f"releases::getter={obj}")
         return obj

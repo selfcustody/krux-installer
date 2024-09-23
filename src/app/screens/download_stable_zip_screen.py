@@ -24,11 +24,7 @@ download_stable_zip_screen.py
 import os
 import time
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.zip_downloader import ZipDownloader
 
@@ -50,6 +46,7 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         # This is a function that will be called
         # when the download thread is finished
         def on_trigger(dt):
+            self.debug(f"latter call timed {dt}ms")
             time.sleep(2.1)
             screen = self.manager.get_screen(self.to_screen)
             fn = partial(
@@ -61,143 +58,116 @@ class DownloadStableZipScreen(BaseDownloadScreen):
         # This is a function that will be called
         # when a bunch of data are streamed from github
         def on_progress(data: bytes):
-            if self.downloader is not None:
-                fn = partial(
-                    self.update,
-                    name=self.name,
-                    key="progress",
-                    value={
-                        "downloaded_len": self.downloader.downloaded_len,
-                        "content_len": self.downloader.content_len,
-                    },
-                )
-                Clock.schedule_once(fn, 0)
-
-            else:
-                self.redirect_error(f"Invalid downloader: {self.downloader}")
+            self.debug(f"Chunck size: {len(data)}")
+            dl_len = getattr(self.downloader, "downloaded_len")
+            ct_len = getattr(self.downloader, "content_len")
+            fn = partial(
+                self.update,
+                name=self.name,
+                key="progress",
+                value={
+                    "downloaded_len": dl_len,
+                    "content_len": ct_len,
+                },
+            )
+            Clock.schedule_once(fn, 0)
 
         # Now define the functions as staticmethods of class
-        self.debug(f"Bind {self.__class__}.on_trigger={on_trigger}")
-        setattr(self.__class__, "on_trigger", on_trigger)
-
-        self.debug(f"Bind {self.__class__}.on_progress={on_progress}")
-        setattr(self.__class__, "on_progress", on_progress)
+        setattr(DownloadStableZipScreen, "on_trigger", on_trigger)
+        setattr(DownloadStableZipScreen, "on_progress", on_progress)
 
         # Once finished, update canvas
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in (
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "WarningAlreadyDownloadedScreen",
-            "DownloadStableZipScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
+        def on_update():
+            self.update_download_screen(key=key, value=value)
 
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+        setattr(DownloadStableZipScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "WarningAlreadyDownloadedScreen",
+                "DownloadStableZipScreen",
+            ),
+            on_update=getattr(DownloadStableZipScreen, "on_update"),
+        )
 
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
+    def build_downloader(self, version: str):
+        """Creates a Downloader given a firmware version"""
+        self.version = version
+        self.downloader = ZipDownloader(
+            version=self.version,
+            destdir=DownloadStableZipScreen.get_destdir_assets(),
+        )
 
-        elif key == "version":
-            if value is not None:
-                self.version = value
-                self.downloader = ZipDownloader(
-                    version=self.version,
-                    destdir=DownloadStableZipScreen.get_destdir_assets(),
-                )
+        url = getattr(self.downloader, "url")
+        destdir = getattr(self.downloader, "destdir")
+        downloading = self.translate("Downloading")
+        to = self.translate("to")
+        filepath = os.path.join(destdir, f"krux-{self.version}.zip")
 
-                if self.downloader is not None:
-                    url = getattr(self.downloader, "url")
-                    destdir = getattr(self.downloader, "destdir")
-                    downloading = self.translate("Downloading")
-                    to = self.translate("to")
-                    filepath = os.path.join(destdir, f"krux-{self.version}.zip")
+        self.ids[f"{self.id}_info"].text = "".join(
+            [
+                downloading,
+                "\n",
+                f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
+                "\n",
+                to,
+                "\n",
+                filepath,
+            ]
+        )
 
-                    self.ids[f"{self.id}_info"].text = "".join(
-                        [
-                            f"[size={self.SIZE_MP}sp]",
-                            downloading,
-                            "\n",
-                            f"[color=#00AABB][ref={url}]{url}[/ref][/color]",
-                            "\n",
-                            to,
-                            "\n",
-                            filepath,
-                            "[/size]",
-                        ]
-                    )
+    def on_download_progress(self, value: dict):
+        """update GUI given a ratio between what is downloaded and its total length"""
+        # calculate percentage of download
+        lens = [value["downloaded_len"], value["content_len"]]
+        percent = lens[0] / lens[1]
 
-                else:
-                    self.redirect_error("Invalid downloader")
+        # Format bytes (one liner) in MB
+        # https://stackoverflow.com/questions/
+        # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
+        downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
 
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
+        of = self.translate("of")
+        self.ids[f"{self.id}_progress"].text = "".join(
+            [
+                f"[b]{ percent * 100:,.2f} %[/b]",
+                "\n",
+                downs[0],
+                f" {of} ",
+                downs[1],
+                " MB",
+            ]
+        )
 
-        elif key == "progress":
-            if value is not None:
-                # calculate percentage of download
-                lens = [value["downloaded_len"], value["content_len"]]
-                percent = lens[0] / lens[1]
-
-                # Format bytes (one liner) in MB
-                # https://stackoverflow.com/questions/
-                # 5194057/better-way-to-convert-file-sizes-in-python#answer-52684562
-                downs = [f"{lens[0]/(1<<20):,.2f}", f"{lens[1]/(1<<20):,.2f}"]
-
-                of = self.translate("of")
-                self.ids[f"{self.id}_progress"].text = "".join(
-                    [
-                        f"[size={self.SIZE_G}sp][b]{ percent * 100:,.2f} %[/b][/size]",
-                        "\n",
-                        f"[size={self.SIZE_MP}sp]",
-                        downs[0],
-                        f" {of} ",
-                        downs[1],
-                        " MB",
-                        "[/size]",
-                    ]
-                )
-
-                # When finish, change the label
-                # and then change screen
-                if percent == 1.00:
-                    if self.downloader is not None:
-                        destdir = getattr(self.downloader, "destdir")
-                        downloaded = self.translate("downloaded")
-                        filepath = os.path.join(destdir, f"krux-{self.version}.zip")
-                        self.ids[f"{self.id}_info"].text = "".join(
-                            [
-                                f"[size={self.SIZE_MP}sp]",
-                                filepath,
-                                "\n",
-                                downloaded,
-                                "[/size]",
-                            ]
-                        )
-                        # When finish, change the label, wait some seconds
-                        # and then change screen
-                        self.trigger()
-
-                    else:
-                        self.redirect_error(f"Invalid downloader: {self.downloader}")
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+        # When finish, change the label
+        # and then change screen
+        if percent == 1.00:
+            destdir = getattr(self.downloader, "destdir")
+            downloaded = self.translate("downloaded")
+            filepath = os.path.join(destdir, f"krux-{self.version}.zip")
+            self.ids[f"{self.id}_info"].text = "".join(
+                [
+                    filepath,
+                    "\n",
+                    downloaded,
+                ]
+            )
+            # When finish, change the label, wait some seconds
+            # and then change screen
+            # trigger is defined in superclass
+            callback_trigger = getattr(self, "trigger")
+            callback_trigger()

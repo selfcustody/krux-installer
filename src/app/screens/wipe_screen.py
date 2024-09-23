@@ -21,15 +21,11 @@
 """
 wipe_screen.py
 """
-import sys
 import threading
 import traceback
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
 from src.utils.flasher.wiper import Wiper
 from src.app.screens.base_flash_screen import BaseFlashScreen
 
@@ -41,52 +37,57 @@ class WipeScreen(BaseFlashScreen):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
         self.wiper = None
         self.success = False
+        self.progress = ""
+        self.device = None
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    def on_pre_enter(self):
-        self.ids[f"{self.id}_grid"].clear_widgets()
+    def build_on_data(self):
+        """
+        Build a streaming IO static method using
+        some instance variables for flash procedure
+        when KTool.print_callback is called
 
-        def on_print_callback(*args, **kwargs):
+        (useful for to be used in tests)
+        """
+
+        # pylint: disable=unused-argument
+        def on_data(*args, **kwargs):
             text = " ".join(str(x) for x in args)
             self.info(text)
-
-            text = text.replace(
-                "\x1b[32m\x1b[1m[INFO]\x1b[0m", "[color=#00ff00]INFO[/color]"
-            )
-            text = text.replace(
-                "\x1b[33mISP loaded", "[color=#efcc00]ISP loaded[/color]"
-            )
-            text = text.replace(
-                "\x1b[33mInitialize K210 SPI Flash",
-                "[color=#efcc00]Initialize K210 SPI Flash[/color]",
-            )
-            text = text.replace("Flash ID: \x1b[33m", "Flash ID: [color=#efcc00]")
-            text = text.replace(
-                "\x1b[0m, unique ID: \x1b[33m", "[/color], unique ID: [color=#efcc00]"
-            )
-            text = text.replace("\x1b[0m, size: \x1b[33m", "[/color], size: ")
-            text = text.replace("\x1b[0m MB", "[/color] MB")
-            text = text.replace("\x1b[0m", "")
-            text = text.replace("\x1b[33m", "")
+            text = WipeScreen.parse_general_output(text)
             text = text.replace(
                 "[INFO] Erasing the whole SPI Flash",
-                "[color=#00ff00]INFO[/color][color=#efcc00] Erasing the whole SPI Flash [/color]",
+                "".join(
+                    [
+                        "[color=#00ff00]INFO[/color]",
+                        "[color=#efcc00] Erasing the whole SPI Flash [/color]",
+                    ]
+                ),
             )
-
             text = text.replace(
                 "\x1b[31m\x1b[1m[ERROR]\x1b[0m", "[color=#ff0000]ERROR[/color]"
             )
-
             self.output.append(text)
 
-            if len(self.output) > 18:
+            if len(self.output) > 10:
                 del self.output[:1]
 
             if "SPI Flash erased." in text:
-                self.trigger()
+                self.is_done = True
+                # pylint: disable=not-callable
+                self.done()
 
             self.ids[f"{self.id}_info"].text = "\n".join(self.output)
+
+        setattr(WipeScreen, "on_data", on_data)
+
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        """When pre-enter the screen, clear widgets and build texts"""
+        self.ids[f"{self.id}_grid"].clear_widgets()
+        self.build_on_data()
+        self.build_on_done()
 
         def on_ref_press(*args):
             if args[1] == "Back":
@@ -96,39 +97,10 @@ class WipeScreen(BaseFlashScreen):
                 App.get_running_app().stop()
 
             else:
-                self.redirect_error(f"Invalid ref: {args[1]}")
-
-        def on_trigger_callback(dt):
-            self.success = True
-            del self.output[4:]
-            self.ids[f"{self.id}_loader"].source = self.done_img
-            self.ids[f"{self.id}_loader"].reload()
-            done = self.translate("DONE")
-            back = self.translate("Back")
-            quit = self.translate("Quit")
-            if sys.platform in ("linux", "win32"):
-                size = self.SIZE_M
-            else:
-                size = self.SIZE_M
-
-            self.ids[f"{self.id}_progress"].text = "".join(
-                [
-                    f"[size={size}sp][b]{done}![/b][/size]",
-                    "\n",
-                    f"[size={size}sp]",
-                    "[color=#00FF00]",
-                    f"[ref=Back][u]{back}[/u][/ref]",
-                    "[/color]",
-                    "        ",
-                    "[color=#EFCC00]",
-                    f"[ref=Quit][u]{quit}[/u][/ref]",
-                    "[/color]",
-                ]
-            )
-            self.ids[f"{self.id}_progress"].bind(on_ref_press=on_ref_press)
-
-        setattr(WipeScreen, "on_print_callback", on_print_callback)
-        setattr(WipeScreen, "on_trigger_callback", on_trigger_callback)
+                msg = f"Invalid ref: {args[1]}"
+                exc = RuntimeError(msg)
+                self.error(msg)
+                self.redirect_exception(exception=exc)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=3, root_widget=f"{self.id}_grid"
@@ -140,133 +112,81 @@ class WipeScreen(BaseFlashScreen):
             root_widget=f"{self.id}_subgrid",
         )
 
-        self.make_label(
+        self.make_button(
+            row=1,
             wid=f"{self.id}_progress",
             text="",
-            root_widget=f"{self.id}_subgrid",
-            markup=True,
             halign="center",
+            font_factor=32,
+            root_widget=f"{self.id}_subgrid",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
 
-        self.make_label(
+        self.make_button(
+            row=2,
             wid=f"{self.id}_info",
             text="",
+            font_factor=72,
             root_widget=f"{self.id}_grid",
-            markup=True,
             halign="justify",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
         """
         Event fired when the screen is displayed and the entering animation is complete.
         """
-        self.debug("Staring wipe...")
-        if self.wiper is not None:
-            please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
-            if sys.platform in ("linux", "win32"):
-                sizes = [self.SIZE_M, self.SIZE_PP]
-            else:
-                sizes = [self.SIZE_MM, self.SIZE_MP]
+        self.done = getattr(WipeScreen, "on_done")
+        self.wiper.ktool.__class__.print_callback = getattr(WipeScreen, "on_data")
+        on_process = partial(self.wiper.wipe, device=self.device)
+        self.thread = threading.Thread(name=self.name, target=on_process)
 
-            self.ids[f"{self.id}_progress"].text = f"[size={sizes[0]}sp][b]{please}[/b]"
-            self.output = []
-            self.progress = ""
-            self.is_done = False
-            self.trigger = getattr(self.__class__, "on_trigger_callback")
-            self.wiper.ktool.__class__.print_callback = getattr(
-                self.__class__, "on_print_callback"
-            )
-            on_process_callback = partial(self.wiper.wipe, device=self.device)
-            self.thread = threading.Thread(name=self.name, target=on_process_callback)
+        please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
+        self.ids[f"{self.id}_progress"].text = please
 
-            # if anything wrong happen, show it
-            def hook(err):
-                msg = "".join(
-                    traceback.format_exception(
-                        err.exc_type, err.exc_value, err.exc_traceback
-                    )
+        # if anything wrong happen, show it
+        def hook(err):
+            if not self.is_done:
+                trace = traceback.format_exception(
+                    err.exc_type, err.exc_value, err.exc_traceback
                 )
+                msg = "".join(trace[-2:])
                 self.error(msg)
-                done = self.translate("DONE")
-                back = self.translate("Back")
-                quit = self.translate("Quit")
+                self.redirect_exception(exception=RuntimeError(f"Wipe failed: {msg}"))
 
-                self.ids[f"{self.id}_progress"].text = "".join(
-                    [
-                        f"[size={sizes[0]}]",
-                        f"[color=#FF0000]{"Wipe failed" if not self.success else done}[/color]",
-                        "[/size]",
-                        "\n",
-                        "\n",
-                        f"[size={sizes[0]}]" "[color=#00FF00]",
-                        f"[ref=Back][u]{back}[/u][/ref]",
-                        "[/color]",
-                        "        ",
-                        "[color=#EFCC00]",
-                        f"[ref=Quit][u]{quit}[/u][/ref]",
-                        "[/color]",
-                        "[/size]",
-                    ]
-                )
-
-                self.ids[f"{self.id}_info"].text = "".join(
-                    [
-                        f"[size={sizes[1]}]",
-                        msg,
-                        "[/size]",
-                    ]
-                )
-
-            # hook what happened
-            threading.excepthook = hook
-            self.thread.start()
-        else:
-            self.redirect_error("Wiper isnt configured")
+        # hook what happened
+        threading.excepthook = hook
+        self.thread.start()
 
     def update(self, *args, **kwargs):
         """Update screen with firmware key. Should be called before `on_enter`"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in (
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "WarningWipeScreen",
-            "WipeScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
+        def on_update():
+            if key == "device":
+                setattr(self, "device", value)
 
-        key = kwargs.get("key")
-        value = kwargs.get("value")
+            if key == "wiper":
+                setattr(self, "wiper", Wiper())
+                setattr(getattr(self, "wiper"), "baudrate", value)
 
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': {value}")
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "device":
-            if value is not None:
-                self.device = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': {value}")
-
-        elif key == "wiper":
-            if value is not None:
-                self.wiper = Wiper()
-                self.wiper.baudrate = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': {value}")
-
-        else:
-            raise ValueError(f'Invalid key: "{key}"')
+        setattr(WipeScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "WarningWipeScreen",
+                "WipeScreen",
+            ),
+            on_update=getattr(WipeScreen, "on_update"),
+        )

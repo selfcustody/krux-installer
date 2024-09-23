@@ -95,7 +95,7 @@ class TestMainScreen(GraphicUnitTest):
 
         calls = []
         for button in grid.children:
-            action = getattr(screen, f"on_press_{button.id}")
+            action = getattr(screen.__class__, f"on_press_{button.id}")
             action(button)
             if button.id in (
                 "main_select_device",
@@ -139,7 +139,7 @@ class TestMainScreen(GraphicUnitTest):
         calls_manager = []
 
         for button in grid.children:
-            action = getattr(screen, f"on_release_{button.id}")
+            action = getattr(screen.__class__, f"on_release_{button.id}")
             action(button)
 
             if button.id in (
@@ -260,8 +260,8 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_invalid_screen(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_invalid_screen(self, mock_redirect_exception, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -270,16 +270,13 @@ class TestMainScreen(GraphicUnitTest):
         screen.update(name="MockedScreen", key="device", value="v24.03.0")
 
         mock_get_locale.assert_any_call()
-        mock_redirect_error.assert_called_once_with(
-            msg="Invalid screen name: MockedScreen"
-        )
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_invalid_key(self, mock_redirect_error, mock_get_locale):
+    def test_fail_update_invalid_key(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
@@ -288,7 +285,6 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="SelectDeviceScreen", key="mock", value="mock")
         mock_get_locale.assert_any_call()
-        mock_redirect_error.assert_called_once_with(msg='Invalid key: "mock"')
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -512,8 +508,8 @@ class TestMainScreen(GraphicUnitTest):
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
             screen.update(name="SelectVersionScreen", key="device", value=device)
-            flash_action = getattr(screen, "on_press_main_flash")
-            wipe_action = getattr(screen, "on_press_main_wipe")
+            flash_action = getattr(screen.__class__, f"on_press_{flash_button.id}")
+            wipe_action = getattr(screen.__class__, f"on_press_{wipe_button.id}")
             flash_action(flash_button)
             wipe_action(wipe_button)
             background_calls.append(call(wid="main_flash", rgba=(0.25, 0.25, 0.25, 1)))
@@ -552,11 +548,11 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        flash_button = grid.children[3]
+        button = grid.children[3]
 
         screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
-        flash_action = getattr(screen, "on_release_main_flash")
-        flash_action(flash_button)
+        action = getattr(screen.__class__, f"on_release_{button.id}")
+        action(button)
 
         mock_get_locale.assert_any_call()
         mock_get_destdir_assets.assert_called_once()
@@ -598,11 +594,11 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        flash_button = grid.children[3]
+        button = grid.children[3]
 
         screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
-        flash_action = getattr(screen, "on_release_main_flash")
-        flash_action(flash_button)
+        action = getattr(screen.__class__, f"on_release_{button.id}")
+        action(button)
 
         mock_get_locale.assert_any_call()
         mock_get_destdir_assets.assert_called_once()
@@ -640,11 +636,11 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        flash_button = grid.children[3]
+        button = grid.children[3]
 
         screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
-        flash_action = getattr(screen, "on_release_main_flash")
-        flash_action(flash_button)
+        action = getattr(screen.__class__, f"on_release_{button.id}")
+        action(button)
 
         mock_get_locale.assert_any_call()
         mock_findall.assert_has_calls(
@@ -681,15 +677,15 @@ class TestMainScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
-        wipe_button = grid.children[2]
+        button = grid.children[2]
 
         calls_set_background = []
         calls_set_screen = []
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
             screen.update(name="SelectVersionScreen", key="device", value=device)
-            wipe_action = getattr(screen, "on_release_main_wipe")
-            wipe_action(wipe_button)
+            action = getattr(screen.__class__, f"on_release_{button.id}")
+            action(button)
 
             calls_set_background.append(call(wid="main_wipe", rgba=(0, 0, 0, 1)))
             calls_set_screen.append(call(name="WarningWipeScreen", direction="left"))

@@ -25,21 +25,22 @@ import os
 import re
 import sys
 import typing
+from math import sqrt
 from pathlib import Path
 from functools import partial
 from kivy.clock import Clock
 from kivy.app import App
 from kivy.core.window import Window
+from kivy.graphics.vertex_instructions import Rectangle
+from kivy.graphics.context_instructions import Color
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
 from kivy.uix.screenmanager import Screen
-from src.utils.trigger import Trigger
+from kivy.weakproxy import WeakProxy
 from src.i18n import T
-from src.utils.selector import VALID_DEVICES
+from src.utils.trigger import Trigger
 
 
 class BaseScreen(Screen, Trigger):
@@ -61,30 +62,8 @@ class BaseScreen(Screen, Trigger):
         self._warn_img = os.path.join(root_assets_path, "assets", "warning.png")
         self._load_img = os.path.join(root_assets_path, "assets", "load.gif")
         self._done_img = os.path.join(root_assets_path, "assets", "done.png")
-        self._error_img = os.path.join(root_assets_path, "assets", "error.png")
 
         self.locale = BaseScreen.get_locale()
-
-        # Setup the correct font size
-        if sys.platform in ("linux", "win32"):
-            self.SIZE_XG = Window.size[0] // 4
-            self.SIZE_GG = Window.size[0] // 8
-            self.SIZE_G = Window.size[0] // 16
-            self.SIZE_MM = Window.size[0] // 24
-            self.SIZE_M = Window.size[0] // 32
-            self.SIZE_MP = Window.size[0] // 48
-            self.SIZE_P = Window.size[0] // 64
-            self.SIZE_PP = Window.size[0] // 128
-
-        elif sys.platform == "darwin":
-            self.SIZE_XG = Window.size[0] // 16
-            self.SIZE_GG = Window.size[0] // 24
-            self.SIZE_G = Window.size[0] // 32
-            self.SIZE_MM = Window.size[0] // 48
-            self.SIZE_M = Window.size[0] // 64
-            self.SIZE_MP = Window.size[0] // 128
-            self.SIZE_P = Window.size[0] // 192
-            self.SIZE_PP = Window.size[0] // 256
 
     @property
     def logo_img(self) -> str:
@@ -111,23 +90,23 @@ class BaseScreen(Screen, Trigger):
         return self._done_img
 
     @property
-    def error_img(self) -> str:
-        """Getter for logo_img"""
-        self.debug(f"getter::error_img={self._logo_img}")
-        return self._error_img
-
-    @property
     def locale(self) -> str:
         """Getter for locale property"""
         return self._locale
 
     @locale.setter
-    def locale(self, value: bool):
+    def locale(self, value: str):
         """Setter for locale property"""
         self.debug(f"locale = {value}")
         self._locale = value
 
+    # pylint: disable=unused-argument
+    def update(self, *args, **kwargs):
+        """Function to be implemented on classes"""
+        pass  # pylint: disable=unnecessary-pass
+
     def translate(self, key: str) -> str:
+        """Translate some message as key"""
         msg = T(key, locale=self.locale, module=self.id)
         self.debug(f"Translated '{key}' to '{msg}'")
         return msg
@@ -146,12 +125,27 @@ class BaseScreen(Screen, Trigger):
         self.manager.transition.direction = direction
         self.manager.current = name
 
-    def make_grid(self, wid: str, rows: int):
+    def make_grid(self, wid: str, rows: int, **kwargs):
         """Build grid where buttons will be placed"""
         if wid not in self.ids:
+
             self.debug(f"Building GridLayout::{wid}")
             grid = GridLayout(cols=1, rows=rows)
             grid.id = wid
+
+            # define a default resize event
+            # with same value of defined font
+            resize_canvas = kwargs.get("resize_canvas")
+
+            if resize_canvas:
+                # pylint: disable=unused-argument
+                def on_size(instance, value):
+                    update = getattr(self, "update")
+                    fn = partial(update, name=self.name, key="canvas")
+                    Clock.schedule_once(fn, 0)
+
+                grid.bind(size=on_size)
+
             self.add_widget(grid)
             self.ids[wid] = WeakProxy(grid)
         else:
@@ -166,12 +160,17 @@ class BaseScreen(Screen, Trigger):
         self.ids[wid] = WeakProxy(grid)
 
     def make_label(
-        self, wid: str, text: str, root_widget: str, markup: bool, halign: str
+        self,
+        wid: str,
+        text: str,
+        root_widget: str,
+        halign: str,
     ):
         """Build grid where buttons will be placed"""
-        self.debug(f"Building GridLayout::{wid}")
-        label = Label(text=text, markup=markup, halign=halign)
+        self.debug(f"Building Label::{wid}")
+        label = Label(text=text, markup=True, halign=halign)
         label.id = wid
+        label.bind(texture_size=label.setter("size"))
         self.ids[root_widget].add_widget(label)
         self.ids[wid] = WeakProxy(label)
 
@@ -191,75 +190,71 @@ class BaseScreen(Screen, Trigger):
     def make_button(
         self,
         root_widget: str,
-        id: str,
+        wid: str,
         text: str,
-        markup: bool,
         row: int,
-        on_press: typing.Callable,
-        on_release: typing.Callable,
+        halign: str | None,
+        font_factor: int | None,
+        on_press: typing.Callable | None,
+        on_release: typing.Callable | None,
+        on_ref_press: typing.Callable | None,
     ):
         """Create buttons in a dynamic way"""
-        self.debug(f"{id} -> {root_widget}")
+        self.debug(f"button::{wid} row={row}")
 
+        # define how many rows we have to distribute them on screen
         total = self.ids[root_widget].rows
         btn = Button(
             text=text,
-            markup=markup,
+            markup=True,
             halign="center",
-            font_size=Window.size[0] // 25,
+            font_size=BaseScreen.get_half_diagonal_screen_size(font_factor),
             background_color=(0, 0, 0, 1),
             color=(1, 1, 1, 1),
         )
-        btn.id = id
+        btn.id = wid
+
+        if halign is not None:
+            btn.halign = halign
 
         # define button methods to be callable in classes
-        setattr(self, f"on_press_{id}", on_press)
-        setattr(self, f"on_release_{id}", on_release)
+        if on_press is not None:
+            btn.bind(on_press=on_press)
+            setattr(self.__class__, f"on_press_{wid}", on_press)
 
-        btn.bind(on_press=on_press)
-        btn.bind(on_release=on_release)
+        if on_release is not None:
+            btn.bind(on_release=on_release)
+            setattr(self.__class__, f"on_release_{wid}", on_release)
+
+        if on_ref_press is not None:
+            btn.bind(on_ref_press=on_ref_press)
+            setattr(self.__class__, f"on_ref_press_{wid}", on_ref_press)
+
+        # define a default resize event
+        # with same value of defined font
+        # pylint: disable=unused-argument
+        def on_size(instance, value):
+            instance.font_size = BaseScreen.get_half_diagonal_screen_size(font_factor)
+
+        btn.bind(size=on_size)
+        setattr(self.__class__, f"on_resize_{wid}", on_size)
+
+        # configure button dimensions and positions
         btn.x = 0
         btn.y = (Window.size[1] / total) * row
         btn.width = Window.size[0]
         btn.height = Window.size[1] / total
+
+        # register button
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
-
-        self.debug(
-            f"button::{id} row={row}, pos_hint={btn.pos_hint}, size_hint={btn.size_hint}"
-        )
-
-    def make_stack_button(
-        self,
-        root_widget: str,
-        wid: str,
-        on_press: typing.Callable,
-        on_release: typing.Callable,
-        size_hint: typing.Tuple[float, float],
-    ):
-        btn = Button(
-            markup=True,
-            font_size=Window.size[0] // 30,
-            background_color=(0, 0, 0, 1),
-            size_hint=size_hint,
-        )
-        btn.id = wid
-        self.ids[root_widget].add_widget(btn)
-        self.ids[btn.id] = WeakProxy(btn)
-        btn.bind(on_press=on_press)
-        btn.bind(on_release=on_release)
-        setattr(self, f"on_press_{wid}", on_press)
-        setattr(self, f"on_release_{wid}", on_release)
-
-    def redirect_error(self, msg: str):
-        exception = RuntimeError(msg)
-        self.redirect_exception(exception=exception)
 
     def redirect_exception(self, exception: Exception):
+        """Get an exception and prepare a ErrorScreen rendering"""
         screen = self.manager.get_screen("ErrorScreen")
         fns = [
-            partial(screen.update, name=self.name, key="error", value=exception),
             partial(screen.update, name=self.name, key="canvas"),
+            partial(screen.update, name=self.name, key="error", value=exception),
         ]
 
         for fn in fns:
@@ -267,37 +262,91 @@ class BaseScreen(Screen, Trigger):
 
         self.set_screen(name="ErrorScreen", direction="left")
 
+    def update_screen(
+        self,
+        name: str,
+        key: str,
+        value: typing.Any,
+        allowed_screens: typing.Tuple,
+        on_update: typing.Callable | None,
+    ):
+        """
+        Update a screen in accord with the valid ones, here or in on_update callback
+        """
+        if name in allowed_screens:
+            self.debug(f"Updating {self.name} from {name}...")
+        else:
+            exc = RuntimeError(f"Invalid screen name: {name}")
+            self.redirect_exception(exception=exc)
+            return
+
+        if key == "locale":
+            if value is not None:
+                self.locale = value
+            else:
+                exc = RuntimeError(f"Invalid value for key '{key}': '{value}'")
+                self.redirect_exception(exception=exc)
+
+        if key == "canvas":
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width + 1, Window.height + 1))
+
+        if on_update is not None:
+            on_update()
+
+    @staticmethod
+    def get_half_diagonal_screen_size(factor: int):
+        """Get half of diagonal size"""
+        w_width, w_height = Window.size
+        return int(sqrt((w_width**2 + w_height**2) / 2)) // factor
+
+    @staticmethod
+    def quit_app():
+        """Stop the kivy process"""
+        app = App.get_running_app()
+        app.stop()
+
     @staticmethod
     def get_destdir_assets() -> str:
+        """Return the current selected path of destination assets directory"""
         app = App.get_running_app()
         return app.config.get("destdir", "assets")
 
     @staticmethod
     def get_baudrate() -> int:
+        """Return the current selected baudrate"""
         app = App.get_running_app()
         return int(app.config.get("flash", "baudrate"))
 
     @staticmethod
     def get_locale() -> str:
+        """Return the current locale"""
         app = App.get_running_app()
         locale = app.config.get("locale", "lang")
 
         if sys.platform in ("linux", "darwin"):
             locale = locale.split(".")
-            return f"{locale[0].replace("-", "_")}.{locale[1]}"
+            sanitized = locale[0].replace("-", "_")
+            encoding = locale[1]
+            return f"{sanitized}.{encoding}"
 
-        elif sys.platform == "win32":
+        if sys.platform == "win32":
             return f"{locale}.UTF-8"
 
-        else:
-            raise RuntimeError(f"Not implemented for '{sys.platform}'")
+        raise RuntimeError(f"Not implemented for '{sys.platform}'")
 
     @staticmethod
     def open_settings():
+        """Open the Settings screen"""
         app = App.get_running_app()
         app.open_settings()
 
     @staticmethod
     def sanitize_markup(msg: str) -> str:
+        """
+        Sanitize a message that come with [ ]
+        and clean it (used in FlashScreen and WipeScreen)
+        """
         cleanr = re.compile("\\[.*?\\]")
         return re.sub(cleanr, "", msg)

@@ -22,19 +22,9 @@
 verify_stable_zip_screen.py
 """
 import os
-import sys
-import time
 from functools import partial
+import typing
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from kivy.app import App
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.button import Button
-from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
 from src.utils.verifyer.sha256_check_verifyer import Sha256CheckVerifyer
 from src.utils.verifyer.sha256_verifyer import Sha256Verifyer
@@ -51,16 +41,47 @@ class VerifyStableZipScreen(BaseScreen):
             wid="verify_stable_zip_screen", name="VerifyStableZipScreen", **kwargs
         )
         self.success = False
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
+        self.make_grid(wid=f"{self.id}_grid", rows=1, resize_screen=True)
 
-        # instead make a button
-        # create a ref text that instead redirect
-        # to a web page, redirect to a screen
-        def _on_ref_press(*args):
-            self.debug(f"Calling ref::{args[0]}::on_ref_press")
-            self.debug(f"Opening {args[1]}")
+        fn = partial(self.update, name=self.name, key="canvas")
+        Clock.schedule_once(fn)
 
-            if args[1] == "UnzipStableScreen":
+    # pylint: disable=unused-argument
+    def update(self, *args, **kwargs):
+        """Update widget from other screens"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
+
+        def on_update():
+            if key == "verify":
+                assets_dir = VerifyStableZipScreen.get_destdir_assets()
+                main_screen = self.manager.get_screen("MainScreen")
+
+                verified = self.build_message_verify_sha256(
+                    assets_dir=assets_dir, version=main_screen.version
+                )
+
+                verified += self.build_message_verify_signature(
+                    assets_dir=assets_dir, version=main_screen.version
+                )
+
+                self.ids[f"{self.id}_label"].text = verified
+
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", self.name),
+            on_update=on_update,
+        )
+
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        self.ids[f"{self.id}_grid"].clear_widgets()
+
+        def on_ref_press(*args):
+            if args[1] == "Proceed":
                 main_screen = self.manager.get_screen("MainScreen")
                 u = self.manager.get_screen("UnzipStableScreen")
 
@@ -84,98 +105,61 @@ class VerifyStableZipScreen(BaseScreen):
 
                 self.set_screen(name="UnzipStableScreen", direction="left")
 
-            elif args[1] == "MainScreen":
+            if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-        setattr(VerifyStableZipScreen, f"on_ref_press_{self.id}", _on_ref_press)
+        verifying_msg = self.translate("Verifying integrity and authenticity")
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_label",
+            root_widget=f"{self.id}_grid",
+            text=f"[color=#efcc00]{verifying_msg}[/color]",
+            font_factor=48,
+            halign="justify",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
+        )
 
-        fn = partial(self.update, name=self.name, key="canvas")
+    # pylint: disable=unused-argument
+    def on_enter(self, *args, **kwargs):
+        fn = partial(self.update, name=self.name, key="verify")
         Clock.schedule_once(fn)
 
-    def update(self, *args, **kwargs):
-        """Update widget from other screens"""
-
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-
-        # Check if update to screen
-        if name in ("ConfigKruxInstaller", "VerifyStableZipScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        # Check locale
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "canvas":
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
-
-    def on_pre_enter(self):
-        self.ids[f"{self.id}_grid"].clear_widgets()
-        verifying_msg = self.translate("Verifying integrity and authenticity")
-
-        warning = Label(
-            text="".join(
-                [
-                    f"[size={self.SIZE_MM}sp]",
-                    "[color=#efcc00]",
-                    verifying_msg,
-                    "[/color]",
-                    "[/size]",
-                ]
-            ),
-            markup=True,
-            valign="center",
-            halign="left",
-        )
-        warning.id = f"{self.id}_label"
-        self.ids[f"{self.id}_grid"].add_widget(warning)
-        self.ids[warning.id] = WeakProxy(warning)
-        self.ids[warning.id].bind(
-            on_ref_press=getattr(VerifyStableZipScreen, f"on_ref_press_{self.id}")
-        )
-
-    def on_enter(self):
-        assets_dir = VerifyStableZipScreen.get_destdir_assets()
-        main_screen = self.manager.get_screen("MainScreen")
-
-        result_sha256 = self.verify_sha256(
-            assets_dir=assets_dir, version=main_screen.version
-        )
-        self.ids[f"{self.id}_label"].text = result_sha256
-
-        result_sign = self.verify_signature(
-            assets_dir=assets_dir, version=main_screen.version
-        )
-        self.ids[f"{self.id}_label"].text += result_sign
-
-    def verify_sha256(self, assets_dir: str, version: str) -> str:
+    def verify_sha256(
+        self, assets_dir: str, version: str
+    ) -> typing.Tuple[str, str, bool]:
         """Do the verification when entering on screen"""
         # verify integrity
-        sha256_data_0 = Sha256Verifyer(filename=f"{assets_dir}/krux-{version}.zip")
-        sha256_data_1 = Sha256CheckVerifyer(
+        sha256_0 = Sha256Verifyer(filename=f"{assets_dir}/krux-{version}.zip")
+        sha256_1 = Sha256CheckVerifyer(
             filename=f"{assets_dir}/krux-{version}.zip.sha256.txt"
         )
 
-        sha256_data_0.load()
-        sha256_data_1.load()
-        txt_hash_0 = sha256_data_0.data.split(" ")[0]
-        txt_hash_1 = sha256_data_1.data.split(" ")[0]
-        checksum = sha256_data_0.verify(txt_hash_1)
+        sha256_0.load()
+        sha256_1.load()
+        hash_0 = sha256_0.data.split(" ", maxsplit=1)[0]
+        hash_1 = sha256_1.data.split(" ", maxsplit=1)[0]
+        return (hash_0, hash_1, sha256_0.verify(hash_1))
 
+    @staticmethod
+    def prettyfy_hash(msg: str) -> str:
+        """Slice strings, two by two, to better visualization"""
+        splitted = [msg[i : i + 2] for i in range(0, len(msg), 2)]
+        subsets = [
+            "   ".join(splitted[i : i + 16]) for i in range(0, len(splitted), 16)
+        ]
+        return "\n".join(subsets)
+
+    def build_message_verify_sha256(self, assets_dir: str, version: str) -> str:
+        """Create a message which user can assert the integrity verification"""
         # memorize result
-        self.success = checksum
+        verify = self.verify_sha256(assets_dir=assets_dir, version=version)
+        hash_0 = verify[0]
+        hash_1 = verify[1]
+        checksummed = verify[2]
+
+        self.success = checksummed
 
         filepath = os.path.join(assets_dir, f"krux-{version}.zip")
         integrity_msg = self.translate("Integrity verification")
@@ -183,62 +167,37 @@ class VerifyStableZipScreen(BaseScreen):
         provided_msg = self.translate("provided hash from")
         hash_color = ""
         hash_msg = ""
+        sha_0 = VerifyStableZipScreen.prettyfy_hash(hash_0)
+        sha_1 = VerifyStableZipScreen.prettyfy_hash(hash_1)
 
-        if sys.platform in ("linux", "win32"):
-            size = [self.SIZE_MP, self.SIZE_P, self.SIZE_PP]
-        else:
-            size = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
-
-        # slice strings, two by two, to better visualization
-        chunk_sha_0 = [txt_hash_0[i : i + 2] for i in range(0, len(txt_hash_0), 2)]
-        chunk_sha_1 = [txt_hash_1[i : i + 2] for i in range(0, len(txt_hash_1), 2)]
-
-        # if strings is greater than 16, split in a 2 subsets
-        subset_sha_0 = [
-            "   ".join(chunk_sha_0[i : i + 16]) for i in range(0, len(chunk_sha_0), 16)
-        ]
-        subset_sha_1 = [
-            "   ".join(chunk_sha_1[i : i + 16]) for i in range(0, len(chunk_sha_1), 16)
-        ]
-
-        # join the 2 subsets with \n (next line) string
-        sha_0 = "\n".join(subset_sha_0)
-        sha_1 = "\n".join(subset_sha_1)
-
-        if checksum:
+        if checksummed:
             hash_color = "#00FF00"
             hash_msg = self.translate("SUCCESS")
         else:
-            hash_color = "FF0000"
+            hash_color = "#FF0000"
             hash_msg = self.translate("FAILED")
 
         return "".join(
             [
-                f"[size={size[0]}sp]",
                 f"[u]{integrity_msg.upper()}[/u]: ",
                 f"[b][color={hash_color}]{hash_msg}[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]{computed_msg} [color=#777777]{filepath}[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]{sha_0}[/size]",
+                sha_0,
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 f"[b]{provided_msg} [color=#777777]{filepath}.sha256.txt[/color][/b]",
-                "[/size]",
                 "\n",
-                f"[size={size[1]}sp]{sha_1}[/size]",
-                "\n",
+                sha_1,
                 "\n",
                 "\n",
             ]
         )
 
     def verify_signature(self, assets_dir: str, version: str) -> bool | str:
+        """Verify official release's signature"""
         # verify signature
         signature = SigCheckVerifyer(filename=f"{assets_dir}/krux-{version}.zip.sig")
         publickey = PemCheckVerifyer(filename=f"{assets_dir}/selfcustody.pem")
@@ -251,9 +210,11 @@ class VerifyStableZipScreen(BaseScreen):
             pubkey=publickey.data,
         )
         sig_verifyer.load()
-        checksig = sig_verifyer.verify()
+        return sig_verifyer.verify()
 
-        # memorize result
+    def build_message_verify_signature(self, assets_dir: str, version: str) -> str:
+        """Create a message which user can assert authenticity the verification"""
+        checksig = self.verify_signature(assets_dir=assets_dir, version=version)
         self.success = self.success and checksig
 
         authenticity_msg = self.translate("Authenticity verification")
@@ -267,50 +228,36 @@ class VerifyStableZipScreen(BaseScreen):
         filepath = os.path.join(assets_dir, f"krux-{version}.zip")
         pempath = os.path.join(assets_dir, "selfcustody.pem")
 
-        if sys.platform in ("linux", "win32"):
-            size = [self.SIZE_MP, self.SIZE_P]
-        else:
-            size = [self.SIZE_M, self.SIZE_MP]
-
         if checksig:
             sig_color = "#00FF00"
             res_msg = good_msg
         else:
-            sig_color = "FF0000"
+            sig_color = "#FF0000"
             res_msg = bad_msg
 
         return "".join(
             [
-                f"[size={size[0]}sp]",
                 f"[u]{authenticity_msg.upper()}[/u]: ",
                 f"[b][color={sig_color}]{res_msg} {sig_msg}[/color][/b]",
-                "[/size]",
                 "\n",
                 "\n",
+                installed_msg,
                 "\n",
-                f"[size={size[1]}sp]{installed_msg}[/size]",
-                "\n" f"[size={size[1]}sp]{check_msg}:[/size]",
+                check_msg,
                 "\n",
                 "\n",
-                f"[size={size[1]}sp]",
                 "[b]",
                 f"openssl sha256< [color=#777777]{filepath}[/color] -binary | \\",
                 "\n"
                 f"openssl pkeyutl -verify -pubin -inkey [color=#777777]{pempath}[/color] \\",
                 "\n",
                 f"-sigfile [color=#777777]{filepath}.sig[/color]",
-                "[/size]",
                 "[/b]",
                 "\n",
                 "\n",
-                f"[size={size[1]}sp][b][color=#{sig_color}]{res_msg} {sig_msg}[/b][/color][/size]",
-                "\n",
-                "\n",
-                f"[size={size[0]}sp]",
-                f"[ref=UnzipStableScreen][color=#00ff00][u]{proceed}[/u][/ref][/color]",
+                f"[ref=Proceed][color=#00ff00][u]{proceed}[/u][/ref][/color]",
                 "             ",
-                f"[ref=MainScreen][color=#ff0000][u]{back}[/u][/ref][/color]",
+                f"[ref=Back][color=#ff0000][u]{back}[/u][/ref][/color]",
                 "[/b]",
-                "[/size]",
             ]
         )

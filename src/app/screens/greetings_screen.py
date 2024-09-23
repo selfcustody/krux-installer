@@ -21,13 +21,16 @@
 """
 greetings_screen.py
 """
+import os
 import sys
 from functools import partial
 from kivy.clock import Clock
-from kivy.graphics import Color
-from kivy.graphics import Rectangle
-from kivy.core.window import Window
-from .base_screen import BaseScreen
+from src.utils.selector import Selector
+from src.app.screens.base_screen import BaseScreen
+
+if sys.platform.startswith("linux"):
+    import distro
+    import grp  # pylint: disable=import-error
 
 
 class GreetingsScreen(BaseScreen):
@@ -41,68 +44,140 @@ class GreetingsScreen(BaseScreen):
         )
 
         # Build grid where buttons will be placed
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
+        self.make_grid(wid=f"{self.id}_grid", rows=1, resize_canvas=True)
 
         # Build logo
         self.make_image(
             wid=f"{self.id}_logo", root_widget=f"{self.id}_grid", source=self.logo_img
         )
 
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
+        """
+        When application start, after greeting user with the krux logo, it will need to check if
+        user is running app in linux or non-linux. If running in linux, the user will be
+        redirect to CheckPermissionsScreen and then to MainScreen. Win32 and Mac will be
+        redirect to MainScreen.
+        """
+        fn_0 = partial(self.update, name=self.name, key="canvas")
+        fn_1 = partial(self.update, name=self.name, key="check-permission")
+        Clock.schedule_once(fn_0, 0)
+        Clock.schedule_once(fn_1, 2.1)
+
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
-        """Update to go to some screen (MainScreen or CheckPermissionsScreen)"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        """
+        After show krux logo, verify:
+        - in linux, if the current user is in dialout group to allow sudoless flash
+        - check the internet connection
+            - if have, update the firmware version to the latest
+        """
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        if name in ("GreetingsScreen", "KruxInstallerApp"):
-            self.debug(f"Updating {self.name} from {name}")
-        else:
-            raise ValueError(f"Invalid screen: {name}")
+        def on_update():
+            if key == "check-permission":
+                self.check_dialout_permission()
 
-        if key == "change_screen":
-            if value is not None and value in (
-                "MainScreen",
-                "CheckPermissionsScreen",
-                "CheckInternetConnectionScreen",
+            if key == "check-internet-connection":
+                self.check_internet_connection()
+
+        setattr(GreetingsScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("KruxInstallerApp", self.name),
+            on_update=getattr(GreetingsScreen, "on_update"),
+        )
+
+    def check_dialout_permission(self):
+        """
+        Here's where the check process start
+        first get the current user, then verify
+        the linux distribution used and use the
+        proper command to add the user in 'dialout'
+        group (in some distros, can be 'uucp')
+        """
+        if sys.platform.startswith("linux"):
+            # get current user
+            _user = os.environ.get("USER")
+            _in_dialout = False
+            _group = None
+
+            # detect linux distro
+            if (
+                distro.id() in ("ubuntu", "fedora", "linuxmint")
+                or distro.like() == "debian"
             ):
-                self.set_screen(name=value, direction="left")
-            else:
-                raise ValueError(f"Invalid value for '{key}': {value}")
+                _group = "dialout"
 
-        elif key == "canvas":
-
-            with self.canvas.before:
-                Color(0, 0, 0)
-                Rectangle(pos=(0, 0), size=Window.size)
-
-        elif key == "check_permissions":
-            # check platform and if is linux, go to CheckPermissionsScreen,
-            # otherwise, go to MainScreen
-
-            if sys.platform == "linux":
-                fn = partial(
-                    self.update,
-                    name=self.name,
-                    key="change_screen",
-                    value="CheckPermissionsScreen",
-                )
-
-            elif sys.platform == "darwin" or sys.platform == "win32":
-                fn = partial(
-                    self.update,
-                    name=self.name,
-                    key="change_screen",
-                    value="CheckInternetConnectionScreen",
-                )
+            elif distro.id() in ("arch", "manjaro", "slackware", "gentoo"):
+                _group = "uucp"
 
             else:
-                raise RuntimeError(f"Not implemented for {sys.platform}")
+                exc = RuntimeError(f"{distro.name(pretty=True)} not supported")
+                self.redirect_exception(exception=exc)
+                return
 
-            Clock.schedule_once(fn, 2.1)
+            # loop throug all linux groups and check
+            # if the user is registered in the "dialout" group
+            for _grp in grp.getgrall():
+                if _group == _grp.gr_name:
+                    for _grpuser in _grp[3]:
+                        if _grpuser == _user:
+                            self.info(f"'{_user}' already in group '{_group}'")
+                            _in_dialout = True
+
+            # if user is not in dialout group, warn user
+            # and then redirect to a screen that will
+            # proceed with the proper operation
+            if not _in_dialout:
+                print("NOT")
+                ask = self.manager.get_screen("AskPermissionDialoutScreen")
+                _distro = distro.name(pretty=True)
+
+                fns = [
+                    partial(ask.update, name=self.name, key="user", value=_user),
+                    partial(ask.update, name=self.name, key="group", value=_group),
+                    partial(ask.update, name=self.name, key="distro", value=_distro),
+                    partial(ask.update, name=self.name, key="screen"),
+                ]
+
+                for fn in fns:
+                    Clock.schedule_once(fn, 0)
+
+                self.set_screen(name="AskPermissionDialoutScreen", direction="left")
+            else:
+                fn = partial(
+                    self.update, name=self.name, key="check-internet-connection"
+                )
+                Clock.schedule_once(fn, 0)
 
         else:
-            raise ValueError(f"Invalid key: '{key}'")
+            fn = partial(self.update, name=self.name, key="check-internet-connection")
+            Clock.schedule_once(fn, 0)
 
-    def on_enter(self):
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn, 0)
+    def check_internet_connection(self):
+        """
+        In reality, this method get the latest version and set to
+        select version button on main_screen. But it can work as
+        internet connection check
+        """
+        try:
+            selector = Selector()
+            main_screen = self.manager.get_screen("MainScreen")
+            fn = partial(
+                main_screen.update,
+                name=self.name,
+                key="version",
+                value=selector.releases[0],
+            )
+            Clock.schedule_once(fn, 0)
+            self.set_screen(name="MainScreen", direction="left")
+
+        # pylint: disable=broad-exception-caught
+        except Exception as exc:
+            self.error(str(exc))
+            self.redirect_exception(exception=exc)

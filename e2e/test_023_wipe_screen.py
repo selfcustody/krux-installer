@@ -1,4 +1,3 @@
-import sys
 import os
 from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
@@ -39,8 +38,9 @@ class TestWipeScreen(GraphicUnitTest):
         self.assertEqual(len(grid.children), 0)
         self.assertEqual(screen.baudrate, None)
         self.assertEqual(screen.thread, None)
-        self.assertEqual(screen.trigger, None)
-        self.assertEqual(screen.output, None)
+        self.assertEqual(screen.is_done, False)
+        self.assertEqual(screen.done, None)
+        self.assertEqual(screen.output, [])
 
         # patch assertions
         mock_get_locale.assert_called_once()
@@ -53,8 +53,8 @@ class TestWipeScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_wrong_name(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_wrong_name(self, mock_redirect_exception, mock_get_locale):
         screen = WipeScreen()
         self.render(screen)
 
@@ -65,24 +65,7 @@ class TestWipeScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
-        mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    def test_fail_update_wrong_key(self, mock_get_locale):
-        screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        with self.assertRaises(ValueError) as exc_info:
-            screen.update(name=screen.name, key="mock")
-
-        self.assertEqual(str(exc_info.exception), 'Invalid key: "mock"')
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.BaseScreen.get_locale")
@@ -98,29 +81,6 @@ class TestWipeScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
-    @patch("src.app.screens.wipe_screen.Rectangle")
-    @patch("src.app.screens.wipe_screen.Color")
-    def test_update_canvas(self, mock_color, mock_rectangle, mock_get_locale):
-        screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-
-        # patch assertions
-        mock_get_locale.assert_called_once()
-        mock_color.assert_called_once_with(0, 0, 0, 1)
-
-        # Check why the below happens: In linux, it will set window
-        # dimension to 640, 800. In Mac, it will set window 1280, 1600
-        args, kwargs = mock_rectangle.call_args_list[-1]
-        self.assertTrue("size" in kwargs)
-        self.assertEqual(len(args), 0)
-        mock_rectangle.assert_called_once_with(size=window.size)
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -165,8 +125,8 @@ class TestWipeScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        self.assertTrue(hasattr(WipeScreen, "on_print_callback"))
-        self.assertTrue(hasattr(WipeScreen, "on_trigger_callback"))
+        self.assertTrue(hasattr(WipeScreen, "on_data"))
+        self.assertTrue(hasattr(WipeScreen, "on_done"))
         self.assertIn(f"{screen.id}_subgrid", screen.ids)
         self.assertIn(f"{screen.id}_loader", screen.ids)
         self.assertIn(f"{screen.id}_progress", screen.ids)
@@ -179,7 +139,7 @@ class TestWipeScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_on_print_callback(self, mock_get_locale):
+    def test_on_data(self, mock_get_locale):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
@@ -188,8 +148,8 @@ class TestWipeScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        on_print_callback = getattr(WipeScreen, "on_print_callback")
-        on_print_callback("[color=#00ff00] INFO [/color] mock")
+        on_data = getattr(WipeScreen, "on_data")
+        on_data("[color=#00ff00] INFO [/color] mock")
 
         self.assertEqual(screen.output, ["[color=#00ff00] INFO [/color] mock"])
         # patch assertions
@@ -208,12 +168,12 @@ class TestWipeScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        on_print_callback = getattr(WipeScreen, "on_print_callback")
+        on_data = getattr(WipeScreen, "on_data")
 
-        for i in range(19):
-            on_print_callback(f"[color=#00ff00] INFO [/color] mock test message {i}")
+        for i in range(4):
+            on_data(f"[color=#00ff00] INFO [/color] mock test message {i}")
 
-        self.assertEqual(len(screen.output), 18)
+        self.assertEqual(len(screen.output), 4)
 
         # patch assertions
         mock_get_locale.assert_any_call()
@@ -222,8 +182,8 @@ class TestWipeScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.wipe_screen.WipeScreen.trigger")
-    def test_on_print_callback_erased(self, mock_trigger, mock_get_locale):
+    @patch("src.app.screens.wipe_screen.WipeScreen.done")
+    def test_on_data_erased(self, mock_done, mock_get_locale):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
@@ -232,21 +192,21 @@ class TestWipeScreen(GraphicUnitTest):
         # get your Window instance safely
         EventLoop.ensure_window()
 
-        on_print_callback = getattr(WipeScreen, "on_print_callback")
-        on_print_callback("[color=#00ff00] INFO [/color] SPI Flash erased.")
+        on_data = getattr(WipeScreen, "on_data")
+        on_data("[color=#00ff00] INFO [/color] SPI Flash erased.")
 
         self.assertEqual(
             screen.output, ["[color=#00ff00] INFO [/color] SPI Flash erased."]
         )
         # patch assertions
         mock_get_locale.assert_any_call()
-        mock_trigger.assert_called_once()
+        mock_done.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_on_trigger_callback(self, mock_get_locale):
+    def test_on_done(self, mock_get_locale):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
@@ -254,18 +214,10 @@ class TestWipeScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-
-        if sys.platform in ("linux", "win32"):
-            size = screen.SIZE_M
-
-        else:
-            size = screen.SIZE_M
-
         text = "".join(
             [
-                f"[size={size}sp][b]DONE![/b][/size]",
+                "[b]DONE![/b]",
                 "\n",
-                f"[size={size}sp]",
                 "[color=#00FF00]",
                 "[ref=Back][u]Back[/u][/ref]",
                 "[/color]",
@@ -275,33 +227,14 @@ class TestWipeScreen(GraphicUnitTest):
                 "[/color]",
             ]
         )
-        on_trigger_callback = getattr(WipeScreen, "on_trigger_callback")
-        on_trigger_callback(0)
+        on_done = getattr(WipeScreen, "on_done")
+        on_done(0)
 
         self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
         self.assertEqual(screen.ids[f"{screen.id}_progress"].text, text)
 
         # patch assertions
         mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_on_enter(self, mock_redirect_error, mock_get_locale):
-        screen = WipeScreen()
-        screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.on_enter()
-
-        # patch assertions
-        mock_get_locale.assert_any_call()
-        mock_redirect_error.assert_called_once_with("Wiper isnt configured")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

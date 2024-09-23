@@ -25,8 +25,6 @@ import typing
 from functools import partial
 from threading import Thread
 from kivy.clock import Clock, ClockEvent
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
 from src.app.screens.base_screen import BaseScreen
 from src.utils.downloader.asset_downloader import AssetDownloader
 
@@ -44,48 +42,59 @@ class BaseDownloadScreen(BaseScreen):
         self.version = None
         self._to_screen = ""
 
-        # progress label, show a "Connecting"
-        # before start the download to make
-        connecting = self.translate("Connecting")
-        text = "".join(
-            [
-                f"[size={self.SIZE_G}]",
-                f"{connecting}...",
-                "[/size]",
-                "[color=#efcc00]",
-                "[/color]",
-            ]
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_progress",
+            root_widget=f"{self.id}_grid",
+            halign=None,
+            text="",
+            font_factor=18,
+            on_press=None,
+            on_release=None,
+            on_ref_press=None,
         )
 
-        progress = Label(
-            text=text,
-            markup=True,
-            valign="center",
-            halign="center",
-        )
+        # A little ugly hacky way to join
+        # the methods: (1) resize the font;
+        # (2) resize canvas. This is needed because
+        # when more than one buttons are used, the
+        # canvas wasnt properly updated.
+        # the bind method is needed only in one
+        # of the buttons
+        # pylint: disable=unused-argument
+        def on_resize(instance, value):
+            instance.font_size = BaseScreen.get_half_diagonal_screen_size(18)
+            update = getattr(self, "update")
+            fn = partial(update, name=self.name, key="canvas")
+            Clock.schedule_once(fn, 0)
+
+        self.ids[f"{self.id}_progress"].bind(size=on_resize)
 
         # information label
         # it has data about url
         # and downloaded paths
-        asset_label = Label(markup=True, valign="center", halign="center")
-
-        # setup progress label
-        progress.id = f"{self.id}_progress"
-        self.ids[f"{self.id}_grid"].add_widget(progress)
-        self.ids[progress.id] = WeakProxy(progress)
-
-        # setup information label
-        asset_label.id = f"{self.id}_info"
-        self.ids[f"{self.id}_grid"].add_widget(asset_label)
-        self.ids[asset_label.id] = WeakProxy(asset_label)
+        # pylint: disable=unused-argument
+        self.make_button(
+            row=1,
+            wid=f"{self.id}_info",
+            root_widget=f"{self.id}_grid",
+            font_factor=52,
+            halign=None,
+            text="",
+            on_press=None,
+            on_release=None,
+            on_ref_press=None,
+        )
 
     @property
     def to_screen(self) -> str:
+        """Get where the current screen will go"""
         self.debug(f"getter::to_screen={self._to_screen}")
         return self._to_screen
 
     @to_screen.setter
     def to_screen(self, value: str):
+        """Set where the current screen will go"""
         self.debug(f"setter::to_screen={value}")
         self._to_screen = value
 
@@ -109,6 +118,7 @@ class BaseDownloadScreen(BaseScreen):
 
     @property
     def thread(self) -> Thread | None:
+        """Return a Thread"""
         self.debug(f"getter::thread={self._thread}")
         return self._thread
 
@@ -141,7 +151,15 @@ class BaseDownloadScreen(BaseScreen):
         self.debug(f"deleter::trigger={self._trigger}")
         del self._trigger
 
-    def on_enter(self):
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        """Before enter, reset text to show that its requesting github API"""
+        connecting = self.translate("Connecting")
+        text = "".join([f"{connecting}..."])
+        self.ids[f"{self.id}_progress"].text = text
+
+    # pylint: disable=unused-argument
+    def on_enter(self, *args):
         """
         Event fired when the screen is displayed and the entering animation is complete.
 
@@ -153,8 +171,9 @@ class BaseDownloadScreen(BaseScreen):
             self.trigger = getattr(self.__class__, "on_trigger")
 
             # on progress should be defined on inherited classes
+            download = getattr(self.downloader, "download")
             on_progress = getattr(self.__class__, "on_progress")
-            _fn = partial(self.downloader.download, on_data=on_progress)
+            _fn = partial(download, on_data=on_progress)
 
             # Now run it as a partial function
             # on parallel thread to not block
@@ -162,4 +181,59 @@ class BaseDownloadScreen(BaseScreen):
             self.thread = Thread(name=self.name, target=_fn)
             self.thread.start()
         else:
-            self.redirect_error("Downloader isnt configured. Use `update` method first")
+            msg = "Downloader isnt configured. Use `update` method first"
+            exc = RuntimeError(msg)
+            self.error(msg)
+            self.redirect_exception(exception=exc)
+
+    def update_download_screen(self, key: str, value: typing.Any):
+        """Update a screen in accord with the valid ones"""
+        if key == "version":
+            build_downloader = getattr(self, "build_downloader")
+            build_downloader(value)
+
+        if key == "progress":
+            on_download_progress = getattr(self, "on_download_progress")
+            on_download_progress(value)
+
+    @staticmethod
+    def make_download_info(
+        download_msg: str, from_url: str, to_msg: str, to_path: str
+    ) -> str:
+        """
+        download_stable_zip_sha256_screen and download_stable_zip_sig_screen
+        use same procedure to update informational content of downloaded file
+        """
+        return "".join(
+            [
+                download_msg,
+                "\n",
+                f"[color=#00AABB][ref={from_url}]{from_url}[/ref][/color]",
+                "\n",
+                to_msg,
+                "\n",
+                to_path,
+            ]
+        )
+
+    @staticmethod
+    def make_progress_info(
+        of_msg: str,
+        percent: float,
+        downloaded_len: float,
+        content_len: float,
+    ) -> str:
+        """
+        download_stable_zip_sha256_screen and download_stable_zip_sig_screen
+        use same procedure to update its progress content of downloaded file
+        """
+        return "".join(
+            [
+                f"[b]{percent * 100:,.2f} %[/b]",
+                "\n",
+                str(downloaded_len),
+                f" {of_msg} ",
+                str(content_len),
+                " B",
+            ]
+        )

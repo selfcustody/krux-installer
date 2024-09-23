@@ -21,13 +21,10 @@
 """
 about_screen.py
 """
-from functools import partial
 import webbrowser
+from functools import partial
 from kivy.clock import Clock
-from kivy.core.window import Window
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from src.utils.constants import get_name, get_version
+from src.utils.constants import get_version
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -42,32 +39,31 @@ class AboutScreen(BaseScreen):
 
         self.make_grid(wid="about_screen_grid", rows=1)
 
-        self.make_label(
-            wid=f"{self.id}_label",
-            text="",
-            root_widget=f"{self.id}_grid",
-            markup=True,
-            halign="justify",
-        )
-
-        def _on_ref_press(*args):
+        def on_ref_press(*args):
             self.debug(f"Calling Button::{args[0]}::on_ref_press")
             self.debug(f"Opening {args[1]}")
 
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-            elif args[1] == "X":
+            if args[1] == "X":
                 webbrowser.open("https://x.com/selfcustodykrux")
 
-            elif args[1] == "SourceCode":
+            if args[1] == "SourceCode":
                 webbrowser.open(self.src_code)
 
-            else:
-                self.redirect_error(f"Invalid ref: {args[1]}")
-
-        setattr(self, f"on_ref_press_{self.id}_label", _on_ref_press)
-        self.ids[f"{self.id}_label"].bind(on_ref_press=_on_ref_press)
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_label",
+            text="",
+            root_widget=f"{self.id}_grid",
+            font_factor=24,
+            halign=None,
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
+        )
+        self.ids[f"{self.id}_label"].halign = "justify"
 
         fns = [
             partial(self.update, name=self.name, key="canvas"),
@@ -77,57 +73,43 @@ class AboutScreen(BaseScreen):
         for fn in fns:
             Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update buttons from selected device/versions on related screens"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        # Check if update to screen
-        if name in ("KruxInstallerApp", "ConfigKruxInstaller", "AboutScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(msg=f"Invalid screen name: {name}")
-
-        if key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        # Check locale
-        elif key == "locale":
-            if value is not None:
-                self.locale = value
+        def on_update():
+            if key == "locale":
+                setattr(self, "locale", value)
                 follow = self.translate("follow us on X")
                 back = self.translate("Back")
 
                 self.ids[f"{self.id}_label"].text = "".join(
                     [
-                        f"[size={self.SIZE_G}sp]",
                         f"[ref=SourceCode][b]v{get_version()}[/b][/ref]",
-                        "[/size]",
                         "\n",
-                        "\n" f"[size={self.SIZE_M}sp]",
+                        "\n",
                         f"{follow}: ",
                         "[color=#00AABB]",
                         "[ref=X][u]@selfcustodykrux[/u][/ref]",
                         "[/color]",
-                        "[/size]",
                         "\n",
                         "\n",
-                        f"[size={self.SIZE_M}sp]",
                         "[color=#00FF00]",
                         "[ref=Back]",
                         f"[u]{back}[/u]",
                         "[/ref]",
                         "[/color]",
-                        "[/size]",
                     ]
                 )
 
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        else:
-            self.redirect_error(msg=f'Invalid key: "{key}"')
+        setattr(AboutScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("KruxInstallerApp", "ConfigKruxInstaller", "AboutScreen"),
+            on_update=getattr(AboutScreen, "on_update"),
+        )

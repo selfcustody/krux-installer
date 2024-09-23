@@ -24,11 +24,6 @@ select_device_screen.py
 import re
 from functools import partial
 from kivy.clock import Clock
-from kivy.cache import Cache
-from kivy.weakproxy import WeakProxy
-from kivy.core.window import Window
-from kivy.uix.button import Button
-from kivy.graphics import Color, Line
 from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.app.screens.base_screen import BaseScreen
 
@@ -47,12 +42,12 @@ class SelectDeviceScreen(BaseScreen):
             ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"]
         ):
 
-            def _on_press(instance):
+            def on_press(instance):
                 if instance.id in self.enabled_devices:
                     self.debug(f"Calling Button::{instance.id}::on_press")
                     self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
-            def _on_release(instance):
+            def on_release(instance):
                 if instance.id in self.enabled_devices:
                     self.debug(f"Calling Button::{instance.id}::on_release")
                     self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
@@ -71,32 +66,25 @@ class SelectDeviceScreen(BaseScreen):
 
             self.make_button(
                 row=row,
-                id=f"select_device_{device}",
+                wid=f"select_device_{device}",
                 root_widget="select_device_screen_grid",
                 text="",
-                markup=True,
-                on_press=_on_press,
-                on_release=_on_release,
+                font_factor=28,
+                halign=None,
+                on_press=on_press,
+                on_release=on_release,
+                on_ref_press=None,
             )
 
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
-        """Update buttons according the valid devices for each version"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
+        """Update buttons according the valid devices for each compatible version"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
-        # Check if update to screen
-        if name in ("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen"):
-            self.debug(f"Updating {self.name} from {name}...")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-
-        if key == "version":
-            self.debug(
-                f"Updating buttons to fit {kwargs.get("key")} = {kwargs.get("version")}"
-            )
-
-            if value is not None:
+        def on_update():
+            if key == "version":
                 self.enabled_devices = []
 
                 for device in (
@@ -108,8 +96,8 @@ class SelectDeviceScreen(BaseScreen):
                     "cube",
                     "wonder_mv",
                 ):
-                    cleanr = re.compile("\\[.*?\\]")
-                    clean_text = re.sub(cleanr, "", value)
+                    cleanre = re.compile("\\[.*?\\]")
+                    clean_text = re.sub(cleanre, "", value)
                     if device not in VALID_DEVICES_VERSIONS[clean_text]:
                         self.ids[f"select_device_{device}"].text = "".join(
                             ["[color=#333333]", device, "[/color]"]
@@ -118,7 +106,11 @@ class SelectDeviceScreen(BaseScreen):
                         self.enabled_devices.append(f"select_device_{device}")
                         self.ids[f"select_device_{device}"].text = device
 
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-        else:
-            self.redirect_error(f"Invalid key: {key}")
+        setattr(SelectDeviceScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen"),
+            on_update=getattr(SelectDeviceScreen, "on_update"),
+        )

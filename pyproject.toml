@@ -1,6 +1,9 @@
+[virtualenvs]
+prefer-active-python = true
+
 [tool.poetry]
 name = "krux-installer"
-version = "0.0.2-alpha"
+version = "0.0.20-alpha-2"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = [
   "qlrd <qlrddev@gmail.com>"
@@ -23,6 +26,7 @@ easy-i18n = "^1.2.0"
 pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
 distro = "^1.9.0"
 pillow = "^10.4.0"
+pyinstaller = "^6.10.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.8.0"
@@ -48,24 +52,28 @@ coverage-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/
 coverage-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report xml ./e2e"
 coverage = ["coverage-unit", "coverage-e2e"]
 
-patch-nix = "sh .ci/patch-pyinstaller-kivy-hook.sh"
-patch-win = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1"
-
-clean-mac = "find . -name '.DS_Store' -delete"
-
 lint.sequence = [
   { cmd = "jsonlint src/i18n/*.json"},
-  { cmd = "pylint --rcfile .pylint/src ./src" },
-  { cmd = "pylint --rcfile .pylint/tests ./tests"},
+  { cmd = "pylint --rcfile=.pylint/src ./src" },
+  { cmd = "pylint --rcfile=.pylint/tests ./tests"},
   { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
 ]
 
-build-nix.sequence = [
+build-linux.sequence = [
+  { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
+  { cmd = "python .ci/create-spec.py"},
+  { cmd = "python -m PyInstaller krux-installer.spec"}
+]
+
+build-macos.sequence = [
+  { cmd = "find . -name '.DS_Store' -delete" },
+  { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
   { cmd = "python .ci/create-spec.py"},
   { cmd = "python -m PyInstaller krux-installer.spec"}
 ]
 
 build-win.sequence = [
+  { cmd = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1" },
   { cmd = "python .ci/create-spec.py"},
   { interpreter = ["powershell", "pwsh"], shell = "& .ci/edit-spec.ps1"},
   { cmd = "python -m PyInstaller krux-installer.spec"}

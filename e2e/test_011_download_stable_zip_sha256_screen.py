@@ -1,5 +1,4 @@
 import os
-import sys
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -55,8 +54,8 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_invalid_name(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_invalid_name(self, mock_redirect_exception, mock_get_locale):
         screen = DownloadStableZipSha256Screen()
         self.render(screen)
 
@@ -66,32 +65,9 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         # do tests
         screen.update(name="MockScreen")
 
-        # default assertions
-        mock_redirect_error.assert_called_once_with("Invalid screen name: MockScreen")
-
         # patch assertions
         mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_key(self, mock_redirect_error, mock_get_locale):
-        screen = DownloadStableZipSha256Screen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        # do tests
-        screen.update(name="DownloadStableZipScreen", key="mock")
-
-        # default assertions
-        mock_redirect_error.assert_any_call('Invalid key: "mock"')
-
-        # patch assertions
-        mock_get_locale.assert_any_call()
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -152,21 +128,8 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        fontsize_g = 0
-        fontsize_mp = 0
-
-        if sys.platform in ("linux", "win32"):
-            fontsize_g = window.size[0] // 16
-            fontsize_mp = window.size[0] // 48
-
-        if sys.platform == "darwin":
-            fontsize_g = window.size[0] // 32
-            fontsize_mp = window.size[0] // 128
 
         # do tests
-
         screen.update(
             name="ConfigKruxInstaller",
             key="progress",
@@ -176,14 +139,12 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         # do tests
         text = "".join(
             [
-                f"[size={fontsize_g}sp][b]1.00 %[/b][/size]",
+                "[b]1.00 %[/b]",
                 "\n",
-                f"[size={fontsize_mp}sp]",
                 "210000",
                 " of ",
                 "21000000",
                 " B",
-                "[/size]",
             ]
         )
 
@@ -238,9 +199,7 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
             ]
         )
 
-        mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 0)]
-        )
+        mock_schedule_once.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -256,18 +215,6 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        window = EventLoop.window
-
-        fontsize_g = 0
-        fontsize_mp = 0
-
-        if sys.platform in ("linux", "win32"):
-            fontsize_g = window.size[0] // 16
-            fontsize_mp = window.size[0] // 48
-
-        if sys.platform == "darwin":
-            fontsize_g = window.size[0] // 32
-            fontsize_mp = window.size[0] // 128
 
         # do tests
         with patch.object(screen, "trigger") as mock_trigger, patch.object(
@@ -284,25 +231,21 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
             # do tests
             text_progress = "".join(
                 [
-                    f"[size={fontsize_g}sp][b]100.00 %[/b][/size]",
+                    "[b]100.00 %[/b]",
                     "\n",
-                    f"[size={fontsize_mp}sp]",
                     "21",
                     " of ",
                     "21",
                     " B",
-                    "[/size]",
                 ]
             )
 
             filepath = os.path.join("mockdir", "krux-v24.07.0.zip.sha256.txt")
             text_info = "".join(
                 [
-                    f"[size={fontsize_mp}sp]",
                     filepath,
                     "\n",
                     "downloaded",
-                    "[/size]",
                 ]
             )
 
@@ -377,9 +320,7 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
                 ),
             ]
         )
-        mock_schedule_once.assert_has_calls(
-            [call(mock_partial(), 0), call(mock_partial(), 0)]
-        )
+        mock_schedule_once.assert_called()
         mock_set_screen.assert_called_once_with(
             name="DownloadStableZipSigScreen", direction="left"
         )

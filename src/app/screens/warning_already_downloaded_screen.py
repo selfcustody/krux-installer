@@ -21,19 +21,10 @@
 """
 about_screen.py
 """
-import sys
+from typing import Any
 from functools import partial
 from kivy.clock import Clock
-from kivy.graphics.vertex_instructions import Rectangle
-from kivy.graphics.context_instructions import Color
-from kivy.core.window import Window
-from kivy.weakproxy import WeakProxy
-from kivy.uix.label import Label
-from kivy.uix.stacklayout import StackLayout
-from kivy.uix.button import Button
-from src.utils.constants import get_name, get_version
 from src.app.screens.base_screen import BaseScreen
-from src.i18n import T
 
 
 class WarningAlreadyDownloadedScreen(BaseScreen):
@@ -46,7 +37,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             **kwargs,
         )
 
-        self.make_grid(wid=f"{self.id}_grid", rows=2)
+        self.make_grid(wid=f"{self.id}_grid", rows=2, resize_canvas=True)
 
         self.make_image(
             wid=f"{self.id}_loader",
@@ -54,15 +45,7 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
         )
 
-        self.make_label(
-            wid=f"{self.id}_label",
-            text="",
-            root_widget=f"{self.id}_grid",
-            markup=True,
-            halign="justify",
-        )
-
-        def _on_ref_press(*args):
+        def on_ref_press(*args):
             if args[1] == "DownloadStableZipScreen":
                 main_screen = self.manager.get_screen("MainScreen")
                 download_screen = self.manager.get_screen("DownloadStableZipScreen")
@@ -78,75 +61,45 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
             if args[1] == "VerifyStableZipScreen":
                 self.set_screen(name="VerifyStableZipScreen", direction="left")
 
-        # When [ref] markup text is clicked, do a action like a button
-        setattr(
-            WarningAlreadyDownloadedScreen, f"on_ref_press_{self.id}", _on_ref_press
+        self.make_button(
+            row=0,
+            wid=f"{self.id}_label",
+            text="",
+            halign=None,
+            font_factor=32,
+            root_widget=f"{self.id}_grid",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
         )
-        self.ids[f"{self.id}_label"].bind(on_ref_press=_on_ref_press)
 
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    def update(self, *args, **kwargs):
-        """Update buttons on related screen"""
-        name = kwargs.get("name")
-        key = kwargs.get("key")
-        value = kwargs.get("value")
-
-        if name in (
-            "ConfigKruxInstaller",
-            "MainScreen",
-            "WarningAlreadyDownloadedScreen",
-        ):
-            self.debug(f"Updating {self.name} from {name}")
-        else:
-            self.redirect_error(f"Invalid screen name: {name}")
-            return
-
-        # Check locale
-        if key == "locale":
-            if value is not None:
-                self.locale = value
-            else:
-                self.redirect_error(f"Invalid value for key '{key}': '{value}'")
-
-        elif key == "canvas":
-            # prepare background
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width, Window.height))
-
-        elif key == "version":
+    def on_warning(self, key: str, value: Any):
+        """Update a warning message on GUI"""
+        if key == "version":
             warning_msg = self.translate("Assets already downloaded")
-            ask_proceed = self.translate(
-                "Do you want to proceed with the same file or do you want to download it again?"
-            )
+            # ask_proceed = self.translate(
+            #    "Do you want to proceed with the same file or do you want to download it again?"
+            # )
             download_msg = self.translate("Download again")
             proceed_msg = self.translate("Proceed with current file")
 
-            if sys.platform in ("linux", "win32"):
-                size = [self.SIZE_M, self.SIZE_MP, self.SIZE_P]
-
-            else:
-                size = [self.SIZE_MM, self.SIZE_MP, self.SIZE_MP]
-
             self.ids[f"{self.id}_label"].text = "".join(
                 [
-                    f"[size={size[0]}sp][b]{warning_msg}[/b][/size]",
+                    f"[color=#efcc00][b]{warning_msg}[/b][/color]",
                     "\n",
-                    f"[size={size[2]}sp]* krux-{value}.zip[/size]",
+                    f"* krux-{value}.zip",
                     "\n",
-                    f"[size={size[2]}sp]* krux-{value}.zip.sha256.txt[/size]",
+                    f"* krux-{value}.zip.sha256.txt",
                     "\n",
-                    f"[size={size[2]}sp]* krux-{value}.zip.sig[/size]",
+                    f"* krux-{value}.zip.sig",
                     "\n",
-                    f"[size={size[2]}sp]* selfcustody.pem[/size]",
-                    "\n",
-                    "\n",
-                    f"[size={size[1]}sp]{ask_proceed}[/size]",
+                    "* selfcustody.pem",
                     "\n",
                     "\n",
-                    f"[size={size[0]}]" f"[color=#00ff00]",
+                    "[color=#00ff00]",
                     "[ref=DownloadStableZipScreen]",
                     f"[u]{download_msg}[/u]",
                     "[/ref]",
@@ -157,9 +110,28 @@ class WarningAlreadyDownloadedScreen(BaseScreen):
                     f"[u]{proceed_msg}[/u]",
                     "[/ref]",
                     "[/color]",
-                    "[/size]",
                 ]
             )
 
-        else:
-            self.redirect_error(f'Invalid key: "{key}"')
+    # pylint: disable=unused-argument
+    def update(self, *args, **kwargs):
+        """Update buttons on related screen"""
+        name = str(kwargs.get("name"))
+        key = str(kwargs.get("key"))
+        value = kwargs.get("value")
+
+        def on_update():
+            self.on_warning(key, value)
+
+        setattr(WarningAlreadyDownloadedScreen, "on_update", on_update)
+        self.update_screen(
+            name=name,
+            key=key,
+            value=value,
+            allowed_screens=(
+                "ConfigKruxInstaller",
+                "MainScreen",
+                "WarningAlreadyDownloadedScreen",
+            ),
+            on_update=getattr(WarningAlreadyDownloadedScreen, "on_update"),
+        )

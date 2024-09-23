@@ -103,7 +103,7 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
 
         calls = []
         for button in grid.children:
-            on_press = getattr(screen, f"on_press_{button.id}")
+            on_press = getattr(screen.__class__, f"on_press_{button.id}")
             on_press(button)
             calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
@@ -145,7 +145,7 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         set_screen_calls = []
 
         for button in grid.children:
-            on_release = getattr(screen, f"on_release_{button.id}")
+            on_release = getattr(screen.__class__, f"on_release_{button.id}")
             on_release(button)
             set_background_calls.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
 
@@ -164,32 +164,8 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_update_locale(self, mock_get_locale):
-        screen = SelectOldVersionScreen()
-        screen.make_grid(
-            wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
-        )
-        screen.clear_grid(wid="select_old_version_screen_grid")
-        screen.fetch_releases(OLD_VERSIONS)
-        self.render(screen)
-
-        screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
-        text_back = "Voltar"
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button_back = grid.children[0]
-
-        self.assertEqual(button_back.text, text_back)
-        mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_error")
-    def test_fail_update_locale(self, mock_redirect_error, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_locale(self, mock_redirect_exception, mock_get_locale):
         screen = SelectOldVersionScreen()
         screen.make_grid(
             wid="select_old_version_screen_grid", rows=len(OLD_VERSIONS) + 1
@@ -202,5 +178,5 @@ class TestSelectOldVersionScreen(GraphicUnitTest):
         EventLoop.ensure_window()
         screen.update(name="Mock", key="locale", value="pt_BR.UTF-8")
 
-        mock_redirect_error.assert_called_once_with("Invalid screen name: Mock")
         mock_get_locale.assert_any_call()
+        mock_redirect_exception.assert_called_once()

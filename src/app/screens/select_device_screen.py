@@ -98,7 +98,11 @@ class SelectDeviceScreen(BaseScreen):
                 ):
                     cleanre = re.compile("\\[.*?\\]")
                     clean_text = re.sub(cleanre, "", value)
-                    if device not in VALID_DEVICES_VERSIONS[clean_text]:
+                    if (
+                        # pylint: disable=consider-iterating-dictionary
+                        clean_text in VALID_DEVICES_VERSIONS.keys()
+                        and device not in VALID_DEVICES_VERSIONS[clean_text]
+                    ):
                         self.ids[f"select_device_{device}"].text = "".join(
                             ["[color=#333333]", device, "[/color]"]
                         )

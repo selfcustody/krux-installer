@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 0.0.20-alpha-3
+
+- Fix the bug that crash when a new firmware version is added on `selfcustody/krux`, but not it isnt a valid one in `VALID_DEVICES_VERSIONS`;
+- The fix suggested by @odudex to manage new versions (good when a hot fix is made) in line 101 of `src/app/screens/select_device_screen.py`;
+
 ## 0.0.20-alpha-2
 
 - Changed the version from `0.0.2-alpha` to `0.0.20-alpha-2` as suggested by @odudex;

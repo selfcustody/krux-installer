@@ -20,7 +20,7 @@ pyserial = "^3.5"
 requests = "^2.31.0"
 pyzbar = "^0.1.9"
 opencv-python = "^4.9.0.80"
-cryptography = "^43.0.0"
+cryptography = "^43.0.1"
 qrcode = "^7.4.2"
 easy-i18n = "^1.2.0"
 pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}

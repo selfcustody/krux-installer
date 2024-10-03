@@ -21,10 +21,7 @@
 """
 __init__.py
 """
-import os
 import sys
-from functools import partial
-from kivy.clock import Clock
 from kivy.core.window import Window
 from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.about_screen import AboutScreen
@@ -51,6 +48,7 @@ from src.app.screens.warning_already_downloaded_screen import (
 from src.app.screens.warning_beta_screen import WarningBetaScreen
 from src.app.screens.warning_wipe_screen import WarningWipeScreen
 from src.app.screens.wipe_screen import WipeScreen
+from src.app.screens.airgap_screen import AirgapScreen
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -89,6 +87,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             WarningAlreadyDownloadedScreen(),
             WarningWipeScreen(),
             FlashScreen(),
+            AirgapScreen(),
             WipeScreen(),
             ErrorScreen(),
         ]

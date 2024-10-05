@@ -273,7 +273,7 @@ class BaseScreen(Screen, Trigger):
         self.ids[inner_box.id] = WeakProxy(inner_box)
 
         # Select button
-        btn = Button(text="Select folder", halign="center")
+        btn = Button(text="Select folder to copy firmware", halign="center")
         btn.id = f"{wid}_inner_box_button"
 
         def on_release(btn):
@@ -286,6 +286,13 @@ class BaseScreen(Screen, Trigger):
         # File chooser
         file_chooser = FileChooserIconView()
         file_chooser.id = f"{wid}_chooser"
+        file_chooser.dirselect = True
+
+        # pytlint: disable=unused-argument
+        def on_selection(fc, selection):
+            btn.text = f"Copy firmware to {selection[0]}"
+
+        file_chooser.bind(selection=on_selection)
         self.ids[box.id].add_widget(file_chooser)
         self.ids[file_chooser.id] = WeakProxy(file_chooser)
 

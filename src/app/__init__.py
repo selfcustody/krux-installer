@@ -48,7 +48,10 @@ from src.app.screens.warning_already_downloaded_screen import (
 from src.app.screens.warning_beta_screen import WarningBetaScreen
 from src.app.screens.warning_wipe_screen import WarningWipeScreen
 from src.app.screens.wipe_screen import WipeScreen
-from src.app.screens.airgap_screen import AirgapScreen
+from src.app.screens.airgap_update_screen import AirgapUpdateScreen
+from src.app.screens.warning_before_airgap_update_screen import (
+    WarningBeforeAirgapUpdateScreen,
+)
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -87,7 +90,8 @@ class KruxInstallerApp(ConfigKruxInstaller):
             WarningAlreadyDownloadedScreen(),
             WarningWipeScreen(),
             FlashScreen(),
-            AirgapScreen(),
+            WarningBeforeAirgapUpdateScreen(),
+            AirgapUpdateScreen(),
             WipeScreen(),
             ErrorScreen(),
         ]

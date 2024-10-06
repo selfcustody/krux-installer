@@ -198,7 +198,7 @@ class UnzipStableScreen(BaseScreen):
             )
 
             # load variables to FlashScreen before get in
-            screen = self.manager.get_screen("AirgapScreen")
+            screen = self.manager.get_screen("AirgapUpdateScreen")
             fns = [
                 partial(
                     screen.update, name=self.name, key="binary", value=bin_full_path
@@ -221,7 +221,7 @@ class UnzipStableScreen(BaseScreen):
             )
 
             time.sleep(2.1)
-            self.set_screen(name="AirgapScreen", direction="left")
+            self.set_screen(name="WarningBeforeAirgapUpdateScreen", direction="left")
 
         p = os.path.join(rel_path, "firmware.bin")
         self.make_button(

@@ -28,11 +28,13 @@ from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
 
 
-class AirgapScreen(BaseScreen):
-    """Flash screen is where flash occurs"""
+class AirgapUpdateScreen(BaseScreen):
+    """AirgapUpdateScreen is where user select a folder (generally a SDCard) to update device"""
 
     def __init__(self, **kwargs):
-        super().__init__(wid="airgap_screen", name="AirgapScreen", **kwargs)
+        super().__init__(
+            wid="airgap_update_screen", name="AirgapUpdateScreen", **kwargs
+        )
         self._firmware_bin = ""
         self._firmware_sig = ""
 
@@ -46,7 +48,7 @@ class AirgapScreen(BaseScreen):
             self.info(f"Copying file {self.firmware_sig} to {new_firmware_sig}")
             shutil.copyfile(self.firmware_sig, new_firmware_sig)
 
-        setattr(AirgapScreen, "on_load", on_load)
+        setattr(AirgapUpdateScreen, "on_load", on_load)
 
         self.make_grid(wid=f"{self.id}_grid", rows=1)
 
@@ -55,7 +57,7 @@ class AirgapScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             view_mode="icon",
             font_factor=44,
-            on_load=getattr(AirgapScreen, "on_load"),
+            on_load=getattr(AirgapUpdateScreen, "on_load"),
         )
 
         fn = partial(self.update, name=self.name, key="canvas")
@@ -99,7 +101,7 @@ class AirgapScreen(BaseScreen):
             if key == "signature":
                 self.firmware_sig = value
 
-        setattr(AirgapScreen, "on_update", on_update)
+        setattr(AirgapUpdateScreen, "on_update", on_update)
         self.update_screen(
             name=name,
             key=key,
@@ -108,7 +110,7 @@ class AirgapScreen(BaseScreen):
                 "ConfigKruxInstaller",
                 "UnzipStableScreen",
                 "DownloadBetaScreen",
-                "AirgapScreen",
+                "AirgapUpdateScreen",
             ),
-            on_update=getattr(AirgapScreen, "on_update"),
+            on_update=getattr(AirgapUpdateScreen, "on_update"),
         )

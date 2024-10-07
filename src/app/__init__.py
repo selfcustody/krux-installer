@@ -52,6 +52,9 @@ from src.app.screens.airgap_update_screen import AirgapUpdateScreen
 from src.app.screens.warning_before_airgap_update_screen import (
     WarningBeforeAirgapUpdateScreen,
 )
+from src.app.screens.warning_after_airgap_update_screen import (
+    WarningAfterAirgapUpdateScreen,
+)
 
 
 class KruxInstallerApp(ConfigKruxInstaller):
@@ -91,6 +94,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
             WarningWipeScreen(),
             FlashScreen(),
             WarningBeforeAirgapUpdateScreen(),
+            WarningAfterAirgapUpdateScreen(),
             AirgapUpdateScreen(),
             WipeScreen(),
             ErrorScreen(),

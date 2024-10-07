@@ -25,6 +25,7 @@ import os
 import shutil
 from functools import partial
 from kivy.clock import Clock
+from src.utils.verifyer.sha256_verifyer import Sha256Verifyer
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -47,6 +48,38 @@ class AirgapUpdateScreen(BaseScreen):
             new_firmware_sig = os.path.join(path, "firmware.bin.sig")
             self.info(f"Copying file {self.firmware_sig} to {new_firmware_sig}")
             shutil.copyfile(self.firmware_sig, new_firmware_sig)
+
+            sha256 = Sha256Verifyer(filename=new_firmware_bin)
+            sha256.load()
+
+            warn_screen = self.manager.get_screen("WarningAfterAirgapUpdateScreen")
+
+            fns = [
+                partial(
+                    warn_screen.update,
+                    name=self.name,
+                    key="bin",
+                    value=new_firmware_bin,
+                ),
+                partial(
+                    warn_screen.update,
+                    name=self.name,
+                    key="sig",
+                    value=new_firmware_sig,
+                ),
+                partial(
+                    warn_screen.update,
+                    name=self.name,
+                    key="hash",
+                    value=sha256.data.split(" ", maxsplit=1)[0],
+                ),
+                partial(warn_screen.update, name=self.name, key="label"),
+            ]
+
+            for fn in fns:
+                Clock.schedule_once(fn, 0)
+
+            self.set_screen(name="WarningAfterAirgapUpdateScreen", direction="left")
 
         setattr(AirgapUpdateScreen, "on_load", on_load)
 

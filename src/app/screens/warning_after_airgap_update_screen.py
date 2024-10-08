@@ -37,27 +37,24 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
             **kwargs,
         )
 
-        self.firmware_bin = ""
-        self.firmware_sig = ""
+        self.sdcard = ""
         self.firmware_hash = ""
 
         self.make_grid(wid=f"{self.id}_grid", rows=2, resize_canvas=True)
-        self.make_image(
-            wid=f"{self.id}_done",
-            source=self.done_img,
-            root_widget=f"{self.id}_grid",
+        self.make_subgrid(
+            wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
         )
 
-        self.build_button()
+        self.build_upper_button()
+        self.build_lower_button()
 
         # load canvas
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
-    def build_button(self):
-        """Build the button screen"""
+    def build_upper_button(self):
+        """Build the upper button screen"""
 
-        # START of on_press buttons
         def on_ref_press(*args):
             if args[1] == "MainScreen":
                 self.set_screen(name="MainScreen", direction="right")
@@ -65,6 +62,26 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
             if args[1] == "Quit":
                 App.get_running_app().stop()
 
+        self.make_image(
+            wid=f"{self.id}_done",
+            source=self.done_img,
+            root_widget=f"{self.id}_subgrid",
+        )
+
+        self.make_button(
+            row=1,
+            wid=f"{self.id}_menu",
+            text="",
+            font_factor=32,
+            root_widget=f"{self.id}_subgrid",
+            halign="center",
+            on_press=None,
+            on_release=None,
+            on_ref_press=on_ref_press,
+        )
+
+    def build_lower_button(self):
+        """Build the lower button screen"""
         self.make_button(
             row=0,
             wid=f"{self.id}_label",
@@ -74,7 +91,7 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             on_press=None,
             on_release=None,
-            on_ref_press=on_ref_press,
+            on_ref_press=None,
         )
         # self.ids[f"{self.id}_label"].halign = "cent"
 
@@ -91,17 +108,15 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
                 setattr(self, "locale", value)
                 self.ids[f"{self.id}_label"].text = self.make_label_text()
 
-            if key == "bin":
-                setattr(self, "firmware_bin", value)
-
-            if key == "sig":
-                setattr(self, "firmware_sig", value)
+            if key == "sdcard":
+                setattr(self, "sdcard", value)
 
             if key == "hash":
                 setattr(self, "firmware_hash", value)
 
             if key == "label":
-                self.ids[f"{self.id}_label"].text = self.make_label_text()
+                self.ids[f"{self.id}_menu"].text = self.make_upper_label_text()
+                self.ids[f"{self.id}_label"].text = self.make_lower_label_text()
 
         setattr(WarningAfterAirgapUpdateScreen, "on_update", on_update)
         self.update_screen(
@@ -116,16 +131,21 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
             on_update=getattr(WarningAfterAirgapUpdateScreen, "on_update"),
         )
 
-    def make_label_text(self):
+    def make_upper_label_text(self):
         """
         Create a warning message where it's content is about
-        the airgapped procedure to update firmware onto device
+        where ther firmware was placed
         """
+        copied = self.translate("have been copied to")
         back = self.translate("Back")
         _quit = self.translate("Quit")
-
         return "".join(
             [
+                f".bin and .sig files {copied}",
+                "\n",
+                f"[color=#efcc00]{self.sdcard}[/color].",
+                "\n",
+                "\n",
                 "[color=#ff0000]",
                 f"[u][ref=Quit]{_quit}[/ref][/u]",
                 "[/color]",
@@ -133,12 +153,29 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
                 "[color=#00ff00]",
                 f"[u][ref=MainScreen]{back}[/ref][/u]",
                 "[/color]",
+            ]
+        )
+
+    def make_lower_label_text(self):
+        """
+        Create a warning message where it's content is about
+        the airgapped procedure to update firmware onto device
+        """
+        insert = self.translate(
+            "Insert the SDcard into your device and reboot it to update"
+        )
+
+        return "".join(
+            [
+                f"* {insert}.",
                 "\n",
                 "\n",
-                f"[color=#333333]{self.firmware_bin}[/color] computed hash:",
+                "* You should see this computed hash on device screen:",
                 "\n",
                 "\n",
+                "[color=#efcc00]",
                 WarningAfterAirgapUpdateScreen.prettyfy_hash(self.firmware_hash),
+                "[/color]",
             ]
         )
 

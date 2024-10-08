@@ -277,7 +277,7 @@ class BaseScreen(Screen, Trigger):
         btn.id = f"{wid}_inner_box_button"
 
         def on_release(btn):
-            on_load(file_chooser.path, file_chooser.selection)
+            on_load(file_chooser.path)
 
         btn.bind(on_release=on_release)
         self.ids[inner_box.id].add_widget(btn)
@@ -290,6 +290,7 @@ class BaseScreen(Screen, Trigger):
 
         # pytlint: disable=unused-argument
         def on_selection(fc, selection):
+            file_chooser.path = selection[0]
             btn.text = f"Copy firmware to {selection[0]}"
 
         file_chooser.bind(selection=on_selection)

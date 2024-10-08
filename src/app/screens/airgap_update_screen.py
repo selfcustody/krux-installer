@@ -39,8 +39,7 @@ class AirgapUpdateScreen(BaseScreen):
         self._firmware_bin = ""
         self._firmware_sig = ""
 
-        # pylint: disable=unused-argument
-        def on_load(path, filename):
+        def on_load(path):
             new_firmware_bin = os.path.join(path, "firmware.bin")
             self.info(f"Copying file {self.firmware_bin} to {new_firmware_bin}")
             shutil.copyfile(self.firmware_bin, new_firmware_bin)
@@ -58,14 +57,8 @@ class AirgapUpdateScreen(BaseScreen):
                 partial(
                     warn_screen.update,
                     name=self.name,
-                    key="bin",
-                    value=new_firmware_bin,
-                ),
-                partial(
-                    warn_screen.update,
-                    name=self.name,
-                    key="sig",
-                    value=new_firmware_sig,
+                    key="sdcard",
+                    value=path,
                 ),
                 partial(
                     warn_screen.update,

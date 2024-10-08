@@ -468,11 +468,9 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
         text = "".join(
             [
-                "[color=#333333]",
-                "Air-gapped update with (soon)",
-                "[/color]",
+                "Air-gapped update with",
                 "\n",
-                "[color=#333333]",
+                "[color=#efcc00]",
                 p,
                 "[/color]",
             ]

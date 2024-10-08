@@ -34,7 +34,9 @@ from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
 from kivy.uix.label import Label
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
+from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
@@ -248,6 +250,52 @@ class BaseScreen(Screen, Trigger):
         # register button
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
+
+    def make_file_chooser(
+        self,
+        root_widget: str,
+        wid: str,
+        view_mode: str,
+        font_factor: int,
+        on_load: typing.Callable,
+    ):
+        """Build a file chooser for airgap screen"""
+        box = BoxLayout(orientation="vertical")
+        box.id = wid
+        self.ids[root_widget].add_widget(box)
+        self.ids[box.id] = WeakProxy(box)
+
+        # Box to put buttons
+        height = int(Window.size[1] * 0.1)
+        inner_box = BoxLayout(size_hint_y=None, height=height)
+        inner_box.id = f"{wid}_inner_box"
+        self.ids[box.id].add_widget(inner_box)
+        self.ids[inner_box.id] = WeakProxy(inner_box)
+
+        # Select button
+        btn = Button(text="Select folder to copy firmware", halign="center")
+        btn.id = f"{wid}_inner_box_button"
+
+        def on_release(btn):
+            on_load(file_chooser.path)
+
+        btn.bind(on_release=on_release)
+        self.ids[inner_box.id].add_widget(btn)
+        self.ids[btn.id] = WeakProxy(btn)
+
+        # File chooser
+        file_chooser = FileChooserIconView()
+        file_chooser.id = f"{wid}_chooser"
+        file_chooser.dirselect = True
+
+        # pytlint: disable=unused-argument
+        def on_selection(fc, selection):
+            file_chooser.path = selection[0]
+            btn.text = f"Copy firmware to {selection[0]}"
+
+        file_chooser.bind(selection=on_selection)
+        self.ids[box.id].add_widget(file_chooser)
+        self.ids[file_chooser.id] = WeakProxy(file_chooser)
 
     def redirect_exception(self, exception: Exception):
         """Get an exception and prepare a ErrorScreen rendering"""

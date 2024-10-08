@@ -2,16 +2,16 @@
   "check_permissions_screen": {
     "Setup": "Configurando",
     "for": "para",
-    "Checking": "Checando",
-    "permissions for": "permissiões para",
+    "Checking": "Verificando",
+    "permissions for": "permissões para",
     "WARNING": "AVISO",
     "This is the first run of KruxInstaller in": "Esta é a primeira execução do KruxInstaller no",
     "and it appears that you do not have privileged access to make flash procedures": "e parece que você não tem acesso privilegiado para realizar procedimentos de flash",
     "To proceed, click in the Allow button and a prompt will ask for your password": "Para continuar, clique no botão Permitir e um prompt solicitará sua senha",
     "to execute the following command": "para executar o seguinte comando",
-    "You may need to logout (or even reboot)": "Talvez você precise deslogar (ou até mesmo reiniciar)",
-    "and back in for the new group to take effect": "e re-logar para que o novo grupo tenha efeito",
-    "Do not worry, this message won't appear again": "Não se preocupe, essa mensagem não irá aparecer novamente",    
+    "You may need to logout (or even reboot)": "Talvez você precise fazer logout (ou até mesmo reiniciar)",
+    "and back in for the new group to take effect": "e fazer login novamente para que o novo grupo tenha efeito",
+    "Do not worry, this message won't appear again": "Não se preocupe, essa mensagem não aparecerá novamente",    
     "Allow": "Permitir",
     "Deny": "Negar"
   }, 
@@ -22,7 +22,7 @@
     "Version": "Versão",
     "Device": "Dispositivo",
     "select a new one": "selecione um novo",
-    "Flash": "Programar o firmware",
+    "Flash": "Gravar firmware",
     "Wipe": "Limpar dispositivo",
     "Settings": "Configurações",
     "About": "Sobre",     
@@ -40,7 +40,7 @@
     "This is our test repository": "Este é nosso repositório de testes",
     "These are unsigned binaries for the latest and most experimental features": "Estes são binários não assinados dos recursos mais experimentais",
     "and it's just for trying new things and providing feedback.": "e serve apenas para experimentar coisas novas e dar opiniões.",
-    "Proceed": "Proceder",
+    "Proceed": "Continuar",
     "Back": "Voltar"
   },
   "download_beta_screen": {
@@ -52,7 +52,7 @@
   },
   "warning_already_downloaded_screen": {
     "Assets already downloaded": "Arquivos já baixados",
-    "Do you want to proceed with the same file or do you want to download it again?": "Você quer proceder com o mesmo arquivo ou quer fazer o download dele novamente?",
+    "Do you want to proceed with the same file or do you want to download it again?": "Você quer continuar com o mesmo arquivo ou baixá-lo novamente?",
     "Download again": "Baixe novamente",
     "Proceed with current file": "Proceda com o arquivo atual"
   },
@@ -96,15 +96,15 @@
     "BAD": "MÁ",
     "SIGNATURE": "ASSINATURA",
     "If you have openssl installed on your system": "Se você tiver o openssl instalado no seu sistema,",
-    "you can check manually with the following command": "você pode checar manualmente a com o seguinte commando",
-    "Proceed": "Proceder",
+    "you can check manually with the following command": "você pode verificar manualmente com o seguinte comando",
+    "Proceed": "Continuar",
     "Back": "Voltar"
   },  
   "unzip_stable_screen": {
     "Flash with": "Flash com",
     "Air-gapped update with": "Atualização isolada com",
-    "Unziping": "Descomprimindo",
-    "Unziped": "Descomprimido"
+    "Unziping": "Descompactando",
+    "Unziped": "Descompactado"
   },
   "flash_screen": {
     "DONE": "FEITO ",
@@ -114,7 +114,7 @@
     "at": "a"
   },
   "wipe_screen": {
-    "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR NÃO DESPLUGUE SEU DISPOSITIVO",
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR, NÃO DESCONECTE SEU DISPOSITIVO",
     "DONE": "FEITO",
     "Back": "Voltar",
     "Quit": "Sair"
@@ -125,7 +125,7 @@
     "Permanently erase all saved data": "Apagar permanentemente todos os dados salvos",
     "Remove the existing firmware": "Remover o firmware existente",
     "Render the device non-functional until new firmware is re-flashed": "Tornar o dispositivo não funcional até que o novo firmware seja atualizado novamente",    
-    "Proceed": "Proceder",
+    "Proceed": "Continuar",
     "Back": "Voltar"
   },
   "about_screen": {

@@ -127,7 +127,7 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "\n",
                 "\n",
                 "[color=#00ff00]",
-                "[ref=MainScreen]Proceder[/ref]",
+                "[ref=MainScreen]Continuar[/ref]",
                 "[/color]",
                 "        ",
                 "[color=#ff0000]",

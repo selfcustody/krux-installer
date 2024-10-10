@@ -301,9 +301,9 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
                 "[/b]",
                 "\n",
                 "\n",
-                "[ref=Proceed][color=#00ff00][u]Proceed[/u][/ref][/color]",
-                "             ",
                 "[ref=Back][color=#ff0000][u]Back[/u][/ref][/color]",
+                "             ",
+                "[ref=Proceed][color=#00ff00][u]Proceed[/u][/ref][/color]",
                 "[/b]",
             ]
         )
@@ -355,9 +355,9 @@ class TestVerifyStableZipScreen(GraphicUnitTest):
                 "[/b]",
                 "\n",
                 "\n",
-                "[ref=Proceed][color=#00ff00][u]Proceed[/u][/ref][/color]",
-                "             ",
                 "[ref=Back][color=#ff0000][u]Back[/u][/ref][/color]",
+                "             ",
+                "[ref=Proceed][color=#00ff00][u]Proceed[/u][/ref][/color]",
                 "[/b]",
             ]
         )

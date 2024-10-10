@@ -255,9 +255,9 @@ class VerifyStableZipScreen(BaseScreen):
                 "[/b]",
                 "\n",
                 "\n",
-                f"[ref=Proceed][color=#00ff00][u]{proceed}[/u][/ref][/color]",
-                "             ",
                 f"[ref=Back][color=#ff0000][u]{back}[/u][/ref][/color]",
+                "             ",
+                f"[ref=Proceed][color=#00ff00][u]{proceed}[/u][/ref][/color]",
                 "[/b]",
             ]
         )

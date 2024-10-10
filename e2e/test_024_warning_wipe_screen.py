@@ -81,13 +81,9 @@ class TestWarningWipeScreen(GraphicUnitTest):
                 "* Render the device non-functional until new firmware is re-flashed",
                 "\n",
                 "\n",
-                "[color=#00FF00]",
-                "[ref=WipeScreen][u]Proceed[/u][/ref]",
-                "[/color]",
+                "[color=#FF0000][ref=MainScreen][u]Back[/u][/ref][/color]",
                 "        ",
-                "[color=#FF0000]",
-                "[ref=MainScreen][u]Back[/u][/ref]",
-                "[/color]",
+                "[color=#00FF00][ref=WipeScreen][u]Proceed[/u][/ref][/color]",
             ]
         )
 

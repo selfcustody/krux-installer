@@ -131,5 +131,12 @@
   "about_screen": {
     "follow us on X": "следите за нами на X",
     "Back": "Назад"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Прежде чем приступить к\nобновлению с воздушным зазором",
+    "Insert a FAT32 formatted SDCard into your computer": "Вставьте SDCard в файловой\nсистеме FAT32 в компьютер",
+    "On the next screen, choose its root folder to copy the firmware": "На следующем экране выберите его\nкорневую папку для копирования прошивки",
+    "Proceed": "Продолжать",
+    "Back": "Вернись"
   }
 }

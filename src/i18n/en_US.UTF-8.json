@@ -127,5 +127,11 @@
   "about_screen": {
     "follow us on X": "follow us on X",
     "Back": "Back"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Before proceeding with the air-gapped update",
+    "Insert a FAT32 formatted SDCard into your computer": "Insert a FAT32 formatted SDCard into your computer",
+    "Proceed": "Proceed",
+    "Back": "Back"
   }
 }

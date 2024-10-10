@@ -129,5 +129,12 @@
   "about_screen": {
     "follow us on X": "volg ons op X",
     "Back": "Terug"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Voordat u doorgaat met de air-gapped update",
+    "Insert a FAT32 formatted SDCard into your computer": "Plaats een FAT32-geformatteerde SDCard in uw computer",
+    "On the next screen, choose its root folder to copy the firmware": "Kies op het volgende scherm de hoofdmap om de firmware te kopiëren",
+    "Proceed": "Doorgaan",
+    "Back": "Terug"
   }
 }

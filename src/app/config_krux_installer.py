@@ -19,7 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-krux_installer.py
+config_krux_installer.py
 """
 import os
 import sys
@@ -35,7 +35,7 @@ from src.app.base_krux_installer import BaseKruxInstaller
 
 
 class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
-    """BaseKruxInstller is the base for Appliction"""
+    """ConfigKruxInstller is where all configuration occurs"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -233,6 +233,9 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             verify = self.screen_manager.get_screen("VerifyStableZipScreen")
             unzip = self.screen_manager.get_screen("UnzipStableScreen")
             about = self.screen_manager.get_screen("AboutScreen")
+            warn_before = self.screen_manager.get_screen(
+                "WarningBeforeAirgapUpdateScreen"
+            )
 
             if sys.platform == "win32":
                 value = f"{value}.UTF-8"
@@ -291,6 +294,12 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 ),
                 partial(
                     about.update, name="ConfigKruxInstaller", key="locale", value=value
+                ),
+                partial(
+                    warn_before.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
                 ),
             ]
 

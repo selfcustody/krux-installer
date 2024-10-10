@@ -131,5 +131,12 @@
   "about_screen": {
     "follow us on X": "síguenos en X",
     "Back": "Volver"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Antes de continuar con la actualización aislada",
+    "Insert a FAT32 formatted SDCard into your computer": "Inserte una tarjeta SD con formato FAT32 en su computadora",
+    "On the next screen, choose its root folder to copy the firmware": "En la siguiente pantalla, elija su carpeta raíz para copiar el firmware",
+    "Proceed": "Proceder",
+    "Back": "Volver"
   }
 }

@@ -3,7 +3,7 @@ prefer-active-python = true
 
 [tool.poetry]
 name = "krux-installer"
-version = "0.0.20-alpha-3"
+version = "0.0.20-alpha-4"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = [
   "qlrd <qlrddev@gmail.com>"
@@ -24,7 +24,6 @@ cryptography = "^43.0.1"
 qrcode = "^7.4.2"
 easy-i18n = "^1.2.0"
 pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
-distro = "^1.9.0"
 pillow = "^10.4.0"
 pyinstaller = "^6.10.0"
 

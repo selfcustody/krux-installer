@@ -29,7 +29,6 @@ from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
 if sys.platform.startswith("linux"):
-    import distro
     import grp  # pylint: disable=import-error
 
 
@@ -104,20 +103,52 @@ class GreetingsScreen(BaseScreen):
             # get current user
             _user = os.environ.get("USER")
             _in_dialout = False
-            _group = None
 
-            # detect linux distro
-            if (
-                distro.id() in ("ubuntu", "fedora", "linuxmint")
-                or distro.like() == "debian"
-            ):
-                _group = "dialout"
+            # Set default group in case no match is found
+            _group = ""
 
-            elif distro.id() in ("arch", "manjaro", "slackware", "gentoo"):
-                _group = "uucp"
+            try:
+                with open("/etc/os-release", mode="r", encoding="utf-8") as f:
+                    os_info = f.readlines()
 
-            else:
-                exc = RuntimeError(f"{distro.name(pretty=True)} not supported")
+                os_data = {
+                    line.split("=")[0]: line.split("=")[1].strip().strip('"')
+                    for line in os_info
+                    if "=" in line
+                }
+
+                # Check for Debian-like systems (PopOS, Ubuntu, Linux Mint, etc.)
+                if "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]:
+                    _group = "dialout"  # Pop!_OS will fall under this
+
+                # Check for Red Hat-based systems (Fedora, CentOS, Rocky Linux, etc.)
+                elif "ID_LIKE" in os_data and "rhel" in os_data["ID_LIKE"]:
+                    _group = "dialout"  # Red Hat-based systems often use `dialout`
+
+                # Check for SUSE-based systems (openSUSE, SUSE Linux Enterprise)
+                elif "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
+                    _group = "dialout"  # SUSE systems also often use `dialout`
+
+                # Arch, Manjaro, Slackware, Gentoo
+                elif os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
+                    _group = "uucp"
+
+                # For Alpine, Clear Linux, Solus, etc.
+                elif os_data.get("ID") in ("alpine", "clear-linux", "solus"):
+                    _group = "dialout"  # These often use `dialout`
+
+                else:
+                    # If none of the conditions match, fall back to the default group
+                    exc = RuntimeError(
+                        f"{os_data.get('PRETTY_NAME', 'Unknown Linux distribution')} not supported"
+                    )
+                    self.redirect_exception(exception=exc)
+                    return
+
+            except FileNotFoundError:
+                exc = RuntimeError(
+                    "Unable to detect Linux distribution (no /etc/os-release found)."
+                )
                 self.redirect_exception(exception=exc)
                 return
 
@@ -136,7 +167,7 @@ class GreetingsScreen(BaseScreen):
             if not _in_dialout:
                 print("NOT")
                 ask = self.manager.get_screen("AskPermissionDialoutScreen")
-                _distro = distro.name(pretty=True)
+                _distro = os_data.get("PRETTY_NAME", "Unknown Linux distribution")
 
                 fns = [
                     partial(ask.update, name=self.name, key="user", value=_user),

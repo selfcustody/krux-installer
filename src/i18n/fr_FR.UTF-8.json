@@ -138,5 +138,13 @@
     "On the next screen, choose its root folder to copy the firmware": "Sur l'écran suivant, choisissez son dossier racine pour copier le firmware",
     "Proceed": "Continuer",
     "Back": "Retour"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "et",
+    "files have been copied to": "les fichiers ont été copiés dans",
+    "Insert the SDcard into your device and reboot it to update": "Insérez la carte SD dans votre appareil et redémarrez-le pour mettre à jour",
+    "You should see this computed hash on device screen": "Vous devriez voir ce hash calculé sur l'écran de l'appareil",
+    "Proceed": "Procéder",
+    "Back": "Retour"
   }
 }

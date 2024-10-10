@@ -136,5 +136,13 @@
     "On the next screen, choose its root folder to copy the firmware": "Kies op het volgende scherm de hoofdmap om de firmware te kopiëren",
     "Proceed": "Doorgaan",
     "Back": "Terug"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "en",
+    "files have been copied to": "bestanden zijn gekopieerd naar",
+    "Insert the SDcard into your device and reboot it to update": "Plaats de SD-kaart in uw apparaat en start het opnieuw op om te updaten",
+    "You should see this computed hash on device screen": "U zou deze berekende hash op het scherm van het apparaat moeten zien",
+    "Proceed": "Doorgaan",
+    "Back": "Terug"
   }
 }

@@ -138,5 +138,13 @@
     "On the next screen, choose its root folder to copy the firmware": "在下一个屏幕上，选择其根文件夹以复制固件",
     "Proceed": "进行",
     "Back": "返回"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "和",
+    "files have been copied to": "文件已复制到",
+    "Insert the SDcard into your device and reboot it to update": "将SD卡插入设备并重启以更新",
+    "You should see this computed hash on device screen": "您应该在设备屏幕上看到此计算的哈希值",
+    "Proceed": "继续",
+    "Back": "返回"
   }
 }

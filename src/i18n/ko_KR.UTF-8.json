@@ -138,5 +138,13 @@
     "On the next screen, choose its root folder to copy the firmware": "다음 화면에서 펌웨어를 복사할 루트 폴더를 선택합니다",
     "Proceed": "진행",
     "Back": "뒤로"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "그리고",
+    "files have been copied to": "파일이 복사되었습니다",
+    "Insert the SDcard into your device and reboot it to update": "SD카드를 장치에 삽입하고 업데이트를 위해 재부팅하세요",
+    "You should see this computed hash on device screen": "이 계산된 해시가 장치 화면에 표시됩니다",
+    "Proceed": "진행",
+    "Back": "뒤로"
   }
 }

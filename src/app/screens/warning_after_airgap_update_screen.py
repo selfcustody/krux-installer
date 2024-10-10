@@ -136,12 +136,13 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
         Create a warning message where it's content is about
         where ther firmware was placed
         """
-        copied = self.translate("have been copied to")
+        _and = self.translate("and")
+        copied = self.translate("files have been copied to")
         back = self.translate("Back")
         _quit = self.translate("Quit")
         return "".join(
             [
-                f".bin and .sig files {copied}",
+                f".bin {_and} .sig {copied}",
                 "\n",
                 f"[color=#efcc00]{self.sdcard}[/color].",
                 "\n",
@@ -164,13 +165,16 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
         insert = self.translate(
             "Insert the SDcard into your device and reboot it to update"
         )
+        you_should = self.translate(
+            "You should see this computed hash on device screen"
+        )
 
         return "".join(
             [
                 f"* {insert}.",
                 "\n",
                 "\n",
-                "* You should see this computed hash on device screen:",
+                f"* {you_should}:",
                 "\n",
                 "\n",
                 "[color=#efcc00]",

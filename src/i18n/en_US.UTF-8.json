@@ -133,5 +133,13 @@
     "Insert a FAT32 formatted SDCard into your computer": "Insert a FAT32 formatted SDCard into your computer",
     "Proceed": "Proceed",
     "Back": "Back"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "and",
+    "files have been copied to": "files have been copied to",
+    "Insert the SDcard into your device and reboot it to update": "Insert the SDcard into your device and reboot it to update",
+    "You should see this computed hash on device screen": "You should see this computed hash on device screen",
+    "Proceed": "Proceed",
+    "Back": "Back"
   }
 }

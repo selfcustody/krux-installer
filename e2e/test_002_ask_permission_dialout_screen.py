@@ -1,6 +1,6 @@
 import os
 import sys
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch, MagicMock, mock_open
 from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -10,7 +10,7 @@ from src.app.screens.ask_permission_dialout_screen import AskPermissionDialoutSc
 
 # WARNING: Do not run these tests on windows
 # they will break because it do not have the builtin 'grp' module
-@mark.skipif(sys.platform == "win32", reason="does not run on windows or macos")
+@mark.skipif(sys.platform == "win32" or sys.platform == "darwin", reason="does not run on windows or macos")
 class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
     @classmethod
@@ -123,10 +123,14 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open", new_callable=mock_open, read_data="arch"
+    )
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_show_warning(self, mock_get_locale):
+    def test_show_warning(self, open_mock, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.user = "user"
         screen.group = "group"

@@ -49,7 +49,7 @@ class AskPermissionDialoutScreen(BaseScreen):
 
         # These variables will setup the inclusion
         # in dialout group, if necessary
-        self._bin = "/usr/bin/usermod"
+        self._bin = self.detect_usermod_bin()
         self._bin_args = ["-a", "-G"]
 
         # pylint: disable=unused-argument
@@ -106,6 +106,60 @@ class AskPermissionDialoutScreen(BaseScreen):
 
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
+
+    def detect_usermod_bin(self):
+        """
+        Detect the correct path for the 'usermod' binary depending on the OS.
+        This function checks different distributions and returns the correct path.
+        """
+        try:
+            with open("/etc/os-release", mode="r", encoding="utf-8") as f:
+                os_info = f.readlines()
+
+            os_data = {
+                line.split("=")[0]: line.split("=")[1].strip().strip('"')
+                for line in os_info
+                if "=" in line
+            }
+
+            # Default path if not identified
+            bin_path = "/usr/sbin/usermod"
+
+            # Check for Debian-based systems (PopOS, Ubuntu, Linux Mint, etc.)
+            if "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]:
+                bin_path = "/usr/sbin/usermod"
+
+            # Check for Red Hat-based systems (Fedora, CentOS, Rocky Linux, etc.)
+            elif "ID_LIKE" in os_data and "rhel" in os_data["ID_LIKE"]:
+                bin_path = "/usr/sbin/usermod"
+
+            # Check for SUSE-based systems (openSUSE, SUSE Linux Enterprise)
+            elif "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
+                bin_path = "/usr/sbin/usermod"
+
+            # Arch, Manjaro, Slackware, Gentoo
+            elif os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
+                bin_path = "/usr/bin/usermod"
+
+            # For Alpine, Clear Linux, Solus, etc.
+            elif os_data.get("ID") in ("alpine", "clear-linux", "solus"):
+                bin_path = "/usr/bin/usermod"
+
+            else:
+                # Default to /usr/sbin/usermod if no match is found
+                exc = RuntimeError(
+                    f"Unrecognized distro: {os_data.get('PRETTY_NAME', 'Unknown')}"
+                )
+                self.redirect_exception(exception=exc)
+
+            return bin_path
+
+        except FileNotFoundError:
+            exc = RuntimeError(
+                "Unable to detect Linux distribution (no /etc/os-release found)."
+            )
+            self.redirect_exception(exception=exc)
+            return None
 
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):

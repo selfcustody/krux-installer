@@ -91,6 +91,82 @@ class GreetingsScreen(BaseScreen):
             on_update=getattr(GreetingsScreen, "on_update"),
         )
 
+    def get_os_dialout_group(self):
+        """Detect OS and properly return the 'dialout' group (in some distros can be 'uucp')"""
+        detected = (None, None)
+        try:
+
+            with open("/etc/os-release", mode="r", encoding="utf-8") as f:
+                os_info = f.readlines()
+
+            os_data = {
+                line.split("=")[0]: line.split("=")[1].strip().strip('"')
+                for line in os_info
+                if "=" in line
+            }
+
+            # Check for Debian-like systems (PopOS, Ubuntu, Linux Mint, etc.)
+            if "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]:
+                detected = (
+                    os_data["ID_LIKE"],
+                    "dialout",
+                )  # Pop!_OS will fall under this
+
+            # Check for Red Hat-based systems (Fedora, CentOS, Rocky Linux, etc.)
+            if "ID_LIKE" in os_data and "rhel" in os_data["ID_LIKE"]:
+                detected = (
+                    os_data["ID_LIKE"],
+                    "dialout",
+                )  # Red Hat-based systems often use `dialout`
+
+            # Check for SUSE-based systems (openSUSE, SUSE Linux Enterprise)
+            if "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
+                detected = (
+                    os_data["ID_LIKE"],
+                    "dialout",
+                )  # SUSE systems also often use `dialout`
+
+            # Arch, Manjaro, Slackware, Gentoo
+            if os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
+                detected = (os_data["ID"], "uucp")
+
+            # For Alpine, Clear Linux, Solus, etc.
+            if os_data.get("ID") in ("alpine", "clear-linux", "solus"):
+                detected = (os_data["ID"], "dialout")
+
+            if not detected[0]:
+                # If none of the conditions match, fall back to the default group
+                exc = RuntimeError(
+                    f"{os_data.get('PRETTY_NAME', 'Unknown Linux distribution')} not supported"
+                )
+                self.redirect_exception(exception=exc)
+
+        except FileNotFoundError:
+            exc = RuntimeError(
+                "Unable to detect Linux distribution (no /etc/os-release found)."
+            )
+            self.redirect_exception(exception=exc)
+
+        return detected
+
+    def is_user_in_dialout_group(self, user: str, group: str):
+        """Check if the provided user is in dialout"""
+        _in_dialout = False
+
+        # loop throug all linux groups and check
+        # if the user is registered in the "dialout" group
+        # pylint: disable=possibly-used-before-assignment
+        for _grp in grp.getgrall():
+            gr_name = _grp.gr_name
+            if gr_name == group:
+                # for _grpuser in _grp[3]:
+                for _grpuser in _grp.gr_mem:
+                    if _grpuser == user:
+                        self.info(f"'{user}' already in group '{gr_name}'")
+                        _in_dialout = True
+
+        return _in_dialout
+
     def check_dialout_permission(self):
         """
         Here's where the check process start
@@ -101,74 +177,17 @@ class GreetingsScreen(BaseScreen):
         """
         if sys.platform.startswith("linux"):
             # get current user
-            _user = os.environ.get("USER")
+            _user = str(os.environ.get("USER"))
             _in_dialout = False
 
             # Set default group in case no match is found
-            _group = ""
-
-            try:
-                with open("/etc/os-release", mode="r", encoding="utf-8") as f:
-                    os_info = f.readlines()
-
-                os_data = {
-                    line.split("=")[0]: line.split("=")[1].strip().strip('"')
-                    for line in os_info
-                    if "=" in line
-                }
-
-                # Check for Debian-like systems (PopOS, Ubuntu, Linux Mint, etc.)
-                if "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]:
-                    _group = "dialout"  # Pop!_OS will fall under this
-
-                # Check for Red Hat-based systems (Fedora, CentOS, Rocky Linux, etc.)
-                elif "ID_LIKE" in os_data and "rhel" in os_data["ID_LIKE"]:
-                    _group = "dialout"  # Red Hat-based systems often use `dialout`
-
-                # Check for SUSE-based systems (openSUSE, SUSE Linux Enterprise)
-                elif "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
-                    _group = "dialout"  # SUSE systems also often use `dialout`
-
-                # Arch, Manjaro, Slackware, Gentoo
-                elif os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
-                    _group = "uucp"
-
-                # For Alpine, Clear Linux, Solus, etc.
-                elif os_data.get("ID") in ("alpine", "clear-linux", "solus"):
-                    _group = "dialout"  # These often use `dialout`
-
-                else:
-                    # If none of the conditions match, fall back to the default group
-                    exc = RuntimeError(
-                        f"{os_data.get('PRETTY_NAME', 'Unknown Linux distribution')} not supported"
-                    )
-                    self.redirect_exception(exception=exc)
-                    return
-
-            except FileNotFoundError:
-                exc = RuntimeError(
-                    "Unable to detect Linux distribution (no /etc/os-release found)."
-                )
-                self.redirect_exception(exception=exc)
-                return
-
-            # loop throug all linux groups and check
-            # if the user is registered in the "dialout" group
-            for _grp in grp.getgrall():
-                if _group == _grp.gr_name:
-                    for _grpuser in _grp[3]:
-                        if _grpuser == _user:
-                            self.info(f"'{_user}' already in group '{_group}'")
-                            _in_dialout = True
+            _distro, _group = self.get_os_dialout_group()
 
             # if user is not in dialout group, warn user
             # and then redirect to a screen that will
             # proceed with the proper operation
-            if not _in_dialout:
-                print("NOT")
+            if not self.is_user_in_dialout_group(user=_user, group=_group):
                 ask = self.manager.get_screen("AskPermissionDialoutScreen")
-                _distro = os_data.get("PRETTY_NAME", "Unknown Linux distribution")
-
                 fns = [
                     partial(ask.update, name=self.name, key="user", value=_user),
                     partial(ask.update, name=self.name, key="group", value=_group),

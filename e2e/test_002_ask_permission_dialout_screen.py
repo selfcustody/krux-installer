@@ -10,7 +10,10 @@ from src.app.screens.ask_permission_dialout_screen import AskPermissionDialoutSc
 
 # WARNING: Do not run these tests on windows
 # they will break because it do not have the builtin 'grp' module
-@mark.skipif(sys.platform == "win32" or sys.platform == "darwin", reason="does not run on windows or macos")
+@mark.skipif(
+    sys.platform in ("win32", "darwin"),
+    reason="does not run on windows or macos",
+)
 class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
     @classmethod
@@ -123,14 +126,19 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    
     @patch(
-        "src.app.screens.ask_permission_dialout_screen.open", new_callable=mock_open, read_data="arch"
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="debian",
     )
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_show_warning(self, open_mock, mock_get_locale):
+    @patch("src.app.screens.base_screen.BaseScreen.manager")
+    def test_show_warning(self, mock_manager, open_mock, mock_get_locale):
+        mock_manager.get_screen = MagicMock()
+        mock_manager.get_screen.update = MagicMock()
+
         screen = AskPermissionDialoutScreen()
         screen.user = "user"
         screen.group = "group"
@@ -155,7 +163,7 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
                 "to execute the following command:",
                 "\n",
                 "[color=#00ff00]",
-                "/usr/bin/usermod -a -G group user",
+                "/usr/sbin/usermod -a -G group user",
                 "[/color]",
                 "\n",
                 "\n",
@@ -170,6 +178,7 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
+        open_mock.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")

@@ -316,6 +316,10 @@ class TestAboutScreen(GraphicUnitTest):
         open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
         mock_redirect_exception.assert_called()
 
+    @mark.skipif(
+        sys.platform in ("win32", "darwin"),
+        reason="does not run on windows or macos",
+    )
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
@@ -337,6 +341,10 @@ class TestAboutScreen(GraphicUnitTest):
         mock_get_locale.assert_called()
         mock_grp.getgrall.assert_called()
 
+    @mark.skipif(
+        sys.platform in ("win32", "darwin"),
+        reason="does not run on windows or macos",
+    )
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"

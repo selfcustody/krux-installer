@@ -1,5 +1,7 @@
 import os
+import sys
 from unittest.mock import patch
+from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.uix.screenmanager import ScreenManager
@@ -28,6 +30,10 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         self.assertEqual(len(app.screens), 0)
         self.assertIsInstance(app.screen_manager, ScreenManager)
 
+    @mark.skipif(
+        sys.platform in ("win32", "darwin"),
+        reason="does not run on windows or macos",
+    )
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
     @patch(

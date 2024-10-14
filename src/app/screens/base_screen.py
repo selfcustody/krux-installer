@@ -262,6 +262,13 @@ class BaseScreen(Screen, Trigger):
         """Build a file chooser for airgap screen"""
         box = BoxLayout(orientation="vertical")
         box.id = wid
+
+        def on_box_size(instance, value):
+            with self.canvas.before:
+                Color(0, 0, 0, 1)
+                Rectangle(size=(Window.width + 1, Window.height + 1))
+
+        box.bind(size=on_box_size)
         self.ids[root_widget].add_widget(box)
         self.ids[box.id] = WeakProxy(box)
 
@@ -278,6 +285,12 @@ class BaseScreen(Screen, Trigger):
 
         def on_release(btn):
             on_load(file_chooser.path)
+
+        # pylint: disable=unused-argument
+        def on_size(instance, value):
+            instance.font_size = BaseScreen.get_half_diagonal_screen_size(font_factor)
+
+        btn.bind(size=on_size)
 
         btn.bind(on_release=on_release)
         self.ids[inner_box.id].add_widget(btn)

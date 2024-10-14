@@ -137,13 +137,17 @@
     "On the next screen, choose its root folder to copy the firmware": "Op die volgende skerm, kies sy wortelgids om die firmware te kopieer",
     "Proceed": "Voortgaan",
     "Back": "Terug"
-  },  
+  },
+  "airgap_update_screen": {
+    "Select folder to copy firmware": "Kies vouer om firmware te kopieer",
+    "Copy firmware to": "Kopieer firmware na"
+  },
   "warning_after_airgap_update_screen": {
     "and": "en",
     "files have been copied to": "lêers is gekopieer na",
     "Insert the SDcard into your device and reboot it to update": "Plaas die SD-kaart in jou toestel en herlaai dit om op te dateer",
     "You should see this computed hash on device screen": "Jy behoort hierdie berekende hash op die toestel se skerm te sien",
-    "Proceed": "Gaan voort",
+    "Quit": "Sluit",
     "Back": "Terug"
   }
 }

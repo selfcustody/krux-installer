@@ -236,6 +236,10 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             warn_before = self.screen_manager.get_screen(
                 "WarningBeforeAirgapUpdateScreen"
             )
+            airgap = self.screen_manager.get_screen("AirgapUpdateScreen")
+            warn_after = self.screen_manager.get_screen(
+                "WarningAfterAirgapUpdateScreen"
+            )
 
             if sys.platform == "win32":
                 value = f"{value}.UTF-8"
@@ -297,6 +301,18 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 ),
                 partial(
                     warn_before.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    airgap.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    warn_after.update,
                     name="ConfigKruxInstaller",
                     key="locale",
                     value=value,

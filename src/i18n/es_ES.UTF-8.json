@@ -139,12 +139,16 @@
     "Proceed": "Proceder",
     "Back": "Volver"
   },
+  "airgap_update_screen": {
+    "Select folder to copy firmware": "Seleccione carpeta para copiar el firmware",
+    "Copy firmware to": "Copiar firmware a"
+  },
   "warning_after_airgap_update_screen": {
     "and": "y",
     "files have been copied to": "los archivos han sido copiados a",
     "Insert the SDcard into your device and reboot it to update": "Inserta la tarjeta SD en tu dispositivo y reinícialo para actualizar",
     "You should see this computed hash on device screen": "Deberías ver este hash calculado en la pantalla del dispositivo",
-    "Proceed": "Continuar",
+    "Quit": "Salir",
     "Back": "Atrás"
   }
 }

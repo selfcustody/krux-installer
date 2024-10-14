@@ -106,7 +106,8 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
             # Check locale
             if key == "locale":
                 setattr(self, "locale", value)
-                self.ids[f"{self.id}_label"].text = self.make_label_text()
+                self.ids[f"{self.id}_menu"].text = self.make_upper_label_text()
+                self.ids[f"{self.id}_label"].text = self.make_lower_label_text()
 
             if key == "sdcard":
                 setattr(self, "sdcard", value)

@@ -134,12 +134,16 @@
     "Proceed": "Proceed",
     "Back": "Back"
   },
+  "airgap_update_screen": {
+    "Select folder to copy firmware": "Select folder to copy firmware",
+    "Copy firmware to": "Copy firmware to"
+  },
   "warning_after_airgap_update_screen": {
     "and": "and",
     "files have been copied to": "files have been copied to",
     "Insert the SDcard into your device and reboot it to update": "Insert the SDcard into your device and reboot it to update",
     "You should see this computed hash on device screen": "You should see this computed hash on device screen",
-    "Proceed": "Proceed",
+    "Quit": "Quit",
     "Back": "Back"
   }
 }

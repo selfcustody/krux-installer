@@ -139,12 +139,16 @@
     "Proceed": "진행",
     "Back": "뒤로"
   },
+  "airgap_update_screen": {
+    "Select folder to copy firmware": "펌웨어를 복사할 폴더 선택",
+    "Copy firmware to": "펌웨어 복사 위치"
+  },
   "warning_after_airgap_update_screen": {
     "and": "그리고",
     "files have been copied to": "파일이 복사되었습니다",
     "Insert the SDcard into your device and reboot it to update": "SD카드를 장치에 삽입하고 업데이트를 위해 재부팅하세요",
     "You should see this computed hash on device screen": "이 계산된 해시가 장치 화면에 표시됩니다",
-    "Proceed": "진행",
+    "Quit": "사임하다",
     "Back": "뒤로"
   }
 }

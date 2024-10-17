@@ -22,6 +22,7 @@
 main_screen.py
 """
 import os
+import sys
 import shutil
 from functools import partial
 from kivy.clock import Clock
@@ -76,14 +77,30 @@ class AirgapUpdateScreen(BaseScreen):
 
         setattr(AirgapUpdateScreen, "on_load", on_load)
 
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
+        def on_filter_sys(directory, filename):
+            if sys.platform == "win32":
+                return not directory == "C:\\" and not filename.endswith(".sys")
+            return True
 
+        def on_filter_dumpstack(directory, filename):
+            if sys.platform == "win32":
+                return not directory == "C:\\" and not filename.endswith(
+                    "DumpStack.log.tmp"
+                )
+            return True
+
+        setattr(
+            AirgapUpdateScreen, "on_filters_list", [on_filter_sys, on_filter_dumpstack]
+        )
+
+        self.make_grid(wid=f"{self.id}_grid", rows=1)
         self.make_file_chooser(
             wid=f"{self.id}_select",
             root_widget=f"{self.id}_grid",
             view_mode="icon",
             font_factor=44,
             on_load=getattr(AirgapUpdateScreen, "on_load"),
+            on_filters_list=getattr(AirgapUpdateScreen, "on_filters_list"),
         )
 
         fn = partial(self.update, name=self.name, key="canvas")

@@ -258,6 +258,7 @@ class BaseScreen(Screen, Trigger):
         view_mode: str,
         font_factor: int,
         on_load: typing.Callable,
+        on_filters_list: typing.Callable,
     ):
         """Build a file chooser for airgap screen"""
         box = BoxLayout(orientation="vertical")
@@ -298,7 +299,7 @@ class BaseScreen(Screen, Trigger):
         self.ids[btn.id] = WeakProxy(btn)
 
         # File chooser
-        file_chooser = FileChooserIconView()
+        file_chooser = FileChooserIconView(filters=on_filters_list)
         file_chooser.id = f"{wid}_chooser"
         file_chooser.dirselect = True
 

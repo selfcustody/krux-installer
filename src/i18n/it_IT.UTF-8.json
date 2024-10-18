@@ -145,8 +145,8 @@
   },
   "warning_after_airgap_update_screen": {
     "and": "e",
-    "files have been copied to": "i file sono stati copiati su",
-    "Insert the SDcard into your device and reboot it to update": "Inserisci la scheda SD nel dispositivo e riavvialo per aggiornare",
+    "have been copied to": "sono stati copiati su",
+    "Insert the SDcard into your device and reboot it to update": "Inserisci la scheda SD nel tuo dispositivo e riavvialo per aggiornare",
     "You should see this computed hash on device screen": "Dovresti vedere questo hash calcolato sullo schermo del dispositivo",
     "Quit": "Dimettersi",
     "Back": "Indietro"

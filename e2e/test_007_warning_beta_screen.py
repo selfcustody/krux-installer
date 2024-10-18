@@ -51,12 +51,12 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "and it's just for trying new things and providing feedback.",
                 "\n",
                 "\n",
-                "[color=#00ff00]",
-                "[ref=MainScreen]Proceed[/ref]",
-                "[/color]",
-                "        ",
                 "[color=#ff0000]",
                 "[ref=SelectVersion]Back[/ref]",
+                "[/color]",
+                "        ",
+                "[color=#00ff00]",
+                "[ref=MainScreen]Proceed[/ref]",
                 "[/color]",
             ]
         )
@@ -126,12 +126,12 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "e serve apenas para experimentar coisas novas e dar opiniões.",
                 "\n",
                 "\n",
-                "[color=#00ff00]",
-                "[ref=MainScreen]Continuar[/ref]",
-                "[/color]",
-                "        ",
                 "[color=#ff0000]",
                 "[ref=SelectVersion]Voltar[/ref]",
+                "[/color]",
+                "        ",
+                "[color=#00ff00]",
+                "[ref=MainScreen]Continuar[/ref]",
                 "[/color]",
             ]
         )

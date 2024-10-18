@@ -1,0 +1,149 @@
+{
+  "check_permissions_screen": {
+    "WARNING": "WARNUNG",
+    "This is the first run of KruxInstaller in": "Dies ist der erste Start von KruxInstaller in",
+    "and it appears that you do not have privileged access to make flash procedures": "und es scheint, dass Sie keinen privilegierten Zugriff haben, um Flash-Vorgänge durchzuführen",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "Um fortzufahren, klicken Sie auf die Schaltfläche Zulassen, und es wird nach Ihrem Passwort gefragt",
+    "to execute the following command": "um den folgenden Befehl auszuführen",
+    "You may need to logout (or even reboot)": "Möglicherweise müssen Sie sich abmelden (oder sogar neu starten)",
+    "and back in for the new group to take effect": "und erneut anmelden, damit die neue Gruppe wirksam wird",
+    "Do not worry, this message won't appear again": "Keine Sorge, diese Nachricht wird nicht wieder angezeigt",
+    "Allow": "Zulassen",
+    "Deny": "Ablehnen"
+  },
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "Überprüfung Ihrer Internetverbindung"
+  },
+  "main_screen": {
+    "Version": "Version",
+    "Device": "Gerät",
+    "select a new one": "neues Gerät auswählen",
+    "Flash": "Firmware flashen",
+    "Wipe": "Gerät löschen",
+    "Settings": "Einstellungen",
+    "About": "Über",
+    "Fetching data from": "Daten abrufen von"
+  },
+  "select_version_screen": {
+    "Old versions": "Ältere Versionen",
+    "Back": "Zurück"
+  },
+  "select_old_version_screen": {
+    "Back": "Zurück"
+  },
+  "warning_beta_screen": {
+    "WARNING": "WARNUNG",
+    "This is our test repository": "Dies ist unser Test-Repository",
+    "These are unsigned binaries for the latest and most experimental features": "Dies sind unsignierte Binärdateien für die neuesten\nund experimentellsten Funktionen",
+    "and it's just for trying new things and providing feedback.": "und dient nur dazu, neue Dinge auszuprobieren und Feedback zu geben.",
+    "Proceed": "Fortfahren",
+    "Back": "Zurück"
+  },
+  "download_beta_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Herunterladen",
+    "to": "zu",
+    "of": "von",
+    "downloaded": "heruntergeladen"
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "Assets bereits heruntergeladen",
+    "Do you want to proceed with the same file or do you want to download it again?": "Möchten Sie mit derselben Datei fortfahren oder sie erneut herunterladen?",
+    "Download again": "Erneut herunterladen",
+    "Proceed with current file": "Mit aktueller Datei fortfahren"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Herunterladen",
+    "to": "zu",
+    "of": "von",
+    "downloaded": "heruntergeladen"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Herunterladen",
+    "to": "zu",
+    "of": "von",
+    "downloaded": "heruntergeladen"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Herunterladen",
+    "to": "zu",
+    "of": "von",
+    "downloaded": "heruntergeladen"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "Verbinden",
+    "Downloading": "Herunterladen",
+    "to": "zu",
+    "of": "von",
+    "downloaded": "heruntergeladen"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "Überprüfung von Integrität und Authentizität",
+    "Integrity verification": "Integritätsprüfung",
+    "computed hash from": "berechneter Hash von",
+    "provided hash from": "bereitgestellter Hash von",
+    "SUCCESS": "ERFOLG",
+    "FAILED": "FEHLGESCHLAGEN",
+    "Authenticity verification": "Authentizitätsprüfung",
+    "GOOD": "GUT",
+    "BAD": "SCHLECHT",
+    "SIGNATURE": "SIGNATUR",
+    "If you have openssl installed on your system": "Wenn OpenSSL auf Ihrem System installiert ist",
+    "you can check manually with the following command": "können Sie manuell mit dem folgenden Befehl überprüfen",
+    "Proceed": "Fortfahren",
+    "Back": "Zurück"
+  },
+  "unzip_stable_screen": {
+    "Flash with": "Flashen mit",
+    "Air-gapped update with": "Air-gapped Update mit",
+    "Unziping": "Entpacken",
+    "Unziped": "Entpackt"
+  },
+  "flash_screen": {
+    "DONE": "FERTIG",
+    "Back": "Zurück",
+    "Quit": "Beenden",
+    "Flashing": "Flashen",
+    "at": "bei"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "BITTE NICHT DAS GERÄT TRENNEN",
+    "DONE": "FERTIG",
+    "Back": "Zurück",
+    "Quit": "Beenden"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "Sie sind dabei, dieses Gerät KOMPLETT ZU LÖSCHEN",
+    "This operation will": "Dieser Vorgang wird",
+    "Permanently erase all saved data": "Alle gespeicherten Daten dauerhaft löschen",
+    "Remove the existing firmware": "Die bestehende Firmware entfernen",
+    "Render the device non-functional until new firmware is re-flashed": "Das Gerät wird funktionslos, bis neue Firmware aufgespielt wird",
+    "Proceed": "Fortfahren",
+    "Back": "Zurück"
+  },
+  "about_screen": {
+    "follow us on X": "Folgen Sie uns auf X",
+    "Back": "Zurück"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Bevor Sie mit dem air-gapped Update fortfahren",
+    "Insert a FAT32 formatted SDCard into your computer": "Legen Sie eine FAT32-formatierte SD-Karte in Ihren Computer ein",
+    "Proceed": "Fortfahren",
+    "Back": "Zurück"
+  },
+  "airgap_update_screen": {
+    "Select folder to copy firmware": "Ordner zum Kopieren der Firmware auswählen",
+    "Copy firmware to": "Firmware kopieren nach"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "und",
+    "have been copied to": "wurden kopiert nach",
+    "Insert the SDcard into your device and reboot it to update": "Legen Sie die SD-Karte in Ihr Gerät\nein und starten Sie es neu, um das Update durchzuführen",
+    "You should see this computed hash on device screen": "Sie sollten diesen berechneten Hash auf dem Bildschirm des Geräts sehen",
+    "Quit": "Beenden",
+    "Back": "Zurück"
+  }
+}

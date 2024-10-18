@@ -145,9 +145,9 @@
   },
   "warning_after_airgap_update_screen": {
     "and": "和",
-    "files have been copied to": "文件已复制到",
-    "Insert the SDcard into your device and reboot it to update": "将SD卡插入设备并重启以更新",
-    "You should see this computed hash on device screen": "您应该在设备屏幕上看到此计算的哈希值",
+    "have been copied to": "已复制到",
+    "Insert the SDcard into your device and reboot it to update": "将SD卡插入设备并重新启动以更新",
+    "You should see this computed hash on device screen": "您应该在设备屏幕上看到此计算出的哈希值",
     "Quit": "退出",
     "Back": "返回"
   }

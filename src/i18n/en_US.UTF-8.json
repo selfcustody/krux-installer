@@ -140,7 +140,7 @@
   },
   "warning_after_airgap_update_screen": {
     "and": "and",
-    "files have been copied to": "files have been copied to",
+    "have been copied to": "have been copied to",
     "Insert the SDcard into your device and reboot it to update": "Insert the SDcard into your device and reboot it to update",
     "You should see this computed hash on device screen": "You should see this computed hash on device screen",
     "Quit": "Quit",

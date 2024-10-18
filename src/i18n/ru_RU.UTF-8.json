@@ -145,7 +145,7 @@
   },
   "warning_after_airgap_update_screen": {
     "and": "и",
-    "files have been copied to": "файлы были скопированы в",
+    "have been copied to": "были скопированы на",
     "Insert the SDcard into your device and reboot it to update": "Вставьте SD-карту в устройство и перезагрузите его для обновления",
     "You should see this computed hash on device screen": "Вы должны увидеть этот вычисленный хэш на экране устройства",
     "Quit": "Покидать",

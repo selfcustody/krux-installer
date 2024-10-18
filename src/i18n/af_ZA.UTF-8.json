@@ -144,9 +144,9 @@
   },
   "warning_after_airgap_update_screen": {
     "and": "en",
-    "files have been copied to": "lêers is gekopieer na",
+    "have been copied to": "is gekopieer na",
     "Insert the SDcard into your device and reboot it to update": "Plaas die SD-kaart in jou toestel en herlaai dit om op te dateer",
-    "You should see this computed hash on device screen": "Jy behoort hierdie berekende hash op die toestel se skerm te sien",
+    "You should see this computed hash on device screen": "Jy moet hierdie berekende hash op die toestel se skerm sien",
     "Quit": "Sluit",
     "Back": "Terug"
   }

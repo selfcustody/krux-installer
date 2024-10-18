@@ -204,6 +204,7 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 "key": "lang",
                 "options": [
                     ConfigKruxInstaller.make_lang_code("af_ZA"),
+                    ConfigKruxInstaller.make_lang_code("de_DE"),
                     ConfigKruxInstaller.make_lang_code("en_US"),
                     ConfigKruxInstaller.make_lang_code("es_ES"),
                     ConfigKruxInstaller.make_lang_code("fr_FR"),

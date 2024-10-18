@@ -138,7 +138,7 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
         where ther firmware was placed
         """
         _and = self.translate("and")
-        copied = self.translate("files have been copied to")
+        copied = self.translate("have been copied to")
         back = self.translate("Back")
         _quit = self.translate("Quit")
         return "".join(

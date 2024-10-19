@@ -1,0 +1,135 @@
+{
+  "check_permissions_screen": {
+    "Setup": "設定中です。",
+    "for": "のため",
+    "Checking": "確認中",
+    "permissions for": "権限を確認しています",
+    "WARNING": "警告",
+    "This is the first run of KruxInstaller in": "これはKruxInstallerで最初の実行です",
+    "and it appears that you do not have privileged access to make flash procedures": "特権アクセスがないため、フラッシュ手順を実行できません。",
+    "To proceed, click in the Allow button and a prompt will ask for your password": "続行するには、許可ボタンをクリックすると、パスワードを入力するように求められます。",
+    "to execute the following command": "次のコマンドを実行するには、",
+    "You may need to logout (or even reboot)": "ログアウト（または再起動）が必要になる場合があります。",
+    "and back in for the new group to take effect": "新しいグループを適用するために、再度ログインしてください。",
+    "Do not worry, this message won't appear again": "ご心配なく。このメッセージは再度表示されません。",
+    "Allow": "許可する",
+    "Deny": "拒否する"
+  }, 
+  "check_internet_connection_screen": {
+    "Checking your internet connection": "インターネット接続を確認しています。"
+  },
+  "main_screen": {
+    "Version": "バージョン",
+    "Device": "デバイス",
+    "select a new one": "新しいのを選択してください。",
+    "Flash": "ファームウェアを書き込む",
+    "Wipe": "デバイスを消去する",
+    "Settings": "設定",
+    "About": "情報",     
+    "Fetching data from": "からデータを取得しています。"
+  },
+  "select_version_screen": {
+    "Old versions": "古いバージョン",
+    "Back": "戻る"
+  },
+  "select_old_version_screen": {
+    "Back": "戻る"
+  },
+  "warning_beta_screen": {
+    "WARNING": "警告",
+    "This is our test repository": "これは私たちのテストリポジトリです",
+    "These are unsigned binaries for the latest and most experimental features": "これらは、最新かつ最も実験的な機能のための署名されていないバイナリです。",
+    "and it's just for trying new things and providing feedback.": "新しいものを試してフィードバックを提供するためだけのものです。",
+    "Proceed": "続行する",
+    "Back": "戻る"
+  },
+  "download_beta_screen": {
+    "Connecting": "接続中",
+    "Downloading": "ダウンロード中",
+    "to": "へ",
+    "of": "から",
+    "downloaded": "ダウンロードしました"
+  },
+  "warning_already_downloaded_screen": {
+    "Assets already downloaded": "すでにダウンロードしたファイルです",
+    "Do you want to proceed with the same file or do you want to download it again?": "同じファイルで続行しますか、それとも再度ダウンロードしますか？",
+    "Download again": "再度ダウンロードしてください。",
+    "Proceed with current file": "現在のファイルで続行する"
+  },
+  "download_stable_zip_screen": {
+    "Connecting": "接続中",
+    "Downloading": "ダウンロード中",
+    "to": "へ",
+    "of": "から",
+    "downloaded": "ダウンロードしました"
+  },
+  "download_stable_zip_sha256_screen": {
+    "Connecting": "接続中",
+    "Downloading": "ダウンロード中",
+    "to": "へ",
+    "of": "から",
+    "downloaded": "ダウンロードしました"
+  },
+  "download_stable_zip_sig_screen": {
+    "Connecting": "接続中",
+    "Downloading": "ダウンロード中",
+    "to": "へ",
+    "of": "から",
+    "downloaded": "ダウンロードしました"
+  },
+  "download_selfcustody_pem_screen": {
+    "Connecting": "接続中",
+    "Downloading": "ダウンロード中",
+    "to": "へ",
+    "of": "から",
+    "downloaded": "ダウンロードしました"
+  },
+  "verify_stable_zip_screen": {
+    "Verifying integrity and authenticity": "整合性と信頼性を確認しています。",
+    "Integrity verification": "整合性を確認しています",
+    "computed hash from": "計算されたハッシュは",
+    "provided hash from": "提供されたハッシュは",
+    "SUCCESS": "成功しました",
+    "FAILED": "失敗しました",
+    "Authenticity verification": "信頼性の確認",
+    "GOOD": "良好",
+    "BAD": "不良",
+    "SIGNATURE": "署名",
+    "If you have openssl installed on your system": "システムにOpenSSLがインストールされている場合は、",
+    "you can check manually with the following command": "次のコマンドで手動で確認できます。",
+    "Proceed": "進む",
+    "Back": "戻る"
+  },  
+  "unzip_stable_screen": {
+    "Flash with": "フラッシュする",
+    "Air-gapped update with": "エアギャップアップデートを使用して",
+    "Unziping": "解凍中",
+    "Unziped": "解凍されました"
+  },
+  "flash_screen": {
+    "DONE": "完了",
+    "Back": "戻る",
+    "Quit": "終了",
+    "Flashing": "フラッシュ中",
+    "at": "で"
+  },
+  "wipe_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "デバイスの電源を切らないでください。",
+    "DONE": "完了",
+    "Back": "戻る",
+    "Quit": "終了"
+  },
+  "warning_wipe_screen": {
+    "You are about to initiate a FULL WIPE of this device": "このデバイスの完全消去を開始しようとしています。",
+    "This operation will": "この操作は",
+    "Permanently erase all saved data": "保存されたすべてのデータを完全に消去します。",
+    "Remove the existing firmware": "既存のファームウェアを削除します。",
+    "Render the device non-functional until new firmware is re-flashed": "新しいファームウェアが再フラッシュされるまで、デバイスは機能しなくなります。",
+    "Proceed": "進む",
+    "Back": "戻る"
+  },
+  "about_screen": {
+    "follow us on X": "Xでフォローよろしくお願いします。",
+    "Back": "戻る"
+  }
+}

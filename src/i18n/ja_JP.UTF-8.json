@@ -131,5 +131,23 @@
   "about_screen": {
     "follow us on X": "Xでフォローよろしくお願いします。",
     "Back": "戻る"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "エアギャップアップデートを進める前に",
+    "Insert a FAT32 formatted SDCard into your computer": "FAT32でフォーマットされたSDカードをコンピュータに挿入してください",
+    "Proceed": "続行",
+    "Back": "戻る"
+  },
+  "airgap_update_screen": {
+    "Select folder to copy firmware": "ファームウェアをコピーするフォルダーを選択",
+    "Copy firmware to": "ファームウェアをコピー先"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "および",
+    "have been copied to": "がコピーされました",
+    "Insert the SDcard into your device and reboot it to update": "SDカードをデバイスに挿入し、再起動して更新を行ってください",
+    "You should see this computed hash on device screen": "この計算されたハッシュがデバイス画面に表示されるはずです",
+    "Quit": "終了",
+    "Back": "戻る"
   }
 }

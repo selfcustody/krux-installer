@@ -62,7 +62,8 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
 
         self.info(f"Registering assets path={self.assets_path}")
 
-        noto_sans_path = os.path.join(self.assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        font_name = "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+        noto_sans_path = os.path.join(self.assets_path, font_name)
         LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @staticmethod

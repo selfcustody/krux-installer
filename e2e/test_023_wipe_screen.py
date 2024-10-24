@@ -22,7 +22,9 @@ class TestWipeScreen(GraphicUnitTest):
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     @patch("src.app.screens.wipe_screen.partial")
     @patch("src.app.screens.wipe_screen.Clock.schedule_once")
     def test_init(self, mock_schedule_once, mock_partial, mock_get_locale):
@@ -69,16 +71,18 @@ class TestWipeScreen(GraphicUnitTest):
         mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     def test_update_locale(self, mock_get_locale):
         screen = WipeScreen()
         self.render(screen)
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        screen.update(name=screen.name, key="locale", value="en_US.UTF8")
+        screen.update(name=screen.name, key="locale", value="en_US.UTF-8")
 
-        self.assertEqual(screen.locale, "en_US.UTF8")
+        self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
         mock_get_locale.assert_called_once()
@@ -101,7 +105,9 @@ class TestWipeScreen(GraphicUnitTest):
         mock_get_locale.asset_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     def test_update_wiper(self, mock_get_locale):
         screen = WipeScreen()
         self.render(screen)

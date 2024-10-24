@@ -35,6 +35,9 @@ class FlashScreen(BaseFlashScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="flash_screen", name="FlashScreen", **kwargs)
+        self.please_msg = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
+        self.flashing_msg = self.translate("Flashing")
+        self.at_msg = self.translate("at")
         self.flasher = Flasher()
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
@@ -85,23 +88,19 @@ class FlashScreen(BaseFlashScreen):
 
         def on_process(file_type: str, iteration: int, total: int, suffix: str):
             percent = (iteration / total) * 100
-            please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
-            flashing = self.translate("Flashing")
-            at = self.translate("at")
-
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
-                    f"[b]{please}[/b]",
+                    f"[b]{self.please_msg}[/b]",
                     "\n",
                     f"{percent:.2f} %",
                     "\n",
-                    f"{flashing} ",
+                    f"{self.flashing_msg} ",
                     "[color=#efcc00]",
                     "[b]",
                     file_type,
                     "[/b]",
                     "[/color]",
-                    f" {at} ",
+                    f" {self.at_msg} ",
                     "[color=#efcc00]",
                     "[b]",
                     suffix,
@@ -143,7 +142,11 @@ class FlashScreen(BaseFlashScreen):
         self.make_button(
             row=1,
             wid=f"{self.id}_progress",
-            text="",
+            text="".join(
+                [
+                    f"[b]{self.please_msg}[/b]",
+                ]
+            ),
             font_factor=32,
             root_widget=f"{self.id}_subgrid",
             halign="center",
@@ -200,13 +203,18 @@ class FlashScreen(BaseFlashScreen):
         value = kwargs.get("value")
 
         def on_update():
+            if key == "locale":
+                self.please_msg = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
+                self.flashing_msg = self.translate("Flashing")
+                self.at_msg = self.translate("at")
+
             if key == "baudrate":
                 setattr(self, "baudrate", value)
 
             if key == "firmware":
                 setattr(self, "firmware", value)
 
-            elif key == "flasher":
+            if key == "flasher":
                 self.flasher.firmware = getattr(self, "firmware")
                 self.flasher.baudrate = getattr(self, "baudrate")
 

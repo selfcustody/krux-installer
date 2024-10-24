@@ -35,6 +35,7 @@ class WipeScreen(BaseFlashScreen):
 
     def __init__(self, **kwargs):
         super().__init__(wid="wipe_screen", name="WipeScreen", **kwargs)
+        self.please_msg = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
         self.wiper = None
         self.success = False
         self.progress = ""
@@ -115,7 +116,11 @@ class WipeScreen(BaseFlashScreen):
         self.make_button(
             row=1,
             wid=f"{self.id}_progress",
-            text="",
+            text="".join(
+                [
+                    f"[b]{self.please_msg}[/b]",
+                ]
+            ),
             halign="center",
             font_factor=32,
             root_widget=f"{self.id}_subgrid",
@@ -146,9 +151,6 @@ class WipeScreen(BaseFlashScreen):
         on_process = partial(self.wiper.wipe, device=self.device)
         self.thread = threading.Thread(name=self.name, target=on_process)
 
-        please = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
-        self.ids[f"{self.id}_progress"].text = please
-
         # if anything wrong happen, show it
         def hook(err):
             if not self.is_done:
@@ -170,6 +172,9 @@ class WipeScreen(BaseFlashScreen):
         value = kwargs.get("value")
 
         def on_update():
+            if key == "locale":
+                self.please_msg = self.translate("PLEASE DO NOT UNPLUG YOUR DEVICE")
+
             if key == "device":
                 setattr(self, "device", value)
 

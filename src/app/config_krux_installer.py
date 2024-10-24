@@ -27,6 +27,7 @@ import json
 import ctypes
 import locale
 from functools import partial
+import typing
 from kivy import resources as kv_resources
 from kivy.clock import Clock
 from kivy.core.text import LabelBase, DEFAULT_FONT
@@ -224,151 +225,258 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
         self.debug(f"{settings}.data={json_str}")
         settings.add_json_panel("Settings", self.config, data=json_str)
 
+    def make_main_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for MainScreen"""
+        main = self.screen_manager.get_screen("MainScreen")
+        partials.append(
+            partial(main.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+        partials.append(
+            partial(
+                main.update,
+                name="ConfigKruxInstaller",
+                key="version",
+                value=main.version,
+            )
+        )
+        partials.append(
+            partial(
+                main.update,
+                name="ConfigKruxInstaller",
+                key="device",
+                value=main.device,
+            )
+        )
+        partials.append(
+            partial(main.update, name="ConfigKruxInstaller", key="flash", value=None)
+        )
+        partials.append(
+            partial(main.update, name="ConfigKruxInstaller", key="wipe", value=None)
+        )
+        partials.append(
+            partial(main.update, name="ConfigKruxInstaller", key="settings", value=None)
+        )
+        partials.append(
+            partial(main.update, name="ConfigKruxInstaller", key="about", value=None)
+        )
+
+    def make_select_version_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for SelectVersionScreen"""
+        vers = self.screen_manager.get_screen("SelectVersionScreen")
+        partials.append(
+            partial(vers.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_select_old_version_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for SelectOldVersionScreen"""
+        oldv = self.screen_manager.get_screen("SelectOldVersionScreen")
+        partials.append(
+            partial(oldv.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_warn_stable_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for WarningAlreradyDownloadedScreen"""
+        warn_stable = self.screen_manager.get_screen("WarningAlreadyDownloadedScreen")
+        partials.append(
+            partial(
+                warn_stable.update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value=loc,
+            )
+        )
+
+    def make_warn_beta_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for WarningBetaScreen"""
+        warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
+        partials.append(
+            partial(
+                warn_beta.update, name="ConfigKruxInstaller", key="locale", value=loc
+            )
+        )
+
+    def make_down_zip_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for DownloadStableZipScreen"""
+        down_zip = self.screen_manager.get_screen("DownloadStableZipScreen")
+        partials.append(
+            partial(
+                down_zip.update, name="ConfigKruxInstaller", key="locale", value=loc
+            )
+        )
+
+    def make_down_zip_sha_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for DownloadStableZipSha256Screen"""
+        down_sha_zip = self.screen_manager.get_screen("DownloadStableZipSha256Screen")
+        partials.append(
+            partial(
+                down_sha_zip.update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value=loc,
+            )
+        )
+
+    def make_down_zip_sig_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for DownloadStableZipSigScreen"""
+        down_sig_zip = self.screen_manager.get_screen("DownloadStableZipSigScreen")
+        partials.append(
+            partial(
+                down_sig_zip.update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value=loc,
+            )
+        )
+
+    def make_down_pem_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for DownloadSelfcustodyPemScreen"""
+        down_pem = self.screen_manager.get_screen("DownloadSelfcustodyPemScreen")
+        partials.append(
+            partial(
+                down_pem.update, name="ConfigKruxInstaller", key="locale", value=loc
+            )
+        )
+
+    def make_down_beta_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for DownloadBetaScreen"""
+        down_beta = self.screen_manager.get_screen("DownloadBetaScreen")
+        partials.append(
+            partial(
+                down_beta.update, name="ConfigKruxInstaller", key="locale", value=loc
+            )
+        )
+
+    def make_verify_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for VerifyStableZipScreen"""
+        verify = self.screen_manager.get_screen("VerifyStableZipScreen")
+        partials.append(
+            partial(verify.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_unzip_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for UnzipStableScreen"""
+        unzip = self.screen_manager.get_screen("UnzipStableScreen")
+        partials.append(
+            partial(unzip.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_flash_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for FlashScreen"""
+        flash = self.screen_manager.get_screen("FlashScreen")
+        partials.append(
+            partial(flash.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_warn_wipe_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for WarningWipeScreen"""
+        warn_wipe = self.screen_manager.get_screen("WarningWipeScreen")
+        partials.append(
+            partial(
+                warn_wipe.update, name="ConfigKruxInstaller", key="locale", value=loc
+            )
+        )
+
+    def make_wipe_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for WipeScreen"""
+        wipe = self.screen_manager.get_screen("WipeScreen")
+        partials.append(
+            partial(wipe.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_warn_before_airgapped_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for WarningBeforeAirgapScreen"""
+        warn_before = self.screen_manager.get_screen("WarningBeforeAirgapUpdateScreen")
+        partials.append(
+            partial(
+                warn_before.update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value=loc,
+            )
+        )
+
+    def make_airgapped_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for AirgapUpdateScreen"""
+        airgap = self.screen_manager.get_screen("AirgapUpdateScreen")
+        partials.append(
+            partial(airgap.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_warn_after_airgapped_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for WarningAfterAirgapUpdateScreen"""
+        warn_after = self.screen_manager.get_screen("WarningAfterAirgapUpdateScreen")
+        partials.append(
+            partial(
+                warn_after.update,
+                name="ConfigKruxInstaller",
+                key="locale",
+                value=loc,
+            )
+        )
+
+    def make_about_partials(self, partials: typing.List[typing.Callable], loc: str):
+        """Update locales for AboutScreen"""
+        about = self.screen_manager.get_screen("AboutScreen")
+        partials.append(
+            partial(about.update, name="ConfigKruxInstaller", key="locale", value=loc)
+        )
+
+    def make_ask_permission_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for AskPermissionDialoutScreen"""
+        if sys.platform == "linux":
+            ask = self.screen_manager.get_screen("AskPermissionDialoutScreen")
+            partials.append(
+                partial(
+                    ask.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=loc,
+                )
+            )
+
     def on_config_change(self, config, section, key, value):
         if section == "locale" and key == "lang":
-            main = self.screen_manager.get_screen("MainScreen")
-            vers = self.screen_manager.get_screen("SelectVersionScreen")
-            oldv = self.screen_manager.get_screen("SelectOldVersionScreen")
-            warn_stable = self.screen_manager.get_screen(
-                "WarningAlreadyDownloadedScreen"
-            )
-            down_zip = self.screen_manager.get_screen("DownloadStableZipScreen")
-            down_sha_zip = self.screen_manager.get_screen(
-                "DownloadStableZipSha256Screen"
-            )
-            down_sig_zip = self.screen_manager.get_screen("DownloadStableZipSigScreen")
-            down_pem = self.screen_manager.get_screen("DownloadSelfcustodyPemScreen")
-            down_beta = self.screen_manager.get_screen("DownloadBetaScreen")
-            warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
-            verify = self.screen_manager.get_screen("VerifyStableZipScreen")
-            unzip = self.screen_manager.get_screen("UnzipStableScreen")
-            about = self.screen_manager.get_screen("AboutScreen")
-            warn_before = self.screen_manager.get_screen(
-                "WarningBeforeAirgapUpdateScreen"
-            )
-            airgap = self.screen_manager.get_screen("AirgapUpdateScreen")
-            warn_after = self.screen_manager.get_screen(
-                "WarningAfterAirgapUpdateScreen"
-            )
 
             if sys.platform == "win32":
                 value = f"{value}.UTF-8"
 
-            partials = [
-                partial(
-                    main.update, name="ConfigKruxInstaller", key="locale", value=value
-                ),
-                partial(
-                    main.update,
-                    name="ConfigKruxInstaller",
-                    key="version",
-                    value=main.version,
-                ),
-                partial(
-                    main.update,
-                    name="ConfigKruxInstaller",
-                    key="device",
-                    value=main.device,
-                ),
-                partial(
-                    main.update, name="ConfigKruxInstaller", key="flash", value=None
-                ),
-                partial(
-                    main.update, name="ConfigKruxInstaller", key="wipe", value=None
-                ),
-                partial(
-                    main.update, name="ConfigKruxInstaller", key="settings", value=None
-                ),
-                partial(
-                    main.update, name="ConfigKruxInstaller", key="about", value=None
-                ),
-                partial(
-                    vers.update, name="ConfigKruxInstaller", key="locale", value=value
-                ),
-                partial(
-                    oldv.update, name="ConfigKruxInstaller", key="locale", value=value
-                ),
-                partial(
-                    warn_stable.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    warn_beta.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    down_zip.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    down_sha_zip.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    down_sig_zip.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    down_pem.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    down_beta.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    verify.update, name="ConfigKruxInstaller", key="locale", value=value
-                ),
-                partial(
-                    unzip.update, name="ConfigKruxInstaller", key="locale", value=value
-                ),
-                partial(
-                    about.update, name="ConfigKruxInstaller", key="locale", value=value
-                ),
-                partial(
-                    warn_before.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    airgap.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-                partial(
-                    warn_after.update,
-                    name="ConfigKruxInstaller",
-                    key="locale",
-                    value=value,
-                ),
-            ]
-
-            if sys.platform == "linux":
-                ask = self.screen_manager.get_screen("AskPermissionDialoutScreen")
-                partials.append(
-                    partial(
-                        ask.update,
-                        name="ConfigKruxInstaller",
-                        key="locale",
-                        value=value,
-                    )
-                )
+            partials = []
+            self.make_ask_permission_partials(partials=partials, loc=value)
+            self.make_main_partials(partials=partials, loc=value)
+            self.make_select_version_partials(partials=partials, loc=value)
+            self.make_select_old_version_partials(partials=partials, loc=value)
+            self.make_warn_stable_partials(partials=partials, loc=value)
+            self.make_warn_beta_partials(partials=partials, loc=value)
+            self.make_down_zip_partials(partials=partials, loc=value)
+            self.make_down_zip_sha_partials(partials=partials, loc=value)
+            self.make_down_zip_sig_partials(partials=partials, loc=value)
+            self.make_down_pem_partials(partials=partials, loc=value)
+            self.make_down_beta_partials(partials=partials, loc=value)
+            self.make_verify_partials(partials=partials, loc=value)
+            self.make_unzip_partials(partials=partials, loc=value)
+            self.make_flash_partials(partials=partials, loc=value)
+            self.make_warn_wipe_partials(partials=partials, loc=value)
+            self.make_wipe_partials(partials=partials, loc=value)
+            self.make_warn_before_airgapped_partials(partials=partials, loc=value)
+            self.make_airgapped_partials(partials=partials, loc=value)
+            self.make_warn_after_airgapped_partials(partials=partials, loc=value)
+            self.make_about_partials(partials=partials, loc=value)
 
             for fn in partials:
                 Clock.schedule_once(fn, 0)

@@ -232,6 +232,13 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             warn_stable = self.screen_manager.get_screen(
                 "WarningAlreadyDownloadedScreen"
             )
+            down_zip = self.screen_manager.get_screen("DownloadStableZipScreen")
+            down_sha_zip = self.screen_manager.get_screen(
+                "DownloadStableZipSha256Screen"
+            )
+            down_sig_zip = self.screen_manager.get_screen("DownloadStableZipSigScreen")
+            down_pem = self.screen_manager.get_screen("DownloadSelfcustodyPemScreen")
+            down_beta = self.screen_manager.get_screen("DownloadBetaScreen")
             warn_beta = self.screen_manager.get_screen("WarningBetaScreen")
             verify = self.screen_manager.get_screen("VerifyStableZipScreen")
             unzip = self.screen_manager.get_screen("UnzipStableScreen")
@@ -289,6 +296,36 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 ),
                 partial(
                     warn_beta.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    down_zip.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    down_sha_zip.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    down_sig_zip.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    down_pem.update,
+                    name="ConfigKruxInstaller",
+                    key="locale",
+                    value=value,
+                ),
+                partial(
+                    down_beta.update,
                     name="ConfigKruxInstaller",
                     key="locale",
                     value=value,

@@ -44,6 +44,9 @@ from kivy.weakproxy import WeakProxy
 from src.i18n import T
 from src.utils.trigger import Trigger
 
+if sys.platform == "win32":
+    import win32file
+
 
 class BaseScreen(Screen, Trigger):
     """Main screen is the 'Home' page"""
@@ -303,6 +306,8 @@ class BaseScreen(Screen, Trigger):
         file_chooser.id = f"{wid}_chooser"
         file_chooser.dirselect = True
 
+        self.detect_usb_windows(file_chooser=file_chooser, btn=btn)
+
         # pytlint: disable=unused-argument
         def on_selection(fc, selection):
             copy = self.translate("Copy firmware to")
@@ -312,6 +317,37 @@ class BaseScreen(Screen, Trigger):
         file_chooser.bind(selection=on_selection)
         self.ids[box.id].add_widget(file_chooser)
         self.ids[file_chooser.id] = WeakProxy(file_chooser)
+
+    def detect_usb_windows(self, file_chooser, btn):
+        """
+        Windows do not show non-C drivers. So to show them
+        will follow a mixed approach:
+        (1) https://stackoverflow.com/questions/4273252/
+               detect-inserted-usb-on-windows#answer-33295355
+        (2) https://stackoverflow.com/questions/26028235/
+              python-kivy-how-to-use-filechooser-access-files-outside-c-drive
+        """
+        if sys.platform == "win32":
+
+            # the placeholder to where we will find
+            drive_list = []
+
+            # Get the USB
+            drivebits = win32file.GetLogicalDrives()
+            for d in range(1, 26):
+                mask = 1 << d
+                if drivebits & mask:
+                    # here if the drive is at least there
+                    # pylint: disable=consider-using-f-string
+                    drname = "%c:\\" % chr(ord("A") + d)
+                    t = win32file.GetDriveType(drname)
+                    if t == win32file.DRIVE_REMOVABLE:
+                        drive_list.append(drname)
+
+            # now gotcha the first
+            file_chooser.path = drive_list[0]
+            copy = self.translate("Copy firmware to")
+            btn.text = f"{copy} {file_chooser.path}"
 
     def redirect_exception(self, exception: Exception):
         """Get an exception and prepare a ErrorScreen rendering"""

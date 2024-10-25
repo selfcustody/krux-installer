@@ -37,8 +37,15 @@ class AirgapUpdateScreen(BaseScreen):
         super().__init__(
             wid="airgap_update_screen", name="AirgapUpdateScreen", **kwargs
         )
+        self.make_grid(wid=f"{self.id}_grid", rows=1)
         self._firmware_bin = ""
         self._firmware_sig = ""
+
+    # pylint: disable=unused-argument
+    def on_enter(self, *args, **kwargs):
+        """When enter, verify if system is windows or other and give
+        a proper way to show folders"""
+        self.ids[f"{self.id}_grid"].clear_widgets()
 
         def on_load(path):
             new_firmware_bin = os.path.join(path, "firmware.bin")
@@ -93,7 +100,6 @@ class AirgapUpdateScreen(BaseScreen):
             AirgapUpdateScreen, "on_filters_list", [on_filter_sys, on_filter_dumpstack]
         )
 
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
         self.make_file_chooser(
             wid=f"{self.id}_select",
             root_widget=f"{self.id}_grid",

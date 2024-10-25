@@ -34,9 +34,7 @@ from kivy.core.window import Window
 from kivy.graphics.vertex_instructions import Rectangle
 from kivy.graphics.context_instructions import Color
 from kivy.uix.label import Label
-from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
-from kivy.uix.filechooser import FileChooserIconView
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
@@ -193,7 +191,8 @@ class BaseScreen(Screen, Trigger):
     def clear_grid(self, wid: str):
         """Clear GridLayout widget"""
         self.debug(f"Clearing widgets from GridLayout::{wid}")
-        self.ids[wid].clear_widgets()
+        if wid in self.ids:
+            self.ids[wid].clear_widgets()
 
     def make_button(
         self,
@@ -257,178 +256,104 @@ class BaseScreen(Screen, Trigger):
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
 
-    def make_file_chooser(
-        self,
-        root_widget: str,
-        wid: str,
-        view_mode: str,
-        font_factor: int,
-        on_load: typing.Callable,
-        on_filters_list: typing.Callable,
-    ):
-        """Build a file chooser for airgap screen"""
-        box = BoxLayout(orientation="vertical")
-        box.id = wid
-
-        def on_box_size(instance, value):
-            with self.canvas.before:
-                Color(0, 0, 0, 1)
-                Rectangle(size=(Window.width + 1, Window.height + 1))
-
-        box.bind(size=on_box_size)
-        self.ids[root_widget].add_widget(box)
-        self.ids[box.id] = WeakProxy(box)
-
-        # Box to put buttons
-        height = int(Window.size[1] * 0.1)
-        inner_box = BoxLayout(size_hint_y=None, height=height)
-        inner_box.id = f"{wid}_inner_box"
-        self.ids[box.id].add_widget(inner_box)
-        self.ids[inner_box.id] = WeakProxy(inner_box)
-
-        # Select button
-        select = self.translate("Select folder to copy firmware")
-        btn = Button(text=select, halign="center")
-        btn.id = f"{wid}_inner_box_button"
-
-        def on_release(btn):
-            on_load(file_chooser.path)
-
-        # pylint: disable=unused-argument
-        def on_size(instance, value):
-            instance.font_size = BaseScreen.get_half_diagonal_screen_size(font_factor)
-
-        btn.bind(size=on_size)
-
-        btn.bind(on_release=on_release)
-        self.ids[inner_box.id].add_widget(btn)
-        self.ids[btn.id] = WeakProxy(btn)
-
-        # File chooser
-        file_chooser = FileChooserIconView(filters=on_filters_list)
-        file_chooser.id = f"{wid}_chooser"
-        file_chooser.dirselect = True
-
-        self.on_get_removable_drives_linux(file_chooser=file_chooser, btn=btn)
-        self.on_get_removable_drives_macos(file_chooser=file_chooser, btn=btn)
-        self.on_get_removable_drives_windows(file_chooser=file_chooser, btn=btn)
-
-        # pytlint: disable=unused-argument
-        def on_selection(fc, selection):
-            copy = self.translate("Copy firmware to")
-            file_chooser.path = selection[0]
-            btn.text = f"{copy} {selection[0]}"
-
-        file_chooser.bind(selection=on_selection)
-        self.ids[box.id].add_widget(file_chooser)
-        self.ids[file_chooser.id] = WeakProxy(file_chooser)
-
-    def on_get_removable_drives_linux(self, file_chooser, btn):
+    def on_get_removable_drives_linux(self) -> typing.List[str]:
         """
         Linux put their removable drives on /mnt or /media
         and to get them is necessary to use lsblk
         """
-        if sys.platform == "linux":
-            drive_list = []
+        drive_list = []
+        # Use the 'lsblk' command to list block devices and their mount points
+        try:
 
-            # Use the 'lsblk' command to list block devices and their mount points
-            try:
+            # pylint: disable=possibly-used-before-assignment
+            result = subprocess.run(
+                ["lsblk", "-P", "-o", "NAME,TYPE,RM,MOUNTPOINT"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            lines = result.stdout.split("\n")
 
-                # pylint: disable=possibly-used-before-assignment
-                result = subprocess.run(
-                    ["lsblk", "-P", "-o", "NAME,TYPE,RM,MOUNTPOINT"],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
-                lines = result.stdout.split("\n")
+            # Process the output to find removable devices
+            for line in lines:
+                # Parse key-value pairs (lsblk -P outputs in NAME="value" format)
+                if 'RM="1"' in line and 'TYPE="part"' in line:
+                    # Split by spaces and parse each key-value pair
+                    attributes = {}
+                    parts = line.split()
 
-                # Process the output to find removable devices
-                for line in lines:
-                    # Parse key-value pairs (lsblk -P outputs in NAME="value" format)
-                    if 'RM="1"' in line and 'TYPE="part"' in line:
-                        # Split by spaces and parse each key-value pair
-                        attributes = {}
-                        parts = line.split()
+                    for part in parts:
+                        key, value = part.split("=", 1)
+                        attributes[key] = value.strip('"')
 
-                        for part in parts:
-                            key, value = part.split("=", 1)
-                            attributes[key] = value.strip('"')
+                    # Check if the device is mounted
+                    if "MOUNTPOINT" in attributes and attributes["MOUNTPOINT"]:
+                        drive_list.append(attributes["MOUNTPOINT"])
 
-                        # Check if the device is mounted
-                        if "MOUNTPOINT" in attributes and attributes["MOUNTPOINT"]:
-                            drive_list.append(attributes["MOUNTPOINT"])
+        except subprocess.CalledProcessError as e:
+            exc = RuntimeError(f"Error detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
 
-                file_chooser.path = drive_list[0]
-                copy = self.translate("Copy firmware to")
-                btn.text = f"{copy} {file_chooser.path}"
+        return drive_list
 
-            except subprocess.CalledProcessError as e:
-                exc = RuntimeError(f"Error detecting removable drives:\n{e}")
-                self.redirect_exception(exception=exc)
-
-    def on_get_removable_drives_macos(self, file_chooser, btn):
+    def on_get_removable_drives_macos(self) -> typing.List[str]:
         """
         MacOS put their removable drives on /dev/disk and mounted on /Volumes
         and to get them is necessary to use diskutil
         """
-        if sys.platform == "darwin":
-            drive_list = []
+        drive_list = []
+        try:
+            # Use 'diskutil' to list all disks, including external ones
+            result = subprocess.run(
+                ["diskutil", "info", "-all"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
 
-            try:
-                # Use 'diskutil' to list all disks, including external ones
-                result = subprocess.run(
-                    ["diskutil", "info", "-all"],
-                    capture_output=True,
-                    text=True,
-                    check=True,
-                )
+            # diskutil separate blocks with a bunch of *
+            blocks = result.stdout.split("**********")
 
-                # diskutil separate blocks with a bunch of *
-                blocks = result.stdout.split("**********")
+            for block in blocks:
+                # Process the output to find external (removable) drives
+                lines = block.split("\n")
+                node = None
+                fat32 = False
+                external = False
+                mounted = False
+                mnt = False
+                for line in lines:
+                    line = line.strip()
 
-                for block in blocks:
-                    # Process the output to find external (removable) drives
-                    lines = block.split("\n")
-                    node = None
-                    fat32 = False
-                    external = False
-                    mounted = False
-                    mnt = False
-                    for line in lines:
-                        line = line.strip()
+                    # Identify if a new device starts (e.g., /dev/disk2)
+                    if "Device Node" in line and "/dev/disk" in line:
+                        node = line.split("Device Node:")[-1].strip()
 
-                        # Identify if a new device starts (e.g., /dev/disk2)
-                        if "Device Node" in line and "/dev/disk" in line:
-                            node = line.split("Device Node:")[-1].strip()
+                    # check if it is FAT32 (the supported by krux devices)
+                    if "File System Personality" in line and "FAT32" in line:
+                        fat32 = True
 
-                        # check if it is FAT32 (the supported by krux devices)
-                        if "File System Personality" in line and "FAT32" in line:
-                            fat32 = True
+                    # Look for external devices
+                    if "Device Location" in line and "External" in line:
+                        external = True
 
-                        # Look for external devices
-                        if "Device Location" in line and "External" in line:
-                            external = True
+                    # Find the mount point, if it exists
+                    if "Mounted" in line and "Yes" in line:
+                        mounted = True
 
-                        # Find the mount point, if it exists
-                        if "Mounted" in line and "Yes" in line:
-                            mounted = True
+                    if "Mount Point" in line:
+                        mnt = line.split("Mount Point:")[-1].strip()
 
-                        if "Mount Point" in line:
-                            mnt = line.split("Mount Point:")[-1].strip()
+                if node and fat32 and external and mounted and mnt:
+                    drive_list.append(mnt)
 
-                    if node and fat32 and external and mounted and mnt:
-                        drive_list.append(mnt)
+        except subprocess.CalledProcessError as e:
+            exc = RuntimeError(f"Error detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
 
-                file_chooser.path = drive_list[0]
-                copy = self.translate("Copy firmware to")
-                btn.text = f"{copy} {file_chooser.path}"
+        return drive_list
 
-            except subprocess.CalledProcessError as e:
-                exc = RuntimeError(f"Error detecting removable drives:\n{e}")
-                self.redirect_exception(exception=exc)
-
-    def on_get_removable_drives_windows(self, file_chooser, btn):
+    def on_get_removable_drives_windows(self) -> typing.List[str]:
         """
         Windows do not show non-C drivers. So to show them
         will follow a mixed approach:
@@ -437,34 +362,32 @@ class BaseScreen(Screen, Trigger):
         (2) https://stackoverflow.com/questions/26028235/
               python-kivy-how-to-use-filechooser-access-files-outside-c-drive
         """
-        if sys.platform == "win32":
-            # the placeholder to where we will find
-            drive_list = []
+        # the placeholder to where we will find
+        drive_list = []
+        try:
+            # Get the USB
+            # pylint: disable=possibly-used-before-assignment
+            drivebits = win32file.GetLogicalDrives()
+            for d in range(1, 26):
+                mask = 1 << d
+                if drivebits & mask:
+                    # here if the drive is at least there
+                    # pylint: disable=consider-using-f-string
+                    drname = "%c:\\" % chr(ord("A") + d)
 
-            try:
-                # Get the USB
-                # pylint: disable=possibly-used-before-assignment
-                drivebits = win32file.GetLogicalDrives()
-                for d in range(1, 26):
-                    mask = 1 << d
-                    if drivebits & mask:
-                        # here if the drive is at least there
-                        # pylint: disable=consider-using-f-string
-                        drname = "%c:\\" % chr(ord("A") + d)
+                    # pylint: disable=possibly-used-before-assignment
+                    t = win32file.GetDriveType(drname)
+                    if t == win32file.DRIVE_REMOVABLE:
+                        drive_list.append(drname)
 
-                        # pylint: disable=possibly-used-before-assignment
-                        t = win32file.GetDriveType(drname)
-                        if t == win32file.DRIVE_REMOVABLE:
-                            drive_list.append(drname)
+            return drive_list
 
-                file_chooser.path = drive_list[0]
-                copy = self.translate("Copy firmware to")
-                btn.text = f"{copy} {file_chooser.path}"
+        # pylint: disable=broad-exception-caught
+        except Exception as e:
+            exc = RuntimeError(f"Error detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
 
-            # pylint: disable=broad-exception-caught
-            except Exception as e:
-                exc = RuntimeError(f"Error detecting removable drives:\n{e}")
-                self.redirect_exception(exception=exc)
+        return drive_list
 
     def redirect_exception(self, exception: Exception):
         """Get an exception and prepare a ErrorScreen rendering"""

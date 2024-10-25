@@ -22,7 +22,6 @@
 main_screen.py
 """
 import os
-import sys
 import shutil
 from functools import partial
 from kivy.clock import Clock
@@ -37,28 +36,28 @@ class AirgapUpdateScreen(BaseScreen):
         super().__init__(
             wid="airgap_update_screen", name="AirgapUpdateScreen", **kwargs
         )
-        self.make_grid(wid=f"{self.id}_grid", rows=1)
+
         self._firmware_bin = ""
         self._firmware_sig = ""
 
-    # pylint: disable=unused-argument
-    def on_enter(self, *args, **kwargs):
-        """When enter, verify if system is windows or other and give
-        a proper way to show folders"""
-        self.ids[f"{self.id}_grid"].clear_widgets()
+    def build_drive_button(self, row: int, drive: str):
+        """dynamically create a callback for copy process"""
 
-        def on_load(path):
-            new_firmware_bin = os.path.join(path, "firmware.bin")
-            self.info(f"Copying file {self.firmware_bin} to {new_firmware_bin}")
+        def on_press(instance):
+            self.debug(f"Calling {instance.id}::on_press")
+            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+
+        def on_release(instance):
+            new_firmware_bin = os.path.join(drive, "firmware.bin")
+            new_firmware_sig = os.path.join(drive, "firmware.bin.sig")
             shutil.copyfile(self.firmware_bin, new_firmware_bin)
-
-            new_firmware_sig = os.path.join(path, "firmware.bin.sig")
-            self.info(f"Copying file {self.firmware_sig} to {new_firmware_sig}")
             shutil.copyfile(self.firmware_sig, new_firmware_sig)
 
+            # After copy, make sha256 hash to show
             sha256 = Sha256Verifyer(filename=new_firmware_bin)
             sha256.load()
 
+            # Now update the next screen
             warn_screen = self.manager.get_screen("WarningAfterAirgapUpdateScreen")
 
             fns = [
@@ -66,7 +65,7 @@ class AirgapUpdateScreen(BaseScreen):
                     warn_screen.update,
                     name=self.name,
                     key="sdcard",
-                    value=path,
+                    value=drive,
                 ),
                 partial(
                     warn_screen.update,
@@ -80,37 +79,25 @@ class AirgapUpdateScreen(BaseScreen):
             for fn in fns:
                 Clock.schedule_once(fn, 0)
 
+            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
             self.set_screen(name="WarningAfterAirgapUpdateScreen", direction="left")
 
-        setattr(AirgapUpdateScreen, "on_load", on_load)
-
-        def on_filter_sys(directory, filename):
-            if sys.platform == "win32":
-                return not directory == "C:\\" and not filename.endswith(".sys")
-            return True
-
-        def on_filter_dumpstack(directory, filename):
-            if sys.platform == "win32":
-                return not directory == "C:\\" and not filename.endswith(
-                    "DumpStack.log.tmp"
-                )
-            return True
-
-        setattr(
-            AirgapUpdateScreen, "on_filters_list", [on_filter_sys, on_filter_dumpstack]
-        )
-
-        self.make_file_chooser(
-            wid=f"{self.id}_select",
+        # Now build the button
+        self.make_button(
             root_widget=f"{self.id}_grid",
-            view_mode="icon",
-            font_factor=44,
-            on_load=getattr(AirgapUpdateScreen, "on_load"),
-            on_filters_list=getattr(AirgapUpdateScreen, "on_filters_list"),
+            wid=f"{self.id}_button_{row}",
+            text=f"Select {drive} to copy firmware",
+            row=row,
+            halign="center",
+            font_factor=36,
+            on_press=on_press,
+            on_release=on_release,
+            on_ref_press=None,
         )
 
-        fn = partial(self.update, name=self.name, key="canvas")
-        Clock.schedule_once(fn, 0)
+    # pylint: disable=unused-argument
+    def on_leave(self, *args):
+        self.clear_widgets()
 
     @property
     def firmware_bin(self) -> str:
@@ -144,6 +131,11 @@ class AirgapUpdateScreen(BaseScreen):
         value = kwargs.get("value")
 
         def on_update():
+            if key == "drives":
+                self.make_grid(wid=f"{self.id}_grid", rows=len(value))
+                for i, drive in enumerate(value):
+                    self.build_drive_button(row=i, drive=drive)
+
             if key == "binary":
                 self.firmware_bin = value
 
@@ -158,7 +150,7 @@ class AirgapUpdateScreen(BaseScreen):
             allowed_screens=(
                 "ConfigKruxInstaller",
                 "UnzipStableScreen",
-                "DownloadBetaScreen",
+                "WarningBeforeAirgapUpdateScreen",
                 "AirgapUpdateScreen",
             ),
             on_update=getattr(AirgapUpdateScreen, "on_update"),

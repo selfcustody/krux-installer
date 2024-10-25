@@ -21,6 +21,7 @@
 """
 about_screen.py
 """
+import sys
 from functools import partial
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
@@ -58,6 +59,22 @@ class WarningBeforeAirgapUpdateScreen(BaseScreen):
                 self.set_screen(name="MainScreen", direction="left")
 
             if args[1] == "AirgapUpdateScreen":
+                drive_list = []
+
+                if sys.platform == "linux":
+                    drive_list = self.on_get_removable_drives_linux()
+
+                if sys.platform == "darwin":
+                    drive_list = self.on_get_removable_drives_macos()
+
+                if sys.platform == "win32":
+                    drive_list = self.on_get_removable_drives_windows()
+
+                screen = self.manager.get_screen("AirgapUpdateScreen")
+                fn = partial(
+                    screen.update, name=self.name, key="drives", value=drive_list
+                )
+                Clock.schedule_once(fn, 0)
                 self.set_screen(name="AirgapUpdateScreen", direction="right")
 
         self.make_button(

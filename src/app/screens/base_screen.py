@@ -44,8 +44,8 @@ from kivy.weakproxy import WeakProxy
 from src.i18n import T
 from src.utils.trigger import Trigger
 
-if sys.platform == "win32":
-    import win32file
+if sys.platform.startswith("win32"):
+    import win32file  # pylint: disable=import-error
 
 
 class BaseScreen(Screen, Trigger):
@@ -333,6 +333,7 @@ class BaseScreen(Screen, Trigger):
             drive_list = []
 
             # Get the USB
+            # pylint: disable=possibly-used-before-assignment
             drivebits = win32file.GetLogicalDrives()
             for d in range(1, 26):
                 mask = 1 << d
@@ -340,6 +341,8 @@ class BaseScreen(Screen, Trigger):
                     # here if the drive is at least there
                     # pylint: disable=consider-using-f-string
                     drname = "%c:\\" % chr(ord("A") + d)
+
+                    # pylint: disable=possibly-used-before-assignment
                     t = win32file.GetDriveType(drname)
                     if t == win32file.DRIVE_REMOVABLE:
                         drive_list.append(drname)

@@ -97,7 +97,9 @@ class AirgapUpdateScreen(BaseScreen):
 
     # pylint: disable=unused-argument
     def on_leave(self, *args):
-        self.clear_widgets()
+        self.info("Clearing widgets")
+        self.clear_grid(wid=f"{self.id}_grid")
+        del self.ids[f"{self.id}_grid"]
 
     @property
     def firmware_bin(self) -> str:

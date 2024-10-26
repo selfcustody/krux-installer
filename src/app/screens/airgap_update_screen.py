@@ -82,11 +82,16 @@ class AirgapUpdateScreen(BaseScreen):
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
             self.set_screen(name="WarningAfterAirgapUpdateScreen", direction="left")
 
+        select = self.translate("Select")
+        to_copy = self.translate("to copy firmware")
+
         # Now build the button
         self.make_button(
             root_widget=f"{self.id}_grid",
             wid=f"{self.id}_button_{row}",
-            text=f"Select {drive} to copy firmware",
+            text="".join(
+                [select, "\n", f"[color=#efcc00]{drive}[/color]", "\n", to_copy]
+            ),
             row=row,
             halign="center",
             font_factor=36,

@@ -135,14 +135,14 @@
   },
   "warning_before_airgap_update_screen": {
     "Before proceeding with the air-gapped update": "Avant de procéder à la mise à jour isolée",
-    "Insert a FAT32 formatted SDCard into your computer": "Insérez une SDCard formatée en FAT32 dans votre ordinateur",
-    "On the next screen, choose its root folder to copy the firmware": "Sur l'écran suivant, choisissez son dossier racine pour copier le firmware",
+    "Insert a FAT32 formatted SDCard into your computer": "Insérez une SDCard formatée en FAT32 dans votre ordinateur",    
+    "On the next screen, choose the drive to copy firmware": "Sur l'écran suivant, choisissez le lecteur pour copier le firmware",
     "Proceed": "Continuer",
     "Back": "Retour"
   },
   "airgap_update_screen": {
-    "Select folder to copy firmware": "Sélectionnez le dossier pour copier le firmware",
-    "Copy firmware to": "Copier le firmware vers"
+    "Select": "Sélectionner",
+    "to copy firmware": "pour copier le firmware"
   },
   "warning_after_airgap_update_screen": {
     "and": "et",

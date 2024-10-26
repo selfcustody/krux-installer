@@ -135,13 +135,13 @@
   "warning_before_airgap_update_screen": {
     "Before proceeding with the air-gapped update": "Voordat u voortgaan met die opdatering met die luggaping",
     "Insert a FAT32 formatted SDCard into your computer": "Plaas 'n FAT32-geformateerde SDCard in jou rekenaar",
-    "On the next screen, choose its root folder to copy the firmware": "Op die volgende skerm, kies sy wortelgids om die firmware te kopieer",
+    "On the next screen, choose the drive to copy firmware": "Kies op die volgende skerm die skyf om firmware te kopieer",
     "Proceed": "Voortgaan",
     "Back": "Terug"
   },
   "airgap_update_screen": {
-    "Select folder to copy firmware": "Kies vouer om firmware te kopieer",
-    "Copy firmware to": "Kopieer firmware na"
+    "Select": "Kies",
+    "to copy firmware": "om firmware te kopieer"
   },
   "warning_after_airgap_update_screen": {
     "and": "en",

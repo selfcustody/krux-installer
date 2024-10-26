@@ -136,13 +136,13 @@
   "warning_before_airgap_update_screen": {
     "Before proceeding with the air-gapped update": "在继续进行气隙更新之前",
     "Insert a FAT32 formatted SDCard into your computer": "将 FAT32 格式的 SD 卡插入计算机",
-    "On the next screen, choose its root folder to copy the firmware": "在下一个屏幕上，选择其根文件夹以复制固件",
+    "On the next screen, choose the drive to copy firmware": "在下一个屏幕上，选择要复制固件的驱动器",
     "Proceed": "进行",
     "Back": "返回"
   },
   "airgap_update_screen": {
-    "Select folder to copy firmware": "选择文件夹以复制固件",
-    "Copy firmware to": "复制固件到"
+    "Select": "选择",
+    "to copy firmware": "以复制固件"
   },
   "warning_after_airgap_update_screen": {
     "and": "和",

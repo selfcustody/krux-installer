@@ -136,13 +136,13 @@
   "warning_before_airgap_update_screen": {
     "Before proceeding with the air-gapped update": "에어 갭 업데이트를 진행하기 전에",
     "Insert a FAT32 formatted SDCard into your computer": "FAT32로 포맷 된 SDCard를 컴퓨터에 삽입하십시오.",
-    "On the next screen, choose its root folder to copy the firmware": "다음 화면에서 펌웨어를 복사할 루트 폴더를 선택합니다",
+    "On the next screen, choose the drive to copy firmware": "다음 화면에서 펌웨어를 복사할 드라이브를 선택하세요",
     "Proceed": "진행",
     "Back": "뒤로"
   },
   "airgap_update_screen": {
-    "Select folder to copy firmware": "펌웨어를 복사할 폴더 선택",
-    "Copy firmware to": "펌웨어 복사 위치"
+    "Select": "선택",
+    "to copy firmware": "펌웨어를 복사하기 위해"
   },
   "warning_after_airgap_update_screen": {
     "and": "그리고",

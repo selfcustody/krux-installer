@@ -122,7 +122,7 @@ class WarningBeforeAirgapUpdateScreen(BaseScreen):
             "Insert a FAT32 formatted SDCard into your computer"
         )
         select_warn_0 = self.translate(
-            "On the next screen, choose its root folder to copy the firmware"
+            "On the next screen, choose the drive to copy firmware"
         )
         proceed = self.translate("Proceed")
         back = self.translate("Back")

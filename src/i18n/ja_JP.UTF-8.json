@@ -136,12 +136,13 @@
   "warning_before_airgap_update_screen": {
     "Before proceeding with the air-gapped update": "エアギャップアップデートを進める前に",
     "Insert a FAT32 formatted SDCard into your computer": "FAT32でフォーマットされたSDカードをコンピュータに挿入してください",
+    "On the next screen, choose the drive to copy firmware": "次の画面で、ファームウェアをコピーするドライブを選択してください",
     "Proceed": "続行",
     "Back": "戻る"
   },
   "airgap_update_screen": {
-    "Select folder to copy firmware": "ファームウェアをコピーするフォルダーを選択",
-    "Copy firmware to": "ファームウェアをコピー先"
+    "Select": "選択",
+    "to copy firmware": "ファームウェアをコピーするために"
   },
   "warning_after_airgap_update_screen": {
     "and": "および",

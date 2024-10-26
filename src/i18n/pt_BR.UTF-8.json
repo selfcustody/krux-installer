@@ -136,13 +136,13 @@
   "warning_before_airgap_update_screen": {
     "Before proceeding with the air-gapped update": "Antes de continuar com a atualização isolada",
     "Insert a FAT32 formatted SDCard into your computer": "Insira no seu computador um SDCard formatado em FAT32",
-    "On the next screen, choose its root folder to copy the firmware": "Na próxima tela, escolha sua pasta raiz para copiar o firmware",
+    "On the next screen, choose the drive to copy firmware": "Na próxima tela, escolha a unidade para copiar o firmware",
     "Proceed": "Continuar",
     "Back": "Voltar"
   },
   "airgap_update_screen": {
-    "Select folder to copy firmware": "Selecione a pasta para copiar o firmware",
-    "Copy firmware to": "Copiar firmware para"
+    "Select": "Selecionar",
+    "to copy firmware": "para copiar o firmware"
   },
   "warning_after_airgap_update_screen": {
     "and": "e",

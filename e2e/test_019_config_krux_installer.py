@@ -414,10 +414,12 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 "key": "lang",
                 "options": [
                     f"af_ZA{utf}",
+                    f"de_DE{utf}",
                     f"en_US{utf}",
                     f"es_ES{utf}",
                     f"fr_FR{utf}",
                     f"it_IT{utf}",
+                    f"ja_JP{utf}",
                     f"ko_KR{utf}",
                     f"nl_NL{utf}",
                     f"pt_BR{utf}",

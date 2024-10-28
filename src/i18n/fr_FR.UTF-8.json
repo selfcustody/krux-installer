@@ -102,11 +102,12 @@
   },
   "unzip_stable_screen": {
     "Flash with": "Flash avec",
-    "Air-gapped update with": "Mise à jour isolée avec (bientôt)",
+    "Air-gapped update with": "Mise à jour isolée avec",
     "Unziping": "Décompression de",
     "Unziped": "Décompressé"
   },
   "flash_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "VEUILLEZ NE PAS DÉBRANCHER VOTRE APPAREIL",
     "DONE": "FAIT",
     "Back": "Retour",
     "Quit": "Fermer",
@@ -130,6 +131,25 @@
   },
   "about_screen": {
     "follow us on X": "suivez-nous sur X",
+    "Back": "Retour"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Avant de procéder à la mise à jour isolée",
+    "Insert a FAT32 formatted SDCard into your computer": "Insérez une SDCard formatée en FAT32 dans votre ordinateur",    
+    "On the next screen, choose the drive to copy firmware": "Sur l'écran suivant, choisissez le lecteur pour copier le firmware",
+    "Proceed": "Continuer",
+    "Back": "Retour"
+  },
+  "airgap_update_screen": {
+    "Select": "Sélectionner",
+    "to copy firmware": "pour copier le firmware"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "et",
+    "have been copied to": "ont été copiés sur",
+    "Insert the SDcard into your device and reboot it to update": "Insérez la carte SD dans votre appareil et redémarrez-le pour mettre à jour",
+    "You should see this computed hash on device screen": "Vous devriez voir ce hachage calculé sur l'écran de l'appareil",
+    "Quit": "Fermer",
     "Back": "Retour"
   }
 }

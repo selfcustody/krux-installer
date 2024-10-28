@@ -102,11 +102,12 @@
   },  
   "unzip_stable_screen": {
     "Flash with": "Вспышка с",
-    "Air-gapped update with": "Изолированное обновление с (скоро будет)",
+    "Air-gapped update with": "Изолированное обновление с",
     "Unziping": "Декомпрессия",
     "Unziped": "Неупакованный"
   },
   "flash_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "ПОЖАЛУЙСТА, НЕ ОТКЛЮЧАЙТЕ УСТРОЙСТВО ОТ СЕТИ",
     "DONE": "ДОГОВОРИЛИСЬ",
     "Back": "Назад",
     "Quit": "Покидать",
@@ -130,6 +131,25 @@
   },
   "about_screen": {
     "follow us on X": "следите за нами на X",
+    "Back": "Назад"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Прежде чем приступить к\nобновлению с воздушным зазором",
+    "Insert a FAT32 formatted SDCard into your computer": "Вставьте SDCard в файловой\nсистеме FAT32 в компьютер",
+    "On the next screen, choose the drive to copy firmware": "На следующем экране выберите диск для копирования прошивки",
+    "Proceed": "Продолжать",
+    "Back": "Вернись"
+  },
+  "airgap_update_screen": {
+    "Select": "Выбрать",
+    "to copy firmware": "чтобы скопировать прошивку"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "и",
+    "have been copied to": "были скопированы на",
+    "Insert the SDcard into your device and reboot it to update": "Вставьте SD-карту в устройство и перезагрузите его для обновления",
+    "You should see this computed hash on device screen": "Вы должны увидеть этот вычисленный хэш на экране устройства",
+    "Quit": "Покидать",
     "Back": "Назад"
   }
 }

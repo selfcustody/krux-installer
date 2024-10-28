@@ -13,7 +13,8 @@ class TestSelectVersionScreen(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        font_name = "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+        noto_sans_path = os.path.join(assets_path, font_name)
         LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
@@ -51,12 +52,12 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "and it's just for trying new things and providing feedback.",
                 "\n",
                 "\n",
-                "[color=#00ff00]",
-                "[ref=MainScreen]Proceed[/ref]",
-                "[/color]",
-                "        ",
                 "[color=#ff0000]",
                 "[ref=SelectVersion]Back[/ref]",
+                "[/color]",
+                "        ",
+                "[color=#00ff00]",
+                "[ref=MainScreen]Proceed[/ref]",
                 "[/color]",
             ]
         )
@@ -126,12 +127,12 @@ class TestSelectVersionScreen(GraphicUnitTest):
                 "e serve apenas para experimentar coisas novas e dar opiniões.",
                 "\n",
                 "\n",
-                "[color=#00ff00]",
-                "[ref=MainScreen]Proceder[/ref]",
-                "[/color]",
-                "        ",
                 "[color=#ff0000]",
                 "[ref=SelectVersion]Voltar[/ref]",
+                "[/color]",
+                "        ",
+                "[color=#00ff00]",
+                "[ref=MainScreen]Continuar[/ref]",
                 "[/color]",
             ]
         )

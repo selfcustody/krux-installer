@@ -13,7 +13,8 @@ class TestAboutScreen(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        font_name = "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+        noto_sans_path = os.path.join(assets_path, font_name)
         LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
@@ -42,7 +43,7 @@ class TestAboutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[ref=SourceCode][b]v0.0.20-alpha-3[/b][/ref]",
+                "[ref=SourceCode][b]v0.0.20-beta[/b][/ref]",
                 "\n",
                 "\n",
                 "follow us on X: ",
@@ -80,7 +81,7 @@ class TestAboutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[ref=SourceCode][b]v0.0.20-alpha-3[/b][/ref]",
+                "[ref=SourceCode][b]v0.0.20-beta[/b][/ref]",
                 "\n",
                 "\n",
                 "siga-nos no X: ",

@@ -42,6 +42,12 @@ from kivy.weakproxy import WeakProxy
 from src.i18n import T
 from src.utils.trigger import Trigger
 
+if sys.platform.startswith("win32"):
+    import win32file  # pylint: disable=import-error
+
+if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
+    import subprocess
+
 
 class BaseScreen(Screen, Trigger):
     """Main screen is the 'Home' page"""
@@ -185,7 +191,8 @@ class BaseScreen(Screen, Trigger):
     def clear_grid(self, wid: str):
         """Clear GridLayout widget"""
         self.debug(f"Clearing widgets from GridLayout::{wid}")
-        self.ids[wid].clear_widgets()
+        if wid in self.ids:
+            self.ids[wid].clear_widgets()
 
     def make_button(
         self,
@@ -248,6 +255,139 @@ class BaseScreen(Screen, Trigger):
         # register button
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
+
+    def on_get_removable_drives_linux(self) -> typing.List[str]:
+        """
+        Linux put their removable drives on /mnt or /media
+        and to get them is necessary to use lsblk
+        """
+        drive_list = []
+        # Use the 'lsblk' command to list block devices and their mount points
+        try:
+
+            # pylint: disable=possibly-used-before-assignment
+            result = subprocess.run(
+                ["lsblk", "-P", "-o", "NAME,TYPE,RM,MOUNTPOINT"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+            lines = result.stdout.split("\n")
+
+            # Process the output to find removable devices
+            for line in lines:
+                # Parse key-value pairs (lsblk -P outputs in NAME="value" format)
+                if 'RM="1"' in line and 'TYPE="part"' in line:
+                    # Split by spaces and parse each key-value pair
+                    attributes = {}
+                    parts = line.split()
+
+                    for part in parts:
+                        key, value = part.split("=", 1)
+                        attributes[key] = value.strip('"')
+
+                    # Check if the device is mounted
+                    if "MOUNTPOINT" in attributes and attributes["MOUNTPOINT"]:
+                        drive_list.append(attributes["MOUNTPOINT"])
+
+        except subprocess.CalledProcessError as e:
+            exc = RuntimeError(f"Error detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
+
+        return drive_list
+
+    def on_get_removable_drives_macos(self) -> typing.List[str]:
+        """
+        MacOS put their removable drives on /dev/disk and mounted on /Volumes
+        and to get them is necessary to use diskutil
+        """
+        drive_list = []
+        try:
+            # Use 'diskutil' to list all disks, including external ones
+            result = subprocess.run(
+                ["diskutil", "info", "-all"],
+                capture_output=True,
+                text=True,
+                check=True,
+            )
+
+            # diskutil separate blocks with a bunch of *
+            blocks = result.stdout.split("**********")
+
+            for block in blocks:
+                # Process the output to find external (removable) drives
+                lines = block.split("\n")
+                node = None
+                fat32 = False
+                external = False
+                mounted = False
+                mnt = False
+                for line in lines:
+                    line = line.strip()
+
+                    # Identify if a new device starts (e.g., /dev/disk2)
+                    if "Device Node" in line and "/dev/disk" in line:
+                        node = line.split("Device Node:")[-1].strip()
+
+                    # check if it is FAT32 (the supported by krux devices)
+                    if "File System Personality" in line and "FAT32" in line:
+                        fat32 = True
+
+                    # Look for external devices
+                    if "Device Location" in line and "External" in line:
+                        external = True
+
+                    # Find the mount point, if it exists
+                    if "Mounted" in line and "Yes" in line:
+                        mounted = True
+
+                    if "Mount Point" in line:
+                        mnt = line.split("Mount Point:")[-1].strip()
+
+                if node and fat32 and external and mounted and mnt:
+                    drive_list.append(mnt)
+
+        except subprocess.CalledProcessError as e:
+            exc = RuntimeError(f"Error detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
+
+        return drive_list
+
+    def on_get_removable_drives_windows(self) -> typing.List[str]:
+        """
+        Windows do not show non-C drivers. So to show them
+        will follow a mixed approach:
+        (1) https://stackoverflow.com/questions/4273252/
+               detect-inserted-usb-on-windows#answer-33295355
+        (2) https://stackoverflow.com/questions/26028235/
+              python-kivy-how-to-use-filechooser-access-files-outside-c-drive
+        """
+        # the placeholder to where we will find
+        drive_list = []
+        try:
+            # Get the USB
+            # pylint: disable=possibly-used-before-assignment
+            drivebits = win32file.GetLogicalDrives()
+            for d in range(1, 26):
+                mask = 1 << d
+                if drivebits & mask:
+                    # here if the drive is at least there
+                    # pylint: disable=consider-using-f-string
+                    drname = "%c:\\" % chr(ord("A") + d)
+
+                    # pylint: disable=possibly-used-before-assignment
+                    t = win32file.GetDriveType(drname)
+                    if t == win32file.DRIVE_REMOVABLE:
+                        drive_list.append(drname)
+
+            return drive_list
+
+        # pylint: disable=broad-exception-caught
+        except Exception as e:
+            exc = RuntimeError(f"Error detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
+
+        return drive_list
 
     def redirect_exception(self, exception: Exception):
         """Get an exception and prepare a ErrorScreen rendering"""

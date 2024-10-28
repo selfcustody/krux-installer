@@ -102,11 +102,12 @@
   },  
   "unzip_stable_screen": {
     "Flash with": "Flash con",
-    "Air-gapped update with": "Aggiornamento isolato con (a breve)",
+    "Air-gapped update with": "Aggiornamento isolato con",
     "Unziping": "Decompressione",
     "Unziped": "Decompresso"
   },
   "flash_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "SI PREGA DI NON SCOLLEGARE IL DISPOSITIVO",
     "DONE": "FATTO",
     "Back": "Indietro",
     "Quit": "Dimettersi",
@@ -131,5 +132,24 @@
   "about_screen": {
     "follow us on X": "seguici su X",
     "Back": "Ritirati"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Prima di procedere con l'aggiornamento air-gapped",
+    "Insert a FAT32 formatted SDCard into your computer": "Inserisci una SDCard formattata FAT32 nel tuo computer",
+    "On the next screen, choose the drive to copy firmware": "Nella schermata successiva, scegli l'unità per copiare il firmware",
+    "Proceed": "Procedere",
+    "Back": "Indietro"
+  },
+  "airgap_update_screen": {
+    "Select": "Seleziona",
+    "to copy firmware": "per copiare il firmware"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "e",
+    "have been copied to": "sono stati copiati su",
+    "Insert the SDcard into your device and reboot it to update": "Inserisci la scheda SD nel tuo dispositivo e riavvialo per aggiornare",
+    "You should see this computed hash on device screen": "Dovresti vedere questo hash calcolato sullo schermo del dispositivo",
+    "Quit": "Dimettersi",
+    "Back": "Indietro"
   }
 }

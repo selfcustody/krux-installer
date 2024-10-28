@@ -1,5 +1,7 @@
 import os
+import sys
 from unittest.mock import patch
+from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.uix.screenmanager import ScreenManager
@@ -14,7 +16,8 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         cwd_path = os.path.dirname(__file__)
         rel_assets_path = os.path.join(cwd_path, "..", "assets")
         assets_path = os.path.abspath(rel_assets_path)
-        noto_sans_path = os.path.join(assets_path, "NotoSansCJK_Cy_SC_KR_Krux.ttf")
+        font_name = "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+        noto_sans_path = os.path.join(assets_path, font_name)
         LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
     @classmethod
@@ -28,6 +31,10 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         self.assertEqual(len(app.screens), 0)
         self.assertIsInstance(app.screen_manager, ScreenManager)
 
+    @mark.skipif(
+        sys.platform in ("win32", "darwin"),
+        reason="does not run on windows or macos",
+    )
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
     @patch(

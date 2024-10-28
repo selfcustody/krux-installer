@@ -102,11 +102,12 @@
   },
   "unzip_stable_screen": {
     "Flash with": "Flash met",
-    "Air-gapped update with": "Update zonder computer met (binnenkort)",
+    "Air-gapped update with": "Update zonder computer met",
     "Unziping": "Uitpakken",
     "Unziped": "Uitgepakt"
   },
   "flash_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL HET APPARAAT NIET LOS",
     "DONE": "KLAAR",
     "Back": "Terug",
     "Quit": "Stoppen"
@@ -128,6 +129,25 @@
   },
   "about_screen": {
     "follow us on X": "volg ons op X",
+    "Back": "Terug"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Voordat u doorgaat met de air-gapped update",
+    "Insert a FAT32 formatted SDCard into your computer": "Plaats een FAT32-geformatteerde SDCard in uw computer",
+    "On the next screen, choose the drive to copy firmware": "Kies op het volgende scherm de schijf om firmware te kopiëren",
+    "Proceed": "Doorgaan",
+    "Back": "Terug"
+  },
+  "airgap_update_screen": {
+    "Select": "Selecteren",
+    "to copy firmware": "om firmware te kopiëren"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "en",
+    "have been copied to": "zijn gekopieerd naar",
+    "Insert the SDcard into your device and reboot it to update": "Plaats de SD-kaart in uw apparaat en start opnieuw op om bij te werken",
+    "You should see this computed hash on device screen": "U zou deze berekende hash op het scherm van het apparaat moeten zien",
+    "Quit": "Stoppen",
     "Back": "Terug"
   }
 }

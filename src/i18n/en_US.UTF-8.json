@@ -98,11 +98,12 @@
   },
   "unzip_stable_screen": {
     "Flash with": "Flash with",
-    "Air-gapped update with": "Air-gapped update with (soon)",
+    "Air-gapped update with": "Air-gapped update with",
     "Unziping": "Extracting",
     "Unziped": "Extracted"
   },
   "flash_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "PLEASE DO NOT UNPLUG YOUR DEVICE",
     "DONE": "DONE",
     "Back": "Back",
     "Quit": "Quit",
@@ -126,6 +127,25 @@
   },
   "about_screen": {
     "follow us on X": "follow us on X",
+    "Back": "Back"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "Before proceeding with the air-gapped update",
+    "Insert a FAT32 formatted SDCard into your computer": "Insert a FAT32 formatted SDCard into your computer",
+    "On the next screen, choose the drive to copy firmware": "On the next screen, choose the drive to copy firmware",
+    "Proceed": "Proceed",
+    "Back": "Back"
+  },
+  "airgap_update_screen": {
+    "Select": "Select",
+    "to copy firmware": "to copy firmware"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "and",
+    "have been copied to": "have been copied to",
+    "Insert the SDcard into your device and reboot it to update": "Insert the SDcard into your device and reboot it to update",
+    "You should see this computed hash on device screen": "You should see this computed hash on device screen",
+    "Quit": "Quit",
     "Back": "Back"
   }
 }

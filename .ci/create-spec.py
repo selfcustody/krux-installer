@@ -73,6 +73,7 @@ if __name__ == "__main__":
         # to keep `sys` module enabled (necessary for Kboot)
         BUILDER_ARGS.append("--onefile")
         BUILDER_ARGS.append("--console")
+        BUILDER_ARGS.append("--hidden-import=win32timezone")
         BUILDER_ARGS.append("--hide-console=minimize-early")
         
     elif SYSTEM == "Darwin":

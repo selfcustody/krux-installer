@@ -149,12 +149,8 @@ class WarningWipeScreen(BaseScreen):
                 f"* {render}",
                 "\n",
                 "\n",
-                "[color=#00FF00]",
-                f"[ref=WipeScreen][u]{proceed}[/u][/ref]",
-                "[/color]",
+                f"[color=#FF0000][ref=MainScreen][u]{back}[/u][/ref][/color]",
                 "        ",
-                "[color=#FF0000]",
-                f"[ref=MainScreen][u]{back}[/u][/ref]",
-                "[/color]",
+                f"[color=#00FF00][ref=WipeScreen][u]{proceed}[/u][/ref][/color]",
             ]
         )

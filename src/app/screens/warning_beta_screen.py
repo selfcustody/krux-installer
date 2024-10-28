@@ -110,12 +110,12 @@ class WarningBetaScreen(BaseScreen):
                 just_try,
                 "\n",
                 "\n",
-                "[color=#00ff00]",
-                f"[ref=MainScreen]{proceed}[/ref]",
-                "[/color]",
-                "        ",
                 "[color=#ff0000]",
                 f"[ref=SelectVersion]{back}[/ref]",
+                "[/color]",
+                "        ",
+                "[color=#00ff00]",
+                f"[ref=MainScreen]{proceed}[/ref]",
                 "[/color]",
             ]
         )

@@ -107,6 +107,7 @@
     "Unziped": "已解压"
   },
   "flash_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "请不要拔下您的设备",
     "DONE": "做",
     "Back": "返回",
     "Quit": "退出",
@@ -130,6 +131,25 @@
   },
   "about_screen": {
     "follow us on X": "在X上关注我们",
+    "Back": "返回"
+  },
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "在继续进行气隙更新之前",
+    "Insert a FAT32 formatted SDCard into your computer": "将 FAT32 格式的 SD 卡插入计算机",
+    "On the next screen, choose the drive to copy firmware": "在下一个屏幕上，选择要复制固件的驱动器",
+    "Proceed": "进行",
+    "Back": "返回"
+  },
+  "airgap_update_screen": {
+    "Select": "选择",
+    "to copy firmware": "以复制固件"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "和",
+    "have been copied to": "已复制到",
+    "Insert the SDcard into your device and reboot it to update": "将SD卡插入设备并重新启动以更新",
+    "You should see this computed hash on device screen": "您应该在设备屏幕上看到此计算出的哈希值",
+    "Quit": "退出",
     "Back": "返回"
   }
 }

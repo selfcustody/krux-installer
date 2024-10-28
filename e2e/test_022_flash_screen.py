@@ -52,9 +52,9 @@ class TestFlashScreen(GraphicUnitTest):
 
         # get your Window instance safely
         EventLoop.ensure_window()
-        screen.update(name=screen.name, key="locale", value="en_US.UTF8")
+        screen.update(name=screen.name, key="locale", value="en_US.UTF-8")
 
-        self.assertEqual(screen.locale, "en_US.UTF8")
+        self.assertEqual(screen.locale, "en_US.UTF-8")
 
         # patch assertions
         mock_get_locale.assert_called()

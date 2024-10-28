@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, mock_open
 from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -94,6 +94,279 @@ class TestAboutScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called_once()
         mock_check_internet.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    def test_get_os_dialout_group_debian(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "debian")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=rhel",
+    )
+    def test_get_os_dialout_group_rhel(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "rhel")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=suse",
+    )
+    def test_get_os_dialout_group_suse(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "suse")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=arch",
+    )
+    def test_get_os_dialout_group_arch(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "arch")
+        self.assertEqual(group[1], "uucp")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=manjaro",
+    )
+    def test_get_os_dialout_group_manjaro(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "manjaro")
+        self.assertEqual(group[1], "uucp")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=slackware",
+    )
+    def test_get_os_dialout_group_slackware(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "slackware")
+        self.assertEqual(group[1], "uucp")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=gentoo",
+    )
+    def test_get_os_dialout_group_gentoo(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "gentoo")
+        self.assertEqual(group[1], "uucp")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=alpine",
+    )
+    def test_get_os_dialout_group_alpine(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "alpine")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=clear-linux",
+    )
+    def test_get_os_dialout_group_clear_linux(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "clear-linux")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=solus",
+    )
+    def test_get_os_dialout_group_solus(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "solus")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=mockos\nPRETTY_NAME=MockOS",
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_get_os_dialout_group_not_supported(
+        self, mock_redirect_exception, open_mock, mock_get_locale
+    ):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], None)
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+        mock_redirect_exception.assert_called()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_get_os_dialout_group_file_not_found(
+        self, mock_redirect_exception, open_mock, mock_get_locale
+    ):
+        open_mock.side_effect = FileNotFoundError()
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], None)
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+        mock_redirect_exception.assert_called()
+
+    @mark.skipif(
+        sys.platform in ("win32", "darwin"),
+        reason="does not run on windows or macos",
+    )
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.greetings_screen.grp")
+    def test_is_user_not_in_dialout(self, mock_grp, mock_get_locale):
+        mock_grp.getgrall.return_value = [
+            MagicMock(gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["brltty"])
+        ]
+        # mock_grp.getgrall.return_value[0].__getitem__ = MagicMock(
+        #    return_value=['dialout', 'x', 1234, ['brltty']]
+        # )
+        screen = GreetingsScreen()
+        is_in_dialout = screen.is_user_in_dialout_group(
+            user="mockuser", group="dialout"
+        )
+        self.assertEqual(is_in_dialout, False)
+
+        mock_get_locale.assert_called()
+        mock_grp.getgrall.assert_called()
+
+    @mark.skipif(
+        sys.platform in ("win32", "darwin"),
+        reason="does not run on windows or macos",
+    )
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.greetings_screen.grp")
+    def test_is_user_in_dialout(self, mock_grp, mock_get_locale):
+        mock_grp.getgrall.return_value = [
+            MagicMock(
+                gr_name="dialout",
+                gr_passwd="x",
+                gr_gid=1234,
+                gr_mem=["brltty", "mockuser"],
+            )
+        ]
+        screen = GreetingsScreen()
+        is_in_dialout = screen.is_user_in_dialout_group(
+            user="mockuser", group="dialout"
+        )
+        self.assertEqual(is_in_dialout, True)
+
+        mock_get_locale.assert_called()
+        mock_grp.getgrall.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -194,114 +467,25 @@ class TestAboutScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.greetings_screen.distro")
-    @patch("src.app.screens.greetings_screen.GreetingsScreen.redirect_exception")
-    def test_fail_check_permission_linux(
-        self,
-        mock_redirect_exception,
-        mock_distro,
-        mock_get_locale,
-        mock_environ_get,
-    ):
-        mock_distro.id = MagicMock(return_value="mockos")
-        mock_distro.like = MagicMock(return_value="mockos")
-        mock_distro.name = MagicMock(return_value="MockOS")
-        screen = GreetingsScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.check_dialout_permission()
-
-        # patch assertions
-        mock_environ_get.assert_called()
-        mock_get_locale.assert_called()
-        mock_distro.id.assert_called()
-        mock_distro.like.assert_called()
-        mock_distro.name.assert_called()
-        mock_redirect_exception.assert_called_once()
-
-    @mark.skipif(
-        sys.platform in ("win32", "darwin"),
-        reason="does not run on windows or darwin",
-    )
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.greetings_screen.os.environ.get", return_value="mockuser")
     @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+        "src.app.screens.greetings_screen.GreetingsScreen.get_os_dialout_group",
+        return_value=["debian", "dialout"],
     )
-    @patch("src.app.screens.greetings_screen.distro")
-    @patch("src.app.screens.greetings_screen.grp")
-    def test_check_permission_ubuntu_in_dialout(
-        self,
-        mock_grp,
-        mock_distro,
-        mock_get_locale,
-        mock_environ_get,
-    ):
-        mock_distro.id = MagicMock(return_value="ubuntu")
-        mock_grp.getgrall = MagicMock()
-        mock_grp.getgrall.return_value = [
-            MagicMock(
-                gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["mockuser"]
-            )
-        ]
-        mock_grp.getgrall.return_value[0].__getitem__ = MagicMock(
-            return_value=["mock", "mock", "mockuser"]
-        )
-
-        screen = GreetingsScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.check_dialout_permission()
-
-        # patch assertions
-        mock_environ_get.assert_called()
-        mock_get_locale.assert_called()
-        mock_distro.id.assert_called()
-        mock_grp.getgrall.assert_called()
-
-    @mark.skipif(
-        sys.platform in ("win32", "darwin"),
-        reason="does not run on windows or darwin",
-    )
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.greetings_screen.os.environ.get", return_value="mockuser")
     @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+        "src.app.screens.greetings_screen.GreetingsScreen.is_user_in_dialout_group",
+        return_value=False,
     )
     @patch("src.app.screens.base_screen.BaseScreen.manager")
-    @patch("src.app.screens.greetings_screen.GreetingsScreen.set_screen")
-    @patch("src.app.screens.greetings_screen.distro")
-    @patch("src.app.screens.greetings_screen.grp")
-    @patch("src.app.screens.greetings_screen.partial")
-    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
-    def test_check_permission_ubuntu_not_in_dialout(
+    def test_check_dialout_permission_not_in_dialout(
         self,
-        mock_schedule_once,
-        mock_partial,
-        mock_grp,
-        mock_distro,
-        mock_set_screen,
         mock_manager,
+        mock_in_dialout,
+        mock_get_os,
         mock_get_locale,
         mock_environ_get,
     ):
         mock_manager.get_screen = MagicMock()
-        mock_distro.id = MagicMock(return_value="ubuntu")
-        mock_distro.name = MagicMock(return_value="Ubuntu")
-        mock_grp.getgrall = MagicMock()
-        mock_grp.getgrall.return_value = [
-            MagicMock(gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["mock"])
-        ]
-        mock_grp.getgrall.return_value[0].__getitem__ = MagicMock(
-            return_value=["mock", "mock", "mock"]
-        )
-
+        mock_manager.get_screen.update = MagicMock()
         screen = GreetingsScreen()
         self.render(screen)
 
@@ -313,13 +497,8 @@ class TestAboutScreen(GraphicUnitTest):
         # patch assertions
         mock_environ_get.assert_called()
         mock_get_locale.assert_called()
-        mock_distro.id.assert_called()
-        mock_distro.name.assert_called()
-        mock_grp.getgrall.assert_called()
-        mock_manager.get_screen.assert_called()
-        mock_set_screen.assert_called()
-        mock_partial.assert_called()
-        mock_schedule_once.assert_called()
+        mock_get_os.assert_called()
+        mock_in_dialout.assert_called()
 
     @mark.skipif(
         sys.platform in ("win32", "darwin"),
@@ -330,34 +509,25 @@ class TestAboutScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    @patch(
+        "src.app.screens.greetings_screen.GreetingsScreen.get_os_dialout_group",
+        return_value=["debian", "dialout"],
+    )
+    @patch(
+        "src.app.screens.greetings_screen.GreetingsScreen.is_user_in_dialout_group",
+        return_value=True,
+    )
     @patch("src.app.screens.base_screen.BaseScreen.manager")
-    @patch("src.app.screens.greetings_screen.GreetingsScreen.set_screen")
-    @patch("src.app.screens.greetings_screen.distro")
-    @patch("src.app.screens.greetings_screen.grp")
-    @patch("src.app.screens.greetings_screen.partial")
-    @patch("src.app.screens.greetings_screen.Clock.schedule_once")
-    def test_check_permission_arch_not_in_dialout(
+    def test_check_dialout_permission_in_dialout(
         self,
-        mock_schedule_once,
-        mock_partial,
-        mock_grp,
-        mock_distro,
-        mock_set_screen,
         mock_manager,
+        mock_in_dialout,
+        mock_get_os,
         mock_get_locale,
         mock_environ_get,
     ):
         mock_manager.get_screen = MagicMock()
-        mock_distro.id = MagicMock(return_value="arch")
-        mock_distro.name = MagicMock(return_value="ArchLinux")
-        mock_grp.getgrall = MagicMock()
-        mock_grp.getgrall.return_value = [
-            MagicMock(gr_name="uucp", gr_passwd="x", gr_gid=1234, gr_mem=["mock"])
-        ]
-        mock_grp.getgrall.return_value[0].__getitem__ = MagicMock(
-            return_value=["mock", "mock", "mock"]
-        )
-
+        mock_manager.get_screen.update = MagicMock()
         screen = GreetingsScreen()
         self.render(screen)
 
@@ -369,10 +539,5 @@ class TestAboutScreen(GraphicUnitTest):
         # patch assertions
         mock_environ_get.assert_called()
         mock_get_locale.assert_called()
-        mock_distro.id.assert_called()
-        mock_distro.name.assert_called()
-        mock_grp.getgrall.assert_called()
-        mock_manager.get_screen.assert_called()
-        mock_set_screen.assert_called()
-        mock_partial.assert_called()
-        mock_schedule_once.assert_called()
+        mock_get_os.assert_called()
+        mock_in_dialout.assert_called()

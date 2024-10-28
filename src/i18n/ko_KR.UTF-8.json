@@ -102,11 +102,12 @@
   },
   "unzip_stable_screen": {
     "Flash with": "플래시 사용",
-    "Air-gapped update with": "격리 업데이트(곧 제공 예정)",
+    "Air-gapped update with": "격리 업데이트",
     "Unziping": "추출",
     "Unziped": "추출"
   },
   "flash_screen": {
+    "PLEASE DO NOT UNPLUG YOUR DEVICE": "장치의 플러그를 뽑지 마십시오.",
     "DONE": "수행",
     "Back": "뒤로",
     "Quit": "사임하다",
@@ -130,6 +131,25 @@
   },
   "about_screen": {
     "follow us on X": "X에서 우리를 따르십시오",
+    "Back": "뒤로"
+  }, 
+  "warning_before_airgap_update_screen": {
+    "Before proceeding with the air-gapped update": "에어 갭 업데이트를 진행하기 전에",
+    "Insert a FAT32 formatted SDCard into your computer": "FAT32로 포맷 된 SDCard를 컴퓨터에 삽입하십시오.",
+    "On the next screen, choose the drive to copy firmware": "다음 화면에서 펌웨어를 복사할 드라이브를 선택하세요",
+    "Proceed": "진행",
+    "Back": "뒤로"
+  },
+  "airgap_update_screen": {
+    "Select": "선택",
+    "to copy firmware": "펌웨어를 복사하기 위해"
+  },
+  "warning_after_airgap_update_screen": {
+    "and": "그리고",
+    "have been copied to": "에 복사되었습니다",
+    "Insert the SDcard into your device and reboot it to update": "SD 카드를 장치에 삽입하고 업데이트하려면 재부팅하세요",
+    "You should see this computed hash on device screen": "장치 화면에서 이 계산된 해시를 확인할 수 있습니다",
+    "Quit": "사임하다",
     "Back": "뒤로"
   }
 }

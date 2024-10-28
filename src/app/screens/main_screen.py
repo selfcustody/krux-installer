@@ -422,15 +422,16 @@ class MainScreen(BaseScreen):
                 ["[color=#333333]", self.translate("Wipe"), "[/color]"]
             )
 
-            if value == "select a new one":
-                self.device = self.translate("select a new one")
-
+        # translate device type value even if it is a vXX.YY.Z
+        # the translator will try to translate and if a proper
+        # value isnt found, use the raw one
+        device_type = self.translate(value)
         device_msg = self.translate("Device")
         self.ids["main_select_device"].text = "".join(
             [
                 f"{device_msg}: ",
                 "[color=#00AABB]",
-                self.device,
+                device_type,
                 "[/color]",
             ]
         )

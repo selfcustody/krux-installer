@@ -40,6 +40,10 @@ class DownloadBetaScreen(BaseDownloadScreen):
         self.firmware = None
         self.device = None
 
+        self.download_msg = self.translate("Downloading")
+        self.to_message = self.translate("to")
+        self.of_message = self.translate("of")
+
         # Define some staticmethods in dynamic way
         # (so they can be called in tests)
         # pylint: disable=unused-argument
@@ -89,6 +93,11 @@ class DownloadBetaScreen(BaseDownloadScreen):
         value = kwargs.get("value")
 
         def on_update():
+            if key == "locale":
+                self.download_msg = self.translate("Downloading")
+                self.to_message = self.translate("to")
+                self.of_message = self.translate("of")
+
             if key == "firmware":
                 if value in ("kboot.kfpkg", "firmware.bin"):
                     self.firmware = value
@@ -138,18 +147,15 @@ class DownloadBetaScreen(BaseDownloadScreen):
             destdir=destdir,
         )
 
-        downloading = self.translate("Downloading")
-        to = self.translate("to")
-
         self.ids[f"{self.id}_info"].text = "".join(
             [
-                downloading,
+                self.download_msg,
                 "\n",
                 "[color=#00AABB]",
                 f"[ref={self.downloader.url}]{self.downloader.url}[/ref]",
                 "[/color]",
                 "\n",
-                to,
+                self.to_message,
                 "\n",
                 self.downloader.destdir,
                 "\n",
@@ -175,7 +181,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
             [
                 f"[b]{ percent * 100:,.2f} %[/b]",
                 "\n",
-                f"{downs[0]} of {downs[1]} MB",
+                f"{downs[0]} {self.of_message} {downs[1]} MB",
             ]
         )
 

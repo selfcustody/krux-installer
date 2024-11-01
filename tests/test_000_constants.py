@@ -1,14 +1,20 @@
 import os
+
+# import sys
 from unittest import TestCase
-from unittest.mock import mock_open, patch
+from unittest.mock import mock_open, patch, MagicMock
 from src.utils.constants import _open_pyproject, get_name, get_version, get_description
 
-PYPROJECT_STR = """
-[tool.poetry]
+PYPROJECT_STR = """[tool.poetry]
 name = "test"
 version = "0.0.1"
-description = "Hello World!"
-"""
+description = \"Hello World!\""""
+
+MOCK_TOML_DATA = {
+    "tool": {
+        "poetry": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
+    }
+}
 
 
 class TestConstants(TestCase):
@@ -19,26 +25,19 @@ class TestConstants(TestCase):
         self, open_mock, mock_version_info
     ):
         mock_version_info.minor = 9
+        mock_tomli = MagicMock()
+        mock_tomli.loads.return_value = MOCK_TOML_DATA
 
-        rootdirname = os.path.abspath(os.path.dirname(__file__))
-        pyproject_filename = os.path.abspath(
-            os.path.join(rootdirname, "..", "pyproject.toml")
-        )
+        with patch.dict("sys.modules", {"tomli": mock_tomli}):
+            rootdirname = os.path.abspath(os.path.dirname(__file__))
+            pyproject_filename = os.path.abspath(
+                os.path.join(rootdirname, "..", "pyproject.toml")
+            )
 
-        data = _open_pyproject()
-        open_mock.assert_called_once_with(pyproject_filename, "r", encoding="utf8")
-        self.assertEqual(
-            data,
-            {
-                "tool": {
-                    "poetry": {
-                        "name": "test",
-                        "version": "0.0.1",
-                        "description": "Hello World!",
-                    }
-                }
-            },
-        )
+            data = _open_pyproject()
+            open_mock.assert_called_once_with(pyproject_filename, "r", encoding="utf8")
+            mock_tomli.loads.assert_called_once_with(PYPROJECT_STR.strip())
+            self.assertEqual(data, MOCK_TOML_DATA)
 
     @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_STR)
     def test_open_pyproject(self, open_mock):

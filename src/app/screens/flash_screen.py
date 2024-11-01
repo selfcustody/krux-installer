@@ -39,6 +39,7 @@ class FlashScreen(BaseFlashScreen):
         self.flashing_msg = self.translate("Flashing")
         self.at_msg = self.translate("at")
         self.flasher = Flasher()
+        self.fail_msg = ""
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -70,6 +71,11 @@ class FlashScreen(BaseFlashScreen):
             elif "*" in text:
                 self.output.append("*")
                 self.output.append("")
+
+            elif "Greeting fail" in text:
+                self.fail_msg = text
+                self.flasher.ktool.kill()
+                self.flasher.ktool.checkKillExit()
 
             if len(self.output) > 10:
                 del self.output[:1]
@@ -186,8 +192,29 @@ class FlashScreen(BaseFlashScreen):
                     err.exc_type, err.exc_value, err.exc_traceback
                 )
                 msg = "".join(trace[-2:])
+                general_msg = "".join(
+                    [
+                        "Ensure that you have selected the correct device ",
+                        "and that your computer has successfully detected it.",
+                    ]
+                )
+
                 self.error(msg)
-                self.redirect_exception(exception=RuntimeError(f"Flash failed: {msg}"))
+                if "StopIteration" in msg:
+                    self.fail_msg = msg
+                    self.fail_msg += f"\n\n{general_msg}"
+                    not_conn_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=not_conn_fail)
+
+                elif "Cancel" in msg:
+                    self.fail_msg = f"{self.fail_msg}\n\n{general_msg}"
+                    greeting_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=greeting_fail)
+
+                else:
+                    self.fail_msg = msg
+                    any_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=any_fail)
 
         # hook what happened
         threading.excepthook = hook

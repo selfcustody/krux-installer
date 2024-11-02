@@ -11,7 +11,7 @@ from src.app.screens.ask_permission_dialout_screen import AskPermissionDialoutSc
 # WARNING: Do not run these tests on windows
 # they will break because it do not have the builtin 'grp' module
 @mark.skipif(
-    sys.platform in ("win32", "darwin"),
+    sys.platform in ("win32"),
     reason="does not run on windows or macos",
 )
 class TestAskPermissionDialoutScreen(GraphicUnitTest):
@@ -29,11 +29,17 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
     def teardown_class(cls):
         EventLoop.exit()
 
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_render_label(self, mock_get_locale):
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    def test_render_label(self, open_mock, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
@@ -46,12 +52,19 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_on_update_user(self, mock_get_locale):
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    def test_on_update_user(self, open_mock, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
@@ -65,12 +78,19 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
 
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_on_update_distro(self, mock_get_locale):
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    def test_on_update_distro(self, open_mock, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
@@ -84,7 +104,9 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
 
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
@@ -92,7 +114,12 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.ask_permission_dialout_screen.AskPermissionDialoutScreen.show_warning"
     )
-    def test_on_update_screen(self, mock_show_warning, mock_get_locale):
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    def test_on_update_screen(self, open_mock, mock_show_warning, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
@@ -106,12 +133,19 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called_once()
         mock_show_warning.assert_called_once()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
 
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_on_update_group(self, mock_get_locale):
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    def test_on_update_group(self, open_mock, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
@@ -125,6 +159,7 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -181,8 +216,8 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
         mock_get_locale.assert_called_once()
         open_mock.assert_called()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.ask_permission_dialout_screen.open",
         new_callable=mock_open,
@@ -381,13 +416,18 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
             callback=on_permission_created,
         )
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
     @patch("src.app.screens.base_screen.BaseScreen.quit_app")
-    def test_press_deny(self, mock_quit_app, mock_get_locale):
+    def test_press_deny(self, mock_quit_app, open_mock, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
@@ -406,13 +446,19 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         mock_get_locale.assert_called_once()
         mock_quit_app.assert_called_once()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_on_permission_created(self, mock_get_locale):
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    def test_on_permission_created(self, open_mock, mock_get_locale):
         screen = AskPermissionDialoutScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
@@ -443,3 +489,4 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         # patch assertions
         mock_get_locale.assert_called_once()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")

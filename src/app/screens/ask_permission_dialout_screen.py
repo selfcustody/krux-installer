@@ -86,7 +86,6 @@ class AskPermissionDialoutScreen(BaseScreen):
 
                 # pylint: disable=broad-exception-caught
                 except Exception as err:
-                    self.error(str(err))
                     self.redirect_exception(exception=err)
 
             if args[1] == "Deny":

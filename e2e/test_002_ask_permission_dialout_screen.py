@@ -256,6 +256,53 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
             callback=on_permission_created,
         )
 
+    @patch("sys.platform", "linux")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.SudoerLinux.exec",
+        side_effect=Exception(),
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_press_allow_on_debian(
+        self, mock_redirect_exception, mock_exec, mock_get_locale, open_mock
+    ):
+        screen = AskPermissionDialoutScreen()
+        screen.manager = MagicMock()
+        screen.manager.get_screen = MagicMock()
+        screen.bin = "mock"
+        screen.bin_args = ["-a", "-G"]
+        screen.group = "mockedgroup"
+        screen.user = "mockeduser"
+
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        action = getattr(screen, f"on_ref_press_{screen.id}_label")
+        action("Allow")
+
+        # patch assertions
+        on_permission_created = getattr(
+            AskPermissionDialoutScreen, "on_permission_created"
+        )
+
+        open_mock.assert_called_once()
+        mock_get_locale.assert_called_once()
+        mock_exec.assert_called_once_with(
+            cmd=["/usr/sbin/usermod", "-a", "-G", "mockedgroup", "mockeduser"],
+            env={},
+            callback=on_permission_created,
+        )
+        mock_redirect_exception.assert_called()
+
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
     @patch(

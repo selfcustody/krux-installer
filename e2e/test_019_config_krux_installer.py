@@ -13,57 +13,50 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     def teardown_class(cls):
         EventLoop.exit()
 
-    @patch("src.app.config_krux_installer.kv_resources.resource_add_path")
     @patch("src.app.config_krux_installer.LabelBase.register")
-    @patch("src.app.config_krux_installer.os.path.abspath", side_effect=["mock/path/assets", "mock//path/i18n"])
-    def test_init(self, mock_abspath, mock_register, mock_resource_add_path):
-        with patch.dict(sys.__dict__, { "frozen": False }): 
-            # Initialize ConfigKruxInstaller instance
+    @patch(
+        "src.app.config_krux_installer.os.path.abspath",
+        side_effect=["mock/path/assets", "mock//path/i18n"],
+    )
+    def test_init(self, mock_abspath, mock_register):
+        with patch.dict(sys.__dict__, {"frozen": False}):
             ConfigKruxInstaller()
-        
-            # Check if resource_add_path is called with the mocked _MEIPASS
             mock_register.assert_called_once_with(
-                "Roboto",
-                "mock/path/assets/NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+                "Roboto", "mock/path/assets/NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
             )
+            mock_abspath.assert_called()
 
     @patch("src.app.config_krux_installer.kv_resources.resource_add_path")
     @patch("src.app.config_krux_installer.LabelBase.register")
     def test_init_frozen_branch(self, mock_register, mock_resource_add_path):
-        with patch.dict(sys.__dict__, { "_MEIPASS": "/mocked/path", "frozen": True }): 
-            # Initialize ConfigKruxInstaller instance
+        with patch.dict(sys.__dict__, {"_MEIPASS": "/mocked/path", "frozen": True}):
             installer = ConfigKruxInstaller()
-        
-            # Check if resource_add_path is called with the mocked _MEIPASS
             mock_resource_add_path.assert_called_with("/mocked/path")
             mock_register.assert_called_once_with(
-                "Roboto",
-                "/mocked/path/assets/NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+                "Roboto", "/mocked/path/assets/NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
             )
-        
-            # Check if the assets_path and i18n_path are set based on _MEIPASS
             self.assertEqual(installer.assets_path, "/mocked/path/assets")
             self.assertEqual(installer.i18n_path, "/mocked/path/src/i18n")
 
     @patch("sys.platform", "linux")
     def test_make_lang_code_posix(self):
-        lang = ConfigKruxInstaller.make_lang_code(lang="en_US")        
+        lang = ConfigKruxInstaller.make_lang_code(lang="en_US")
         self.assertEqual(lang, "en_US.UTF-8")
-    
+
     @patch("sys.platform", "win32")
     def test_make_lang_code_windows(self):
-        lang = ConfigKruxInstaller.make_lang_code(lang="en_US")        
+        lang = ConfigKruxInstaller.make_lang_code(lang="en_US")
         self.assertEqual(lang, "en_US")
-        
+
     @patch("sys.platform", "mockos")
     def test_fail_make_lang_code(self):
         with self.assertRaises(OSError) as exc:
-            ConfigKruxInstaller.make_lang_code(lang="en_US")        
+            ConfigKruxInstaller.make_lang_code(lang="en_US")
         self.assertEqual(
             str(exc.exception),
-            "Couldn't possible to setup locale: OS 'mockos' not implemented"
+            "Couldn't possible to setup locale: OS 'mockos' not implemented",
         )
-        
+
     @patch.dict(os.environ, {"LANG": "en-US.UTF-8"}, clear=True)
     @patch("sys.platform", "linux")
     def test_get_system_lang_linux(self):
@@ -409,14 +402,17 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         mock_get_application_config.assert_called_once_with("mockfile")
 
     @patch("sys.platform", "linux")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir", return_value="mockdir")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang", return_value="en_US.UTF-8")
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir",
+        return_value="mockdir",
+    )
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang",
+        return_value="en_US.UTF-8",
+    )
     @patch("src.app.config_krux_installer.os.path.isfile", return_value=True)
     def test_build_config_posix_no_default_lang(
-        self,
-        mock_isfile,
-        mock_get_system_lang,
-        mock_create_app_dir
+        self, mock_isfile, mock_get_system_lang, mock_create_app_dir
     ):
         config = MagicMock()
         config.setdefaults = MagicMock()
@@ -427,6 +423,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
+        mock_get_system_lang.assert_called_once()
         mock_isfile.assert_called_once_with("mock/i18n/en_US.UTF-8.json")
         config.setdefaults.assert_has_calls(
             [
@@ -435,16 +432,19 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 call("locale", {"lang": "en_US.UTF-8"}),
             ]
         )
-    
+
     @patch("sys.platform", "linux")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir", return_value="mockdir")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang", return_value="mo_CK.UTF-8")
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir",
+        return_value="mockdir",
+    )
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang",
+        return_value="mo_CK.UTF-8",
+    )
     @patch("src.app.config_krux_installer.os.path.isfile", return_value=False)
     def test_build_config_posix_default_lang(
-        self,
-        mock_isfile,
-        mock_get_system_lang,
-        mock_create_app_dir
+        self, mock_isfile, mock_get_system_lang, mock_create_app_dir
     ):
         config = MagicMock()
         config.setdefaults = MagicMock()
@@ -455,6 +455,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
+        mock_get_system_lang.assert_called_once()
         mock_isfile.assert_called_once_with("mock/i18n/mo_CK.UTF-8.json")
         config.setdefaults.assert_has_calls(
             [
@@ -465,14 +466,17 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         )
 
     @patch("sys.platform", "win32")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir", return_value="mockdir")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang", return_value="en_US")
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir",
+        return_value="mockdir",
+    )
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang",
+        return_value="en_US",
+    )
     @patch("src.app.config_krux_installer.os.path.isfile", return_value=True)
     def test_build_config_windows_default_lang(
-        self,
-        mock_isfile,
-        mock_get_system_lang,
-        mock_create_app_dir
+        self, mock_isfile, mock_get_system_lang, mock_create_app_dir
     ):
         config = MagicMock()
         config.setdefaults = MagicMock()
@@ -480,7 +484,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app = ConfigKruxInstaller()
         app.i18n_path = "mock/i18n"
         app.build_config(config)
-        
+
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
         mock_get_system_lang.assert_called_once()
@@ -492,16 +496,19 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 call("locale", {"lang": "en_US"}),
             ]
         )
-    
+
     @patch("sys.platform", "win32")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir", return_value="mockdir")
-    @patch("src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang", return_value="mo_CK")
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.create_app_dir",
+        return_value="mockdir",
+    )
+    @patch(
+        "src.app.config_krux_installer.ConfigKruxInstaller.get_system_lang",
+        return_value="mo_CK",
+    )
     @patch("src.app.config_krux_installer.os.path.isfile", return_value=False)
     def test_build_config_windows_no_default_lang(
-        self,
-        mock_isfile,
-        mock_get_system_lang,
-        mock_create_app_dir
+        self, mock_isfile, mock_get_system_lang, mock_create_app_dir
     ):
         config = MagicMock()
         config.setdefaults = MagicMock()
@@ -509,7 +516,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app = ConfigKruxInstaller()
         app.i18n_path = "mock/i18n"
         app.build_config(config)
-        
+
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
         mock_get_system_lang.assert_called_once()

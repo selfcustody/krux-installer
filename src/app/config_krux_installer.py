@@ -77,7 +77,7 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
             return lang
 
         raise OSError(
-            f"Couldn 't possible to setup locale: OS '{sys.platform}' not implemented"
+            f"Couldn't possible to setup locale: OS '{sys.platform}' not implemented"
         )
 
     @staticmethod

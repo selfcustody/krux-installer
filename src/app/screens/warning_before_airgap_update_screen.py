@@ -70,12 +70,17 @@ class WarningBeforeAirgapUpdateScreen(BaseScreen):
                 if sys.platform == "win32":
                     drive_list = self.on_get_removable_drives_windows()
 
-                screen = self.manager.get_screen("AirgapUpdateScreen")
-                fn = partial(
-                    screen.update, name=self.name, key="drives", value=drive_list
-                )
-                Clock.schedule_once(fn, 0)
-                self.set_screen(name="AirgapUpdateScreen", direction="right")
+                if len(drive_list) == 0:
+                    exc = RuntimeError("No removable drives found")
+                    self.redirect_exception(exception=exc)
+
+                else:
+                    screen = self.manager.get_screen("AirgapUpdateScreen")
+                    fn = partial(
+                        screen.update, name=self.name, key="drives", value=drive_list
+                    )
+                    Clock.schedule_once(fn, 0)
+                    self.set_screen(name="AirgapUpdateScreen", direction="right")
 
         self.make_button(
             row=0,

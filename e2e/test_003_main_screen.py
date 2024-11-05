@@ -224,6 +224,22 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_version(self, mock_redirect_exception, mock_get_locale):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        screen.update(name="SelectVersionScreen", key="version")
+        mock_redirect_exception.assert_called()
+        mock_get_locale.assert_called()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     # pylint: disable=too-many-locals
     def test_update_device(self, mock_get_locale):
         screen = MainScreen()
@@ -256,6 +272,22 @@ class TestMainScreen(GraphicUnitTest):
             self.assertEqual(wipe_button.text, mocked_text_wipe)
 
         mock_get_locale.assert_any_call()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_device(self, mock_redirect_exception, mock_get_locale):
+        screen = MainScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        screen.update(name="SelectVersionScreen", key="device")
+        mock_redirect_exception.assert_called()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -527,12 +559,10 @@ class TestMainScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.base_screen.BaseScreen.get_destdir_assets")
-    @patch("src.app.screens.main_screen.re.findall", side_effect=[True])
     @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[False])
     def test_on_release_flash_to_download_stable_zip_screen(
         self,
         mock_isfile,
-        mock_findall,
         mock_get_destdir_assets,
         mock_get_locale,
         mock_manager,
@@ -561,9 +591,42 @@ class TestMainScreen(GraphicUnitTest):
         mock_set_screen.assert_called_once_with(
             name="DownloadStableZipScreen", direction="left"
         )
-        mock_findall.assert_called_once_with(r"^v\d+\.\d+\.\d$", "v24.03.0")
         pattern = re.compile(r".*v24\.03\.0\.zip")
         self.assertTrue(pattern.match(mock_isfile.call_args[0][0]))
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.main_screen.MainScreen.set_background")
+    @patch("src.app.screens.main_screen.MainScreen.manager")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_on_release_flash_to_download_stable_zip_screen(
+        self,
+        mock_redirect_exception,
+        mock_get_locale,
+        mock_manager,
+        mock_set_background,
+    ):
+        mock_manager.get_screen = MagicMock()
+
+        screen = MainScreen()
+        screen.version = "mocked"
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+        window = EventLoop.window
+        grid = window.children[0].children[0]
+        button = grid.children[3]
+
+        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
+        action = getattr(screen.__class__, f"on_release_{button.id}")
+        action(button)
+
+        mock_get_locale.assert_any_call()
+        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
+        mock_redirect_exception.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -573,12 +636,10 @@ class TestMainScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.base_screen.BaseScreen.get_destdir_assets")
-    @patch("src.app.screens.main_screen.re.findall", side_effect=[True])
     @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[True])
     def test_on_release_flash_to_warning_already_downloaded_zip_screen(
         self,
         mock_isfile,
-        mock_findall,
         mock_get_destdir_assets,
         mock_get_locale,
         mock_manager,
@@ -607,7 +668,6 @@ class TestMainScreen(GraphicUnitTest):
         mock_set_screen.assert_called_once_with(
             name="WarningAlreadyDownloadedScreen", direction="left"
         )
-        mock_findall.assert_called_once_with(r"^v\d+\.\d+\.\d$", "v24.03.0")
         pattern = re.compile(r".*v24\.03\.0\.zip")
         self.assertTrue(pattern.match(mock_isfile.call_args[0][0]))
 
@@ -618,10 +678,8 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.main_screen.re.findall", side_effect=[False, True])
     def test_on_release_flash_to_download_beta_screen(
         self,
-        mock_findall,
         mock_get_locale,
         mock_manager,
         mock_set_screen,
@@ -644,12 +702,6 @@ class TestMainScreen(GraphicUnitTest):
         action(button)
 
         mock_get_locale.assert_any_call()
-        mock_findall.assert_has_calls(
-            [
-                call("^v\\d+\\.\\d+\\.\\d$", "odudex/krux_binaries"),
-                call(r"^odudex/krux_binaries", "odudex/krux_binaries"),
-            ]
-        )
         mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
         mock_set_screen.assert_called_once_with(
             name="DownloadBetaScreen", direction="left"

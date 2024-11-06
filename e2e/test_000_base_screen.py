@@ -1,4 +1,6 @@
 import os
+import subprocess
+import sys
 from pathlib import Path
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
@@ -6,6 +8,86 @@ from kivy.tests.common import GraphicUnitTest
 from kivy.uix.button import Button
 from kivy.uix.screenmanager import ScreenManager
 from src.app.screens.base_screen import BaseScreen
+
+MOCK_DISKS_LINUX = """
+NAME="sda" TYPE="disk" RM="0" MOUNTPOINT=""
+NAME="sda1" TYPE="part" RM="0" MOUNTPOINT="/boot"
+NAME="sda2" TYPE="part" RM="0" MOUNTPOINT="/"
+NAME="sda3" TYPE="part" RM="0" MOUNTPOINT="[SWAP]"
+NAME="sdb" TYPE="disk" RM="1" MOUNTPOINT=""
+NAME="sdb1" TYPE="part" RM="1" MOUNTPOINT="/media/mock/USB1"
+NAME="sdc" TYPE="disk" RM="0" MOUNTPOINT=""
+NAME="sdc1" TYPE="part" RM="0" MOUNTPOINT="/mnt/data"
+NAME="sdd" TYPE="disk" RM="1" MOUNTPOINT=""
+NAME="sdd1" TYPE="part" RM="1" MOUNTPOINT="/media/mock/USB2"
+"""
+
+MOCK_DISKS_MAC = """
+   Device Identifier:        disk0
+   Device Node:              /dev/disk0
+   Whole:                    Yes
+   Part of Whole:            disk0
+   Device / Media Name:      Apple SSD
+   Volume Name:              Macintosh HD
+   Mounted:                  Yes
+   Mount Point:              /
+   File System:              APFS
+   Content (IOContent):      Apple_APFS
+   Device Block Size:        512 Bytes
+   Disk Size:                500.3 GB (500279395328 Bytes)
+   Read-Only Media:          No
+   Removable Media:          No
+   Solid State:              Yes
+   Virtual:                  No
+   Ejectable:                No
+
+   Device Identifier:        disk0s1
+   Device Node:              /dev/disk0s1
+   Whole:                    No
+   Part of Whole:            disk0
+   Volume Name:              EFI
+   Mounted:                  No
+   File System:              MS-DOS (FAT32)
+   Content (IOContent):      EFI
+   Device Block Size:        512 Bytes
+   Disk Size:                209.7 MB (209715200 Bytes)
+   Read-Only Media:          No
+   Removable Media:          No
+
+   Device Identifier:        disk0s2
+   Device Node:              /dev/disk0s2
+   Whole:                    No
+   Part of Whole:            disk0
+   Volume Name:              Macintosh HD - Data
+   Mounted:                  Yes
+   Mount Point:              /System/Volumes/Data
+   File System:              APFS
+   Content (IOContent):      Apple_APFS
+   Device Block Size:        512 Bytes
+   Disk Size:                500.1 GB (500000000000 Bytes)
+   Read-Only Media:          No
+   Removable Media:          No
+
+   Device Identifier:        disk1
+   Device Node:              /dev/disk1
+   Device Location:          External
+   Whole:                    Yes
+   Part of Whole:            disk1
+   Device / Media Name:      External USB Drive
+   Volume Name:              Backup Drive
+   Mounted:                  Yes
+   Mount Point:              /Volumes/Backup Drive
+   File System:              FAT32
+   File System Personality   MS-DOS FAT32
+   Content (IOContent):      Apple_HFS
+   Device Block Size:        4096 Bytes
+   Disk Size:                2.0 TB (2000000000000 Bytes)
+   Read-Only Media:          No
+   Removable Media:          Yes
+   Solid State:              No
+   Virtual:                  No
+   Ejectable:                Yes
+"""
 
 
 class TestBaseScreen(GraphicUnitTest):
@@ -98,7 +180,7 @@ class TestBaseScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_init_linux(self, mock_get_locale):
+    def test_init_linux_no_frozen(self, mock_get_locale):
         screen = BaseScreen(wid="mock", name="Mock")
         self.render(screen)
 
@@ -111,6 +193,31 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(window.children[0].height, window.height)
 
         mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_init_linux_frozen(self, mock_get_locale):
+        with patch.dict(
+            sys.__dict__, {"_MEIPASS": os.path.join("mock", "path"), "frozen": True}
+        ):
+            screen = BaseScreen(wid="mock", name="Mock")
+            self.render(screen)
+
+            # get your Window instance safely
+            EventLoop.ensure_window()
+            window = EventLoop.window
+
+            # your asserts
+            self.assertEqual(
+                screen.logo_img, os.path.join("mock", "path", "assets", "logo.png")
+            )
+            self.assertEqual(window.children[0], screen)
+            self.assertEqual(window.children[0].height, window.height)
+
+            mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.BaseScreen.get_locale")
@@ -432,3 +539,89 @@ class TestBaseScreen(GraphicUnitTest):
         mock_color.assert_called_once_with(0, 0, 0, 1)
         mock_rectangle.assert_called_once()
         mock_get_locale.assert_called_once()
+
+    @patch("sys.platform", "linux")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch("src.app.screens.base_screen.subprocess.run")
+    def test_on_get_removable_drives_linux(self, mock_run, mock_get_locale):
+        mock_run.return_value = MagicMock(stdout=MOCK_DISKS_LINUX)
+        screen = BaseScreen(wid="mock", name="Mock")
+        disks = screen.on_get_removable_drives_linux()
+
+        self.assertEqual(len(disks), 2)
+        self.assertEqual(disks[0], "/media/mock/USB1")
+        self.assertEqual(disks[1], "/media/mock/USB2")
+
+        mock_get_locale.assert_called_once()
+        mock_run.assert_called_once_with(
+            ["lsblk", "-P", "-o", "NAME,TYPE,RM,MOUNTPOINT"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+    @patch("sys.platform", "linux")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.subprocess.run",
+        side_effect=subprocess.CalledProcessError(cmd="mock", returncode=1),
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_on_get_removable_drives_linux(
+        self, mock_redirect_error, mock_run, mock_get_locale
+    ):
+        mock_run.return_value = MagicMock(stdout=MOCK_DISKS_LINUX)
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.on_get_removable_drives_linux()
+
+        mock_get_locale.assert_called_once()
+        mock_run.assert_called_once_with(
+            ["lsblk", "-P", "-o", "NAME,TYPE,RM,MOUNTPOINT"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        mock_redirect_error.assert_called()
+
+    @patch("sys.platform", "darwin")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch("src.app.screens.base_screen.subprocess.run")
+    def test_on_get_removable_drives_mac(self, mock_run, mock_get_locale):
+        mock_run.return_value = MagicMock(stdout=MOCK_DISKS_MAC)
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.on_get_removable_drives_macos()
+
+        mock_get_locale.assert_called_once()
+        mock_run.assert_called_once_with(
+            ["diskutil", "info", "-all"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+    @patch("sys.platform", "darwin")
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.BaseScreen.get_locale")
+    @patch(
+        "src.app.screens.base_screen.subprocess.run",
+        side_effect=subprocess.CalledProcessError(cmd="mock", returncode=1),
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_on_get_removable_drives_mac(
+        self, mock_redirect_error, mock_run, mock_get_locale
+    ):
+        mock_run.return_value = MagicMock(stdout=MOCK_DISKS_MAC)
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.on_get_removable_drives_macos()
+
+        mock_get_locale.assert_called_once()
+        mock_run.assert_called_once_with(
+            ["diskutil", "info", "-all"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        mock_redirect_error.assert_called()

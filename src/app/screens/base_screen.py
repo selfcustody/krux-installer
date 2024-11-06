@@ -384,6 +384,7 @@ class BaseScreen(Screen, Trigger):
 
         # pylint: disable=broad-exception-caught
         except Exception as e:
+            print(e)
             exc = RuntimeError(f"Error detecting removable drives:\n{e}")
             self.redirect_exception(exception=exc)
 
@@ -391,6 +392,7 @@ class BaseScreen(Screen, Trigger):
 
     def redirect_exception(self, exception: Exception):
         """Get an exception and prepare a ErrorScreen rendering"""
+        print(exception)
         screen = self.manager.get_screen("ErrorScreen")
         fns = [
             partial(screen.update, name=self.name, key="canvas"),

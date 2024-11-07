@@ -2,13 +2,9 @@ import sys
 import importlib
 import unittest
 from unittest.mock import MagicMock, patch
-from pytest import mark
 from src.app.screens.base_screen import BaseScreen
 
 
-@mark.skipif(
-    sys.platform == "win32", reason="This test is intended for non-Windows platforms"
-)
 class TestBaseScreenWindowsDrives(unittest.TestCase):
     def setUp(self):
         # Patch `sys.platform` to simulate a Windows environment

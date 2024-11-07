@@ -294,6 +294,11 @@ class BaseScreen(Screen, Trigger):
             exc = RuntimeError(f"Error detecting removable drives:\n{e}")
             self.redirect_exception(exception=exc)
 
+        # pylint: disable=broad-exception-caught
+        except Exception as e:
+            exc = RuntimeError(f"Unknow error while detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
+
         return drive_list
 
     def on_get_removable_drives_macos(self) -> typing.List[str]:
@@ -351,6 +356,11 @@ class BaseScreen(Screen, Trigger):
             exc = RuntimeError(f"Error detecting removable drives:\n{e}")
             self.redirect_exception(exception=exc)
 
+        # pylint: disable=broad-exception-caught
+        except Exception as e:
+            exc = RuntimeError(f"Unknow error while detecting removable drives:\n{e}")
+            self.redirect_exception(exception=exc)
+
         return drive_list
 
     def on_get_removable_drives_windows(self) -> typing.List[str]:
@@ -384,7 +394,6 @@ class BaseScreen(Screen, Trigger):
 
         # pylint: disable=broad-exception-caught
         except Exception as e:
-            print(e)
             exc = RuntimeError(f"Error detecting removable drives:\n{e}")
             self.redirect_exception(exception=exc)
 

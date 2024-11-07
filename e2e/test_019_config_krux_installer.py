@@ -16,27 +16,42 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch("src.app.config_krux_installer.LabelBase.register")
     @patch(
         "src.app.config_krux_installer.os.path.abspath",
-        side_effect=["mock/path/assets", "mock//path/i18n"],
+        side_effect=[
+            os.path.join("mock", "path", "assets"),
+            os.path.join("mock", "path", "i18n"),
+        ],
     )
     def test_init(self, mock_abspath, mock_register):
         with patch.dict(sys.__dict__, {"frozen": False}):
             ConfigKruxInstaller()
             mock_register.assert_called_once_with(
-                "Roboto", "mock/path/assets/NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+                "Roboto",
+                os.path.join(
+                    "mock", "path", "assets", "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+                ),
             )
             mock_abspath.assert_called()
 
     @patch("src.app.config_krux_installer.kv_resources.resource_add_path")
     @patch("src.app.config_krux_installer.LabelBase.register")
     def test_init_frozen_branch(self, mock_register, mock_resource_add_path):
-        with patch.dict(sys.__dict__, {"_MEIPASS": "/mocked/path", "frozen": True}):
+        with patch.dict(
+            sys.__dict__, {"_MEIPASS": os.path.join("mocked", "path"), "frozen": True}
+        ):
             installer = ConfigKruxInstaller()
-            mock_resource_add_path.assert_called_with("/mocked/path")
+            mock_resource_add_path.assert_called_with(os.path.join("mocked", "path"))
             mock_register.assert_called_once_with(
-                "Roboto", "/mocked/path/assets/NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+                "Roboto",
+                os.path.join(
+                    "mocked", "path", "assets", "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
+                ),
             )
-            self.assertEqual(installer.assets_path, "/mocked/path/assets")
-            self.assertEqual(installer.i18n_path, "/mocked/path/src/i18n")
+            self.assertEqual(
+                installer.assets_path, os.path.join("mocked", "path", "assets")
+            )
+            self.assertEqual(
+                installer.i18n_path, os.path.join("mocked", "path", "src", "i18n")
+            )
 
     @patch("sys.platform", "linux")
     def test_make_lang_code_posix(self):
@@ -418,13 +433,15 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         config.setdefaults = MagicMock()
 
         app = ConfigKruxInstaller()
-        app.i18n_path = "mock/i18n"
+        app.i18n_path = os.path.join("mock", "i18n")
         app.build_config(config)
 
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
         mock_get_system_lang.assert_called_once()
-        mock_isfile.assert_called_once_with("mock/i18n/en_US.UTF-8.json")
+        mock_isfile.assert_called_once_with(
+            os.path.join("mock", "i18n", "en_US.UTF-8.json")
+        )
         config.setdefaults.assert_has_calls(
             [
                 call("destdir", {"assets": "mockdir"}),
@@ -450,13 +467,15 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         config.setdefaults = MagicMock()
 
         app = ConfigKruxInstaller()
-        app.i18n_path = "mock/i18n"
+        app.i18n_path = os.path.join("mock", "i18n")
         app.build_config(config)
 
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
         mock_get_system_lang.assert_called_once()
-        mock_isfile.assert_called_once_with("mock/i18n/mo_CK.UTF-8.json")
+        mock_isfile.assert_called_once_with(
+            os.path.join("mock", "i18n", "mo_CK.UTF-8.json")
+        )
         config.setdefaults.assert_has_calls(
             [
                 call("destdir", {"assets": "mockdir"}),
@@ -482,13 +501,15 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         config.setdefaults = MagicMock()
 
         app = ConfigKruxInstaller()
-        app.i18n_path = "mock/i18n"
+        app.i18n_path = os.path.join("mock", "i18n")
         app.build_config(config)
 
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
         mock_get_system_lang.assert_called_once()
-        mock_isfile.assert_called_once_with("mock/i18n/en_US.UTF-8.json")
+        mock_isfile.assert_called_once_with(
+            os.path.join("mock", "i18n", "en_US.UTF-8.json")
+        )
         config.setdefaults.assert_has_calls(
             [
                 call("destdir", {"assets": "mockdir"}),
@@ -514,13 +535,15 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         config.setdefaults = MagicMock()
 
         app = ConfigKruxInstaller()
-        app.i18n_path = "mock/i18n"
+        app.i18n_path = os.path.join("mock", "i18n")
         app.build_config(config)
 
         # patch assertions
         mock_create_app_dir.assert_called_once_with(name="local")
         mock_get_system_lang.assert_called_once()
-        mock_isfile.assert_called_once_with("mock/i18n/mo_CK.UTF-8.json")
+        mock_isfile.assert_called_once_with(
+            os.path.join("mock", "i18n", "mo_CK.UTF-8.json")
+        )
         config.setdefaults.assert_has_calls(
             [
                 call("destdir", {"assets": "mockdir"}),

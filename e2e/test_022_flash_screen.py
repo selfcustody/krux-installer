@@ -144,6 +144,32 @@ class TestFlashScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
+    def test_greeting_fail_on_data_mock(self, mock_get_locale):
+        screen = FlashScreen()
+        screen.flasher.ktool.kill = MagicMock()
+        screen.flasher.ktool.checkKillExit = MagicMock()
+
+        screen.output = []
+        screen.on_pre_enter()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        on_data = getattr(FlashScreen, "on_data")
+        on_data("Greeting fail: mock")
+
+        self.assertEqual(screen.fail_msg, "Greeting fail: mock")
+
+        # patch assertions
+        mock_get_locale.assert_called()
+        screen.flasher.ktool.kill.assert_called()
+        screen.flasher.ktool.checkKillExit.assert_called()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
     def test_on_data_mock(self, mock_get_locale):
         screen = FlashScreen()
         screen.output = []

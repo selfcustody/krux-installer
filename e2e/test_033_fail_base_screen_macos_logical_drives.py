@@ -13,7 +13,7 @@ class CalledProcessError(Exception):
         self.returncode = returncode
 
 
-class TestBaseScreenLinuxDrives(unittest.TestCase):
+class TestFailBaseScreenMacDrives(unittest.TestCase):
     def setUp(self):
         self.platform_patch = patch("sys.platform", "darwin")
         self.platform_patch.start()

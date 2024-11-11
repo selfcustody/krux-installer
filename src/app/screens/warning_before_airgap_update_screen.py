@@ -82,6 +82,12 @@ class WarningBeforeAirgapUpdateScreen(BaseScreen):
                     Clock.schedule_once(fn, 0)
                     self.set_screen(name="AirgapUpdateScreen", direction="right")
 
+        setattr(
+            WarningBeforeAirgapUpdateScreen,
+            f"on_ref_press_{self.id}_label",
+            on_ref_press,
+        )
+
         self.make_button(
             row=0,
             wid=f"{self.id}_label",
@@ -91,7 +97,9 @@ class WarningBeforeAirgapUpdateScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             on_press=None,
             on_release=None,
-            on_ref_press=on_ref_press,
+            on_ref_press=getattr(
+                WarningBeforeAirgapUpdateScreen, f"on_ref_press_{self.id}_label"
+            ),
         )
         self.ids[f"{self.id}_label"].halign = "justify"
 

@@ -47,6 +47,8 @@ class AirgapUpdateScreen(BaseScreen):
             self.debug(f"Calling {instance.id}::on_press")
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
 
+        setattr(AirgapUpdateScreen, f"on_press_{self.id}_button_{row}", on_press)
+
         def on_release(instance):
             new_firmware_bin = os.path.join(drive, "firmware.bin")
             new_firmware_sig = os.path.join(drive, "firmware.bin.sig")
@@ -81,6 +83,8 @@ class AirgapUpdateScreen(BaseScreen):
 
             self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
             self.set_screen(name="WarningAfterAirgapUpdateScreen", direction="left")
+
+        setattr(AirgapUpdateScreen, f"on_release_{self.id}_button_{row}", on_release)
 
         select = self.translate("Select")
         to_copy = self.translate("to copy firmware")

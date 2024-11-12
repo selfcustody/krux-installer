@@ -61,17 +61,12 @@ class TestWarningBeforeAirgapUpdateScreen(GraphicUnitTest):
         self.assertEqual(button.text, text)
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.base_screen.BaseScreen.set_screen")
     def test_on_ref_press_back(self, mock_set_screen, mock_get_locale):
         screen = WarningBeforeAirgapUpdateScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         action = getattr(
             screen, "on_ref_press_warning_before_airgap_update_screen_label"

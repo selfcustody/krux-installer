@@ -40,8 +40,9 @@ cli = "python src/krux-installer.py"
 format-src= "black ./src"
 format-tests= "black ./tests"
 format-e2e= "black ./e2e"
+format-drives= "black ./e2e_drives"
 format-installer = "black ./krux-installer.py"
-format = ["format-src", "format-tests", "format-e2e", "format-installer"]
+format = ["format-src", "format-tests", "format-e2e", "format-drives", "format-installer"]
 
 test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"
 test-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e"
@@ -57,7 +58,8 @@ lint.sequence = [
   { cmd = "jsonlint src/i18n/*.json"},
   { cmd = "pylint --rcfile=.pylint/src ./src" },
   { cmd = "pylint --rcfile=.pylint/tests ./tests"},
-  { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e"},
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives"}
 ]
 
 build-linux.sequence = [

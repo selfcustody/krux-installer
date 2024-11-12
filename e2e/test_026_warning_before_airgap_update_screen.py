@@ -92,7 +92,7 @@ class TestWarningBeforeAirgapUpdateScreen(GraphicUnitTest):
         mock_get_locale.assert_any_call()
 
     @patch("sys.platform", "linux")
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    # @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -106,10 +106,10 @@ class TestWarningBeforeAirgapUpdateScreen(GraphicUnitTest):
         screen = WarningBeforeAirgapUpdateScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
-        self.render(screen)
+        # self.render(screen)
 
         # get your Window instance safely
-        EventLoop.ensure_window()
+        # EventLoop.ensure_window()
 
         action = getattr(
             screen, "on_ref_press_warning_before_airgap_update_screen_label"
@@ -176,7 +176,6 @@ class TestWarningBeforeAirgapUpdateScreen(GraphicUnitTest):
         on_get_removable_drives_windows.assert_called_once()
 
     @patch("sys.platform", "linux")
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -198,10 +197,6 @@ class TestWarningBeforeAirgapUpdateScreen(GraphicUnitTest):
         screen = WarningBeforeAirgapUpdateScreen()
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         action = getattr(
             screen, "on_ref_press_warning_before_airgap_update_screen_label"

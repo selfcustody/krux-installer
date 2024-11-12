@@ -93,7 +93,6 @@ class TestWarningWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -103,10 +102,8 @@ class TestWarningWipeScreen(GraphicUnitTest):
     )
     def test_update_locale(self, mock_make_label_text, mock_get_locale):
         screen = WarningWipeScreen()
-        self.render(screen)
 
         # get your Window instance safely
-        EventLoop.ensure_window()
         screen.update(name=screen.name, key="locale", value="en_US.UTF8")
 
         self.assertEqual(screen.locale, "en_US.UTF8")
@@ -135,7 +132,6 @@ class TestWarningWipeScreen(GraphicUnitTest):
         mock_get_locale.assert_any_call()
         mock_make_label_text.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -149,17 +145,10 @@ class TestWarningWipeScreen(GraphicUnitTest):
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
 
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
         button = screen.ids[f"{screen.id}_label"]
 
         action = getattr(screen.__class__, f"on_ref_press_{button.id}")
-        action(label, "WipeScreen")
+        action(button, "WipeScreen")
 
         mock_get_locale.assert_any_call()
         screen.manager.get_screen.assert_has_calls(

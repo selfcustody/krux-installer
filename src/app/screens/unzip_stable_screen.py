@@ -177,6 +177,8 @@ class UnzipStableScreen(BaseScreen):
         extract_msg = self.translate("Unziping")
         extracted_msg = self.translate("Unziped")
 
+        wid = f"{self.id}_airgap_button"
+
         def on_press(instance):
             self.debug(f"Calling Button::{instance.id}::on_press")
             file_path = os.path.join(rel_path, "firmware.bin")
@@ -184,6 +186,8 @@ class UnzipStableScreen(BaseScreen):
                 [extract_msg, "\n", "[color=#efcc00]", file_path, "[/color]"]
             )
             self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
+
+        setattr(UnzipStableScreen, f"on_press_{wid}", on_press)
 
         def on_release(instance):
             self.debug(f"Calling Button::{instance.id}::on_release")
@@ -223,10 +227,12 @@ class UnzipStableScreen(BaseScreen):
             time.sleep(2.1)
             self.set_screen(name="WarningBeforeAirgapUpdateScreen", direction="left")
 
+        setattr(UnzipStableScreen, f"on_release_{wid}", on_release)
+
         p = os.path.join(rel_path, "firmware.bin")
         self.make_button(
             row=1,
-            wid=f"{self.id}_airgap_button",
+            wid=wid,
             root_widget=f"{self.id}_grid",
             text="".join([airgap_msg, "\n", "[color=#efcc00]", p, "[/color]"]),
             font_factor=42,

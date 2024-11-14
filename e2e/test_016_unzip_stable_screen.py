@@ -245,24 +245,22 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="airgap-button")
 
-        # p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
-        # text = "".join(
-        #    [
-        #        "[color=#333333]",
-        #        "Air-gapped update with (soon)",
-        #        "[/color]",
-        #        "\n",
-        #        "[color=#333333]",
-        #        p,
-        #        "[/color]",
-        #    ]
-        # )
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
+        text = "".join(
+            [
+                "Air-gapped update with",
+                "\n",
+                "[color=#efcc00]",
+                p,
+                "[/color]",
+            ]
+        )
 
         # default assertions
-        # button = screen.ids[f"{screen.id}_airgap_button"]
-        # self.assertEqual(screen.ids[f"{screen.id}_airgap_button"].text, text)
-        # self.assertTrue(hasattr(screen.__class__, f"on_press_{button.id}"))
-        # self.assertTrue(hasattr(screen.__class__, f"on_release_{button.id}"))
+        button = screen.ids[f"{screen.id}_airgap_button"]
+        self.assertEqual(screen.ids[f"{screen.id}_airgap_button"].text, text)
+        self.assertTrue(hasattr(screen.__class__, f"on_press_{button.id}"))
+        self.assertTrue(hasattr(screen.__class__, f"on_release_{button.id}"))
 
         # patch assertions
         mock_get_destdir_assets.assert_any_call()
@@ -335,30 +333,28 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         screen.update(name="VerifyStableZipScreen", key="device", value="mock")
         screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
         screen.update(name="VerifyStableZipScreen", key="airgap-button")
-        # button = screen.ids[f"{screen.id}_airgap_button"]
-        # action = getattr(screen.__class__, f"on_press_{button.id}")
-        # action(button)
+        button = screen.ids[f"{screen.id}_airgap_button"]
+        action = getattr(screen.__class__, f"on_press_{button.id}")
+        action(button)
 
-        # p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
-        # text = "".join(
-        #    [
-        #        "[color=#333333]",
-        #        "Air-gapped update with (soon)",
-        #        "[/color]",
-        #        "\n",
-        #        "[color=#333333]",
-        #        p,
-        #        "[/color]",
-        #    ]
-        # )
+        p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
+        text = "".join(
+            [
+                "Extracting",
+                "\n",
+                "[color=#efcc00]",
+                p,
+                "[/color]",
+            ]
+        )
 
         # default assertions
-        # self.assertEqual(button.text, text)
+        self.assertEqual(button.text, text)
 
         # patch assertions
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
-        mock_set_background.assert_not_called()
+        mock_set_background.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -436,19 +432,19 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
     )
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
-    # @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
+    @patch("src.app.screens.unzip_stable_screen.FirmwareUnzip")
     @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.manager")
     @patch("src.app.screens.unzip_stable_screen.time.sleep")
     def test_on_release_airgapped_button(
         self,
         mock_sleep,
         mock_manager,
-        #    mock_firmware_unzip,
+        mock_firmware_unzip,
         mock_set_background,
         mock_get_destdir_assets,
         mock_get_locale,
     ):
-        #    mock_firmware_unzip.load = MagicMock()
+        mock_firmware_unzip.load = MagicMock()
         mock_manager.get_screen = MagicMock()
 
         screen = UnzipStableScreen()
@@ -463,13 +459,13 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         screen.update(name="VerifyStableZipScreen", key="airgap-button")
 
         button = screen.ids[f"{screen.id}_airgap_button"]
-        # action = getattr(screen.__class__, f"on_release_{button.id}")
-        # action(button)
+        action = getattr(screen.__class__, f"on_release_{button.id}")
+        action(button)
 
         p = os.path.join("mock", "krux-v0.0.1", "maixpy_mock", "firmware.bin")
         text = "".join(
             [
-                "Air-gapped update with",
+                "Extracted",
                 "\n",
                 "[color=#efcc00]",
                 p,
@@ -483,7 +479,7 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         # patch assertions
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
-        #    mock_firmware_unzip.assert_not_called()
-        mock_set_background.assert_not_called()
-        mock_manager.get_screen.assert_not_called()
-        mock_sleep.assert_not_called()
+        mock_firmware_unzip.assert_called()
+        mock_set_background.assert_called()
+        mock_manager.get_screen.assert_called()
+        mock_sleep.assert_called()

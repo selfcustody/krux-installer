@@ -24,7 +24,6 @@ main_screen.py
 import threading
 import traceback
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_flash_screen import BaseFlashScreen
 from src.utils.flasher import Flasher
@@ -124,16 +123,16 @@ class FlashScreen(BaseFlashScreen):
         self.build_on_process()
         self.build_on_done()
 
+        wid = f"{self.id}_info"
+
         def on_ref_press(*args):
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-            elif args[1] == "Quit":
-                App.get_running_app().stop()
+            if args[1] == "Quit":
+                self.quit_app()
 
-            else:
-                exc = RuntimeError(f"Invalid ref: {args[1]}")
-                self.redirect_exception(exception=exc)
+        setattr(FlashScreen, f"on_ref_press_{wid}", on_ref_press)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
@@ -163,7 +162,7 @@ class FlashScreen(BaseFlashScreen):
 
         self.make_button(
             row=2,
-            wid=f"{self.id}_info",
+            wid=wid,
             text="",
             font_factor=72,
             root_widget=f"{self.id}_grid",
@@ -187,6 +186,7 @@ class FlashScreen(BaseFlashScreen):
 
         # if anything wrong happen, show it
         def hook(err):
+            print(err)
             if not self.is_done:
                 trace = traceback.format_exception(
                     err.exc_type, err.exc_value, err.exc_traceback
@@ -199,7 +199,6 @@ class FlashScreen(BaseFlashScreen):
                     ]
                 )
 
-                self.error(msg)
                 if "StopIteration" in msg:
                     self.fail_msg = msg
                     self.fail_msg += f"\n\n{general_msg}"

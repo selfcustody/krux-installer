@@ -277,3 +277,51 @@ class TestWipeScreen(GraphicUnitTest):
             any_order=True,
         )
         mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.set_screen")
+    def test_on_ref_press_back_after_done(self, mock_set_screen, mock_get_locale):
+        screen = WipeScreen()
+        screen.output = []
+        screen.on_pre_enter()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        on_done = getattr(WipeScreen, "on_done")
+        on_ref_press = getattr(WipeScreen, "on_ref_press_wipe_screen_info")
+
+        on_done(0)
+        on_ref_press(screen.ids["wipe_screen_info"], "Back")
+
+        # patch assertions
+        mock_get_locale.assert_any_call()
+        mock_set_screen.assert_called()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.quit_app")
+    def test_on_ref_press_quit_after_done(self, mock_quit_app, mock_get_locale):
+        screen = WipeScreen()
+        screen.output = []
+        screen.on_pre_enter()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        on_done = getattr(WipeScreen, "on_done")
+        on_ref_press = getattr(WipeScreen, "on_ref_press_wipe_screen_info")
+
+        on_done(0)
+        on_ref_press(screen.ids["wipe_screen_info"], "Quit")
+
+        # patch assertions
+        mock_get_locale.assert_any_call()
+        mock_quit_app.assert_called()

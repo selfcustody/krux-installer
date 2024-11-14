@@ -25,7 +25,6 @@ import threading
 import traceback
 from functools import partial
 from kivy.clock import Clock
-from kivy.app import App
 from src.utils.flasher.wiper import Wiper
 from src.app.screens.base_flash_screen import BaseFlashScreen
 
@@ -96,18 +95,16 @@ class WipeScreen(BaseFlashScreen):
         self.build_on_data()
         self.build_on_done()
 
+        wid = f"{self.id}_info"
+
         def on_ref_press(*args):
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-            elif args[1] == "Quit":
-                App.get_running_app().stop()
+            if args[1] == "Quit":
+                self.quit_app()
 
-            else:
-                msg = f"Invalid ref: {args[1]}"
-                exc = RuntimeError(msg)
-                self.error(msg)
-                self.redirect_exception(exception=exc)
+        setattr(WipeScreen, f"on_ref_press_{wid}", on_ref_press)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=3, root_widget=f"{self.id}_grid"

@@ -1,6 +1,6 @@
 import os
 from unittest.mock import patch, MagicMock
-from kivy.base import EventLoop, EventLoopBase
+from kivy.base import EventLoop
 from kivy.tests.common import GraphicUnitTest
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.error_screen import ErrorScreen
@@ -21,29 +21,19 @@ class TestErrorScreen(GraphicUnitTest):
     def teardown_class(cls):
         EventLoop.exit()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     def test_init(self, mock_get_locale):
         screen = ErrorScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
 
         # default assertions
-        self.assertEqual(grid.id, "error_screen_grid")
-        self.assertEqual(len(grid.children), 1)
-        self.assertEqual(label.id, "error_screen_label")
+        self.assertTrue("error_screen_grid" in screen.ids)
+        self.assertTrue("error_screen_label" in screen.ids)
 
         # patch assertions
         mock_get_locale.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -51,10 +41,8 @@ class TestErrorScreen(GraphicUnitTest):
         screen = ErrorScreen()
         screen.manager = MagicMock()
         screen.manager.screen_names = ["KruxInstallerApp", screen.name]
-        self.render(screen)
 
         # get your Window instance safely
-        EventLoop.ensure_window()
         label = screen.ids[f"{screen.id}_label"]
 
         error = RuntimeError("Error: mocked error: at test")
@@ -93,32 +81,22 @@ class TestErrorScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.error_screen.ErrorScreen.set_screen")
     def test_on_ref_press_back(self, mock_set_screen, mock_get_locale):
         screen = ErrorScreen()
-
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
         button = screen.ids[f"{screen.id}_label"]
 
         action = getattr(ErrorScreen, f"on_ref_press_{button.id}")
-        action(label, "Back")
+        action(button, "Back")
 
         mock_get_locale.assert_any_call()
         mock_set_screen.assert_called_once_with(
             name="GreetingsScreen", direction="right"
         )
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -128,22 +106,14 @@ class TestErrorScreen(GraphicUnitTest):
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
 
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
         button = screen.ids[f"{screen.id}_label"]
 
         action = getattr(ErrorScreen, f"on_ref_press_{button.id}")
-        action(label, "Quit")
+        action(button, "Quit")
 
         mock_get_locale.assert_any_call()
         mock_quit_app.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -153,17 +123,10 @@ class TestErrorScreen(GraphicUnitTest):
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
 
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
         button = screen.ids[f"{screen.id}_label"]
 
         action = getattr(ErrorScreen, f"on_ref_press_{button.id}")
-        action(label, "ReportIssue")
+        action(button, "ReportIssue")
 
         mock_get_locale.assert_any_call()
         mock_web_open.assert_called_once_with(

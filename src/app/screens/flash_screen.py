@@ -186,7 +186,6 @@ class FlashScreen(BaseFlashScreen):
 
         # if anything wrong happen, show it
         def hook(err):
-            print(err)
             if not self.is_done:
                 trace = traceback.format_exception(
                     err.exc_type, err.exc_value, err.exc_traceback
@@ -215,8 +214,10 @@ class FlashScreen(BaseFlashScreen):
                     any_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
                     self.redirect_exception(exception=any_fail)
 
+        setattr(FlashScreen, "on_except_hook", hook)
+
         # hook what happened
-        threading.excepthook = hook
+        threading.excepthook = getattr(FlashScreen, "on_except_hook")
 
         # start thread
         self.thread.start()

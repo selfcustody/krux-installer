@@ -53,18 +53,12 @@ class TestWipeScreen(GraphicUnitTest):
         )
         mock_schedule_once.assert_has_calls([call(mock_partial(), 0)], any_order=True)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
     def test_fail_update_wrong_name(self, mock_redirect_exception, mock_get_locale):
         screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
         screen.update(name="MockScreen")
 
         # patch assertions
@@ -76,8 +70,6 @@ class TestWipeScreen(GraphicUnitTest):
     )
     def test_update_locale(self, mock_get_locale):
         screen = WipeScreen()
-
-        # get your Window instance safely
         screen.update(name=screen.name, key="locale", value="en_US.UTF-8")
 
         self.assertEqual(screen.locale, "en_US.UTF-8")
@@ -85,16 +77,11 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     def test_update_device(self, mock_get_locale):
         screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
         screen.update(name=screen.name, key="device", value="amigo")
 
         self.assertEqual(screen.device, "amigo")
@@ -137,7 +124,6 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -146,13 +132,8 @@ class TestWipeScreen(GraphicUnitTest):
         screen.wiper = MagicMock()
         screen.wiper.ktool.kill = MagicMock()
         screen.wiper.ktool.checkKillExit = MagicMock()
-
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         on_data = getattr(WipeScreen, "on_data")
         on_data("Greeting fail: mock")
@@ -164,7 +145,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen.wiper.ktool.kill.assert_called()
         screen.wiper.ktool.checkKillExit.assert_called()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -172,10 +152,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         on_data = getattr(WipeScreen, "on_data")
         on_data("[color=#00ff00] INFO [/color] mock")
@@ -184,7 +160,6 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -192,11 +167,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
         on_data = getattr(WipeScreen, "on_data")
 
         for i in range(4):
@@ -207,7 +177,6 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -216,10 +185,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         on_data = getattr(WipeScreen, "on_data")
         on_data("[color=#00ff00] INFO [/color] SPI Flash erased.")
@@ -265,7 +230,6 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -300,7 +264,6 @@ class TestWipeScreen(GraphicUnitTest):
         )
         mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -337,6 +300,7 @@ class TestWipeScreen(GraphicUnitTest):
         # Patch threading.excepthook with the custom hook
         with patch("threading.excepthook", mock_excepthook):
             # Call the on_enter method
+            screen.on_pre_enter()
             screen.on_enter()
 
             # Simulate the exception using ExceptHookArgs
@@ -356,7 +320,6 @@ class TestWipeScreen(GraphicUnitTest):
         mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
         mock_redirect_exception.assert_called()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -393,6 +356,7 @@ class TestWipeScreen(GraphicUnitTest):
         # Patch threading.excepthook with the custom hook
         with patch("threading.excepthook", mock_excepthook):
             # Call the on_enter method
+            screen.on_pre_enter()
             screen.on_enter()
 
             # Simulate the exception using ExceptHookArgs
@@ -412,7 +376,6 @@ class TestWipeScreen(GraphicUnitTest):
         mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
         mock_redirect_exception.assert_called()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -449,6 +412,7 @@ class TestWipeScreen(GraphicUnitTest):
         # Patch threading.excepthook with the custom hook
         with patch("threading.excepthook", mock_excepthook):
             # Call the on_enter method
+            screen.on_pre_enter()
             screen.on_enter()
 
             # Simulate the exception using ExceptHookArgs
@@ -468,7 +432,6 @@ class TestWipeScreen(GraphicUnitTest):
         mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
         mock_redirect_exception.assert_called()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -477,10 +440,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         on_done = getattr(WipeScreen, "on_done")
         on_ref_press = getattr(WipeScreen, "on_ref_press_wipe_screen_info")
@@ -492,7 +451,6 @@ class TestWipeScreen(GraphicUnitTest):
         mock_get_locale.assert_any_call()
         mock_set_screen.assert_called()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -501,10 +459,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         on_done = getattr(WipeScreen, "on_done")
         on_ref_press = getattr(WipeScreen, "on_ref_press_wipe_screen_info")

@@ -1,6 +1,6 @@
 import os
 from unittest.mock import patch, MagicMock, call
-from kivy.base import EventLoop, EventLoopBase
+from kivy.base import EventLoop
 from kivy.tests.common import GraphicUnitTest
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.warning_wipe_screen import WarningWipeScreen
@@ -21,7 +21,6 @@ class TestWarningWipeScreen(GraphicUnitTest):
     def teardown_class(cls):
         EventLoop.exit()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -29,20 +28,13 @@ class TestWarningWipeScreen(GraphicUnitTest):
     @patch("src.app.screens.warning_wipe_screen.Clock.schedule_once")
     def test_init(self, mock_schedule_once, mock_partial, mock_get_locale):
         screen = WarningWipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        image = grid.children[1]
-        label = grid.children[0]
 
         # default assertions
-        self.assertEqual(grid.id, "warning_wipe_screen_grid")
+        grid = screen.ids[f"{screen.id}_grid"]
+        self.assertTrue("warning_wipe_screen_grid" in screen.ids)
         self.assertEqual(len(grid.children), 2)
-        self.assertEqual(image.id, "warning_wipe_screen_warn")
-        self.assertEqual(label.id, "warning_wipe_screen_label")
+        self.assertTrue("warning_wipe_screen_warn" in screen.ids)
+        self.assertTrue("warning_wipe_screen_label" in screen.ids)
 
         # patch assertions
         mock_get_locale.assert_called_once()
@@ -51,19 +43,12 @@ class TestWarningWipeScreen(GraphicUnitTest):
         )
         mock_schedule_once.assert_has_calls([call(mock_partial(), 0)], any_order=True)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     def test_make_label_text(self, mock_get_locale):
         screen = WarningWipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
+        label = screen.ids[f"{screen.id}_label"]
         screen.update(name=screen.name, key="locale", value="en_US.UTF-8")
 
         text = "".join(
@@ -112,7 +97,6 @@ class TestWarningWipeScreen(GraphicUnitTest):
         mock_get_locale.assert_called_once()
         mock_make_label_text.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -122,11 +106,7 @@ class TestWarningWipeScreen(GraphicUnitTest):
     )
     def test_on_enter(self, mock_make_label_text, mock_get_locale):
         screen = WarningWipeScreen()
-        self.render(screen)
         screen.on_enter()
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         # patch assertions
         mock_get_locale.assert_any_call()

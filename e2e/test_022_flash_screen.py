@@ -5,10 +5,6 @@ from kivy.tests.common import GraphicUnitTest
 from src.app.screens.flash_screen import FlashScreen
 
 
-class CustomStopIteration(Exception):
-    pass
-
-
 class TestFlashScreen(GraphicUnitTest):
 
     @classmethod

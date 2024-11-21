@@ -185,8 +185,10 @@ class WipeScreen(BaseFlashScreen):
                     any_fail = RuntimeError(f"Wipe failed:\n{self.fail_msg}\n")
                     self.redirect_exception(exception=any_fail)
 
+        setattr(WipeScreen, "on_except_hook", hook)
+
         # hook what happened
-        threading.excepthook = hook
+        threading.excepthook = getattr(WipeScreen, "on_except_hook")
         self.thread.start()
 
     def update(self, *args, **kwargs):

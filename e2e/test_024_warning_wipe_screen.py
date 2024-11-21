@@ -176,7 +176,6 @@ class TestWarningWipeScreen(GraphicUnitTest):
             [call(mock_partial(), 0), call(mock_partial(), 0)], any_order=True
         )
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -186,16 +185,10 @@ class TestWarningWipeScreen(GraphicUnitTest):
         screen.manager = MagicMock()
         screen.manager.get_screen = MagicMock()
 
-        self.render(screen)
-
         # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
         button = screen.ids[f"{screen.id}_label"]
         action = getattr(screen.__class__, f"on_ref_press_{button.id}")
-        action(label, "MainScreen")
+        action(button, "MainScreen")
 
         mock_get_locale.assert_any_call()
         mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")

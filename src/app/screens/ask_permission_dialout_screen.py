@@ -136,6 +136,11 @@ class AskPermissionDialoutScreen(BaseScreen):
             elif "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
                 bin_path = "/usr/sbin/usermod"
 
+            # Check for Fedora, to fix issue #115
+            # see https://github.com/selfcustody/krux-installer/issues/115
+            elif os_data.get("ID") in ("fedora",):
+                bin_path = "/usr/sbin/usermod"
+
             # Arch, Manjaro, Slackware, Gentoo
             elif os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
                 bin_path = "/usr/bin/usermod"

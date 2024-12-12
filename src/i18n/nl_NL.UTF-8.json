@@ -116,7 +116,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL HET APPARAAT NIET LOS",
     "DONE": "KLAAR",
     "Back": "Terug",
-    "Quit": "Stoppen"
+    "Quit": "Stoppen",
+    "disconnect and reconnect device before flash again": "koppel het apparaat los en sluit het opnieuw aan voordat je opnieuw flasht"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Je staat op het punt om te starten met het VOLLEDIGE WISSEN van dit apparaat",

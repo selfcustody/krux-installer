@@ -212,6 +212,8 @@ class TestWipeScreen(GraphicUnitTest):
             [
                 "[b]DONE![/b]",
                 "\n",
+                "disconnect and reconnect device before flash again",
+                "\n",
                 "[color=#00FF00]",
                 "[ref=Back][u]Back[/u][/ref]",
                 "[/color]",

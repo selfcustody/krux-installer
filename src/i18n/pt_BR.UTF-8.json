@@ -118,7 +118,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR, NÃO DESCONECTE SEU DISPOSITIVO",
     "DONE": "FEITO",
     "Back": "Voltar",
-    "Quit": "Sair"
+    "Quit": "Sair",
+    "disconnect and reconnect device before flash again": "desconecte e reconecte o dispositivo antes de realizar o flash novamente"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Você está prestes a iniciar uma limpeza completa deste dispositivo",

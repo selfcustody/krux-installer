@@ -118,7 +118,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "SI PREGA DI NON SCOLLEGARE IL DISPOSITIVO",
     "DONE": "FATTO",
     "Back": "Indietro",
-    "Quit": "Dimettersi"
+    "Quit": "Dimettersi",
+    "disconnect and reconnect device before flash again": "disconnetti e riconnetti il dispositivo prima di flashare di nuovo"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Stai per avviare una CANCELLAZIONE COMPLETA di questo dispositivo",

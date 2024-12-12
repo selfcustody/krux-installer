@@ -118,7 +118,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "ПОЖАЛУЙСТА, НЕ ОТКЛЮЧАЙТЕ УСТРОЙСТВО ОТ СЕТИ",
     "DONE": "ДОГОВОРИЛИСЬ",
     "Back": "Назад",
-    "Quit": "Покидать"
+    "Quit": "Покидать",
+    "disconnect and reconnect device before flash again": "отсоедините и снова подключите устройство перед повторной прошивкой"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Вы собираетесь инициировать ПОЛНУЮ ОЧИСТКУ этого устройства",

@@ -118,7 +118,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "장치의 플러그를 뽑지 마십시오.",
     "DONE": "수행",
     "Back": "뒤로",
-    "Quit": "사임하다"
+    "Quit": "사임하다",
+    "disconnect and reconnect device before flash again": "다시 플래시하기 전에 장치를 연결 해제하고 다시 연결하세요"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "이 장치의 전체 지우기를 시작하려고 합니다.",

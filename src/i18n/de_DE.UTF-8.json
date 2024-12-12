@@ -114,7 +114,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "BITTE NICHT DAS GERÄT TRENNEN",
     "DONE": "FERTIG",
     "Back": "Zurück",
-    "Quit": "Beenden"
+    "Quit": "Beenden",
+    "disconnect and reconnect device before flash again": "Gerät trennen und erneut verbinden, bevor erneut geflasht wird"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Sie sind dabei, dieses Gerät KOMPLETT ZU LÖSCHEN",

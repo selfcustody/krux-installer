@@ -118,7 +118,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "请不要拔下您的设备",
     "DONE": "完成",
     "Back": "返回",
-    "Quit": "退出"
+    "Quit": "退出",
+    "disconnect and reconnect device before flash again": "在重新刷机之前，请断开并重新连接设备"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "您的操作将会完全擦除此设备",

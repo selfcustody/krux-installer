@@ -199,13 +199,7 @@ class TestFlasher(TestCase):
                 ),
             ]
         )
-        mock_ktool_log.assert_has_calls(
-            [
-                call("Greeting fail: mock test for mocked"),
-                call(""),
-                call("Port mocked_next not working"),
-            ]
-        )
+        mock_ktool_log.assert_has_calls([call("Port mocked_next not working")])
 
     @patch("os.path.exists", return_value=True)
     @patch("src.utils.flasher.base_flasher.list_ports", new_callable=MockListPortsGrep)
@@ -228,7 +222,9 @@ class TestFlasher(TestCase):
         mock_process.side_effect = [mock_exception, True]
 
         mock_next.side_effect = [MagicMock(device="mocked")]
-        mock_list_ports.grep.return_value.__next__.side_effect = [StopIteration()]
+        mock_list_ports.grep.return_value.__next__.side_effect = [
+            StopIteration("mocked stop")
+        ]
 
         callback = MagicMock()
         f = Flasher()
@@ -257,6 +253,4 @@ class TestFlasher(TestCase):
                 ),
             ]
         )
-        mock_ktool_log.assert_has_calls(
-            [call("Greeting fail: mock test for mocked"), call("")]
-        )
+        mock_ktool_log.assert_has_calls([call("mocked stop")])

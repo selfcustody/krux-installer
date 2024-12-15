@@ -47,11 +47,11 @@ class Wiper(BaseFlasher):
 
                 self.ktool.process()
 
+            except StopIteration as stop_exc:
+                self.ktool.__class__.log(str(stop_exc))
+
             # pylint: disable=broad-exception-caught
             except Exception as exc:
-                self.ktool.__class__.log(f"{str(exc)} for {self.port}")
-                self.ktool.__class__.log("")
-
                 try:
                     newport = next(self._available_ports_generator)
                     if self.is_port_working(newport.device):
@@ -72,6 +72,9 @@ class Wiper(BaseFlasher):
 
                 except StopIteration as stop_exc:
                     self.ktool.__class__.log(str(stop_exc))
+
+                except Exception as gen_exc:
+                    self.ktool.__class__.log(str(gen_exc))
 
         else:
             exc = RuntimeError(f"Port {self.port} not working")

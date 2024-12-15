@@ -12,7 +12,7 @@ without typing any command in terminal for [flash the firmware onto the device](
 
 ## Installing
 
-[<img src="img/badge_github.png" width="186">](https://github.com/selfcustody/krux-installer/releases)
+[<img src="img/badge_github.png" alt="github releases page" width="186">](https://github.com/selfcustody/krux-installer/releases)
 
 Available for:
 

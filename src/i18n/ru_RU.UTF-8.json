@@ -119,7 +119,7 @@
     "DONE": "ДОГОВОРИЛИСЬ",
     "Back": "Назад",
     "Quit": "Покидать",
-    "disconnect and reconnect device before flash again": "отсоедините и снова подключите устройство перед повторной прошивкой"
+    "disconnect and reconnect device before flash again": "отсоедините и снова подключите\nустройство перед повторной прошивкой"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Вы собираетесь инициировать ПОЛНУЮ ОЧИСТКУ этого устройства",

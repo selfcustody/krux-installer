@@ -12,8 +12,9 @@ without typing any command in terminal for [flash the firmware onto the device](
 
 ## Installing
 
-There are pre-built
-[releases](https://github.com/selfcustody/krux-installer/releases) for:
+[<img src="img/badge_github.png" alt="github releases page" width="186">](https://github.com/selfcustody/krux-installer/releases)
+
+Available for:
 
 * Linux:
   * Debian-like;
@@ -23,7 +24,7 @@ There are pre-built
   * intel processors;
   * arm64 processors (M1/M2/M3).
   
-To build it from the source, please follow the steps below:
+## Build from source
 
 * [System setup](/#system-setup)
   * [Linux](/#linux)

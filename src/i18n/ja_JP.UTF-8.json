@@ -119,7 +119,7 @@
     "DONE": "完了",
     "Back": "戻る",
     "Quit": "終了",
-    "disconnect and reconnect device before flash again": "再度フラッシュする前にデバイスを切断して再接続してください"
+    "disconnect and reconnect device before flash again": "再フラッシュする前にデバイスを切断して再接続してください"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "このデバイスの完全消去を開始しようとしています。",

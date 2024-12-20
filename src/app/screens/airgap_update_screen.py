@@ -50,8 +50,8 @@ class AirgapUpdateScreen(BaseScreen):
         setattr(AirgapUpdateScreen, f"on_press_{self.id}_button_{row}", on_press)
 
         def on_release(instance):
-            new_firmware_bin = os.path.join(drive, "firmware.bin")
-            new_firmware_sig = os.path.join(drive, "firmware.bin.sig")
+            new_firmware_bin = os.path.normpath(os.path.join(drive, "firmware.bin"))
+            new_firmware_sig = os.path.normpath(os.path.join(drive, "firmware.bin.sig"))
             shutil.copyfile(self.firmware_bin, new_firmware_bin)
             shutil.copyfile(self.firmware_sig, new_firmware_sig)
 

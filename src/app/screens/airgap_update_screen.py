@@ -52,37 +52,48 @@ class AirgapUpdateScreen(BaseScreen):
         def on_release(instance):
             new_firmware_bin = os.path.normpath(os.path.join(drive, "firmware.bin"))
             new_firmware_sig = os.path.normpath(os.path.join(drive, "firmware.bin.sig"))
-            shutil.copyfile(self.firmware_bin, new_firmware_bin)
-            shutil.copyfile(self.firmware_sig, new_firmware_sig)
+            try:
+                shutil.copyfile(self.firmware_bin, new_firmware_bin)
+                shutil.copyfile(self.firmware_sig, new_firmware_sig)
 
-            # After copy, make sha256 hash to show
-            sha256 = Sha256Verifyer(filename=new_firmware_bin)
-            sha256.load()
+                # After copy, make sha256 hash to show
+                sha256 = Sha256Verifyer(filename=new_firmware_bin)
+                sha256.load()
 
-            # Now update the next screen
-            warn_screen = self.manager.get_screen("WarningAfterAirgapUpdateScreen")
+                # Now update the next screen
+                warn_screen = self.manager.get_screen("WarningAfterAirgapUpdateScreen")
 
-            fns = [
-                partial(
-                    warn_screen.update,
-                    name=self.name,
-                    key="sdcard",
-                    value=drive,
-                ),
-                partial(
-                    warn_screen.update,
-                    name=self.name,
-                    key="hash",
-                    value=sha256.data.split(" ", maxsplit=1)[0],
-                ),
-                partial(warn_screen.update, name=self.name, key="label"),
-            ]
+                fns = [
+                    partial(
+                        warn_screen.update,
+                        name=self.name,
+                        key="sdcard",
+                        value=drive,
+                    ),
+                    partial(
+                        warn_screen.update,
+                        name=self.name,
+                        key="hash",
+                        value=sha256.data.split(" ", maxsplit=1)[0],
+                    ),
+                    partial(warn_screen.update, name=self.name, key="label"),
+                ]
 
-            for fn in fns:
-                Clock.schedule_once(fn, 0)
+                for fn in fns:
+                    Clock.schedule_once(fn, 0)
 
-            self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
-            self.set_screen(name="WarningAfterAirgapUpdateScreen", direction="left")
+                self.set_background(wid=instance.id, rgba=(0, 0, 0, 1))
+                self.set_screen(name="WarningAfterAirgapUpdateScreen", direction="left")
+
+            except shutil.Error as err_exc:
+                self.redirect_exception(exception=err_exc)
+
+            except shutil.ExecError as exec_exc:
+                self.redirect_exception(exception=exec_exc)
+
+            # pylint: disable=broad-exception-caught
+            except Exception as exc:
+                self.redirect_exception(exception=exc)
 
         setattr(AirgapUpdateScreen, f"on_release_{self.id}_button_{row}", on_release)
 

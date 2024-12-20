@@ -118,7 +118,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "VEUILLEZ NE PAS DÉBRANCHER VOTRE APPAREIL",
     "DONE": "FAIT",
     "Back": "Retour",
-    "Quit": "Fermer"
+    "Quit": "Fermer",
+    "disconnect and reconnect device before flash again": "déconnectez et reconnectez l'appareil avant de flasher à nouveau"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Vous êtes sur le point de lancer un EFFACEMENT COMPLET de cet appareil",

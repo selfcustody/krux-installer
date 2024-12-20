@@ -140,10 +140,22 @@ class BaseFlashScreen(BaseScreen):
             back = self.translate("Back")
             _quit = self.translate("Quit")
 
+            # If the done step occurs in FlashScreen,
+            # just put a line break
+            # It it occurs in WipeScreen,
+            # add a message to remove device and re-plug
+            # it again before flash
+            below_done = "\n"
+            if self.name == "WipeScreen":
+                below_done += self.translate(
+                    "disconnect and reconnect device before flash again"
+                )
+                below_done += "\n"
+
             self.ids[f"{self.id}_progress"].text = "".join(
                 [
                     f"[b]{done}![/b]",
-                    "\n",
+                    below_done,
                     "[color=#00FF00]",
                     f"[ref=Back][u]{back}[/u][/ref]",
                     "[/color]",

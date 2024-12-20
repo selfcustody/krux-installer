@@ -1,4 +1,5 @@
 import os
+import threading
 from unittest.mock import patch, MagicMock, call
 from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
@@ -52,34 +53,23 @@ class TestWipeScreen(GraphicUnitTest):
         )
         mock_schedule_once.assert_has_calls([call(mock_partial(), 0)], any_order=True)
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
     def test_fail_update_wrong_name(self, mock_redirect_exception, mock_get_locale):
         screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
         screen.update(name="MockScreen")
 
         # patch assertions
         mock_get_locale.assert_called_once()
         mock_redirect_exception.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     def test_update_locale(self, mock_get_locale):
         screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
         screen.update(name=screen.name, key="locale", value="en_US.UTF-8")
 
         self.assertEqual(screen.locale, "en_US.UTF-8")
@@ -87,16 +77,11 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     def test_update_device(self, mock_get_locale):
         screen = WipeScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
         screen.update(name=screen.name, key="device", value="amigo")
 
         self.assertEqual(screen.device, "amigo")
@@ -104,16 +89,13 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.asset_called_once()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     def test_update_wiper(self, mock_get_locale):
         screen = WipeScreen()
-        self.render(screen)
 
         # get your Window instance safely
-        EventLoop.ensure_window()
         screen.update(name=screen.name, key="wiper", value=1500000)
         self.assertEqual(screen.wiper.baudrate, 1500000)
 
@@ -142,7 +124,27 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_greeting_fail_on_data_mock(self, mock_get_locale):
+        screen = WipeScreen()
+        screen.wiper = MagicMock()
+        screen.wiper.ktool.kill = MagicMock()
+        screen.wiper.ktool.checkKillExit = MagicMock()
+        screen.output = []
+        screen.on_pre_enter()
+
+        on_data = getattr(WipeScreen, "on_data")
+        on_data("Greeting fail: mock")
+
+        self.assertEqual(screen.fail_msg, "Greeting fail: mock")
+
+        # patch assertions
+        mock_get_locale.assert_called()
+        screen.wiper.ktool.kill.assert_called()
+        screen.wiper.ktool.checkKillExit.assert_called()
+
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -150,10 +152,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         on_data = getattr(WipeScreen, "on_data")
         on_data("[color=#00ff00] INFO [/color] mock")
@@ -162,7 +160,6 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -170,11 +167,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
         on_data = getattr(WipeScreen, "on_data")
 
         for i in range(4):
@@ -185,7 +177,6 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -194,10 +185,6 @@ class TestWipeScreen(GraphicUnitTest):
         screen = WipeScreen()
         screen.output = []
         screen.on_pre_enter()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
 
         on_data = getattr(WipeScreen, "on_data")
         on_data("[color=#00ff00] INFO [/color] SPI Flash erased.")
@@ -225,6 +212,8 @@ class TestWipeScreen(GraphicUnitTest):
             [
                 "[b]DONE![/b]",
                 "\n",
+                "disconnect and reconnect device before flash again",
+                "\n",
                 "[color=#00FF00]",
                 "[ref=Back][u]Back[/u][/ref]",
                 "[/color]",
@@ -243,7 +232,6 @@ class TestWipeScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_any_call()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -277,3 +265,209 @@ class TestWipeScreen(GraphicUnitTest):
             any_order=True,
         )
         mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
+
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.wipe_screen.partial")
+    @patch("src.app.screens.wipe_screen.threading.Thread")
+    @patch("src.utils.flasher.Flasher")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_on_enter_fail_stopiteration(
+        self,
+        mock_redirect_exception,
+        mock_flasher,
+        mock_thread,
+        mock_partial,
+        mock_get_locale,
+    ):
+        mock_flasher.__class__.print_callback = MagicMock()
+
+        screen = WipeScreen()
+        screen.wiper = MagicMock()
+        screen.wiper.ktool = MagicMock()
+        screen.wiper.flash = MagicMock()
+        setattr(WipeScreen, "on_done", MagicMock())
+        setattr(WipeScreen, "on_data", MagicMock())
+        setattr(WipeScreen, "on_process", MagicMock())
+
+        # Define a custom excepthook
+        def mock_excepthook(args):
+            exc_type, exc_value, exc_traceback, thread = args.sequence
+            self.assertTrue(issubclass(exc_type, Exception))
+            self.assertEqual(str(exc_value), "StopIteration mocked")
+            self.assertEqual(exc_traceback, None)
+            self.assertTrue(thread is mock_thread)
+
+        # Patch threading.excepthook with the custom hook
+        with patch("threading.excepthook", mock_excepthook):
+            # Call the on_enter method
+            screen.on_pre_enter()
+            screen.on_enter()
+
+            # Simulate the exception using ExceptHookArgs
+            exc_args = threading.ExceptHookArgs(
+                sequence=(
+                    Exception,
+                    Exception("StopIteration mocked"),
+                    None,
+                    mock_thread,
+                )
+            )
+            threading.excepthook(exc_args)
+
+        # patch assertions
+        mock_get_locale.assert_called()
+        mock_partial.assert_called()
+        mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
+        mock_redirect_exception.assert_called()
+
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.wipe_screen.partial")
+    @patch("src.app.screens.wipe_screen.threading.Thread")
+    @patch("src.utils.flasher.Flasher")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_on_enter_fail_cancel(
+        self,
+        mock_redirect_exception,
+        mock_flasher,
+        mock_thread,
+        mock_partial,
+        mock_get_locale,
+    ):
+        mock_flasher.__class__.print_callback = MagicMock()
+
+        screen = WipeScreen()
+        screen.wiper = MagicMock()
+        screen.wiper.ktool = MagicMock()
+        screen.wiper.flash = MagicMock()
+        setattr(WipeScreen, "on_done", MagicMock())
+        setattr(WipeScreen, "on_data", MagicMock())
+        setattr(WipeScreen, "on_process", MagicMock())
+
+        # Define a custom excepthook
+        def mock_excepthook(args):
+            exc_type, exc_value, exc_traceback, thread = args.sequence
+            self.assertTrue(issubclass(exc_type, Exception))
+            self.assertEqual(str(exc_value), "Cancel mocked")
+            self.assertEqual(exc_traceback, None)
+            self.assertTrue(thread is mock_thread)
+
+        # Patch threading.excepthook with the custom hook
+        with patch("threading.excepthook", mock_excepthook):
+            # Call the on_enter method
+            screen.on_pre_enter()
+            screen.on_enter()
+
+            # Simulate the exception using ExceptHookArgs
+            exc_args = threading.ExceptHookArgs(
+                sequence=(
+                    Exception,
+                    Exception("Cancel mocked"),
+                    None,
+                    mock_thread,
+                )
+            )
+            threading.excepthook(exc_args)
+
+        # patch assertions
+        mock_get_locale.assert_called()
+        mock_partial.assert_called()
+        mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
+        mock_redirect_exception.assert_called()
+
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.wipe_screen.partial")
+    @patch("src.app.screens.wipe_screen.threading.Thread")
+    @patch("src.utils.flasher.Flasher")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_on_enter_fail_unknow(
+        self,
+        mock_redirect_exception,
+        mock_flasher,
+        mock_thread,
+        mock_partial,
+        mock_get_locale,
+    ):
+        mock_flasher.__class__.print_callback = MagicMock()
+
+        screen = WipeScreen()
+        screen.wiper = MagicMock()
+        screen.wiper.ktool = MagicMock()
+        screen.wiper.flash = MagicMock()
+        setattr(WipeScreen, "on_done", MagicMock())
+        setattr(WipeScreen, "on_data", MagicMock())
+        setattr(WipeScreen, "on_process", MagicMock())
+
+        # Define a custom excepthook
+        def mock_excepthook(args):
+            exc_type, exc_value, exc_traceback, thread = args.sequence
+            self.assertTrue(issubclass(exc_type, Exception))
+            self.assertEqual(str(exc_value), "Unknow mocked")
+            self.assertEqual(exc_traceback, None)
+            self.assertTrue(thread is mock_thread)
+
+        # Patch threading.excepthook with the custom hook
+        with patch("threading.excepthook", mock_excepthook):
+            # Call the on_enter method
+            screen.on_pre_enter()
+            screen.on_enter()
+
+            # Simulate the exception using ExceptHookArgs
+            exc_args = threading.ExceptHookArgs(
+                sequence=(
+                    Exception,
+                    Exception("Unknow mocked"),
+                    None,
+                    mock_thread,
+                )
+            )
+            threading.excepthook(exc_args)
+
+        # patch assertions
+        mock_get_locale.assert_called()
+        mock_partial.assert_called()
+        mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
+        mock_redirect_exception.assert_called()
+
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.set_screen")
+    def test_on_ref_press_back_after_done(self, mock_set_screen, mock_get_locale):
+        screen = WipeScreen()
+        screen.output = []
+        screen.on_pre_enter()
+
+        on_done = getattr(WipeScreen, "on_done")
+        on_ref_press = getattr(WipeScreen, "on_ref_press_wipe_screen_info")
+
+        on_done(0)
+        on_ref_press(screen.ids["wipe_screen_info"], "Back")
+
+        # patch assertions
+        mock_get_locale.assert_any_call()
+        mock_set_screen.assert_called()
+
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.quit_app")
+    def test_on_ref_press_quit_after_done(self, mock_quit_app, mock_get_locale):
+        screen = WipeScreen()
+        screen.output = []
+        screen.on_pre_enter()
+
+        on_done = getattr(WipeScreen, "on_done")
+        on_ref_press = getattr(WipeScreen, "on_ref_press_wipe_screen_info")
+
+        on_done(0)
+        on_ref_press(screen.ids["wipe_screen_info"], "Quit")
+
+        # patch assertions
+        mock_get_locale.assert_any_call()
+        mock_quit_app.assert_called()

@@ -22,7 +22,6 @@
 about_screen.py
 """
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
 
@@ -60,7 +59,11 @@ class WarningAfterAirgapUpdateScreen(BaseScreen):
                 self.set_screen(name="MainScreen", direction="right")
 
             if args[1] == "Quit":
-                App.get_running_app().stop()
+                self.quit_app()
+
+        setattr(
+            WarningAfterAirgapUpdateScreen, f"on_ref_press_{self.id}_menu", on_ref_press
+        )
 
         self.make_image(
             wid=f"{self.id}_done",

@@ -114,7 +114,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "PLEASE DO NOT UNPLUG YOUR DEVICE",
     "DONE": "DONE",
     "Back": "Back",
-    "Quit": "Quit"
+    "Quit": "Quit",
+    "disconnect and reconnect device before flash again": "disconnect and reconnect device before flash again"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "You are about to initiate a FULL WIPE of this device",

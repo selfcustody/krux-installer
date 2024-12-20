@@ -86,7 +86,6 @@ class AskPermissionDialoutScreen(BaseScreen):
 
                 # pylint: disable=broad-exception-caught
                 except Exception as err:
-                    self.error(str(err))
                     self.redirect_exception(exception=err)
 
             if args[1] == "Deny":
@@ -135,6 +134,11 @@ class AskPermissionDialoutScreen(BaseScreen):
 
             # Check for SUSE-based systems (openSUSE, SUSE Linux Enterprise)
             elif "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
+                bin_path = "/usr/sbin/usermod"
+
+            # Check for Fedora, to fix issue #115
+            # see https://github.com/selfcustody/krux-installer/issues/115
+            elif "ID" in os_data and "fedora" in os_data["ID"]:
                 bin_path = "/usr/sbin/usermod"
 
             # Arch, Manjaro, Slackware, Gentoo

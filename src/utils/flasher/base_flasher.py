@@ -55,6 +55,7 @@ class BaseFlasher(Trigger):
     def __init__(self):
         super().__init__()
         self.ktool = KTool()
+        self.stop_thread = False
 
     @property
     def firmware(self) -> str:

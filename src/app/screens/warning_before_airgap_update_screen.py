@@ -70,12 +70,23 @@ class WarningBeforeAirgapUpdateScreen(BaseScreen):
                 if sys.platform == "win32":
                     drive_list = self.on_get_removable_drives_windows()
 
-                screen = self.manager.get_screen("AirgapUpdateScreen")
-                fn = partial(
-                    screen.update, name=self.name, key="drives", value=drive_list
-                )
-                Clock.schedule_once(fn, 0)
-                self.set_screen(name="AirgapUpdateScreen", direction="right")
+                if len(drive_list) == 0:
+                    exc = RuntimeError("No removable drives found")
+                    self.redirect_exception(exception=exc)
+
+                else:
+                    screen = self.manager.get_screen("AirgapUpdateScreen")
+                    fn = partial(
+                        screen.update, name=self.name, key="drives", value=drive_list
+                    )
+                    Clock.schedule_once(fn, 0)
+                    self.set_screen(name="AirgapUpdateScreen", direction="right")
+
+        setattr(
+            WarningBeforeAirgapUpdateScreen,
+            f"on_ref_press_{self.id}_label",
+            on_ref_press,
+        )
 
         self.make_button(
             row=0,
@@ -86,7 +97,9 @@ class WarningBeforeAirgapUpdateScreen(BaseScreen):
             root_widget=f"{self.id}_grid",
             on_press=None,
             on_release=None,
-            on_ref_press=on_ref_press,
+            on_ref_press=getattr(
+                WarningBeforeAirgapUpdateScreen, f"on_ref_press_{self.id}_label"
+            ),
         )
         self.ids[f"{self.id}_label"].halign = "justify"
 

@@ -117,7 +117,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "MOET ASSEBLIEF NIE U TOESTEL ONTKOPPEL NIE",
     "DONE": "GEDOEN",
     "Back": "Terug",
-    "Quit": "Sluit"
+    "Quit": "Sluit",
+    "disconnect and reconnect device before flash again": "ontkoppel en koppel die toestel weer voordat jy weer flits"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "U is op die punt om 'n VOLLEDIGE WIPE van hierdie toestel te begin",

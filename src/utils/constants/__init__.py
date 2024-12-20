@@ -33,6 +33,7 @@ import os
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
 VALID_DEVICES_VERSIONS = {
+    "v24.11.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
     "v24.09.1": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
     "v24.09.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
     "v24.07.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube"],
@@ -62,7 +63,7 @@ def _open_pyproject() -> dict[str, Any]:
     like name, version and description
     """
     if sys.version_info.minor <= 10:
-        # pylint: disable=import-outside-toplevel
+        # pylint: disable=import-outside-toplevel,import-error
         from tomli import loads as load_toml
     if sys.version_info.minor > 10:
         # pylint: disable=import-outside-toplevel,import-error

@@ -68,7 +68,6 @@ class WarningWipeScreen(BaseScreen):
                 )
 
                 for fn in partials:
-                    print(fn)
                     Clock.schedule_once(fn, 0)
 
                 self.set_screen(name=args[1], direction="left")

@@ -7,6 +7,9 @@ from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.greetings_screen import GreetingsScreen
 
+# to be used in mocking grp
+import src.app.screens.greetings_screen
+
 
 class TestAboutScreen(GraphicUnitTest):
 
@@ -317,40 +320,50 @@ class TestAboutScreen(GraphicUnitTest):
         mock_redirect_exception.assert_called()
 
     @mark.skipif(
-        sys.platform in ("win32", "darwin"),
-        reason="does not run on windows or macos",
+        sys.platform in ("win32"),
+        reason="does not run on windows",
     )
+    @patch("sys.platform", "linux")  # Patch platform to Linux
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.greetings_screen.grp")
-    def test_is_user_not_in_dialout(self, mock_grp, mock_get_locale):
+    def test_is_user_not_in_dialout(self, mock_get_locale):
+        # Create a mock grp module
+        mock_grp = MagicMock()
         mock_grp.getgrall.return_value = [
             MagicMock(gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["brltty"])
         ]
-        # mock_grp.getgrall.return_value[0].__getitem__ = MagicMock(
-        #    return_value=['dialout', 'x', 1234, ['brltty']]
-        # )
+
+        # Temporarily add the mock grp to greetings_screen's global namespace
+        setattr(src.app.screens.greetings_screen, "grp", mock_grp)
+
+        # Initialize the screen and call the method to test
         screen = GreetingsScreen()
         is_in_dialout = screen.is_user_in_dialout_group(
             user="mockuser", group="dialout"
         )
-        self.assertEqual(is_in_dialout, False)
 
+        # Assertions
+        self.assertEqual(is_in_dialout, False)
         mock_get_locale.assert_called()
         mock_grp.getgrall.assert_called()
 
+        # Clean up by removing the mock from the module's namespace
+        delattr(src.app.screens.greetings_screen, "grp")
+
     @mark.skipif(
-        sys.platform in ("win32", "darwin"),
-        reason="does not run on windows or macos",
+        sys.platform in ("win32"),
+        reason="does not run on windows",
     )
+    @patch("sys.platform", "linux")  # Patch platform to Linux
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.greetings_screen.grp")
-    def test_is_user_in_dialout(self, mock_grp, mock_get_locale):
+    def test_is_user_in_dialout(self, mock_get_locale):
+        # Create a mock grp module
+        mock_grp = MagicMock()
         mock_grp.getgrall.return_value = [
             MagicMock(
                 gr_name="dialout",
@@ -359,6 +372,11 @@ class TestAboutScreen(GraphicUnitTest):
                 gr_mem=["brltty", "mockuser"],
             )
         ]
+
+        # Temporarily add the mock grp to greetings_screen's global namespace
+        setattr(src.app.screens.greetings_screen, "grp", mock_grp)
+
+        # Initialize the screen and call the method to test
         screen = GreetingsScreen()
         is_in_dialout = screen.is_user_in_dialout_group(
             user="mockuser", group="dialout"
@@ -459,9 +477,10 @@ class TestAboutScreen(GraphicUnitTest):
         mock_schedule_once.assert_called()
 
     @mark.skipif(
-        sys.platform in ("win32", "darwin"),
+        sys.platform in ("win32"),
         reason="does not run on windows or darwin",
     )
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.greetings_screen.os.environ.get", return_value="mockuser")
     @patch(
@@ -501,9 +520,10 @@ class TestAboutScreen(GraphicUnitTest):
         mock_in_dialout.assert_called()
 
     @mark.skipif(
-        sys.platform in ("win32", "darwin"),
+        sys.platform in ("win32"),
         reason="does not run on windows or darwin",
     )
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.greetings_screen.os.environ.get", return_value="mockuser")
     @patch(

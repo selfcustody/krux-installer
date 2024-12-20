@@ -1,4 +1,5 @@
 import os
+import sys
 from pathlib import Path
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
@@ -94,11 +95,20 @@ class TestBaseScreen(GraphicUnitTest):
         mock_get_ruunning_app.return_value.open_settings.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_static_quit_app(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.stop = MagicMock()
+
+        BaseScreen.quit_app()
+        mock_get_ruunning_app.return_value.stop.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_init_linux(self, mock_get_locale):
+    def test_init_linux_no_frozen(self, mock_get_locale):
         screen = BaseScreen(wid="mock", name="Mock")
         self.render(screen)
 
@@ -111,6 +121,31 @@ class TestBaseScreen(GraphicUnitTest):
         self.assertEqual(window.children[0].height, window.height)
 
         mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_init_linux_frozen(self, mock_get_locale):
+        with patch.dict(
+            sys.__dict__, {"_MEIPASS": os.path.join("mock", "path"), "frozen": True}
+        ):
+            screen = BaseScreen(wid="mock", name="Mock")
+            self.render(screen)
+
+            # get your Window instance safely
+            EventLoop.ensure_window()
+            window = EventLoop.window
+
+            # your asserts
+            self.assertEqual(
+                screen.logo_img, os.path.join("mock", "path", "assets", "logo.png")
+            )
+            self.assertEqual(window.children[0], screen)
+            self.assertEqual(window.children[0].height, window.height)
+
+            mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.BaseScreen.get_locale")
@@ -400,6 +435,40 @@ class TestBaseScreen(GraphicUnitTest):
         )
         self.assertEqual(screen.locale, "mocked")
         mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_fail_update_screen_locale(self, mock_redirect_exception, mock_get_locale):
+        screen = BaseScreen(wid="mock", name="Mock")
+        screen.make_grid(wid="mock_grid", rows=1)
+        screen.make_button(
+            row=0,
+            wid="mock_button",
+            root_widget="mock_grid",
+            text="Mocked button",
+            font_factor=32,
+            halign=None,
+            on_press=MagicMock(),
+            on_release=MagicMock(),
+            on_ref_press=MagicMock(),
+        )
+        setattr(screen, "update", MagicMock())
+        self.render(screen)
+        self.assertEqual(screen.locale, "en_US.UTF-8")
+
+        screen.update_screen(
+            name="MockedScreen",
+            key="locale",
+            value=None,
+            allowed_screens=("MockedScreen",),
+            on_update=MagicMock(),
+        )
+
+        mock_get_locale.assert_called_once()
+        mock_redirect_exception.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.BaseScreen.get_locale")

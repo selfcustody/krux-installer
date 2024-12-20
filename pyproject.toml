@@ -3,7 +3,7 @@ prefer-active-python = true
 
 [tool.poetry]
 name = "krux-installer"
-version = "0.0.20-beta"
+version = "0.0.20"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = [
   "qlrd <qlrddev@gmail.com>"
@@ -40,22 +40,26 @@ cli = "python src/krux-installer.py"
 format-src= "black ./src"
 format-tests= "black ./tests"
 format-e2e= "black ./e2e"
+format-drives= "black ./e2e_drives"
 format-installer = "black ./krux-installer.py"
-format = ["format-src", "format-tests", "format-e2e", "format-installer"]
+format = ["format-src", "format-tests", "format-e2e", "format-drives", "format-installer"]
 
 test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"
 test-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e"
-test = ["test-unit", "test-e2e"]
+test-drives = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e_drives"
+test = ["test-unit", "test-e2e", "test-drives"]
 
 coverage-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report xml ./tests"
 coverage-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report xml ./e2e"
-coverage = ["coverage-unit", "coverage-e2e"]
+coverage-drives = "pytest --cov-append --cov=src/app --cov-branch --cov-report xml ./e2e_drives"
+coverage = ["coverage-unit", "coverage-e2e", "coverage-drives"]
 
 lint.sequence = [
   { cmd = "jsonlint src/i18n/*.json"},
   { cmd = "pylint --rcfile=.pylint/src ./src" },
   { cmd = "pylint --rcfile=.pylint/tests ./tests"},
-  { cmd = "pylint --rcfile=.pylint/tests ./e2e"}
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e"},
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives"}
 ]
 
 build-linux.sequence = [

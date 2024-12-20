@@ -23,6 +23,7 @@ main_screen.py
 """
 import os
 import re
+import typing
 from functools import partial
 from kivy.clock import Clock
 from src.utils.selector import VALID_DEVICES
@@ -190,6 +191,71 @@ class MainScreen(BaseScreen):
         )
         self.ids[wid].size_hint = (1, 1)
 
+    def on_check_any_official_release(
+        self, partial_list: typing.List[typing.Callable]
+    ) -> str:
+        """Check if any official release file exists"""
+        resources = MainScreen.get_destdir_assets()
+        zipfile = os.path.join(resources, f"krux-{self.version}.zip")
+        to_screen = None
+
+        if os.path.isfile(zipfile):
+            to_screen = "WarningAlreadyDownloadedScreen"
+        else:
+            to_screen = "DownloadStableZipScreen"
+
+        screen = self.manager.get_screen(to_screen)
+        partial_list.append(
+            partial(
+                screen.update,
+                name=self.name,
+                key="canvas",
+            )
+        )
+        partial_list.append(
+            partial(
+                screen.update,
+                name=self.name,
+                key="version",
+                value=self.version,
+            )
+        )
+
+        return to_screen
+
+    def on_check_any_beta_release(
+        self, partial_list: typing.List[typing.Callable]
+    ) -> str:
+        """Check if release is beta"""
+        to_screen = "DownloadBetaScreen"
+        screen = self.manager.get_screen(to_screen)
+        partial_list.append(
+            partial(
+                screen.update,
+                name=self.name,
+                key="canvas",
+            )
+        )
+        partial_list.append(
+            partial(
+                screen.update,
+                name=self.name,
+                key="firmware",
+                value="kboot.kfpkg",
+            )
+        )
+        partial_list.append(
+            partial(
+                screen.update,
+                name=self.name,
+                key="device",
+                value=self.device,
+            )
+        )
+
+        partial_list.append(partial(screen.update, name=self.name, key="downloader"))
+        return to_screen
+
     def build_flash_button(self):
         """Create staticmethods using instance variables to control the flash button"""
         wid = "main_flash"
@@ -211,75 +277,33 @@ class MainScreen(BaseScreen):
 
                 # partials are functions that call `update`
                 # method in screen before go to them
-                partials = []
+                partial_list = []
+                err = None
 
-                # Check if any official release file exists
-                if re.findall(r"^v\d+\.\d+\.\d$", self.version):
-                    resources = MainScreen.get_destdir_assets()
-                    zipfile = os.path.join(resources, f"krux-{self.version}.zip")
-
-                    if os.path.isfile(zipfile):
-                        to_screen = "WarningAlreadyDownloadedScreen"
-                    else:
-                        to_screen = "DownloadStableZipScreen"
-
-                    screen = self.manager.get_screen(to_screen)
-                    partials.append(
-                        partial(
-                            screen.update,
-                            name=self.name,
-                            key="canvas",
-                        )
-                    )
-                    partials.append(
-                        partial(
-                            screen.update,
-                            name=self.name,
-                            key="version",
-                            value=self.version,
-                        )
+                if re.match(r"^v\d+\.\d+\.\d$", self.version):
+                    to_screen = self.on_check_any_official_release(
+                        partial_list=partial_list
                     )
 
-                # check if release is beta
-                elif re.findall("^odudex/krux_binaries", self.version):
-                    to_screen = "DownloadBetaScreen"
-                    screen = self.manager.get_screen(to_screen)
-                    partials.append(
-                        partial(
-                            screen.update,
-                            name=self.name,
-                            key="canvas",
-                        )
+                elif re.match("^odudex/krux_binaries", self.version):
+                    to_screen = self.on_check_any_beta_release(
+                        partial_list=partial_list
                     )
-                    partials.append(
-                        partial(
-                            screen.update,
-                            name=self.name,
-                            key="firmware",
-                            value="kboot.kfpkg",
-                        )
-                    )
-                    partials.append(
-                        partial(
-                            screen.update,
-                            name=self.name,
-                            key="device",
-                            value=self.device,
-                        )
-                    )
-                    partials.append(
-                        partial(screen.update, name=self.name, key="downloader")
-                    )
+
+                else:
+                    err = RuntimeError(f"version '{self.version}' not supported")
+                    self.redirect_exception(exception=err)
+                    return
 
                 # Execute the partials
-                for fn in partials:
+                for fn in partial_list:
                     Clock.schedule_once(fn, 0)
 
                 # Goto the selected screen
                 self.set_screen(name=to_screen, direction="left")
 
-        setattr(MainScreen, "on_press_flash", on_press_flash)
-        setattr(MainScreen, "on_release_flash", on_release_flash)
+        setattr(MainScreen, f"on_press_{wid}", on_press_flash)
+        setattr(MainScreen, f"on_release_{wid}", on_release_flash)
 
         flash_msg = self.translate("Flash")
         self.make_button(
@@ -289,8 +313,8 @@ class MainScreen(BaseScreen):
             text=f"[color=#333333]{flash_msg}[/color]",
             font_factor=28,
             halign=None,
-            on_press=getattr(MainScreen, "on_press_flash"),
-            on_release=getattr(MainScreen, "on_release_flash"),
+            on_press=getattr(MainScreen, f"on_press_{wid}"),
+            on_release=getattr(MainScreen, f"on_release_{wid}"),
             on_ref_press=None,
         )
 
@@ -450,7 +474,6 @@ class MainScreen(BaseScreen):
                     self.update_version(value)
                 else:
                     error = RuntimeError(f"Invalid value for key '{key}': {value}")
-                    self.error(str(error))
                     self.redirect_exception(exception=error)
 
             if key == "device":
@@ -458,7 +481,6 @@ class MainScreen(BaseScreen):
                     self.update_device(value)
                 else:
                     error = RuntimeError(f"Invalid value for key '{key}': {value}")
-                    self.error(str(error))
                     self.redirect_exception(exception=error)
 
             if key == "flash":

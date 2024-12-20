@@ -118,7 +118,8 @@
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR, NO DESCONECTE SU DISPOSITIVO",
     "DONE": "HECHO",
     "Back": "Volve",
-    "Quit": "Salir"
+    "Quit": "Salir",
+    "disconnect and reconnect device before flash again": "desconecta y vuelve a conectar el dispositivo antes de volver a flashear"
   },
   "warning_wipe_screen": {
     "You are about to initiate a FULL WIPE of this device": "Está a punto de iniciar un BORRADO COMPLETO de este dispositivo",

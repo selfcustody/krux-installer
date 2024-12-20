@@ -25,7 +25,6 @@ import threading
 import traceback
 from functools import partial
 from kivy.clock import Clock
-from kivy.app import App
 from src.utils.flasher.wiper import Wiper
 from src.app.screens.base_flash_screen import BaseFlashScreen
 
@@ -40,6 +39,7 @@ class WipeScreen(BaseFlashScreen):
         self.success = False
         self.progress = ""
         self.device = None
+        self.fail_msg = ""
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -74,6 +74,11 @@ class WipeScreen(BaseFlashScreen):
             if len(self.output) > 10:
                 del self.output[:1]
 
+            if "Greeting fail" in text:
+                self.fail_msg = text
+                self.wiper.ktool.kill()
+                self.wiper.ktool.checkKillExit()
+
             if "SPI Flash erased." in text:
                 self.is_done = True
                 # pylint: disable=not-callable
@@ -90,18 +95,16 @@ class WipeScreen(BaseFlashScreen):
         self.build_on_data()
         self.build_on_done()
 
+        wid = f"{self.id}_info"
+
         def on_ref_press(*args):
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-            elif args[1] == "Quit":
-                App.get_running_app().stop()
+            if args[1] == "Quit":
+                self.quit_app()
 
-            else:
-                msg = f"Invalid ref: {args[1]}"
-                exc = RuntimeError(msg)
-                self.error(msg)
-                self.redirect_exception(exception=exc)
+        setattr(WipeScreen, f"on_ref_press_{wid}", on_ref_press)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=3, root_widget=f"{self.id}_grid"
@@ -158,11 +161,34 @@ class WipeScreen(BaseFlashScreen):
                     err.exc_type, err.exc_value, err.exc_traceback
                 )
                 msg = "".join(trace[-2:])
+                general_msg = "".join(
+                    [
+                        "Ensure that you have selected the correct device ",
+                        "and that your computer has successfully detected it.",
+                    ]
+                )
+
                 self.error(msg)
-                self.redirect_exception(exception=RuntimeError(f"Wipe failed: {msg}"))
+                if "StopIteration" in msg:
+                    self.fail_msg = msg
+                    self.fail_msg += f"\n\n{general_msg}"
+                    not_conn_fail = RuntimeError(f"Wipe failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=not_conn_fail)
+
+                elif "Cancel" in msg:
+                    self.fail_msg = f"{self.fail_msg}\n\n{general_msg}"
+                    greeting_fail = RuntimeError(f"Wipe failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=greeting_fail)
+
+                else:
+                    self.fail_msg = msg
+                    any_fail = RuntimeError(f"Wipe failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=any_fail)
+
+        setattr(WipeScreen, "on_except_hook", hook)
 
         # hook what happened
-        threading.excepthook = hook
+        threading.excepthook = getattr(WipeScreen, "on_except_hook")
         self.thread.start()
 
     def update(self, *args, **kwargs):

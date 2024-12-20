@@ -112,7 +112,7 @@ class GreetingsScreen(BaseScreen):
                     "dialout",
                 )  # Pop!_OS will fall under this
 
-            # Check for Red Hat-based systems (Fedora, CentOS, Rocky Linux, etc.)
+            # Check for Red Hat-based systems (CentOS, Rocky Linux, etc.)
             if "ID_LIKE" in os_data and "rhel" in os_data["ID_LIKE"]:
                 detected = (
                     os_data["ID_LIKE"],
@@ -125,6 +125,14 @@ class GreetingsScreen(BaseScreen):
                     os_data["ID_LIKE"],
                     "dialout",
                 )  # SUSE systems also often use `dialout`
+
+            # Check for Fedora, to fix issue #115
+            # see https://github.com/selfcustody/krux-installer/issues/115
+            elif "ID" in os_data and "fedora" in os_data["ID"]:
+                detected = (
+                    os_data["ID"],
+                    "dialout",
+                )  # FEDORA systems also often use `dialout`
 
             # Arch, Manjaro, Slackware, Gentoo
             if os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):

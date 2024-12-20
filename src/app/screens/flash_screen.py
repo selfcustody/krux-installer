@@ -24,7 +24,6 @@ main_screen.py
 import threading
 import traceback
 from functools import partial
-from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_flash_screen import BaseFlashScreen
 from src.utils.flasher import Flasher
@@ -39,6 +38,7 @@ class FlashScreen(BaseFlashScreen):
         self.flashing_msg = self.translate("Flashing")
         self.at_msg = self.translate("at")
         self.flasher = Flasher()
+        self.fail_msg = ""
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
@@ -70,6 +70,11 @@ class FlashScreen(BaseFlashScreen):
             elif "*" in text:
                 self.output.append("*")
                 self.output.append("")
+
+            elif "Greeting fail" in text:
+                self.fail_msg = text
+                self.flasher.ktool.kill()
+                self.flasher.ktool.checkKillExit()
 
             if len(self.output) > 10:
                 del self.output[:1]
@@ -118,16 +123,16 @@ class FlashScreen(BaseFlashScreen):
         self.build_on_process()
         self.build_on_done()
 
+        wid = f"{self.id}_info"
+
         def on_ref_press(*args):
             if args[1] == "Back":
                 self.set_screen(name="MainScreen", direction="right")
 
-            elif args[1] == "Quit":
-                App.get_running_app().stop()
+            if args[1] == "Quit":
+                self.quit_app()
 
-            else:
-                exc = RuntimeError(f"Invalid ref: {args[1]}")
-                self.redirect_exception(exception=exc)
+        setattr(FlashScreen, f"on_ref_press_{wid}", on_ref_press)
 
         self.make_subgrid(
             wid=f"{self.id}_subgrid", rows=2, root_widget=f"{self.id}_grid"
@@ -157,7 +162,7 @@ class FlashScreen(BaseFlashScreen):
 
         self.make_button(
             row=2,
-            wid=f"{self.id}_info",
+            wid=wid,
             text="",
             font_factor=72,
             root_widget=f"{self.id}_grid",
@@ -186,11 +191,33 @@ class FlashScreen(BaseFlashScreen):
                     err.exc_type, err.exc_value, err.exc_traceback
                 )
                 msg = "".join(trace[-2:])
-                self.error(msg)
-                self.redirect_exception(exception=RuntimeError(f"Flash failed: {msg}"))
+                general_msg = "".join(
+                    [
+                        "Ensure that you have selected the correct device ",
+                        "and that your computer has successfully detected it.",
+                    ]
+                )
+
+                if "StopIteration" in msg:
+                    self.fail_msg = msg
+                    self.fail_msg += f"\n\n{general_msg}"
+                    not_conn_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=not_conn_fail)
+
+                elif "Cancel" in msg:
+                    self.fail_msg = f"{self.fail_msg}\n\n{general_msg}"
+                    greeting_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=greeting_fail)
+
+                else:
+                    self.fail_msg = msg
+                    any_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=any_fail)
+
+        setattr(FlashScreen, "on_except_hook", hook)
 
         # hook what happened
-        threading.excepthook = hook
+        threading.excepthook = getattr(FlashScreen, "on_except_hook")
 
         # start thread
         self.thread.start()

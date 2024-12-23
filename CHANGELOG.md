@@ -1,5 +1,28 @@
 # CHANGELOG
 
+## 0.0.20
+
+- Fixed Fedora crashes;
+- Better error handling during flash procedure;
+- Better error handling during wipe procedure;
+- Better error handling during air-gap update procedure;
+
+## 0.0.20-beta
+
+- Now user can, after download and verify an official firmware, select between:
+  - to flash;
+  - or make an airgapped update:
+    - user will be requested to insert a SDCard on computer;
+    - user can select among recognized removable drives;
+    - both firmware.bin and firmware.bin.sig will be copied to sdcard;
+    - after the copy, user will be requested to eject sdcard and insert it on device;
+    - at same time, the firmware.bin's computed hash will appear to compare with the computed hash on device;
+
+- Minor updates
+  - added support to de_DE locale;
+  - added support to ja_JP locale;
+  - fixes on Windows bug that didn't allow users to select a custom asset folder;
+
 ## 0.0.20-alpha-3
 
 - Fix the bug that crash when a new firmware version is added on `selfcustody/krux`, but not it isnt a valid one in `VALID_DEVICES_VERSIONS`;

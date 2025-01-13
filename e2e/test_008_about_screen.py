@@ -43,7 +43,7 @@ class TestAboutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[ref=SourceCode][b]v0.0.20[/b][/ref]",
+                "[ref=SourceCode][b]v0.0.21[/b][/ref]",
                 "\n",
                 "\n",
                 "follow us on X: ",
@@ -81,7 +81,7 @@ class TestAboutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[ref=SourceCode][b]v0.0.20[/b][/ref]",
+                "[ref=SourceCode][b]v0.0.21[/b][/ref]",
                 "\n",
                 "\n",
                 "siga-nos no X: ",

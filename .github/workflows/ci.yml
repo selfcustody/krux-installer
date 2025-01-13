@@ -24,7 +24,6 @@ jobs:
           list-files: json
           filters: |
             change:
-              - 'CHANGELOG.md'
               - 'LICENSE'
             
       # ref: https://github.com/github/docs/blob/main/.github/workflows/triage-unallowed-contributions.yml
@@ -36,7 +35,6 @@ jobs:
             let workflowFailMessage = "It looks like you've modified some files that we can't accept as contributions."
             try {
               const badFilesArr = [
-                'CHANGELOG.md',
                 'LICENSE'  
               ]
               const badFiles = badFilesArr.join('\n- ')

@@ -19,7 +19,7 @@ tomli = { version = "^2.0.1", python = "<3.11" }
 pyserial = "^3.5"
 requests = "^2.31.0"
 pyzbar = "^0.1.9"
-opencv-python = "^4.9.0.80"
+opencv-python = "^4.11.0.86"
 cryptography = "^43.0.1"
 qrcode = "^8.0"
 easy-i18n = "^1.2.0"

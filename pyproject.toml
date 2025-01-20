@@ -24,7 +24,7 @@ cryptography = "^43.0.1"
 qrcode = "^8.0"
 easy-i18n = "^1.2.0"
 pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
-pillow = "^11.0.0"
+pillow = "^11.1.0"
 pyinstaller = "^6.10.0"
 
 [tool.poetry.group.dev.dependencies]

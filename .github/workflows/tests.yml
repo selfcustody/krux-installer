@@ -30,7 +30,7 @@ jobs:
           architecture: x64
       
       - name: Install poetry dependencies
-        run: poetry install
+        run: poetry install --no-root
 
       - name: Check format/
         run: |
@@ -62,7 +62,7 @@ jobs:
           architecture: x64
 
       - name: Install poetry dependencies
-        run: poetry install
+        run: poetry install --no-root
         
       - name: Lint src/
         run: poetry run poe lint
@@ -120,7 +120,7 @@ jobs:
           python-version: '3.12'
                  
       - name: Install project and its dependencies
-        run: poetry install
+        run: poetry install --no-root
         
       - name: Run tests with coverage (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -131,7 +131,7 @@ jobs:
             poetry run poe coverage
             
       - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         if: ${{ runner.os == 'Linux' }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

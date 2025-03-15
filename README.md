@@ -217,3 +217,52 @@ It will export all project in a
 
 To more options see [.ci/create-spec.py](./.ci/create-spec.py) against the PyInstaller
 [options](https://pyinstaller.org).
+
+### Build PPA package yourself
+
+You will need installed [`docker`](https://docs.docker.com/get-docker)
+and [`docker-compose`](https://docs.docker.com/compose/install)
+to build the PPA package.
+
+```bash
+docker-compose -f ubuntu/docker-compose.yml build
+docker-compose -f ubuntu/docker-compose.yml up
+
+# alternatively, you can use the command below to build the PPA package
+# this is neat to see the logs and manually
+docker-compose -f ubuntu/docker-compose.yml run --rm -it ppa-builder /bin/bash
+
+# once inside the container, run the command below to build the PPA package
+root@container:/# build
+```
+
+It will build proper PPA files (including vendoring the dependencies),
+and will generate `ubuntu/output/artifacts`:
+
+* `krux-installer_<version>-1.debian.tar.xz`;
+
+* `krux-installer_<version>-1.dsc`;
+
+* `krux-installer_<version>-1_source.buildinfo`;
+
+* `krux-installer_<version>-1_source.changes`;
+
+* `krux-installer_<version>.orig.tar.gz`
+
+You can then install, locally doing:
+
+```bash
+# copy them to /tmp, so it can be removed after
+cp -r ubuntu/output/artifacts/* /tmp
+cd /tmp
+
+# extract sources
+dpkg-source -x krux-installer_<version>.dsc
+cd krux-installer-<version>
+
+# build: this will produce a
+# /tmp/krux-installer_<version>-1_amd64.deb
+dpkg-build -us -uc -b 
+
+# go back to /tmp and install
+dpkg -i krux-installer_<version>-1_amd64.deb

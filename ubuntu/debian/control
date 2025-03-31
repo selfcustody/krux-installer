@@ -1,0 +1,13 @@
+Source: krux-installer
+Section: utils
+Priority: optional
+Maintainer: qlrd <qlrddev@gmail.com>
+Build-Depends: debhelper-compat (= 13), dh-python, python3-all, python3-pip, python3-venv, build-essential
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+
+Package: krux-installer
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: A standalone GUI to flash Krux firmware on K210 devices
+ This package ships a Python app built using vendored dependencies.

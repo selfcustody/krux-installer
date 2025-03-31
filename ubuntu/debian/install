@@ -1,0 +1,3 @@
+dist/krux-installer usr/bin/
+debian/usr/share/applications/krux-installer.desktop usr/share/applications/
+assets/icon.png usr/share/pixmaps/krux-installer.png

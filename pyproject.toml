@@ -21,7 +21,7 @@ requests = "^2.31.0"
 pyzbar = "^0.1.9"
 opencv-python = "^4.9.0.80"
 cryptography = "^44.0.2"
-qrcode = "^8.0"
+qrcode = "^8.1"
 easy-i18n = "^1.2.0"
 pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
 pillow = "^11.0.0"

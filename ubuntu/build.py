@@ -84,7 +84,9 @@ def export_and_vendor_dependencies(build_dir):
     for file in [req, dev_req]:
         log(f"Downloading dependencies from {file.name}")
         content = file.read_text()
+        # Patch pysudoer and filelock version
         content = re.sub(r"^pysudoer\s*@.*", "", content, flags=re.MULTILINE)
+        content = re.sub(r"filelock==[^\\n]+", "filelock>=3.12.2", content)
         file.write_text(content)
         for line in content.splitlines():
             if line.strip():

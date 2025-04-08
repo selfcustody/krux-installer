@@ -220,11 +220,26 @@ To more options see [.ci/create-spec.py](./.ci/create-spec.py) against the PyIns
 
 ### Build PPA package yourself
 
-You will need installed [`docker`](https://docs.docker.com/get-docker)
-and [`docker-compose`](https://docs.docker.com/compose/install)
-to build the PPA package.
+You will need installed [`docker`](https://docs.docker.com/get-docker),  [`docker-compose`](https://docs.docker.com/compose/install)
+to build the PPA package, as well sbuild dependencies to simulate
+the ubuntu launchpad build.
+
+#### Prepare environment
 
 ```bash
+sudo apt update
+
+# Install docker and docker-compose
+sudo apt install docker.io docker-compose
+
+# Install sbuild, debootstrap, schroot, fakeroot and gnupg
+sudo apt install sbuild debootstrap schroot fakeroot gnupg
+```
+
+#### Build source files
+
+```bash
+# build docker
 docker-compose -f ubuntu/docker-compose.yml build
 docker-compose -f ubuntu/docker-compose.yml up
 
@@ -235,6 +250,8 @@ docker-compose -f ubuntu/docker-compose.yml run --rm -it ppa-builder /bin/bash
 # once inside the container, run the command below to build the PPA package
 root@container:/# build
 ```
+
+#### Check artifacts
 
 It will build proper PPA files (including vendoring the dependencies),
 and will generate `ubuntu/output/artifacts`:
@@ -249,20 +266,28 @@ and will generate `ubuntu/output/artifacts`:
 
 * `krux-installer_<version>.orig.tar.gz`
 
-You can then install, locally doing:
+#### Simulate Launchpad builds locally like a pro
+
+You can simulate the launchpad build, locally, doing:
 
 ```bash
-# copy them to /tmp, so it can be removed after
-cp -r ubuntu/output/artifacts/* /tmp
-cd /tmp
+# enable universe
+chmod +x ./ubuntu/chrooter.sh
+./ubuntu/chrooter.sh <ubuntu-release-name>
+```
 
-# extract sources
-dpkg-source -x krux-installer_<version>.dsc
-cd krux-installer-<version>
+`<ubuntu-release-name>` is a  name, like `jammy`, `focal`, `bionic`, etc.
 
-# build: this will produce a
-# /tmp/krux-installer_<version>-1_amd64.deb
-dpkg-build -us -uc -b 
+This is a script that will create a chroot environment in `/srv/chroot/<ubuntu-release-name>-<arch>`,
+enter on it and install the dependencies needed to build the PPA package.
 
-# go back to /tmp and install
-dpkg -i krux-installer_<version>-1_amd64.deb
+#### Full Clean-Up
+
+If something goes wrong with chroot, you can clean up the environment:
+
+```bash
+sudo rm -rf /srv/chroot/noble-amd64
+sudo rm -f /etc/sbuild/chroot/noble-amd64-sbuild
+sudo rm -f /etc/schroot/chroot.d/noble-amd64-sbuild*
+sudo rm -rf /var/lib/sbuild/noble-amd64-sbuild
+```

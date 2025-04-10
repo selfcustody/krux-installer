@@ -29,12 +29,14 @@ sudo sbuild-createchroot \
 # ====== Add current user to sbuild group ======
 if ! groups "$USER" | grep -qw sbuild; then
   echo "➕ Adding user $USER to 'sbuild' group"
-  sudo usermod -aG sbuild "$USER"
+  sudo sbuild-adduser $USER
+  #sudo usermod -aG sbuild "$USER"
+  #newgrp sbuild
   echo "⚠️ Please log out and log back in to apply group membership."
 fi
 
 # ====== Prepare build files ======
-echo "📦 Copying build artifacts to: $BUILD_DIR"
+echo "📦 Copying build artifacts from $ARTIFACTS_DIR to: $BUILD_DIR"
 mkdir -p "$BUILD_DIR"
 cp "$ARTIFACTS_DIR"/${PACKAGE_NAME}_* "$BUILD_DIR"
 

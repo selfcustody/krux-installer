@@ -5,6 +5,7 @@ export PYTHONPATH := $(CURDIR)
 
 VERSION := $(shell dpkg-parsechangelog --show-field Version | cut -d- -f1)
 VENV := .krux-installer-v$(VERSION)
+POETRY_CACHE_DIR := $(CURDIR)/.poetry-cache
 
 %:
 	dh $@ --with python3
@@ -12,12 +13,18 @@ VENV := .krux-installer-v$(VERSION)
 override_dh_auto_build:
 	python3 -m venv $(VENV)
 	$(VENV)/bin/pip install --no-index --find-links=vendor poetry
-	$(VENV)/bin/poetry install --no-root --no-ansi --no-interaction
-	$(VENV)/bin/poetry run poe build
+	POETRY_CACHE_DIR=$(POETRY_CACHE_DIR) \
+		$(VENV)/bin/poetry install --no-root --no-ansi --no-interaction
+	POETRY_CACHE_DIR=$(POETRY_CACHE_DIR) \
+		$(VENV)/bin/poetry run poe build-linux
 
 override_dh_auto_install:
 	dh_auto_install
 	install -Dm755 dist/krux-installer $(CURDIR)/debian/krux-installer/usr/bin/krux-installer
+
+override_dh_auto_clean:
+	rm -rf $(VENV) $(POETRY_CACHE_DIR)
+	dh_auto_clean
 
 override_dh_quilt_patch:
 	dh_quilt_patch --skip

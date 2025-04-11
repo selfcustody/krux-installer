@@ -22,11 +22,13 @@ import sys
 import tarfile
 from datetime import datetime
 from pathlib import Path
+from urllib.request import urlretrieve
 
 LOG_FILE = "build.log"
 ZIP_NAME = "pysudoer-0.0.1.zip"
 PYSUDOER_REPO = "https://github.com/qlrd/pysudoer.git"
 PYSUDOER_COMMIT = "47093f5eef1185e4e652c0ff7324678b01e3b677"
+PATCH_URL = "https://raw.githubusercontent.com/ikus060/kivy/21c7110ee79f355d6a42da0a274d2426b1e18665/kivy/tools/packaging/pyinstaller_hooks/__init__.py"
 ENTRY_SCRIPT = "krux-installer.py"
 MODULE_NAME = "krux_installer"
 COPYRIGHT_HEADER = """Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
@@ -53,6 +55,42 @@ def vendor_git_zip(build_dir, zip_path):
     run(["git", "checkout", PYSUDOER_COMMIT], cwd=tmp)
     shutil.make_archive(zip_path.with_suffix(""), "zip", root_dir=tmp, base_dir=".")
     shutil.rmtree(tmp)
+
+
+def patch_vendored_pyinstaller_hook(venv_path):
+    log("📌 Patching vendored pyinstaller_hooks/__init__.py")
+    py_ver = f"{sys.version_info.major}.{sys.version_info.minor}"
+    hook_path = (
+        Path(venv_path)
+        / f"lib/python{py_ver}/site-packages/kivy/tools/packaging/pyinstaller_hooks/__init__.py"
+    )
+    patched_hook_path = Path("pyinstaller_hook_patch.py")
+    patch_path = Path("pyinstaller_hook.patch")
+
+    if not hook_path.exists():
+        log(f"❌ Could not find target hook file: {hook_path}")
+        return
+
+    log(f"📥 Downloading patch from {PATCH_URL}")
+    urlretrieve(PATCH_URL, patched_hook_path)
+
+    log("🧪 Creating patch diff")
+    diff = subprocess.run(
+        ["diff", "-u", str(hook_path), str(patched_hook_path)],
+        capture_output=True,
+        text=True,
+    )
+    patch_path.write_text(diff.stdout)
+
+    log("🧩 Applying patch")
+    patch = subprocess.run(["patch", str(hook_path)], input=diff.stdout, text=True)
+    if patch.returncode == 0:
+        log("✅ Patch applied successfully")
+    else:
+        log("⚠️ Patch application failed")
+
+    patched_hook_path.unlink(missing_ok=True)
+    patch_path.unlink(missing_ok=True)
 
 
 def export_and_vendor_dependencies(build_dir):
@@ -84,7 +122,6 @@ def export_and_vendor_dependencies(build_dir):
     for file in [req, dev_req]:
         log(f"Downloading dependencies from {file.name}")
         content = file.read_text()
-        # Patch pysudoer and filelock version
         content = re.sub(r"^pysudoer\s*@.*", "", content, flags=re.MULTILINE)
         content = re.sub(r"filelock==[^\\n]+", "filelock>=3.12.2", content)
         file.write_text(content)
@@ -100,29 +137,6 @@ def export_and_vendor_dependencies(build_dir):
         run(["pip", "download", "poetry", "--dest", str(vendor)])
     except subprocess.CalledProcessError:
         log("⚠️ Failed to download Poetry")
-
-
-def patch_pyinstaller_kivy_hook(venv_path):
-    patch_file = Path(".ci/patches/pyinstaller_kivy_hook.py")
-    py_ver = f"{sys.version_info.major}.{sys.version_info.minor}"
-    target = (
-        Path(venv_path)
-        / f"lib/python{py_ver}/site-packages/kivy/tools/packaging/pyinstaller_hooks/__init__.py"
-    )
-
-    if not patch_file.exists() or not target.exists():
-        log("Patch or target file does not exist. Skipping patch.")
-        return
-
-    log("Patching pyinstaller_kivy_hook...")
-    patch_diff = subprocess.run(
-        ["diff", "-u", str(target), str(patch_file)], capture_output=True, text=True
-    )
-    patch = subprocess.run(["patch", str(target)], input=patch_diff.stdout, text=True)
-    if patch.returncode == 0:
-        log("Patch applied successfully.")
-    else:
-        log("⚠️ Patch application failed.")
 
 
 def parse_changelog(changelog_path, version):
@@ -363,6 +377,9 @@ def main():
     fix_poetry_structure(build_dir)
     generate_desktop_file(output_dir / "debian" / "usr" / "share" / "applications")
     build_tarball(output_dir, args.software_version)
+
+    # 🩹 Patch vendored PyInstaller Kivy hook (after structure fix)
+    patch_vendored_pyinstaller_hook(sys.prefix)
 
     run(["dpkg-buildpackage", "-S", "-us", "-uc"], cwd=output_dir)
 

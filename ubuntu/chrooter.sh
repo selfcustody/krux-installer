@@ -30,8 +30,8 @@ sudo sbuild-createchroot \
 if ! groups "$USER" | grep -qw sbuild; then
   echo "➕ Adding user $USER to 'sbuild' group"
   sudo sbuild-adduser $USER
-  #sudo usermod -aG sbuild "$USER"
-  #newgrp sbuild
+  sudo usermod -aG sbuild "$USER"
+  newgrp sbuild
   echo "⚠️ Please log out and log back in to apply group membership."
 fi
 

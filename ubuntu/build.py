@@ -156,9 +156,7 @@ def generate_include_binaries(output_dir):
 
 def generate_postinst(output_dir):
     path = output_dir / "debian" / "postinst"
-    path.write_text(
-        """
-#!/bin/sh
+    postinst_content = """#!/bin/sh
 set -e
 
 if [ -n "$SUDO_USER" ] && [ "$SUDO_USER" != "root" ]; then
@@ -171,9 +169,11 @@ elif [ -n "$USER" ] && [ "$USER" != "root" ]; then
   usermod -a -G dialout $USER
 fi
 
+#DEBHELPER#
+
 exit 0
 """
-    )
+    path.write_text(postinst_content, encoding="utf-8", newline="\n")
     path.chmod(0o755)
 
 

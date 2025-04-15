@@ -28,6 +28,7 @@ RUN apt-get update && \
   python3-poetry \
   rsync \
   dos2unix \
+  quilt \
   && rm -rf /var/lib/apt/lists/*
 
 # Clone and prepare source

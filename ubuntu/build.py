@@ -120,7 +120,9 @@ def parse_changelog(changelog_path, version):
     raise ValueError(f"Version {version} not found in changelog")
 
 
-def generate_changelog(changelog_path, version, output_path, name, email):
+def generate_changelog(
+    changelog_path, version, output_path, name, email, distribution="noble"
+):
     date, body_raw = parse_changelog(changelog_path, version)
     body = "\n".join(
         textwrap.fill(
@@ -131,7 +133,7 @@ def generate_changelog(changelog_path, version, output_path, name, email):
         for line in body_raw.splitlines()
         if line.strip()
     )
-    content = f"""krux-installer ({version}-1) unstable; urgency=medium
+    content = f"""krux-installer ({version}-1) {distribution}; urgency=medium
 
   {body}
 
@@ -325,6 +327,7 @@ def main():
     parser.add_argument("--maintainer-name", required=True)
     parser.add_argument("--maintainer-email", required=True)
     parser.add_argument("--skip-vendor", action="store_true")
+    parser.add_argument("--distribution", default="noble")
     args = parser.parse_args()
 
     build_dir = Path(args.build_dir).resolve()
@@ -343,6 +346,7 @@ def main():
         output_dir / "debian" / "changelog",
         args.maintainer_name,
         args.maintainer_email,
+        args.distribution,
     )
     generate_copyright(build_dir / args.license, output_dir / "debian" / "copyright")
     generate_include_binaries(output_dir / "debian")

@@ -11,6 +11,10 @@ ENV VERSION="${VERSION:-0.0.20}" \
   BUILD_DIR=${BUILD_DIR:-/opt/source} \
   OUTPUT_DIR=${OUTPUT_DIR:-/opt/output}
 
+# Define the distribution name
+RUN DIST=$(grep VERSION_CODENAME /etc/os-release | cut -d= -f2)
+ENV DIST=${DIST:-noble}
+
 # Install system dependencies
 RUN apt-get update && \
   apt-get install -y \
@@ -62,4 +66,5 @@ CMD build \
   --license ${BUILD_DIR}/LICENSE \
   --software-version ${VERSION} \
   --maintainer-name "qlrd" \
-  --maintainer-email "qlrddev@gmail.com"
+  --maintainer-email "qlrddev@gmail.com" \
+  --distribution ${DIST:-noble}

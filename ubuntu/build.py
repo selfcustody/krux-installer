@@ -18,11 +18,10 @@ import argparse
 import re
 import shutil
 import subprocess
-import sys
 import tarfile
+import textwrap
 from datetime import datetime
 from pathlib import Path
-from urllib.request import urlretrieve
 
 LOG_FILE = "build.log"
 ZIP_NAME = "pysudoer-0.0.1.zip"
@@ -86,7 +85,9 @@ def export_and_vendor_dependencies(build_dir):
         log(f"Downloading dependencies from {file.name}")
         content = file.read_text()
         content = re.sub(r"^pysudoer\s*@.*", "", content, flags=re.MULTILINE)
-        content = re.sub(r"filelock==[^\\n]+", "filelock>=3.12.2", content)
+        content = re.sub(
+            r"^filelock.*$", "filelock>=3.12.2", content, flags=re.MULTILINE
+        )
         file.write_text(content)
         for line in content.splitlines():
             if line.strip():
@@ -120,10 +121,19 @@ def parse_changelog(changelog_path, version):
 
 
 def generate_changelog(changelog_path, version, output_path, name, email):
-    date, body = parse_changelog(changelog_path, version)
+    date, body_raw = parse_changelog(changelog_path, version)
+    body = "\n".join(
+        textwrap.fill(
+            f"  * {line.strip('*- ')}",  # <- only a single leading bullet
+            width=79,
+            subsequent_indent="    ",
+        )
+        for line in body_raw.splitlines()
+        if line.strip()
+    )
     content = f"""krux-installer ({version}-1) unstable; urgency=medium
 
-{body}
+  {body}
 
  -- {name} <{email}>  {date}\n"""
     output_path.parent.mkdir(parents=True, exist_ok=True)

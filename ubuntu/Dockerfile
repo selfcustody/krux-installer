@@ -33,6 +33,7 @@ RUN apt-get update && \
   rsync \
   dos2unix \
   quilt \
+  libglib2.0-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Clone and prepare source

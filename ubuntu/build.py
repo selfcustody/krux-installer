@@ -144,7 +144,23 @@ def generate_changelog(
 
 def generate_copyright(license_path, output_path):
     license_text = license_path.read_text()
-    content = f"{COPYRIGHT_HEADER}\nFiles: *\nCopyright: {datetime.now().year} SelfCustody\nLicense: {license_text}"
+
+    # DEP-5 indentation rules: one space before lines, "." for empty lines
+    def format_license_block(text):
+        lines = text.strip().splitlines()
+        return "\n".join(f" {line}" if line.strip() else " ." for line in lines)
+
+    license_block = format_license_block(license_text)
+
+    content = (
+        f"{COPYRIGHT_HEADER}\n"
+        f"Files: *\n"
+        f"Copyright: {datetime.now().year} selfcustody\n"
+        f"License: MIT\n\n"
+        f"License: MIT\n"
+        f"{license_block}\n"
+    )
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(content)
 

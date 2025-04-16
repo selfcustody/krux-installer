@@ -5,7 +5,7 @@ Maintainer: qlrd <qlrddev@gmail.com>
 Standards-Version: 4.6.2
 Rules-Requires-Root: no
 Homepage: https://github.com/selfcustody/krux-installer
-Build-Depends: debhelper-compat (= 13),dh-python,dh-sequence-python3,python3-all,python3.12,python3.12-dev,python3.12-venv,python3-pip,quilt
+Build-Depends: debhelper-compat (= 13),dh-python,dh-sequence-python3,python3-all,python3.12,python3.12-dev,python3.12-venv,python3-pip,quilt,libglib2.0-dev
 
 Package: krux-installer
 Architecture: amd64

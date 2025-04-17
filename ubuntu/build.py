@@ -15,6 +15,7 @@ Handles:
 """
 
 import argparse
+import gzip
 import re
 import shutil
 import subprocess
@@ -33,6 +34,8 @@ COPYRIGHT_HEADER = """Format: https://www.debian.org/doc/packaging-manuals/copyr
 Upstream-Name: krux-installer
 Source: https://github.com/selfcustody/krux-installer
 """
+
+is_initial_upload = True
 
 
 def log(msg):
@@ -124,18 +127,21 @@ def generate_changelog(
     changelog_path, version, output_path, name, email, distribution="noble"
 ):
     date, body_raw = parse_changelog(changelog_path, version)
-    body = "\n".join(
+    wrapped_body = "\n".join(
         textwrap.fill(
-            f"  * {line.strip('*- ')}",  # <- only a single leading bullet
+            f"  *{line.strip("-* ").strip()}",
             width=79,
-            subsequent_indent="    ",
+            subsequent_indent="  ",
         )
         for line in body_raw.splitlines()
         if line.strip()
     )
+
     content = f"""krux-installer ({version}-1) {distribution}; urgency=medium
 
-  {body}
+{wrapped_body}
+
+  Closes: #1000000
 
  -- {name} <{email}>  {date}\n"""
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -220,6 +226,41 @@ Categories=Utility;
 StartupNotify=false
 """
     )
+
+
+def generate_manpage(output_dir):
+    man_source = textwrap.dedent(
+        """\
+        .TH KRUX-INSTALLER 1 "December 2024" "Krux Installer 0.0.20" "User Commands"
+        .SH NAME
+        krux-installer \- Flash Krux firmware to K210 devices
+        .SH SYNOPSIS
+        .B krux-installer
+        .SH DESCRIPTION
+        A graphical tool to flash Krux firmware onto supported K210 devices. It supports official and beta firmware, air-gapped updates, and device wiping.
+        .SH AUTHOR
+        qlrd <qlrddev@gmail.com>
+        .SH HOMEPAGE
+        https://github.com/selfcustody/krux-installer
+        """
+    )
+
+    # Path where man page will be compressed and stored
+    man_target = (
+        output_dir
+        / "debian"
+        / "krux-installer"
+        / "usr"
+        / "share"
+        / "man"
+        / "man1"
+        / "krux-installer.1.gz"
+    )
+    man_target.parent.mkdir(parents=True, exist_ok=True)
+
+    # Write and compress the man page
+    with gzip.open(man_target, "wt", encoding="utf-8") as f:
+        f.write(man_source)
 
 
 def fix_poetry_structure(build_dir):
@@ -369,6 +410,7 @@ def main():
     generate_postinst(output_dir)
     fix_poetry_structure(build_dir)
     generate_desktop_file(output_dir / "debian" / "usr" / "share" / "applications")
+    generate_manpage(output_dir)
     build_tarball(output_dir, args.software_version)
 
     run(["dpkg-buildpackage", "-S", "-us", "-uc"], cwd=output_dir)

@@ -34,6 +34,11 @@ RUN apt-get update && \
   dos2unix \
   quilt \
   libglib2.0-dev \
+  libx11-dev \
+  libice-dev \
+  libsm-dev \ 
+  libxext-dev \
+  libxrender-dev \
   && rm -rf /var/lib/apt/lists/*
 
 # Clone and prepare source

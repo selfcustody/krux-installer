@@ -183,6 +183,7 @@ def generate_include_binaries(output_dir):
                 "krux-installer-*/assets/*.ico",
                 "krux-installer-*/assets/*.icns",
                 "krux-installer-*/assets/*.bmp",
+                "debian/krux-installer.1.gz",
             ]
         )
     )
@@ -229,9 +230,9 @@ StartupNotify=false
 
 
 def generate_manpage(output_dir):
-    man_source = textwrap.dedent(
+    manpage_text = textwrap.dedent(
         """\
-        .TH KRUX-INSTALLER 1 "December 2024" "Krux Installer 0.0.20" "User Commands"
+        .TH KRUX-INSTALLER 1 "April 2025" "Krux Installer 0.0.20" "User Commands"
         .SH NAME
         krux-installer \- Flash Krux firmware to K210 devices
         .SH SYNOPSIS
@@ -245,22 +246,10 @@ def generate_manpage(output_dir):
         """
     )
 
-    # Path where man page will be compressed and stored
-    man_target = (
-        output_dir
-        / "debian"
-        / "krux-installer"
-        / "usr"
-        / "share"
-        / "man"
-        / "man1"
-        / "krux-installer.1.gz"
-    )
-    man_target.parent.mkdir(parents=True, exist_ok=True)
-
-    # Write and compress the man page
-    with gzip.open(man_target, "wt", encoding="utf-8") as f:
-        f.write(man_source)
+    gz_path = output_dir / "debian" / "krux-installer.1.gz"
+    gz_path.parent.mkdir(parents=True, exist_ok=True)
+    with gzip.open(gz_path, "wt", encoding="utf-8") as f:
+        f.write(manpage_text)
 
 
 def fix_poetry_structure(build_dir):

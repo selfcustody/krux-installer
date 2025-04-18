@@ -24,7 +24,7 @@ Build-Depends:
 
 Package: krux-installer
 Architecture: amd64
-Depends:${shlibs:Depends},${python3:Depends},${misc:Depends},libpython3.12,libc6 (>= 2.29)
+Depends:${shlibs:Depends},${python3:Depends},${misc:Depends}
 Description: Standalone GUI to flash Krux firmware on K210 devices
  This application allows users to flash the Krux firmware onto K210 devices
  using a graphical user interface. It supports selecting firmware versions,

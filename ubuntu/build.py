@@ -184,6 +184,7 @@ def generate_include_binaries(output_dir):
                 "krux-installer-*/assets/*.icns",
                 "krux-installer-*/assets/*.bmp",
                 "debian/krux-installer.1.gz",
+                "debian/krux-installer/usr/share/pixmaps/krux-installer.png",
             ]
         )
     )
@@ -227,6 +228,22 @@ Categories=Utility;
 StartupNotify=false
 """
     )
+
+
+def install_icon(output_dir):
+    source_icon = output_dir / "assets" / "logo.png"
+    dest_icon = (
+        output_dir
+        / "debian"
+        / "krux-installer"
+        / "usr"
+        / "share"
+        / "pixmaps"
+        / "krux-installer.png"
+    )
+    if source_icon.exists():
+        dest_icon.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(source_icon, dest_icon)
 
 
 def generate_manpage(output_dir):
@@ -399,6 +416,7 @@ def main():
     generate_postinst(output_dir)
     fix_poetry_structure(build_dir)
     generate_desktop_file(output_dir / "debian" / "usr" / "share" / "applications")
+    install_icon(output_dir)
     generate_manpage(output_dir)
     build_tarball(output_dir, args.software_version)
 

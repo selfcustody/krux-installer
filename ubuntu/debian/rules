@@ -22,6 +22,8 @@ override_dh_auto_install:
 	dh_auto_install
 	install -Dm755 dist/krux-installer $(CURDIR)/debian/krux-installer/usr/bin/krux-installer
 	install -Dm644 debian/krux-installer.1.gz $(CURDIR)/debian/krux-installer/usr/share/man/man1/krux-installer.1.gz
+	install -Dm644 debian/usr/share/applications/krux-installer.desktop $(CURDIR)/debian/krux-installer/usr/share/applications/krux-installer.desktop
+	install -Dm644 assets/logo.png $(CURDIR)/debian/krux-installer/usr/share/pixmaps/krux-installer.png
 
 override_dh_auto_clean:
 	rm -rf $(VENV) $(POETRY_CACHE_DIR)

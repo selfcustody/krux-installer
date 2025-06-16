@@ -31,7 +31,7 @@ pyinstaller = "^6.10.0"
 black = "^25.1.0"
 pylint = "^3.3.1"
 pyinstaller = "^6.3.0"
-pytest-cov = "^6.0.0"
+pytest-cov = "^6.2.1"
 poethepoet = "^0.33.0"
 demjson3 = "^3.0.6"
 

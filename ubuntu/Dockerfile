@@ -42,7 +42,7 @@ RUN apt-get update && \
   && rm -rf /var/lib/apt/lists/*
 
 # Clone and prepare source
-RUN git clone https://github.com/selfcustody/krux-installer.git ${BUILD_DIR} && \
+RUN git clone --recurse-submodules https://github.com/selfcustody/krux-installer.git ${BUILD_DIR} && \
   cd ${BUILD_DIR} && \
   git fetch --tags && \
   git checkout v${VERSION} && \

@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export PYTHONPATH := $(CURDIR)
+
+SOFTWARE_VERSION := $(shell grep ^version pyproject.toml | cut -d'"' -f2)
+VENV := .krux-installer-v$(SOFTWARE_VERSION)
+POETRY_CACHE_DIR := $(CURDIR)/.poetry-cache
+
+%:
+	dh $@ --with python3
+
+override_dh_auto_build:
+	mkdir -p $(POETRY_CACHE_DIR)
+	python3 -m venv $(VENV)
+	$(VENV)/bin/pip install --no-index --find-links=vendor poetry
+	POETRY_CACHE_DIR=$(POETRY_CACHE_DIR) $(VENV)/bin/poetry install --no-root --no-ansi --no-interaction
+	mkdir -p .build-home
+	HOME=$(CURDIR)/.build-home POETRY_CACHE_DIR=$(POETRY_CACHE_DIR) $(VENV)/bin/poetry run poe build-linux
+
+override_dh_auto_install:
+	dh_auto_install
+	install -Dm755 dist/krux-installer $(CURDIR)/debian/krux-installer/usr/bin/krux-installer
+	install -Dm644 debian/krux-installer.1.gz $(CURDIR)/debian/krux-installer/usr/share/man/man1/krux-installer.1.gz
+	install -Dm644 debian/usr/share/applications/krux-installer.desktop $(CURDIR)/debian/krux-installer/usr/share/applications/krux-installer.desktop
+	install -Dm644 assets/logo.png $(CURDIR)/debian/krux-installer/usr/share/pixmaps/krux-installer.png
+
+override_dh_auto_clean:
+	rm -rf $(VENV) $(POETRY_CACHE_DIR)
+	dh_auto_clean
+
+override_dh_quilt_patch:
+	dh_quilt_patch --skip

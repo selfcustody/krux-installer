@@ -63,8 +63,9 @@ def _open_pyproject() -> dict[str, Any]:
     like name, version and description
     """
     if sys.version_info.minor <= 10:
-        # pylint: disable=import-outside-toplevel,import-error
-        from tomli import loads as load_toml
+        raise EnvironmentError(
+            "Python < 3.10 not supported. Please update or use pyenv."
+        )
     if sys.version_info.minor > 10:
         # pylint: disable=import-outside-toplevel,import-error
         from tomllib import loads as load_toml

@@ -217,3 +217,77 @@ It will export all project in a
 
 To more options see [.ci/create-spec.py](./.ci/create-spec.py) against the PyInstaller
 [options](https://pyinstaller.org).
+
+### Build PPA package yourself
+
+You will need installed [`docker`](https://docs.docker.com/get-docker),  [`docker-compose`](https://docs.docker.com/compose/install)
+to build the PPA package, as well sbuild dependencies to simulate
+the ubuntu launchpad build.
+
+#### Prepare environment
+
+```bash
+sudo apt update
+
+# Install docker and docker-compose
+sudo apt install docker.io docker-compose
+
+# Install sbuild, debootstrap, schroot, fakeroot and gnupg
+sudo apt install sbuild debootstrap schroot fakeroot gnupg
+```
+
+#### Build source files
+
+```bash
+# build docker
+docker-compose -f ubuntu/docker-compose.yml build
+docker-compose -f ubuntu/docker-compose.yml up
+
+# alternatively, you can use the command below to build the PPA package
+# this is neat to see the logs and manually
+docker-compose -f ubuntu/docker-compose.yml run --rm -it ppa-builder /bin/bash
+
+# once inside the container, run the command below to build the PPA package
+root@container:/# build
+```
+
+#### Check artifacts
+
+It will build proper PPA files (including vendoring the dependencies),
+and will generate `ubuntu/output/artifacts`:
+
+* `krux-installer_<version>-1.debian.tar.xz`;
+
+* `krux-installer_<version>-1.dsc`;
+
+* `krux-installer_<version>-1_source.buildinfo`;
+
+* `krux-installer_<version>-1_source.changes`;
+
+* `krux-installer_<version>.orig.tar.gz`
+
+#### Simulate Launchpad builds locally like a pro
+
+You can simulate the launchpad build, locally, doing:
+
+```bash
+# enable universe
+chmod +x ./ubuntu/chrooter.sh
+./ubuntu/chrooter.sh <ubuntu-release-name>
+```
+
+`<ubuntu-release-name>` is a  name, like `jammy`, `focal`, `bionic`, etc.
+
+This is a script that will create a chroot environment in `/srv/chroot/<ubuntu-release-name>-<arch>`,
+enter on it and install the dependencies needed to build the PPA package.
+
+#### Full Clean-Up
+
+If something goes wrong with chroot, you can clean up the environment:
+
+```bash
+sudo rm -rf /srv/chroot/noble-amd64
+sudo rm -f /etc/sbuild/chroot/noble-amd64-sbuild
+sudo rm -f /etc/schroot/chroot.d/noble-amd64-sbuild*
+sudo rm -rf /var/lib/sbuild/noble-amd64-sbuild
+```

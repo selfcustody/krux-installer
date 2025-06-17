@@ -1,0 +1,31 @@
+Source: krux-installer
+Section: utils
+Priority: optional
+Maintainer: qlrd <qlrddev@gmail.com>
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://github.com/selfcustody/krux-installer
+Build-Depends:
+  debhelper-compat (= 13),
+  dh-python,
+  dh-sequence-python3,
+  python3-all,
+  python3.12,
+  python3.12-dev,
+  python3.12-venv,
+  python3-pip,
+  quilt,
+  libglib2.0-dev,
+  libx11-dev,
+  libice-dev,
+  libsm-dev,
+  libxext-dev,
+  libxrender-dev
+
+Package: krux-installer
+Architecture: amd64
+Depends:${shlibs:Depends},${python3:Depends},${misc:Depends}
+Description: Standalone GUI to flash Krux firmware on K210 devices
+ This application allows users to flash the Krux firmware onto K210 devices
+ using a graphical user interface. It supports selecting firmware versions,
+ verifying signatures, and performing air-gapped updates.

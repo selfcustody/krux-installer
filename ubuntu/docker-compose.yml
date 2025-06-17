@@ -1,0 +1,11 @@
+services:
+  ppa-builder:
+    build:
+      context: ..
+      dockerfile: ubuntu/Dockerfile
+      args:
+        VERSION: "0.0.20"
+        BUILD_DIR: /opt/source
+        OUTPUT_DIR: /opt/output
+    volumes:
+      - ./output:/opt/output

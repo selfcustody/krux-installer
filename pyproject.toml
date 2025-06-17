@@ -5,9 +5,7 @@ prefer-active-python = true
 name = "krux-installer"
 version = "0.0.21"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
-authors = [
-  "qlrd <qlrddev@gmail.com>"
-]
+authors = ["qlrd <qlrddev@gmail.com>"]
 license = "LICENSE"
 readme = "README.md"
 
@@ -15,7 +13,6 @@ readme = "README.md"
 python = ">3.9.1,<3.13"
 kivy = "2.3.1"
 kivysome = "^0.2.1"
-tomli = { version = "^2.2.1", python = "<3.11" }
 pyserial = "^3.5"
 requests = "^2.31.0"
 pyzbar = "^0.1.9"
@@ -23,7 +20,7 @@ opencv-python = "^4.9.0.80"
 cryptography = "^44.0.2"
 qrcode = "^8.0"
 easy-i18n = "^1.2.0"
-pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
+pysudoer = { git = "https://github.com/qlrd/pysudoer.git" }
 pillow = "^11.0.0"
 pyinstaller = "^6.10.0"
 
@@ -37,12 +34,18 @@ demjson3 = "^3.0.6"
 
 [tool.poe.tasks]
 cli = "python src/krux-installer.py"
-format-src= "black ./src"
-format-tests= "black ./tests"
-format-e2e= "black ./e2e"
-format-drives= "black ./e2e_drives"
+format-src = "black ./src"
+format-tests = "black ./tests"
+format-e2e = "black ./e2e"
+format-drives = "black ./e2e_drives"
 format-installer = "black ./krux-installer.py"
-format = ["format-src", "format-tests", "format-e2e", "format-drives", "format-installer"]
+format = [
+  "format-src",
+  "format-tests",
+  "format-e2e",
+  "format-drives",
+  "format-installer",
+]
 
 test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"
 test-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e"
@@ -55,31 +58,31 @@ coverage-drives = "pytest --cov-append --cov=src/app --cov-branch --cov-report x
 coverage = ["coverage-unit", "coverage-e2e", "coverage-drives"]
 
 lint.sequence = [
-  { cmd = "jsonlint src/i18n/*.json"},
+  { cmd = "jsonlint src/i18n/*.json" },
   { cmd = "pylint --rcfile=.pylint/src ./src" },
-  { cmd = "pylint --rcfile=.pylint/tests ./tests"},
-  { cmd = "pylint --rcfile=.pylint/tests ./e2e"},
-  { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives"}
+  { cmd = "pylint --rcfile=.pylint/tests ./tests" },
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e" },
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives" },
 ]
 
 build-linux.sequence = [
-  { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
-  { cmd = "python .ci/create-spec.py"},
-  { cmd = "python -m PyInstaller krux-installer.spec"}
+  { cmd = "python .ci/create-spec.py" },
+  { cmd = "python -m PyInstaller krux-installer.spec" },
 ]
 
 build-macos.sequence = [
   { cmd = "find . -name '.DS_Store' -delete" },
-  { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
-  { cmd = "python .ci/create-spec.py"},
-  { cmd = "python -m PyInstaller krux-installer.spec"}
+  { cmd = "python .ci/create-spec.py" },
+  { cmd = "python -m PyInstaller krux-installer.spec" },
 ]
 
 build-win.sequence = [
-  { cmd = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1" },
-  { cmd = "python .ci/create-spec.py"},
-  { interpreter = ["powershell", "pwsh"], shell = "& .ci/edit-spec.ps1"},
-  { cmd = "python -m PyInstaller krux-installer.spec"}
+  { cmd = "python .ci/create-spec.py" },
+  { interpreter = [
+    "powershell",
+    "pwsh",
+  ], shell = "& .ci/edit-spec.ps1" },
+  { cmd = "python -m PyInstaller krux-installer.spec" },
 ]
 
 [tool.poe.tasks.dev-debug]

@@ -1,9 +1,10 @@
 import os
-
 # import sys
 from unittest import TestCase
-from unittest.mock import mock_open, patch, MagicMock
-from src.utils.constants import _open_pyproject, get_name, get_version, get_description
+from unittest.mock import MagicMock, mock_open, patch
+
+from src.utils.constants import (_open_pyproject, get_description, get_name,
+                                 get_version)
 
 PYPROJECT_STR = """[tool.poetry]
 name = "test"
@@ -28,16 +29,13 @@ class TestConstants(TestCase):
         mock_tomli = MagicMock()
         mock_tomli.loads.return_value = MOCK_TOML_DATA
 
-        with patch.dict("sys.modules", {"tomli": mock_tomli}):
-            rootdirname = os.path.abspath(os.path.dirname(__file__))
-            pyproject_filename = os.path.abspath(
-                os.path.join(rootdirname, "..", "pyproject.toml")
-            )
+        with self.assertRaises(OSError) as exc:
+            _open_pyproject()
 
-            data = _open_pyproject()
-            open_mock.assert_called_once_with(pyproject_filename, "r", encoding="utf8")
-            mock_tomli.loads.assert_called_once_with(PYPROJECT_STR.strip())
-            self.assertEqual(data, MOCK_TOML_DATA)
+        self.assertEqual(
+            str(exc.exception),
+            "Python < 3.10 not supported. Please update or use pyenv.",
+        )
 
     @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_STR)
     def test_open_pyproject(self, open_mock):

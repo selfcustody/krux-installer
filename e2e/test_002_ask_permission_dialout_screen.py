@@ -537,3 +537,111 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
         # patch assertions
         mock_get_locale.assert_called_once()
         open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data='ID=nixos\nVERSION_ID=25.11\nPRETTY_NAME="NixOS 25.11"',
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale",
+        return_value="en_US.UTF-8",
+    )
+    def test_nixos_detection_during_init(self, mock_get_locale, open_mock):
+        """Test that NixOS is detected and usermod bin is set correctly during initialization"""
+        # pylint: disable=protected-access
+        screen = AskPermissionDialoutScreen()
+        screen.manager = MagicMock()
+        screen.manager.get_screen = MagicMock()
+
+        self.render(screen)
+        EventLoop.ensure_window()
+
+        # Verify the bin path was set to NixOS path
+        self.assertEqual(screen._bin, "/run/current-system/sw/bin/usermod")
+
+        # Verify os-release was read
+        open_mock.assert_called()
+        mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data='ID=nixos\nVERSION_ID=25.11\nPRETTY_NAME="NixOS 25.11"',
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale",
+        return_value="en_US.UTF-8",
+    )
+    def test_nixos_detection_different_version(self, mock_get_locale, open_mock):
+        """Test NixOS detection with a different version"""
+        # pylint: disable=protected-access
+        screen = AskPermissionDialoutScreen()
+        screen.manager = MagicMock()
+        screen.manager.get_screen = MagicMock()
+
+        self.render(screen)
+        EventLoop.ensure_window()
+
+        # Should still detect NixOS and set the correct path
+        self.assertEqual(screen._bin, "/run/current-system/sw/bin/usermod")
+
+        open_mock.assert_called()
+        mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID=nixos",
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale",
+        return_value="en_US.UTF-8",
+    )
+    def test_nixos_detection_minimal_osrelease(self, mock_get_locale, open_mock):
+        """Test NixOS detection with minimal os-release content"""
+        # pylint: disable=protected-access
+        screen = AskPermissionDialoutScreen()
+        screen.manager = MagicMock()
+        screen.manager.get_screen = MagicMock()
+
+        self.render(screen)
+        EventLoop.ensure_window()
+
+        self.assertEqual(screen._bin, "/run/current-system/sw/bin/usermod")
+
+        open_mock.assert_called()
+        mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID_LIKE=debian",
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale",
+        return_value="en_US.UTF-8",
+    )
+    def test_non_nixos_usermod_bin(self, mock_get_locale, open_mock):
+        """Test that non-NixOS systems use default /usr/sbin/usermod"""
+        # pylint: disable=protected-access
+        screen = AskPermissionDialoutScreen()
+        screen.manager = MagicMock()
+        screen.manager.get_screen = MagicMock()
+
+        self.render(screen)
+        EventLoop.ensure_window()
+
+        # Should use default path for Debian-like systems
+        self.assertEqual(screen._bin, "/usr/sbin/usermod")
+
+        open_mock.assert_called()
+        mock_get_locale.assert_called_once()

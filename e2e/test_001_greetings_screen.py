@@ -561,3 +561,23 @@ class TestAboutScreen(GraphicUnitTest):
         mock_get_locale.assert_called()
         mock_get_os.assert_called()
         mock_in_dialout.assert_called()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("sys.platform", "linux")
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data='ID="nixos"\nVERSION_ID="25.11"\nPRETTY_NAME="NixOS 25.11"\n',
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale",
+        return_value="en_US.UTF-8",
+    )
+    def test_get_os_dialout_group_nixos(self, mock_get_locale, open_mock):
+        screen = GreetingsScreen()
+        distro, group = screen.get_os_dialout_group()
+
+        self.assertEqual(distro, "nixos")
+        self.assertEqual(group, "dialout")
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")

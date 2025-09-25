@@ -29,7 +29,7 @@ from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
 if sys.platform.startswith("linux"):
-    import grp  # pylint: disable=import-error
+    import grp
 
 
 class GreetingsScreen(BaseScreen):
@@ -142,6 +142,11 @@ class GreetingsScreen(BaseScreen):
             if os_data.get("ID") in ("alpine", "clear-linux", "solus"):
                 detected = (os_data["ID"], "dialout")
 
+            # Check for NixOS 25.11 and allow it
+            if os_data.get("ID") == "nixos":
+                id_version = os_data.get("VERSION_ID", "unknown version")
+                detected = (os_data["ID"], "dialout")
+                print(f"Allowing NixOS {id_version} (experimental support)")
             if not detected[0]:
                 # If none of the conditions match, fall back to the default group
                 exc = RuntimeError(

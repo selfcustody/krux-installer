@@ -148,6 +148,9 @@ class AskPermissionDialoutScreen(BaseScreen):
             # For Alpine, Clear Linux, Solus, etc.
             elif os_data.get("ID") in ("alpine", "clear-linux", "solus"):
                 bin_path = "/usr/bin/usermod"
+            # For NixOS
+            elif os_data.get("ID") == "nixos":
+                bin_path = "/run/current-system/sw/bin/usermod"
 
             else:
                 # Default to /usr/sbin/usermod if no match is found

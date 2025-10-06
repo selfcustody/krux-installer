@@ -33,6 +33,16 @@ import os
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
 VALID_DEVICES_VERSIONS = {
+    "v25.10.0": [
+        "m5stickv",
+        "amigo",
+        "dock",
+        "yahboom",
+        "cube",
+        "wonder_mv",
+        "tzt",
+    ],
+    "v25.09.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
     "v24.11.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
     "v24.09.1": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
     "v24.09.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
@@ -53,6 +63,7 @@ VALID_DEVICES_VERSIONS = {
         "dock",
         "cube",
         "wonder_mv",
+        "tzt",
     ],
 }
 

@@ -87,6 +87,9 @@ class BaseFlasher(Trigger):
         elif value in ("dock", "yahboom", "wonder_mv"):
             vid = "7523"
 
+        elif value == "tzt":
+            vid = "55d3"
+
         else:
             raise ValueError(f"Device not implemented: {value}")
 
@@ -116,7 +119,7 @@ class BaseFlasher(Trigger):
             self._board = "goE"
             self.debug(f"board::setter={self._board}")
 
-        elif value in ("dock", "wonder_mv"):
+        elif value in ("dock", "wonder_mv", "tzt"):
             self._board = "dan"
             self.debug(f"board::setter={self._board}")
 

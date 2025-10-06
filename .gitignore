@@ -90,3 +90,7 @@ simulator/sd
 !tests/firmware-v0.0.0.bin.badsig
 !tests/firmware-v0.0.0.bin.sha256.txt
 !tests/firmware-v0.0.0.bin.sig
+
+# nix garbage
+flake.lock
+.nix-bin 

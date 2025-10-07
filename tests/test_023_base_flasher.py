@@ -89,6 +89,22 @@ class TestBaseFlasher(TestCase):
         f.port = "yahboom"
         mock_grep.assert_called_once_with("7523")
 
+    @patch(
+        "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
+    )
+    def test_set_port_wonder(self, mock_grep):
+        f = BaseFlasher()
+        f.port = "wonder_mv"
+        mock_grep.assert_called_once_with("7523")
+
+    @patch(
+        "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
+    )
+    def test_set_port_tzt(self, mock_grep):
+        f = BaseFlasher()
+        f.port = "tzt"
+        mock_grep.assert_called_once_with("55d3")
+
     def test_fail_set_port(self):
         with self.assertRaises(ValueError) as exc_info:
             f = BaseFlasher()
@@ -124,6 +140,16 @@ class TestBaseFlasher(TestCase):
     def test_set_board_dock(self):
         f = BaseFlasher()
         f.board = "dock"
+        self.assertEqual(f.board, "dan")
+
+    def test_set_board_wonder_mv(self):
+        f = BaseFlasher()
+        f.board = "wonder_mv"
+        self.assertEqual(f.board, "dan")
+
+    def test_set_board_tzt(self):
+        f = BaseFlasher()
+        f.board = "tzt"
         self.assertEqual(f.board, "dan")
 
     def test_set_board_yahboom(self):

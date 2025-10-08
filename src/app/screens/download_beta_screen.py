@@ -115,6 +115,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
                     "yahboom",
                     "cube",
                     "wonder_mv",
+                    "tzt",
                 ):
                     self.device = value
                 else:

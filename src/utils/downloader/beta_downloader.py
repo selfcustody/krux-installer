@@ -29,7 +29,16 @@ from .asset_downloader import AssetDownloader
 class BetaDownloader(AssetDownloader):
     """Download beta assets from odudex/krux_binaries"""
 
-    VALID_DEVICES = ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv")
+    VALID_DEVICES = (
+        "m5stickv",
+        "amigo",
+        "dock",
+        "bit",
+        "yahboom",
+        "cube",
+        "wonder_mv",
+        "tzt",
+    )
 
     VALID_BINARY_TYPES = ("firmware.bin", "kboot.kfpkg")
 

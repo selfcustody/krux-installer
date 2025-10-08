@@ -40,6 +40,7 @@ VALID_DEVICES = (
     "yahboom",
     "cube",
     "wonder_mv",
+    "tzt",
 )
 
 

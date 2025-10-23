@@ -28,20 +28,12 @@ Generic selector to select devices or versions
 import typing
 from http.client import HTTPResponse
 import requests
+from utils.constants import VALID_DEVICES_VERSIONS
 from ..trigger import Trigger
 
-VALID_DEVICES = (
-    "m5stickv",
-    "amigo",
-    "amigo_tft",
-    "amigo_ips",
-    "dock",
-    "bit",
-    "yahboom",
-    "cube",
-    "wonder_mv",
-    "tzt",
-)
+first_version = next(iter(VALID_DEVICES_VERSIONS))
+
+VALID_DEVICES = VALID_DEVICES_VERSIONS[first_version]
 
 
 class Selector(Trigger):

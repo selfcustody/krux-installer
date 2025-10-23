@@ -28,9 +28,6 @@ from kivy.clock import Clock
 from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
-if sys.platform.startswith("linux"):
-    import grp
-
 
 class GreetingsScreen(BaseScreen):
     """GreetingsScreen show Krux logo"""
@@ -166,13 +163,21 @@ class GreetingsScreen(BaseScreen):
         """Check if the provided user is in dialout"""
         _in_dialout = False
 
-        # loop throug all linux groups and check
+        # Import only when needed on Linux
+        if not sys.platform.startswith("linux"):
+            return False
+        # pylint: disable=import-outside-toplevel
+        try:
+            import grp
+        except ImportError:
+            self.error("grp module not available")
+            return False
+
+        # loop through all linux groups and check
         # if the user is registered in the "dialout" group
-        # pylint: disable=possibly-used-before-assignment
         for _grp in grp.getgrall():
             gr_name = _grp.gr_name
             if gr_name == group:
-                # for _grpuser in _grp[3]:
                 for _grpuser in _grp.gr_mem:
                     if _grpuser == user:
                         self.info(f"'{user}' already in group '{gr_name}'")

@@ -37,6 +37,7 @@ VALID_DEVICES_VERSIONS = {
         "m5stickv",
         "amigo",
         "dock",
+        "bit",
         "yahboom",
         "cube",
         "wonder_mv",
@@ -99,18 +100,18 @@ def get_name() -> str:
     """
     Get project name defined in pyproject.toml
     """
-    return _open_pyproject()["tool"]["poetry"]["name"]
+    return _open_pyproject()["project"]["name"]
 
 
 def get_version() -> str:
     """
     Get project version defined in pyproject.toml
     """
-    return _open_pyproject()["tool"]["poetry"]["version"]
+    return _open_pyproject()["project"]["version"]
 
 
 def get_description() -> str:
     """
     Get project description defined in pyproject.toml
     """
-    return _open_pyproject()["tool"]["poetry"]["description"]
+    return _open_pyproject()["project"]["description"]

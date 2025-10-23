@@ -7,9 +7,6 @@ from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.greetings_screen import GreetingsScreen
 
-# to be used in mocking grp
-import src.app.screens.greetings_screen
-
 
 class TestAboutScreen(GraphicUnitTest):
 
@@ -323,20 +320,27 @@ class TestAboutScreen(GraphicUnitTest):
         sys.platform in ("win32"),
         reason="does not run on windows",
     )
-    @patch("sys.platform", "linux")  # Patch platform to Linux
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_is_user_not_in_dialout(self, mock_get_locale):
+    @patch("builtins.__import__")
+    def test_is_user_not_in_dialout(self, mock_import, mock_get_locale):
         # Create a mock grp module
         mock_grp = MagicMock()
         mock_grp.getgrall.return_value = [
             MagicMock(gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["brltty"])
         ]
 
-        # Temporarily add the mock grp to greetings_screen's global namespace
-        setattr(src.app.screens.greetings_screen, "grp", mock_grp)
+        # Configure mock_import to return our mock_grp when 'grp' is imported
+        def import_mock(name, *args, **kwargs):
+            if name == "grp":
+                return mock_grp
+            # For any other import, use the real import
+            return __import__(name, *args, **kwargs)
+
+        mock_import.side_effect = import_mock
 
         # Initialize the screen and call the method to test
         screen = GreetingsScreen()
@@ -349,19 +353,17 @@ class TestAboutScreen(GraphicUnitTest):
         mock_get_locale.assert_called()
         mock_grp.getgrall.assert_called()
 
-        # Clean up by removing the mock from the module's namespace
-        delattr(src.app.screens.greetings_screen, "grp")
-
     @mark.skipif(
         sys.platform in ("win32"),
         reason="does not run on windows",
     )
-    @patch("sys.platform", "linux")  # Patch platform to Linux
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_is_user_in_dialout(self, mock_get_locale):
+    @patch("builtins.__import__")
+    def test_is_user_in_dialout(self, mock_import, mock_get_locale):
         # Create a mock grp module
         mock_grp = MagicMock()
         mock_grp.getgrall.return_value = [
@@ -373,8 +375,14 @@ class TestAboutScreen(GraphicUnitTest):
             )
         ]
 
-        # Temporarily add the mock grp to greetings_screen's global namespace
-        setattr(src.app.screens.greetings_screen, "grp", mock_grp)
+        # Configure mock_import to return our mock_grp when 'grp' is imported
+        def import_mock(name, *args, **kwargs):
+            if name == "grp":
+                return mock_grp
+            # For any other import, use the real import
+            return __import__(name, *args, **kwargs)
+
+        mock_import.side_effect = import_mock
 
         # Initialize the screen and call the method to test
         screen = GreetingsScreen()

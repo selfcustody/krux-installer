@@ -213,7 +213,7 @@ jobs:
 
       - name: Upload artifact deb (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-deb.outputs.pkg }}
           path: |
@@ -222,7 +222,7 @@ jobs:
       
       - name: Upload artifact rpm (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-rpm.outputs.pkg }}
           path: |
@@ -231,7 +231,7 @@ jobs:
             
       - name: Upload artifacts (MacOS)
         if: ${{ runner.os == 'macOS' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-macos.outputs.pkg }}
           path: |
@@ -240,7 +240,7 @@ jobs:
       
       - name: Upload artifacts (Windows)
         if: ${{ runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-windows.outputs.pkg }}
           path: |

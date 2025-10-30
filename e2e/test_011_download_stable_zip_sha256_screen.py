@@ -325,3 +325,28 @@ class TestDownloadStableZipSha256Screen(GraphicUnitTest):
         mock_set_screen.assert_called_once_with(
             name="DownloadStableZipSigScreen", direction="left"
         )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.download_stable_zip_sha256_screen.time.sleep")
+    @patch("src.app.screens.base_download_screen.BaseDownloadScreen.on_pre_enter")
+    def test_on_pre_enter(self, mock_super_on_pre_enter, mock_sleep, mock_get_locale):
+        screen = DownloadStableZipSha256Screen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # Call on_pre_enter
+        screen.on_pre_enter()
+
+        # Verify time.sleep was called with 3 seconds
+        mock_sleep.assert_called_once_with(3)
+
+        # Verify parent's on_pre_enter was called
+        mock_super_on_pre_enter.assert_called_once()
+
+        # patch assertions
+        mock_get_locale.assert_any_call()

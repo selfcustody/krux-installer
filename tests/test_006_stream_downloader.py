@@ -233,3 +233,36 @@ class TestStreamDownloader(TestCase):
                 },
                 timeout=30,
             )
+    @patch("src.utils.downloader.stream_downloader.time.sleep", return_value=None)
+    @patch("src.utils.downloader.stream_downloader.requests")
+    def test_rate_limit_retry_then_success(self, mock_requests, mock_sleep):
+        mock_response_429 = MagicMock()
+        mock_response_429.status_code = 429
+        http_error = requests.exceptions.HTTPError()
+        http_error.response = mock_response_429
+        mock_response_429.raise_for_status.side_effect = http_error
+        mock_response_200 = MagicMock()
+        mock_response_200.status_code = 200
+        mock_response_200.headers = {"Content-Length": "210000"}
+        mock_response_200.iter_content.return_value = [[b"test", b"data"]]
+        mock_response_200.raise_for_status.return_value = None
+
+        mock_requests.get.side_effect = [
+            mock_response_429,
+            mock_response_429,
+            mock_response_200,
+        ]
+        mock_requests.exceptions = requests.exceptions
+
+        sd = StreamDownloader(url=URL)
+        setattr(sd, "on_data", MagicMock())
+
+        sd.download_file_stream(url="https://any.call/test.zip", max_retries=5)
+
+        self.assertEqual(mock_requests.get.call_count, 3)
+
+        self.assertEqual(mock_sleep.call_count, 2)
+        expected_sleep_calls = [call(2), call(4)]
+        mock_sleep.assert_has_calls(expected_sleep_calls)
+
+        self.assertEqual(sd.content_len, 210000)

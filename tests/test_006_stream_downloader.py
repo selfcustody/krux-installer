@@ -233,6 +233,7 @@ class TestStreamDownloader(TestCase):
                 },
                 timeout=30,
             )
+
     @patch("src.utils.downloader.stream_downloader.time.sleep", return_value=None)
     @patch("src.utils.downloader.stream_downloader.requests")
     def test_rate_limit_retry_then_success(self, mock_requests, mock_sleep):

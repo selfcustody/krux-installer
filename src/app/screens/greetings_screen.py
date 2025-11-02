@@ -28,8 +28,10 @@ from kivy.clock import Clock
 from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
-if sys.platform.startswith("linux"):
+try:
     import grp
+except ImportError:
+    grp = None  # grp is only available on Unix systems
 
 
 class GreetingsScreen(BaseScreen):
@@ -165,6 +167,10 @@ class GreetingsScreen(BaseScreen):
     def is_user_in_dialout_group(self, user: str, group: str):
         """Check if the provided user is in dialout"""
         _in_dialout = False
+
+        # grp module is only available on Unix systems
+        if "grp" not in globals() or grp is None:
+            return _in_dialout
 
         # loop throug all linux groups and check
         # if the user is registered in the "dialout" group

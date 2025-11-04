@@ -28,11 +28,6 @@ from kivy.clock import Clock
 from src.utils.selector import Selector
 from src.app.screens.base_screen import BaseScreen
 
-try:
-    import grp
-except ImportError:
-    grp = None  # grp is only available on Unix systems
-
 
 class GreetingsScreen(BaseScreen):
     """GreetingsScreen show Krux logo"""
@@ -169,12 +164,14 @@ class GreetingsScreen(BaseScreen):
         _in_dialout = False
 
         # grp module is only available on Unix systems
-        if "grp" not in globals() or grp is None:
+        try:
+            import grp  # pylint: disable=import-outside-toplevel
+        except ImportError:
+            # grp not available (e.g., on Windows)
             return _in_dialout
 
         # loop throug all linux groups and check
         # if the user is registered in the "dialout" group
-        # pylint: disable=possibly-used-before-assignment
         for _grp in grp.getgrall():
             gr_name = _grp.gr_name
             if gr_name == group:

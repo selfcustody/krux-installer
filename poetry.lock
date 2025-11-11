@@ -1355,6 +1355,21 @@ files = [
 ]
 
 [[package]]
+name = "olefile"
+version = "0.47"
+description = "Python package to parse, read and write Microsoft OLE2 files (Structured Storage or Compound Document, Microsoft Office)"
+optional = false
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
+groups = ["main"]
+files = [
+    {file = "olefile-0.47-py2.py3-none-any.whl", hash = "sha256:543c7da2a7adadf21214938bb79c83ea12b473a4b6ee4ad4bf854e7715e13d1f"},
+    {file = "olefile-0.47.zip", hash = "sha256:599383381a0bf3dfbd932ca0ca6515acd174ed48870cbf7fee123d698c192c1c"},
+]
+
+[package.extras]
+tests = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "opencv-python"
 version = "4.12.0.88"
 description = "Wrapper package for OpenCV python bindings."
@@ -2333,4 +2348,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">3.9.1,<3.13"
-content-hash = "5e0d5fbc803088b62fbab1d65463749d2ba4a2a7fbfd5c19235aa22bb435417c"
+content-hash = "071b6fb0f966998653f2b9b368281dbef0819e0b3ef814eb7c32cde181b245de"

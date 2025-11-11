@@ -119,4 +119,4 @@ if __name__ == "__main__":
         print(f"{k}: {v}")
 
     print()
-    PyInstaller.building.makespec.main(["krux-installer.py"], **vars(args))
+    PyInstaller.building.makespec.main(["krux_installer.py"], **vars(args))

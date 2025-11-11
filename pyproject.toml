@@ -2,7 +2,7 @@
 prefer-active-python = true
 
 [tool.poetry]
-name = "krux-installer"
+name = "krux_installer"
 version = "0.0.21"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = [
@@ -17,31 +17,31 @@ kivy = "2.3.1"
 kivysome = "^0.2.1"
 tomli = { version = "^2.2.1", python = "<3.11" }
 pyserial = "^3.5"
-requests = "^2.31.0"
+requests = "^2.32.5"
 pyzbar = "^0.1.9"
-opencv-python = "^4.9.0.80"
-cryptography = "^44.0.2"
+opencv-python = "^4.12.0.88"
+cryptography = "^44.0.3"
 qrcode = "^8.2"
 easy-i18n = "^1.2.0"
 pysudoer = {git = "https://github.com/qlrd/pysudoer.git"}
-pillow = "^11.0.0"
-pyinstaller = "^6.10.0"
+pillow = "^11.3.0"
+pyinstaller = "^6.16.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^25.1.0"
-pylint = "^3.3.1"
-pyinstaller = "^6.3.0"
-pytest-cov = "^6.0.0"
-poethepoet = "^0.33.0"
+black = "^25.11.0"
+pylint = "^3.3.9"
+pyinstaller = "^6.16.0"
+pytest-cov = "^6.3.0"
+poethepoet = "^0.33.1"
 demjson3 = "^3.0.6"
 
 [tool.poe.tasks]
-cli = "python src/krux-installer.py"
+cli = "python src/krux_installer.py"
 format-src= "black ./src"
 format-tests= "black ./tests"
 format-e2e= "black ./e2e"
 format-drives= "black ./e2e_drives"
-format-installer = "black ./krux-installer.py"
+format-installer = "black ./krux_installer.py"
 format = ["format-src", "format-tests", "format-e2e", "format-drives", "format-installer"]
 
 test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"
@@ -84,11 +84,11 @@ build-win.sequence = [
 
 [tool.poe.tasks.dev-debug]
 env = { LOGLEVEL = "debug" }
-cmd = "python krux-installer.py"
+cmd = "python krux_installer.py"
 
 [tool.poe.tasks.dev]
 env = { LOGLEVEL = "info" }
-cmd = "python krux-installer.py"
+cmd = "python krux_installer.py"
 
 [build-system]
 requires = ["poetry-core"]

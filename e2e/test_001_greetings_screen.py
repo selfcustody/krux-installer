@@ -4,6 +4,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch, mock_open
 from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
+from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.greetings_screen import GreetingsScreen
 
@@ -12,6 +13,10 @@ class TestAboutScreen(GraphicUnitTest):
 
     @classmethod
     def teardown_class(cls):
+        # Unschedule all pending Clock events to prevent race conditions
+        # with subsequent tests
+        for event in Clock.get_events():
+            Clock.unschedule(event)
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

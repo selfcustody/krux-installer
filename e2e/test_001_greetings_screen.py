@@ -7,9 +7,6 @@ from kivy.base import EventLoop, EventLoopBase
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.greetings_screen import GreetingsScreen
 
-# to be used in mocking grp
-import src.app.screens.greetings_screen
-
 
 class TestAboutScreen(GraphicUnitTest):
 
@@ -335,22 +332,18 @@ class TestAboutScreen(GraphicUnitTest):
             MagicMock(gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["brltty"])
         ]
 
-        # Temporarily add the mock grp to greetings_screen's global namespace
-        setattr(src.app.screens.greetings_screen, "grp", mock_grp)
+        # Temporarily patch sys.modules to use mock grp
+        with patch.dict("sys.modules", {"grp": mock_grp}):
+            # Initialize the screen and call the method to test
+            screen = GreetingsScreen()
+            is_in_dialout = screen.is_user_in_dialout_group(
+                user="mockuser", group="dialout"
+            )
 
-        # Initialize the screen and call the method to test
-        screen = GreetingsScreen()
-        is_in_dialout = screen.is_user_in_dialout_group(
-            user="mockuser", group="dialout"
-        )
-
-        # Assertions
-        self.assertEqual(is_in_dialout, False)
-        mock_get_locale.assert_called()
-        mock_grp.getgrall.assert_called()
-
-        # Clean up by removing the mock from the module's namespace
-        delattr(src.app.screens.greetings_screen, "grp")
+            # Assertions
+            self.assertEqual(is_in_dialout, False)
+            mock_get_locale.assert_called()
+            mock_grp.getgrall.assert_called()
 
     @mark.skipif(
         sys.platform in ("win32"),
@@ -373,18 +366,17 @@ class TestAboutScreen(GraphicUnitTest):
             )
         ]
 
-        # Temporarily add the mock grp to greetings_screen's global namespace
-        setattr(src.app.screens.greetings_screen, "grp", mock_grp)
+        # Temporarily patch sys.modules to use mock grp
+        with patch.dict("sys.modules", {"grp": mock_grp}):
+            # Initialize the screen and call the method to test
+            screen = GreetingsScreen()
+            is_in_dialout = screen.is_user_in_dialout_group(
+                user="mockuser", group="dialout"
+            )
+            self.assertEqual(is_in_dialout, True)
 
-        # Initialize the screen and call the method to test
-        screen = GreetingsScreen()
-        is_in_dialout = screen.is_user_in_dialout_group(
-            user="mockuser", group="dialout"
-        )
-        self.assertEqual(is_in_dialout, True)
-
-        mock_get_locale.assert_called()
-        mock_grp.getgrall.assert_called()
+            mock_get_locale.assert_called()
+            mock_grp.getgrall.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -581,3 +573,31 @@ class TestAboutScreen(GraphicUnitTest):
         self.assertEqual(group, "dialout")
         mock_get_locale.assert_called()
         open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    def test_is_user_in_dialout_when_grp_import_fails(self, mock_get_locale):
+        """Test that is_user_in_dialout_group returns False when grp import raises ImportError"""
+        import builtins  # pylint: disable=import-outside-toplevel
+
+        screen = GreetingsScreen()
+
+        # Create a custom import function that raises ImportError for grp
+        original_import = builtins.__import__
+
+        def custom_import(name, *args, **kwargs):
+            if name == "grp":
+                raise ImportError("No module named 'grp'")
+            return original_import(name, *args, **kwargs)
+
+        # Patch __import__ to use our custom function
+        with patch("builtins.__import__", side_effect=custom_import):
+            is_in_dialout = screen.is_user_in_dialout_group(
+                user="mockuser", group="dialout"
+            )
+
+            # Assertions
+            self.assertEqual(is_in_dialout, False)
+            mock_get_locale.assert_called()

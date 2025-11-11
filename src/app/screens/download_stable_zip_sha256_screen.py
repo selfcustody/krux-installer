@@ -75,6 +75,12 @@ class DownloadStableZipSha256Screen(BaseDownloadScreen):
         Clock.schedule_once(fn, 0)
 
     # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        """Before enter, add delay to avoid GitHub rate limiting"""
+        time.sleep(3)
+        super().on_pre_enter(*args)
+
+    # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """Update screen with version key. Should be called before `on_enter`"""
         name = str(kwargs.get("name"))

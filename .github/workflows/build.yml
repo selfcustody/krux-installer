@@ -39,7 +39,7 @@ jobs:
       - name: Install poetry
         run: pipx install poetry
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ matrix.arch != 'arm64' }}
         with:
           python-version: '3.12'
@@ -47,7 +47,7 @@ jobs:
           cache-dependency-path: './poetry.lock'
           architecture: ${{ matrix.arch }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ matrix.arch == 'arm64' }}
         with:
           python-version: '3.12'

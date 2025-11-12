@@ -1,10 +1,17 @@
 import os
+import sys
 from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.about_screen import AboutScreen
+
+# Import tomllib for Python 3.11+ or tomli for earlier versions
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 
 class TestAboutScreen(GraphicUnitTest):
@@ -17,6 +24,13 @@ class TestAboutScreen(GraphicUnitTest):
         font_name = "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
         noto_sans_path = os.path.join(assets_path, font_name)
         LabelBase.register(DEFAULT_FONT, noto_sans_path)
+
+        # Read version from pyproject.toml
+        pyproject_path = os.path.join(cwd_path, "..", "pyproject.toml")
+        pyproject_abs_path = os.path.abspath(pyproject_path)
+        with open(pyproject_abs_path, "rb") as f:
+            pyproject_data = tomllib.load(f)
+        cls.version = pyproject_data["tool"]["poetry"]["version"]
 
     @classmethod
     def teardown_class(cls):
@@ -48,7 +62,7 @@ class TestAboutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[ref=SourceCode][b]v0.0.21[/b][/ref]",
+                f"[ref=SourceCode][b]v{self.version}[/b][/ref]",
                 "\n",
                 "\n",
                 "follow us on X: ",
@@ -86,7 +100,7 @@ class TestAboutScreen(GraphicUnitTest):
 
         text = "".join(
             [
-                "[ref=SourceCode][b]v0.0.21[/b][/ref]",
+                f"[ref=SourceCode][b]v{self.version}[/b][/ref]",
                 "\n",
                 "\n",
                 "siga-nos no X: ",

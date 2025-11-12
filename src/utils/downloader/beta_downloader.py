@@ -38,6 +38,7 @@ class BetaDownloader(AssetDownloader):
         "cube",
         "wonder_mv",
         "tzt",
+        "embed_fire",
     )
 
     VALID_BINARY_TYPES = ("firmware.bin", "kboot.kfpkg")

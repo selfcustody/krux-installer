@@ -22,7 +22,7 @@ class TestBaseFlasher(TestCase):
             mock_exists.assert_called_once_with("mock/test/kboot.kfpkg")
 
         self.assertEqual(
-            str(exc_info.exception), "File do not exist: mock/test/kboot.kfpkg"
+            str(exc_info.exception), "File does not exist: mock/test/kboot.kfpkg"
         )
 
     @patch(
@@ -173,6 +173,54 @@ class TestBaseFlasher(TestCase):
         f.print_callback = MagicMock()
         f.print_callback()
         f.print_callback.assert_called_once()
+
+    @patch(
+        "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
+    )
+    def test_embed_fire_baudrate_limit_enforced(self, mock_grep):
+        """Test that embed_fire baudrate is capped at 400000"""
+        f = BaseFlasher()
+        f.baudrate = 1500000  # Set high baudrate
+        self.assertEqual(f.baudrate, 1500000)
+
+        f.set_device("embed_fire")
+
+        # Baudrate should be capped to 400000
+        self.assertEqual(f.baudrate, 400000)
+        self.assertEqual(f.board, "dan")
+        mock_grep.assert_called_once_with("7523")
+
+    @patch(
+        "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
+    )
+    def test_embed_fire_baudrate_limit_not_applied_when_below_limit(self, mock_grep):
+        """Test that embed_fire baudrate is not modified when already below 400000"""
+        f = BaseFlasher()
+        f.baudrate = 115200  # Set acceptable baudrate
+        self.assertEqual(f.baudrate, 115200)
+
+        f.set_device("embed_fire")
+
+        # Baudrate should remain unchanged
+        self.assertEqual(f.baudrate, 115200)
+        self.assertEqual(f.board, "dan")
+        mock_grep.assert_called_once_with("7523")
+
+    @patch(
+        "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
+    )
+    def test_other_devices_no_baudrate_limit(self, mock_grep):
+        """Test that other devices can use high baudrates without capping"""
+        f = BaseFlasher()
+        f.baudrate = 1500000  # Set high baudrate
+        self.assertEqual(f.baudrate, 1500000)
+
+        f.set_device("amigo")
+
+        # Baudrate should remain unchanged for non-embed_fire devices
+        self.assertEqual(f.baudrate, 1500000)
+        self.assertEqual(f.board, "goE")
+        mock_grep.assert_called_once_with("0403")
 
     @patch("src.utils.flasher.base_flasher.Serial", side_effect=SerialException())
     def test_fail_is_port_working(self, mock_serial):

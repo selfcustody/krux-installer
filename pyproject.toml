@@ -3,7 +3,7 @@ prefer-active-python = true
 
 [tool.poetry]
 name = "krux_installer"
-version = "0.0.21"
+version = "0.0.22"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = ["qlrd <qlrddev@gmail.com>"]
 license = "LICENSE"

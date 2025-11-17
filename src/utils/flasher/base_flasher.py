@@ -23,7 +23,6 @@
 base_flasher.py
 """
 import os
-import typing
 from serial import Serial
 from serial.serialutil import SerialException
 from serial.tools import list_ports
@@ -46,126 +45,139 @@ class BaseFlasher(Trigger):
         76800,
         115200,
         230400,
+        400000,
         460800,
         576000,
         921600,
         1500000,
     )
 
+    # Device to VID mapping
+    DEVICE_VID_MAP = {
+        "amigo": "0403",
+        "amigo_tft": "0403",
+        "amigo_ips": "0403",
+        "m5stickv": "0403",
+        "bit": "0403",
+        "cube": "0403",
+        "dock": "7523",
+        "yahboom": "7523",
+        "wonder_mv": "7523",
+        "embed_fire": "7523",
+        "tzt": "55d3",
+    }
+
+    # Device to board mapping
+    DEVICE_BOARD_MAP = {
+        "amigo": "goE",
+        "amigo_tft": "goE",
+        "amigo_ips": "goE",
+        "m5stickv": "goE",
+        "bit": "goE",
+        "yahboom": "goE",
+        "cube": "goE",
+        "dock": "dan",
+        "wonder_mv": "dan",
+        "tzt": "dan",
+        "embed_fire": "dan",
+    }
+
     def __init__(self):
         super().__init__()
         self.ktool = KTool()
         self.stop_thread = False
+        self.print_callback = None
+        self._firmware = None
+        self._port = None
+        self._board = None
+        self._baudrate = None
 
     @property
     def firmware(self) -> str:
-        """Getter for firmware's full path"""
-        self.debug(f"firmware::getter={self._firmware}")
+        """Firmware file path with validation"""
         return self._firmware
 
     @firmware.setter
     def firmware(self, value: str):
-        """Setter for firmware's firmware's full path"""
+        """Set firmware file path with validation"""
         if not os.path.exists(value):
-            raise ValueError(f"File do not exist: {value}")
-
+            raise ValueError(f"File does not exist: {value}")
         self.debug(f"firmware::setter={value}")
         self._firmware = value
 
     @property
     def port(self) -> str:
-        """Getter for device port system full path"""
-        self.debug(f"ports::getter={self._port}")
+        """Device port path"""
         return self._port
 
     @port.setter
-    def port(self, value: str):
-        """Setter for available ports's full path by giving device name"""
-        if value in ("amigo", "amigo_tft", "amigo_ips", "m5stickv", "bit", "cube"):
-            vid = "0403"
-
-        elif value in ("dock", "yahboom", "wonder_mv"):
-            vid = "7523"
-
-        elif value == "tzt":
-            vid = "55d3"
-
-        else:
-            raise ValueError(f"Device not implemented: {value}")
+    def port(self, device: str):
+        """Set port by device name (e.g., 'amigo', 'dock', 'tzt')"""
+        if (vid := self.DEVICE_VID_MAP.get(device)) is None:
+            raise ValueError(f"Device not implemented: {device}")
 
         self._available_ports_generator = list_ports.grep(vid)
-        port = next(self._available_ports_generator)
-        self._port = port.device
-        self.debug(f"ports::setter={self._port}")
+        self._port = next(self._available_ports_generator).device
+        self.debug(f"port::setter={self._port} (from device {device})")
 
     @property
     def board(self) -> str:
-        """Return a new instance of board"""
-        self.debug(f"board::getter={self._board}")
+        """Board type ('goE' or 'dan')"""
         return self._board
 
     @board.setter
-    def board(self, value: str):
-        """Setter for board giving device name"""
-        if value in (
-            "amigo",
-            "amigo_tft",
-            "amigo_ips",
-            "m5stickv",
-            "bit",
-            "yahboom",
-            "cube",
-        ):
-            self._board = "goE"
-            self.debug(f"board::setter={self._board}")
-
-        elif value in ("dock", "wonder_mv", "tzt"):
-            self._board = "dan"
-            self.debug(f"board::setter={self._board}")
-
-        else:
-            raise ValueError(f"Device not implemented: {value}")
+    def board(self, device: str):
+        """Set board by device name (e.g., 'amigo', 'dock')"""
+        if (board := self.DEVICE_BOARD_MAP.get(device)) is None:
+            raise ValueError(f"Device not implemented: {device}")
+        self._board = board
+        self.debug(f"board::setter={self._board} (from device {device})")
 
     @property
     def baudrate(self) -> int:
-        """Getter for baudrate"""
-        self.debug(f"baudrate::getter={self._baudrate}")
+        """Baudrate with validation"""
         return self._baudrate
 
     @baudrate.setter
     def baudrate(self, value: int):
-        """Setter for baudrate"""
-        if value in BaseFlasher.VALID_BAUDRATES:
-            self.debug(f"baudrate::setter={value}")
-            self._baudrate = value
-        else:
-            raise ValueError(f"Invalid baudrate: {str(value)}")
+        """Set baudrate with validation"""
+        if value not in self.VALID_BAUDRATES:
+            raise ValueError(f"Invalid baudrate: {value}")
+        self.debug(f"baudrate::setter={value}")
+        self._baudrate = value
 
-    @property
-    def print_callback(self):
+    def set_device(self, device: str) -> None:
         """
-        Getter for print_callback. KTool have two callbacks:
-            - print_callback: a property of an instance of KTool that do KTool.log calls
-            - callback: an argument of `process` method that parse the progress of flash
-        """
-        self.debug(f"print_callback::getter={self._print_callback}")
-        return self._print_callback
+        Set both port and board for a given device name.
+        Also enforces device-specific constraints (e.g., baudrate limits).
 
-    @print_callback.setter
-    def print_callback(self, value: typing.Callable):
+        Args:
+            device: Device name (e.g., 'amigo', 'dock', 'tzt')
         """
-        Getter for print_callback. KTool have two callbacks:
-            - print_callback: a property of an instance of KTool that do KTool.log calls
-            - callback: an argument of `process` method that parse the progress of flash
-        """
-        self.debug(f"print_callback::setter={value}")
-        self._print_callback = value
+        self.port = device
+        self.board = device
 
-    def is_port_working(self, port) -> bool:
+        # Enforce baudrate limit for embed_fire
+        if device == "embed_fire" and self.baudrate and self.baudrate > 400000:
+            self.debug(
+                f"baudrate {self.baudrate} exceeds embed_fire limit, capping at 400000"
+            )
+            self.baudrate = 400000
+
+    def _log_error(self, message: str) -> None:
+        """
+        Log an error message using ktool's logging mechanism.
+
+        Args:
+            message: Error message to log
+        """
+        self.ktool.__class__.log(message)
+
+    def is_port_working(self, port: str) -> bool:
         """Check if a port is working"""
         try:
-            serialport = Serial(port)
-            serialport.close()
+            with Serial(port):
+                pass  # Connection successful
             return True
         except SerialException:
             return False

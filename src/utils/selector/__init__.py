@@ -41,6 +41,7 @@ VALID_DEVICES = (
     "cube",
     "wonder_mv",
     "tzt",
+    "embed_fire",
 )
 
 

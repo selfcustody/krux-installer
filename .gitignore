@@ -94,3 +94,7 @@ simulator/sd
 # nix garbage
 flake.lock
 .nix-bin 
+
+#uv garbage 
+.devenv/
+uv.lock

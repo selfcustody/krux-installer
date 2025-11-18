@@ -325,12 +325,13 @@ class TestAboutScreen(GraphicUnitTest):
         sys.platform in ("win32"),
         reason="does not run on windows",
     )
-    @patch("sys.platform", "linux")  # Patch platform to Linux
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_is_user_not_in_dialout(self, mock_get_locale):
+    @patch("builtins.__import__")
+    def test_is_user_not_in_dialout(self, mock_import, mock_get_locale):
         # Create a mock grp module
         mock_grp = MagicMock()
         mock_grp.getgrall.return_value = [
@@ -354,12 +355,13 @@ class TestAboutScreen(GraphicUnitTest):
         sys.platform in ("win32"),
         reason="does not run on windows",
     )
-    @patch("sys.platform", "linux")  # Patch platform to Linux
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_is_user_in_dialout(self, mock_get_locale):
+    @patch("builtins.__import__")
+    def test_is_user_in_dialout(self, mock_import, mock_get_locale):
         # Create a mock grp module
         mock_grp = MagicMock()
         mock_grp.getgrall.return_value = [

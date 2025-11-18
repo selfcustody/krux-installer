@@ -36,21 +36,9 @@ class SelectDeviceScreen(BaseScreen):
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
         self.enabled_devices = []
-        self.make_grid(wid="select_device_screen_grid", rows=9)
-
-        for row, device in enumerate(
-            [
-                "m5stickv",
-                "amigo",
-                "dock",
-                "bit",
-                "yahboom",
-                "cube",
-                "wonder_mv",
-                "tzt",
-                "embed_fire",
-            ]
-        ):
+        self.make_grid(wid="select_device_screen_grid", rows=8)
+        first_version = next(iter(VALID_DEVICES_VERSIONS))
+        for row, device in enumerate(VALID_DEVICES_VERSIONS[first_version]):
 
             def on_press(instance):
                 if instance.id in self.enabled_devices:
@@ -96,18 +84,8 @@ class SelectDeviceScreen(BaseScreen):
         def on_update():
             if key == "version":
                 self.enabled_devices = []
-
-                for device in (
-                    "m5stickv",
-                    "amigo",
-                    "dock",
-                    "bit",
-                    "yahboom",
-                    "cube",
-                    "wonder_mv",
-                    "tzt",
-                    "embed_fire",
-                ):
+                first_version = next(iter(VALID_DEVICES_VERSIONS))
+                for device in VALID_DEVICES_VERSIONS[first_version]:
                     cleanre = re.compile("\\[.*?\\]")
                     clean_text = re.sub(cleanre, "", value)
                     if (

@@ -123,6 +123,7 @@ RPM_NAME=${name}-${version}
 BUILD_PATH=$HOME/rpmbuild
 TAR_PATH=$BUILD_PATH/$RPM_NAME
 CHANGELOG=$(cat $changelog)
+BINARY_NAME=$(basename "$binary")
 
 mkdir -v -p $RPM_NAME
 mkdir -v -p $BUILD_PATH/
@@ -131,6 +132,10 @@ mkdir -v -p $BUILD_PATH/RPMS
 mkdir -v -p $BUILD_PATH/SOURCES
 mkdir -v -p $BUILD_PATH/SPECS
 mkdir -v -p $BUILD_PATH/SRPMS
+
+echo ""
+echo "Binary name extracted: ${BINARY_NAME}"
+echo "Package name: ${name}"
 
 # Place the script in the designated directory
 cp -v $binary $RPM_NAME
@@ -169,7 +174,7 @@ mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{_datadir}/doc/%{name}
 mkdir -p %{buildroot}%{_datarootdir}/applications/%{name}
 mkdir -p %{buildroot}%{_datarootdir}/icons/hicolor/512x512/apps
-cp %{name} %{buildroot}%{_bindir}
+cp ${BINARY_NAME} %{buildroot}%{_bindir}/%{name}
 cp README %{buildroot}%{_datadir}/doc/%{name}/README
 cp %{name}.png %{buildroot}%{_datarootdir}/icons/hicolor/512x512/apps/%{name}.png
 echo "[Desktop Entry]" > %{buildroot}%{_datarootdir}/applications/%{name}.desktop

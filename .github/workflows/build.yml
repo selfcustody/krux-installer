@@ -20,11 +20,8 @@ jobs:
             
           - os: windows-latest
             arch: x64
-            
-          - os: macos-13
-            arch: x64
-            
-          - os: macos-14
+
+          - os: macos-15
             arch: arm64
      
     runs-on: ${{ matrix.os }}
@@ -32,14 +29,14 @@ jobs:
     
     steps:
       
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
           
       - name: Install poetry
         run: pipx install poetry
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ matrix.arch != 'arm64' }}
         with:
           python-version: '3.12'
@@ -47,7 +44,7 @@ jobs:
           cache-dependency-path: './poetry.lock'
           architecture: ${{ matrix.arch }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ matrix.arch == 'arm64' }}
         with:
           python-version: '3.12'
@@ -78,7 +75,7 @@ jobs:
           echo "dyld-path=${OPENSSL_PATH}/lib" >> $GITHUB_OUTPUT
          
       - name: Install project and its dependencies
-        run: poetry install --no-root
+        run: poetry install
      
       - name: Build dist (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -108,6 +105,8 @@ jobs:
           VERSION: ${{ steps.setup-linux.outputs.version }}
           DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
         run: |
+          # PyInstaller creates krux-installer (with hyphen), not krux_installer
+          BINARY_PATH="./dist/krux-installer"
           sh .ci/create-deb.sh \
             -a "${NAME}" \
             -o ./release \
@@ -116,7 +115,7 @@ jobs:
             -m qlrd \
             -e qlrddev@gmail.com \
             -d "${DESCRIPTION}" \
-            -b "./dist/${NAME}" \
+            -b "${BINARY_PATH}" \
             -i ./assets/icon.png
           tree ./release
           echo "build-path=$(pwd)/release" >> $GITHUB_OUTPUT
@@ -131,6 +130,8 @@ jobs:
           DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
         run: |
           RPM_VERSION=$(sed -e 's/-/_/g' <<< $VERSION)
+          # PyInstaller creates krux-installer (with hyphen), not krux_installer
+          BINARY_PATH="./dist/krux-installer"
           sh .ci/create-rpm.sh \
             -a "${NAME}" \
             -v $RPM_VERSION \
@@ -139,7 +140,7 @@ jobs:
             -d "${DESCRIPTION}" \
             -c ./CHANGELOG.md \
             -r ./README.md \
-            -b "./dist/${NAME}" \
+            -b "${BINARY_PATH}" \
             -i ./assets/icon.png
           tree ./release
           rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.spec
@@ -154,8 +155,9 @@ jobs:
           NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
           VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
           ARCH="$(uname -m)"
+          APP_NAME="krux-installer"
           mkdir -p ./release
-          create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${NAME}.app"
+          create-dmg --volname "${NAME}" --volicon ./assets/icon.icns --window-pos 200 120 --window-size 800 400 --icon-size 100 --icon "${APP_NAME}.app" 200 190 --app-drop-link 600 185 "./release/${NAME}_${VER}_${ARCH}.dmg" "./dist/${APP_NAME}.app"
           echo "build-path=$(pwd)/release" >> $GITHUB_OUTPUT
           echo "pkg=${NAME}_${VER}_${ARCH}.dmg" >> $GITHUB_OUTPUT
 
@@ -164,16 +166,31 @@ jobs:
         id: release-windows
         shell: pwsh
         run: |
-          choco --yes install nsis
-          New-Item ".\release" -Type Directory  
+          choco install nsis -y
+          # NSIS is installed to Program Files (x86)
+          $nsisPath = "C:\Program Files (x86)\NSIS\makensis.exe"
+          if (-not (Test-Path $nsisPath)) {
+            throw "NSIS not found at expected location: $nsisPath"
+          }
+          Write-Host "Found NSIS at: $nsisPath"
+          New-Item ".\release" -Type Directory -ErrorAction SilentlyContinue
           $name = poetry run python -c 'from src.utils.constants import get_name; print(get_name())'
           $version = poetry run python -c 'from src.utils.constants import get_version; print(get_version())'
           $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
+          # create-nsis.py creates {app_name}.nsi file, so it will be krux_installer.nsi
           poetry run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\LICENSE -i .\assets\icon.ico -O .
-          makensis.exe .\krux-installer.nsi
-          Move-Item -Path ".\krux-installer Setup.exe" -Destination ".\release\krux-installer_v$version Setup.exe"
-          echo "build-path=$pwd\release" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
-          echo "pkg=krux-installer_v$version Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
+          # Compile the NSI file (it's named after $name, which is krux_installer)
+          & $nsisPath ".\${name}.nsi"
+          # NSIS creates the installer with the app name (krux_installer), not with hyphen
+          $setupFile = ".\${name} Setup.exe"
+          Write-Host "Looking for setup file: $setupFile"
+          if (-not (Test-Path $setupFile)) {
+            Get-ChildItem -Path "." -Filter "*Setup.exe" | ForEach-Object { Write-Host "Found: $($_.Name)" }
+            throw "Setup file not found at: $setupFile"
+          }
+          Move-Item -Path $setupFile -Destination ".\release\${name}_v${version}_Setup.exe"
+          echo "build-path=$pwd\release" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "pkg=${name}_v${version}_Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
             
       - name: Hash (Linux deb)
         if: ${{ runner.os == 'Linux' }}
@@ -213,7 +230,7 @@ jobs:
 
       - name: Upload artifact deb (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-deb.outputs.pkg }}
           path: |
@@ -222,7 +239,7 @@ jobs:
       
       - name: Upload artifact rpm (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-rpm.outputs.pkg }}
           path: |
@@ -231,7 +248,7 @@ jobs:
             
       - name: Upload artifacts (MacOS)
         if: ${{ runner.os == 'macOS' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-macos.outputs.pkg }}
           path: |
@@ -240,7 +257,7 @@ jobs:
       
       - name: Upload artifacts (Windows)
         if: ${{ runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v4         
+        uses: actions/upload-artifact@v5         
         with:
           name: ${{ steps.release-windows.outputs.pkg }}
           path: |

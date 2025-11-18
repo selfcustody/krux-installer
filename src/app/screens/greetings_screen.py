@@ -163,17 +163,14 @@ class GreetingsScreen(BaseScreen):
         """Check if the provided user is in dialout"""
         _in_dialout = False
 
-        # Import only when needed on Linux
-        if not sys.platform.startswith("linux"):
-            return False
-        # pylint: disable=import-outside-toplevel
+        # grp module is only available on Unix systems
         try:
-            import grp
+            import grp  # pylint: disable=import-outside-toplevel
         except ImportError:
-            self.error("grp module not available")
-            return False
+            # grp not available (e.g., on Windows)
+            return _in_dialout
 
-        # loop through all linux groups and check
+        # loop throug all linux groups and check
         # if the user is registered in the "dialout" group
         for _grp in grp.getgrall():
             gr_name = _grp.gr_name

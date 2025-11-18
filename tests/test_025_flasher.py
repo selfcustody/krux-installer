@@ -50,7 +50,8 @@ class TestFlasher(TestCase):
             f.firmware = "mock/maixpy_amigo/kboot.kfpkg"
 
         self.assertEqual(
-            str(exc_info.exception), "File do not exist: mock/maixpy_amigo/kboot.kfpkg"
+            str(exc_info.exception),
+            "File does not exist: mock/maixpy_amigo/kboot.kfpkg",
         )
         mock_exists.assert_called_once_with("mock/maixpy_amigo/kboot.kfpkg")
 

@@ -123,6 +123,17 @@ if [ $architecture == "x86_64" ]; then
   architecture="amd64"
 fi
 
+# convert underscores to hyphens for debian package name
+# Debian package names must only contain lowercase alphanums and '-+.'
+pkg_name=$(echo "${app_name}" | tr '_' '-')
+if [ "${app_name}" != "${pkg_name}" ]; then
+  echo ""
+  echo "Converting package name for Debian naming convention"
+  echo "----------------------------------------------------"
+  echo "Application name: ${app_name} (for binaries/files)"
+  echo "Package name: ${pkg_name} (for control file)"
+fi
+
 echo""
 
 FULL_OUTPUT_PATH=${output_dir}/${app_name}_${version}_${architecture}
@@ -138,7 +149,7 @@ cp -v ${icon} $FULL_OUTPUT_PATH/usr/share/icons/hicolor/512x512/apps/${app_name}
 
 # create control file
 cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/control
-Package: ${app_name}
+Package: ${pkg_name}
 Version: ${version}
 Architecture: ${architecture}
 Maintainer: ${maintainer_name} <${maintainer_email}>

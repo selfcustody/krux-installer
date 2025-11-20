@@ -1,19 +1,16 @@
 import os
-
-# import sys
 from unittest import TestCase
 from unittest.mock import mock_open, patch, MagicMock
 from src.utils.constants import _open_pyproject, get_name, get_version, get_description
 
-PYPROJECT_STR = """[tool.poetry]
+# Updated to use [project] instead of [tool.poetry]
+PYPROJECT_STR = """[project]
 name = "test"
 version = "0.0.1"
-description = \"Hello World!\""""
+description = "Hello World!\""""
 
 MOCK_TOML_DATA = {
-    "tool": {
-        "poetry": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
-    }
+    "project": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
 }
 
 
@@ -51,12 +48,10 @@ class TestConstants(TestCase):
         self.assertEqual(
             data,
             {
-                "tool": {
-                    "poetry": {
-                        "name": "test",
-                        "version": "0.0.1",
-                        "description": "Hello World!",
-                    }
+                "project": {
+                    "name": "test",
+                    "version": "0.0.1",
+                    "description": "Hello World!",
                 }
             },
         )

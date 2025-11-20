@@ -30,7 +30,7 @@ Available for:
   * [Linux](/#linux)
   * [Windows](/#windows)
   * [MacOS](/#macos)
-  * [Install poetry](/#install-poetry)
+  * [Install UV](/#install-UV)
 * [Download sources](/#download-sources)
 * [Update code](/#update-code)
 * [Developing](/#developing)
@@ -116,16 +116,9 @@ OPENSSL_FULL_VERSION=`openssl --version | awk ' { print $2}'`
 export DYLD_LIBRARY_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VERSION/$OPENSSL_FULL_VERSION/lib:$DYLD_LIBRARY_PATH"
 ```
 
-### Install poetry
+### Install UV
 
-Make sure you have `poetry` installed:
-
-```b̀ash
-python -m pipx install poetry
-````
-
-If you have problems with installation, make sure to
-properly [configure its options](https://pipx.pypa.io/latest/installation/#installation-options).
+Follow the steps to install UV on https://docs.astral.sh/uv/reference/storage/
 
 ## Download sources
 
@@ -138,7 +131,7 @@ git clone --recurse-submodules https://github.com/selfcustody/krux-installer.git
 Install python dependencies:
 
 ```b̀ash
-poetry install
+uv synv --all-extras
 ```
 
 ## Update code
@@ -158,32 +151,32 @@ coverage and build.
 ### See all available tasks
 
 ```bash
-poetry run poe
+uv run poe
 ```
 
 ### Format code
 
 ```bash
-poetry run poe format
+uv run poe format
 ```
 
 ### Lint
 
 ```bash
-poetry run poe lint
+uv run poe lint
 ```
 
 ### Test and coverage
 
 ```bash
-poetry run poe test
+uv run poe test
 ```
 
 For systems without a window manager:
 
 ```bash
 # Linux only
-poetry run poe test --no-xvfb
+uv run poe test --no-xvfb
 ```
 
 You can see all coverage results opening you browser and type
@@ -193,19 +186,19 @@ You can see all coverage results opening you browser and type
 ### Build for any Linux distribution
 
 ```bash
-poetry run poe build-linux
+uv run poe build-linux
 ```
 
 ### Build for MacOS
 
 ```bash
-poetry run poe build-macos
+uv run poe build-macos
 ```
 
 ### Build for Windows
 
 ```bash
-poetry run poe build-win
+uv run poe build-win
 ```
 
 It will export all project in a

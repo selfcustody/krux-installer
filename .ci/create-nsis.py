@@ -185,16 +185,18 @@ def make_on_init(args: Namespace) -> str:
 
 def make_finish_page_action(args: Namespace) -> str:
     print("* make function finishpageaction")
+    # Extract just the filename from the binary path for the shortcut target
+    binary_filename = os.path.basename(args.binary)
     return "\n".join([
         ";--------------------------------",
         "; function finishpageaction",
         "function finishpageaction",
         "\t; Start Menu",
         "\tCreateDirectory \"$SMPROGRAMS\\${APP_NAME}\"",
-        "\tCreateShortCut  \"$SMPROGRAMS\\${APP_NAME}.lnk\" \"$INSTDIR\\${APP_NAME}.exe\"",
+        f"\tCreateShortCut  \"$SMPROGRAMS\\${{APP_NAME}}.lnk\" \"$INSTDIR\\{binary_filename}\"",
         "",
         "\t; Desktop shortcut",
-        "\tCreateShortCut  \"$DESKTOP\\${APP_NAME}.lnk\" \"$INSTDIR\\${APP_NAME}.exe\"",
+        f"\tCreateShortCut  \"$DESKTOP\\${{APP_NAME}}.lnk\" \"$INSTDIR\\{binary_filename}\"",
         "functionEnd",
         "",
         "",

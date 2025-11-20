@@ -132,7 +132,7 @@ properly [configure its options](https://pipx.pypa.io/latest/installation/#insta
 Clone the repository:
 
 ```bash
-git clone --recurse-submodules https://github.com/krux-installer.git
+git clone --recurse-submodules https://github.com/selfcustody/krux-installer.git
 ```
 
 Install python dependencies:

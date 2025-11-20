@@ -36,10 +36,20 @@ class SelectDeviceScreen(BaseScreen):
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
         self.enabled_devices = []
-        self.make_grid(wid="select_device_screen_grid", rows=8)
+        self.make_grid(wid="select_device_screen_grid", rows=9)
 
         for row, device in enumerate(
-            ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv", "tzt"]
+            [
+                "m5stickv",
+                "amigo",
+                "dock",
+                "bit",
+                "yahboom",
+                "cube",
+                "wonder_mv",
+                "tzt",
+                "embed_fire",
+            ]
         ):
 
             def on_press(instance):
@@ -96,6 +106,7 @@ class SelectDeviceScreen(BaseScreen):
                     "cube",
                     "wonder_mv",
                     "tzt",
+                    "embed_fire",
                 ):
                     cleanre = re.compile("\\[.*?\\]")
                     clean_text = re.sub(cleanre, "", value)

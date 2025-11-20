@@ -206,6 +206,7 @@ class BaseScreen(Screen, Trigger):
         on_release: typing.Callable | None,
         on_ref_press: typing.Callable | None,
     ):
+        # pylint: disable=too-many-positional-arguments
         """Create buttons in a dynamic way"""
         self.debug(f"button::{wid} row={row}")
 
@@ -421,6 +422,7 @@ class BaseScreen(Screen, Trigger):
         allowed_screens: typing.Tuple,
         on_update: typing.Callable | None,
     ):
+        # pylint: disable=too-many-positional-arguments
         """
         Update a screen in accord with the valid ones, here or in on_update callback
         """

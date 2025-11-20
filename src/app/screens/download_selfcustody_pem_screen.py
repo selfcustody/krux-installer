@@ -68,6 +68,12 @@ class DownloadSelfcustodyPemScreen(BaseDownloadScreen):
         fn = partial(self.update, name=self.name, key="canvas")
         Clock.schedule_once(fn, 0)
 
+    # pylint: disable=unused-argument
+    def on_pre_enter(self, *args):
+        """Before enter, add delay to avoid GitHub rate limiting"""
+        time.sleep(3)
+        super().on_pre_enter(*args)
+
     def on_update_pem(self):
         """Update public key certificate on GUI"""
         self.downloader = PemDownloader(

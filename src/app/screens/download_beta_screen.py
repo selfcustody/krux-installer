@@ -116,6 +116,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
                     "cube",
                     "wonder_mv",
                     "tzt",
+                    "embed_fire",
                 ):
                     self.device = value
                 else:

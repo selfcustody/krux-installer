@@ -33,19 +33,13 @@ jobs:
         with:
           submodules: recursive
           
-      - name: Install poetry
-        run: pipx install poetry
-
-      - uses: actions/setup-python@v6
-        if: ${{ matrix.arch != 'arm64' }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
         with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: './poetry.lock'
-          architecture: ${{ matrix.arch }}
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
 
       - uses: actions/setup-python@v6
-        if: ${{ matrix.arch == 'arm64' }}
         with:
           python-version: '3.12'
 
@@ -55,9 +49,9 @@ jobs:
         run: |
           sudo apt-get install tree rpm
           mkdir -p ./release
-          NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
-          VERSION="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
-          DESCRIPTION="$(poetry run python -c 'from src.utils.constants import get_description; print(get_description())')"
+          NAME="$(uv run python -c 'from src.utils.constants import get_name; print(get_name())')"
+          VERSION="$(uv run python -c 'from src.utils.constants import get_version; print(get_version())')"
+          DESCRIPTION="$(uv run python -c 'from src.utils.constants import get_description; print(get_description())')"
           echo "name=${NAME}" >> $GITHUB_OUTPUT
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "description=${DESCRIPTION}" >> $GITHUB_OUTPUT
@@ -75,27 +69,27 @@ jobs:
           echo "dyld-path=${OPENSSL_PATH}/lib" >> $GITHUB_OUTPUT
          
       - name: Install project and its dependencies
-        run: poetry install
+        run: uv sync
      
       - name: Build dist (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
         with:
           run: |
-            poetry add pytest-xvfb
-            poetry run poe build-linux
+            uv add pytest-xvfb
+            uv run poe build-linux
 
       - name: Build dist (MacOS)
         if: ${{ runner.os == 'macOS' }}
         env:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
-        run: poetry run poe build-macos
+        run: uv run poe build-macos
         
       - name: Build dist (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
-        run: poetry run poe build-win
+        run: uv run poe build-win
           
       - name: Build release deb (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -152,8 +146,8 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         id: release-macos
         run: |
-          NAME="$(poetry run python -c 'from src.utils.constants import get_name; print(get_name())')"
-          VER="$(poetry run python -c 'from src.utils.constants import get_version; print(get_version())')"
+          NAME="$(uv run python -c 'from src.utils.constants import get_name; print(get_name())')"
+          VER="$(uv run python -c 'from src.utils.constants import get_version; print(get_version())')"
           ARCH="$(uname -m)"
           APP_NAME="krux-installer"
           mkdir -p ./release
@@ -174,11 +168,11 @@ jobs:
           }
           Write-Host "Found NSIS at: $nsisPath"
           New-Item ".\release" -Type Directory -ErrorAction SilentlyContinue
-          $name = poetry run python -c 'from src.utils.constants import get_name; print(get_name())'
-          $version = poetry run python -c 'from src.utils.constants import get_version; print(get_version())'
-          $description = poetry run python -c 'from src.utils.constants import get_description; print(get_description())'
+          $name = uv run python -c 'from src.utils.constants import get_name; print(get_name())'
+          $version = uv run python -c 'from src.utils.constants import get_version; print(get_version())'
+          $description = uv run python -c 'from src.utils.constants import get_description; print(get_description())'
           # create-nsis.py creates {app_name}.nsi file, so it will be krux_installer.nsi
-          poetry run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\LICENSE -i .\assets\icon.ico -O .
+          uv run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\LICENSE -i .\assets\icon.ico -O .
           # Compile the NSI file (it's named after $name, which is krux_installer)
           & $nsisPath ".\${name}.nsi"
           # NSIS creates the installer with the app name (krux_installer), not with hyphen

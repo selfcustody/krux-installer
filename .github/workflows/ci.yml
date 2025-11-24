@@ -69,7 +69,7 @@ jobs:
     if: ${{ always() && needs.job1.outputs.markdown_change == 'true' }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 

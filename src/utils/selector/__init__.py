@@ -28,7 +28,7 @@ Generic selector to select devices or versions
 import typing
 from http.client import HTTPResponse
 import requests
-from utils.constants import VALID_DEVICES_VERSIONS
+from src.utils.constants import VALID_DEVICES_VERSIONS
 from ..trigger import Trigger
 
 first_version = next(iter(VALID_DEVICES_VERSIONS))

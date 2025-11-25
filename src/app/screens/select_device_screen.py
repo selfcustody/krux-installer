@@ -36,7 +36,7 @@ class SelectDeviceScreen(BaseScreen):
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
         self.enabled_devices = []
-        self.make_grid(wid="select_device_screen_grid", rows=8)
+        self.make_grid(wid="select_device_screen_grid", rows=9)
         first_version = next(iter(VALID_DEVICES_VERSIONS))
         for row, device in enumerate(VALID_DEVICES_VERSIONS[first_version]):
 

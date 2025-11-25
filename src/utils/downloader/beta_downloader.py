@@ -23,7 +23,7 @@
 beta_downloader.py
 """
 import tempfile
-from utils.constants import VALID_DEVICES_VERSIONS
+from src.utils.constants import VALID_DEVICES_VERSIONS
 from .asset_downloader import AssetDownloader
 
 

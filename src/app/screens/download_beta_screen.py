@@ -27,7 +27,7 @@ from functools import partial
 from kivy.clock import Clock
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
-from utils.constants import VALID_DEVICES_VERSIONS
+from src.utils.constants import VALID_DEVICES_VERSIONS
 
 
 class DownloadBetaScreen(BaseDownloadScreen):

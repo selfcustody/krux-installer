@@ -23,6 +23,7 @@
 stream_downloader.py
 """
 import os
+import time
 import requests
 from .trigger_downloader import TriggerDownloader
 
@@ -32,7 +33,7 @@ class StreamDownloader(TriggerDownloader):
     Download files in a stream mode
     """
 
-    def download_file_stream(self, url: str):
+    def download_file_stream(self, url: str, max_retries: int = 5):
         """
         Given a :attr:`url`, download a large file in a streaming manner to given
         destination folder (:attr: `dest_dir`)
@@ -45,37 +46,64 @@ class StreamDownloader(TriggerDownloader):
         """
         # Get the filename by url and construct the request
         # Check for any HTTPError and then process chunks of data
-        try:
-            self.filename = os.path.basename(url)
-            self.debug(f"download_file_stream::filename={self.filename}")
+        retry_count = 0
+        last_exception = None
 
-            headers = {
-                "Content-Disposition": f"attachment filename={self.filename}",
-                "Connection": "keep-alive",
-                "Cache-Control": "max-age=0",
-                "Accept-Encoding": "gzip, deflate, br",
-            }
-            self.debug(
-                "download_file_stream::requests.get=< url: "
-                + f"{url}, stream: True, headers: {headers}, timeout: 30 >"
-            )
-            res = requests.get(url=url, stream=True, headers=headers, timeout=30)
+        while retry_count <= max_retries:
+            try:
+                self.filename = os.path.basename(url)
+                self.debug(f"download_file_stream::filename={self.filename}")
 
-            self.debug("download_file_stream::raise_for_status")
-            res.raise_for_status()
+                headers = {
+                    "Content-Disposition": f"attachment filename={self.filename}",
+                    "Connection": "keep-alive",
+                    "Cache-Control": "max-age=0",
+                    "Accept-Encoding": "gzip, deflate, br",
+                }
+                self.debug(
+                    "download_file_stream::requests.get=< url: "
+                    + f"{url}, stream: True, headers: {headers}, timeout: 30 >"
+                )
+                res = requests.get(url=url, stream=True, headers=headers, timeout=30)
 
-        except requests.exceptions.Timeout as t_exc:
-            raise RuntimeError(f"Download timeout error: {t_exc.__cause__ }") from t_exc
+                self.debug("download_file_stream::raise_for_status")
+                res.raise_for_status()
 
-        except requests.exceptions.ConnectionError as c_exc:
+                # If we get here, request was successful, break the retry loop
+                break
+
+            except requests.exceptions.Timeout as t_exc:
+                raise RuntimeError(
+                    f"Download timeout error: {t_exc.__cause__ }"
+                ) from t_exc
+
+            except requests.exceptions.ConnectionError as c_exc:
+                raise RuntimeError(
+                    f"Download connection error: {c_exc.__cause__}"
+                ) from c_exc
+
+            except requests.exceptions.HTTPError as h_exc:
+                # Check if it's a 429 rate limit error
+                if res.status_code == 429 and retry_count < max_retries:
+                    # Exponential backoff: 2, 4, 8, 16, 32 seconds
+                    wait_time = 2 ** (retry_count + 1)
+                    self.debug(
+                        f"Rate limited (429). Retrying in {wait_time}s "
+                        f"(attempt {retry_count + 1}/{max_retries})"
+                    )
+                    time.sleep(wait_time)
+                    retry_count += 1
+                    last_exception = h_exc
+                    continue
+                raise RuntimeError(
+                    f"HTTP error {res.status_code}: {h_exc.__cause__}"
+                ) from h_exc
+
+        # If we exhausted all retries, raise the last exception
+        if retry_count > max_retries and last_exception:
             raise RuntimeError(
-                f"Download connection error: {c_exc.__cause__}"
-            ) from c_exc
-
-        except requests.exceptions.HTTPError as h_exc:
-            raise RuntimeError(
-                f"HTTP error {res.status_code}: {h_exc.__cause__}"
-            ) from h_exc
+                f"HTTP error {res.status_code}: Failed after {max_retries} retries"
+            ) from last_exception
 
         # get some contents to calculate the amount
         # of downloaded data

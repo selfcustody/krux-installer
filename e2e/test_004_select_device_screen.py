@@ -1,5 +1,6 @@
 from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
+from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.select_device_screen import SelectDeviceScreen
 
@@ -8,6 +9,10 @@ class TestSelectDeviceScreen(GraphicUnitTest):
 
     @classmethod
     def teardown_class(cls):
+        # Unschedule all pending Clock events to prevent race conditions
+        # with subsequent tests
+        for event in Clock.get_events():
+            Clock.unschedule(event)
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -58,15 +63,16 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
         buttons = grid.children
 
-        self.assertEqual(len(buttons), 8)
-        self.assertEqual(buttons[7].id, "select_device_m5stickv")
-        self.assertEqual(buttons[6].id, "select_device_amigo")
-        self.assertEqual(buttons[5].id, "select_device_dock")
-        self.assertEqual(buttons[4].id, "select_device_bit")
-        self.assertEqual(buttons[3].id, "select_device_yahboom")
-        self.assertEqual(buttons[2].id, "select_device_cube")
-        self.assertEqual(buttons[1].id, "select_device_wonder_mv")
-        self.assertEqual(buttons[0].id, "select_device_tzt")
+        self.assertEqual(len(buttons), 9)
+        self.assertEqual(buttons[8].id, "select_device_m5stickv")
+        self.assertEqual(buttons[7].id, "select_device_amigo")
+        self.assertEqual(buttons[6].id, "select_device_dock")
+        self.assertEqual(buttons[5].id, "select_device_bit")
+        self.assertEqual(buttons[4].id, "select_device_yahboom")
+        self.assertEqual(buttons[3].id, "select_device_cube")
+        self.assertEqual(buttons[2].id, "select_device_wonder_mv")
+        self.assertEqual(buttons[1].id, "select_device_tzt")
+        self.assertEqual(buttons[0].id, "select_device_embed_fire")
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)

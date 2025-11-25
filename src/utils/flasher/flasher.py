@@ -20,24 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-__init__.py
+flasher.py
 """
-import typing
+from collections.abc import Callable
 from src.utils.selector import VALID_DEVICES
 from src.utils.flasher.base_flasher import BaseFlasher
-
-# Example of parsing progress
-# def get_progress(file_type_str, iteration, total, suffix):
-#    """Default callback for flashing (repeat the one from ktool)"""
-#    percent = ("{0:." + str(1) + "f}").format(100 * (iteration / float(total)))
-#    filled_length = int(100 * iteration // total)
-#    barascii = "=" * filled_length + "-" * (100 - filled_length)
-#    msg = f"\r%|{barascii}| {percent}% {suffix}"
-#    if percent == 100:
-#        print()
-#        print(msg)
-#    else:
-#        sys.stdout.write(msg)
 
 
 class Flasher(BaseFlasher):
@@ -47,55 +34,63 @@ class Flasher(BaseFlasher):
     :attr:`KTool.process`.
     """
 
-    def flash(self, callback: typing.Callable):
+    def _detect_device_from_firmware(self) -> None:
+        """Detect device type from firmware filename and set port/board"""
+        for device in VALID_DEVICES:
+            if device in self.firmware:
+                self.set_device(device)
+                return
+
+    def _flash_with_port(self, port: str, callback: Callable) -> None:
+        """
+        Attempt to flash firmware using the specified port.
+
+        Args:
+            port: Serial port path
+            callback: Progress callback function
+        """
+        self.ktool.process(
+            terminal=False,
+            dev=port,
+            baudrate=int(self.baudrate),
+            board=self.board,
+            file=self.firmware,
+            callback=callback,
+        )
+
+    def flash(self, callback: Callable) -> None:
         """
         Detect available ports, try default flash process and
-        if not work, try custom port
-        """
-        for device in VALID_DEVICES:
-            # pylint: disable=unsupported-membership-test
-            if device in self.firmware:
-                self.port = device
-                self.board = device
+        if not working, try alternative port.
 
-        if self.is_port_working(self.port):
+        Args:
+            callback: Progress callback function
+        """
+        self._detect_device_from_firmware()
+
+        # Guard clause: check if port is working
+        if not self.is_port_working(self.port):
+            self._log_error(f"Port {self.port} not working")
+            return
+
+        try:
+            self._flash_with_port(self.port, callback)
+
+        except StopIteration as stop_exc:
+            self._log_error(str(stop_exc))
+
+        # pylint: disable=broad-exception-caught
+        except Exception:
+            # Try alternative port on any error
             try:
-                self.ktool.process(
-                    terminal=False,
-                    dev=self.port,
-                    baudrate=int(self.baudrate),
-                    board=self.board,
-                    file=self.firmware,
-                    callback=callback,
-                )
+                newport = next(self._available_ports_generator)
+                if self.is_port_working(newport.device):
+                    self._flash_with_port(newport.device, callback)
+                else:
+                    self._log_error(f"Port {newport.device} not working")
 
             except StopIteration as stop_exc:
-                self.ktool.__class__.log(str(stop_exc))
+                self._log_error(str(stop_exc))
 
-            # pylint: disable=broad-exception-caught
-            except Exception as exc:
-                try:
-                    newport = next(self._available_ports_generator)
-                    if self.is_port_working(newport.device):
-                        self.ktool.process(
-                            terminal=False,
-                            dev=newport.device,
-                            baudrate=int(self.baudrate),
-                            board=self.board,
-                            file=self.firmware,
-                            callback=callback,
-                        )
-
-                    else:
-                        exc = RuntimeError(f"Port {newport.device} not working")
-                        self.ktool.__class__.log(str(exc))
-
-                except StopIteration as stop_exc:
-                    self.ktool.__class__.log(str(stop_exc))
-
-                except Exception as gen_exc:
-                    self.ktool.__class__.log(str(gen_exc))
-
-        else:
-            exc = RuntimeError(f"Port {self.port} not working")
-            self.ktool.__class__.log(str(exc))
+            except Exception as gen_exc:
+                self._log_error(str(gen_exc))

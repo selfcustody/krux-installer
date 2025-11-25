@@ -17,12 +17,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Install poetry
         run: pipx install poetry
         
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
           cache: 'poetry'
@@ -30,7 +30,7 @@ jobs:
           architecture: x64
       
       - name: Install poetry dependencies
-        run: poetry install --no-root
+        run: poetry install
 
       - name: Check format/
         run: |
@@ -47,14 +47,14 @@ jobs:
     
     steps:
       
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
           
       - name: Install poetry
         run: pipx install poetry
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: '3.12'
           cache: 'poetry'
@@ -62,7 +62,7 @@ jobs:
           architecture: x64
 
       - name: Install poetry dependencies
-        run: poetry install --no-root
+        run: poetry install
         
       - name: Lint src/
         run: poetry run poe lint
@@ -89,24 +89,21 @@ jobs:
           - os: windows-latest
             arch: x64
                         
-          - os: macos-13
-            arch: x64
-            
-          - os: macos-14
+          - os: macos-15
             arch: arm64
         
     runs-on: ${{ matrix.os }}
     
     steps:
       
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
 
       - name: Install poetry
         run: pipx install poetry
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ matrix.arch != 'arm64' }}
         with:
           python-version: '3.12'
@@ -114,13 +111,13 @@ jobs:
           cache-dependency-path: './poetry.lock'
           architecture: ${{ matrix.arch }}
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         if: ${{ matrix.arch == 'arm64' }}
         with:
           python-version: '3.12'
                  
       - name: Install project and its dependencies
-        run: poetry install --no-root
+        run: poetry install
         
       - name: Run tests with coverage (Linux)
         if: ${{ runner.os == 'Linux' }}

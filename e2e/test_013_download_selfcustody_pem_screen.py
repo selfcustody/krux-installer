@@ -1,6 +1,7 @@
 import os
 from unittest.mock import patch, call
 from kivy.base import EventLoop, EventLoopBase
+from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.download_selfcustody_pem_screen import (
@@ -21,6 +22,10 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
 
     @classmethod
     def teardown_class(cls):
+        # Unschedule all pending Clock events to prevent race conditions
+        # with subsequent tests
+        for event in Clock.get_events():
+            Clock.unschedule(event)
         EventLoop.exit()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -306,3 +311,28 @@ class TestDownloadSelfcustodyPemScreen(GraphicUnitTest):
         mock_set_screen.assert_called_once_with(
             name="VerifyStableZipScreen", direction="left"
         )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.download_selfcustody_pem_screen.time.sleep")
+    @patch("src.app.screens.base_download_screen.BaseDownloadScreen.on_pre_enter")
+    def test_on_pre_enter(self, mock_super_on_pre_enter, mock_sleep, mock_get_locale):
+        screen = DownloadSelfcustodyPemScreen()
+        self.render(screen)
+
+        # get your Window instance safely
+        EventLoop.ensure_window()
+
+        # Call on_pre_enter
+        screen.on_pre_enter()
+
+        # Verify time.sleep was called with 3 seconds
+        mock_sleep.assert_called_once_with(3)
+
+        # Verify parent's on_pre_enter was called
+        mock_super_on_pre_enter.assert_called_once()
+
+        # patch assertions
+        mock_get_locale.assert_any_call()

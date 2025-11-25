@@ -25,70 +25,166 @@ constants.py
 Some constants to be used accros application
 """
 
-from typing import Any
+from typing import Any, List
 import sys
 import os
+import re
 
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
+VALID_DEVICES = [
+    "m5stickv",
+    "amigo",
+    "dock",
+    "bit",
+    "yahboom",
+    "cube",
+    "wonder_mv",
+    "tzt",
+    "embed_fire",
+]
+
 VALID_DEVICES_VERSIONS = {
-    "v25.11.0": [
-        "m5stickv",
-        "amigo",
-        "dock",
-        "bit",
-        "yahboom",
-        "cube",
-        "wonder_mv",
-        "tzt",
-        "embed_fire",
-    ],
-    "v25.10.1": [
-        "m5stickv",
-        "amigo",
-        "dock",
-        "bit",
-        "yahboom",
-        "cube",
-        "wonder_mv",
-        "tzt",
-    ],
-    "v25.10.0": [
-        "m5stickv",
-        "amigo",
-        "dock",
-        "bit",
-        "yahboom",
-        "cube",
-        "wonder_mv",
-        "tzt",
-    ],
-    "v25.09.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
-    "v24.11.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
-    "v24.09.1": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
-    "v24.09.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube", "wonder_mv"],
-    "v24.07.0": ["m5stickv", "amigo", "dock", "bit", "yahboom", "cube"],
-    "v24.03.0": ["m5stickv", "amigo", "dock", "bit", "yahboom"],
-    "v23.09.1": ["m5stickv", "amigo", "dock", "bit"],
-    "v23.09.0": ["m5stickv", "amigo", "dock", "bit"],
-    "v22.08.2": ["m5stickv", "amigo", "dock", "bit"],
-    "v22.08.1": ["m5stickv", "amigo", "dock", "bit"],
-    "v22.08.0": ["m5stickv", "amigo", "dock", "bit"],
-    "v22.03.0": ["m5stickv"],
-    "odudex/krux_binaries": [
-        "m5stickv",
-        "amigo",
-        "dock",
-        "bit",
-        "yahboom",
-        "dock",
-        "cube",
-        "wonder_mv",
-        "tzt",
-        "embed_fire",
-    ],
+    "m5stickv": {
+        "initial": "v22.03.0",
+        "final": None,
+    },
+    "amigo": {
+        "initial": "v22.08.0",
+        "final": None,
+    },
+    "dock": {
+        "initial": "v22.08.0",
+        "final": None,
+    },
+    "bit": {
+        "initial": "v22.08.0",
+        "final": "v25.10.0",
+    },
+    "yahboom": {
+        "initial": "v24.03.0",
+        "final": None,
+    },
+    "cube": {
+        "initial": "v24.07.0",
+        "final": None,
+    },
+    "wonder_mv": {
+        "initial": "v24.09.0",
+        "final": None,
+    },
+    "tzt": {
+        "initial": "v25.10.0",
+        "final": None,
+    },
+    "embed_fire": {
+        "initial": "v25.11.0",
+        "final": None,
+    },
 }
+
+
+def _parse_version(version: str) -> tuple:
+    """
+    Parse version string into comparable tuple.
+
+    Args:
+        version: Version string in format 'vYY.MM.P' (e.g., 'v22.03.0')
+
+    Returns:
+        Tuple of integers (year, month, patch) for comparison
+        Returns (0, 0, 0) if parsing fails
+    """
+    match = re.match(r"^v(\d+)\.(\d+)\.(\d+)$", version)
+    if match:
+        return tuple(map(int, match.groups()))
+    return (0, 0, 0)
+
+
+def compare_versions(version1: str, version2: str) -> int:
+    """
+    Compare two version strings.
+
+    Args:
+        version1: First version string
+        version2: Second version string
+
+    Returns:
+        -1 if version1 < version2
+         0 if version1 == version2
+         1 if version1 > version2
+    """
+    v1_tuple = _parse_version(version1)
+    v2_tuple = _parse_version(version2)
+
+    if v1_tuple < v2_tuple:
+        return -1
+    if v1_tuple > v2_tuple:
+        return 1
+    return 0
+
+
+def is_device_valid_for_version(device: str, version: str) -> bool:
+    """
+    Check if a device is valid for a specific Krux version.
+
+    Args:
+        device: Device name (e.g., 'm5stickv', 'amigo', etc.)
+        version: Version string (e.g., 'v24.03.0')
+
+    Returns:
+        True if device is compatible with the version, False otherwise
+    """
+    if device not in VALID_DEVICES_VERSIONS:
+        return False
+
+    device_info = VALID_DEVICES_VERSIONS[device]
+    initial_version = device_info["initial"]
+    final_version = device_info["final"]
+
+    if compare_versions(version, initial_version) < 0:
+        return False
+
+    if final_version is not None and compare_versions(version, final_version) > 0:
+        return False
+
+    return True
+
+
+def get_valid_devices_for_version(version: str) -> List[str]:
+    """
+    Get list of valid devices for a specific Krux version.
+
+    Args:
+        version: Version string (e.g., 'v24.03.0')
+
+    Returns:
+        List of device names that are compatible with the version
+    """
+    valid_devices = []
+
+    for device in VALID_DEVICES:
+        if is_device_valid_for_version(device, version):
+            valid_devices.append(device)
+
+    return valid_devices
+
+
+def get_device_support_info(device: str) -> dict:
+    """
+    Get support information for a specific device.
+
+    Args:
+        device: Device name
+
+    Returns:
+        Dictionary with 'initial' and 'final' version info
+    """
+    if device not in VALID_DEVICES_VERSIONS:
+        return {"initial": None, "final": None}
+
+    return VALID_DEVICES_VERSIONS[device].copy()
 
 
 def _open_pyproject() -> dict[str, Any]:

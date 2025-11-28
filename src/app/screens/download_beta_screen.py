@@ -27,7 +27,7 @@ from functools import partial
 from kivy.clock import Clock
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
-from utils.constants import VALID_DEVICES_VERSIONS
+from src.utils.constants import VALID_DEVICES
 
 
 class DownloadBetaScreen(BaseDownloadScreen):
@@ -108,8 +108,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
                     self.redirect_exception(exception=error)
 
             if key == "device":
-                first_version = next(iter(VALID_DEVICES_VERSIONS))
-                if value in VALID_DEVICES_VERSIONS[first_version]:
+                if value in VALID_DEVICES:
                     self.device = value
                 else:
                     error = RuntimeError(f"Invalid value for key '{key}': {value}")

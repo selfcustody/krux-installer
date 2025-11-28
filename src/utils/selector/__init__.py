@@ -28,21 +28,8 @@ Generic selector to select devices or versions
 import typing
 from http.client import HTTPResponse
 import requests
+from src.utils.constants import VALID_DEVICES
 from ..trigger import Trigger
-
-VALID_DEVICES = (
-    "m5stickv",
-    "amigo",
-    "amigo_tft",
-    "amigo_ips",
-    "dock",
-    "bit",
-    "yahboom",
-    "cube",
-    "wonder_mv",
-    "tzt",
-    "embed_fire",
-)
 
 
 class Selector(Trigger):

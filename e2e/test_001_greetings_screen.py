@@ -1,6 +1,7 @@
 import os
 import sys
 from pathlib import Path
+import builtins
 from unittest.mock import MagicMock, patch, mock_open
 from pytest import mark
 from kivy.base import EventLoop, EventLoopBase
@@ -325,7 +326,7 @@ class TestAboutScreen(GraphicUnitTest):
         sys.platform in ("win32"),
         reason="does not run on windows",
     )
-    @patch("sys.platform", "linux")  # Patch platform to Linux
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
@@ -337,10 +338,11 @@ class TestAboutScreen(GraphicUnitTest):
             MagicMock(gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["brltty"])
         ]
 
-        # Temporarily patch sys.modules to use mock grp
+        # Initialize the screen FIRST
+        screen = GreetingsScreen()
+
+        # Then patch when calling the method
         with patch.dict("sys.modules", {"grp": mock_grp}):
-            # Initialize the screen and call the method to test
-            screen = GreetingsScreen()
             is_in_dialout = screen.is_user_in_dialout_group(
                 user="mockuser", group="dialout"
             )
@@ -354,7 +356,7 @@ class TestAboutScreen(GraphicUnitTest):
         sys.platform in ("win32"),
         reason="does not run on windows",
     )
-    @patch("sys.platform", "linux")  # Patch platform to Linux
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
@@ -371,15 +373,16 @@ class TestAboutScreen(GraphicUnitTest):
             )
         ]
 
-        # Temporarily patch sys.modules to use mock grp
+        # Initialize the screen FIRST
+        screen = GreetingsScreen()
+
+        # Then patch when calling the method
         with patch.dict("sys.modules", {"grp": mock_grp}):
-            # Initialize the screen and call the method to test
-            screen = GreetingsScreen()
             is_in_dialout = screen.is_user_in_dialout_group(
                 user="mockuser", group="dialout"
             )
-            self.assertEqual(is_in_dialout, True)
 
+            self.assertEqual(is_in_dialout, True)
             mock_get_locale.assert_called()
             mock_grp.getgrall.assert_called()
 
@@ -585,8 +588,6 @@ class TestAboutScreen(GraphicUnitTest):
     )
     def test_is_user_in_dialout_when_grp_import_fails(self, mock_get_locale):
         """Test that is_user_in_dialout_group returns False when grp import raises ImportError"""
-        import builtins  # pylint: disable=import-outside-toplevel
-
         screen = GreetingsScreen()
 
         # Create a custom import function that raises ImportError for grp

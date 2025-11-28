@@ -23,24 +23,14 @@
 beta_downloader.py
 """
 import tempfile
+from src.utils.constants import VALID_DEVICES
 from .asset_downloader import AssetDownloader
 
 
 class BetaDownloader(AssetDownloader):
     """Download beta assets from odudex/krux_binaries"""
 
-    VALID_DEVICES = (
-        "m5stickv",
-        "amigo",
-        "dock",
-        "bit",
-        "yahboom",
-        "cube",
-        "wonder_mv",
-        "tzt",
-        "embed_fire",
-    )
-
+    VALID_DEVICES = VALID_DEVICES
     VALID_BINARY_TYPES = ("firmware.bin", "kboot.kfpkg")
 
     def __init__(

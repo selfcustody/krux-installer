@@ -1,17 +1,11 @@
 import os
-import sys
+import tomllib
 from unittest.mock import patch, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.about_screen import AboutScreen
-
-# Import tomllib for Python 3.11+ or tomli for earlier versions
-if sys.version_info >= (3, 11):
-    import tomllib
-else:
-    import tomli as tomllib
 
 
 class TestAboutScreen(GraphicUnitTest):
@@ -30,7 +24,7 @@ class TestAboutScreen(GraphicUnitTest):
         pyproject_abs_path = os.path.abspath(pyproject_path)
         with open(pyproject_abs_path, "rb") as f:
             pyproject_data = tomllib.load(f)
-        cls.version = pyproject_data["tool"]["poetry"]["version"]
+        cls.version = pyproject_data["project"]["version"]
 
     @classmethod
     def teardown_class(cls):

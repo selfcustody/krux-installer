@@ -1,5 +1,5 @@
 {
-   description = "Krux-installer flake";
+  description = "Krux-installer flake";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
@@ -10,15 +10,14 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        python = pkgs.python314;
+        python = pkgs.python313;
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = [
             python
-            pkgs.poetry  
+            pkgs.uv
             pkgs.polkit
             pkgs.openssl
-            #pkgs.uv
             pkgs.git
             pkgs.pkg-config
             pkgs.zlib
@@ -48,9 +47,14 @@
             pkgs.pango
             pkgs.gdk-pixbuf
             pkgs.atk
+            # SDL2 for Kivy/pygame
+            pkgs.SDL2
+            pkgs.SDL2_image
+            pkgs.SDL2_mixer
+            pkgs.SDL2_ttf
           ];
           shellHook = ''
-            # Set up proper directories for Poetry and Python
+            # Set up proper directories
             export HOME="''${HOME:-$(pwd)/.home}"
             export XDG_DATA_HOME="$HOME/.local/share"
             export XDG_CONFIG_HOME="$HOME/.config" 
@@ -59,39 +63,37 @@
             # Create necessary directories
             mkdir -p "$HOME" "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
             
-            # Poetry configuration
-            export POETRY_CACHE_DIR="$XDG_CACHE_HOME/pypoetry"
-            export POETRY_DATA_DIR="$XDG_DATA_HOME/pypoetry"
-            export POETRY_CONFIG_DIR="$XDG_CONFIG_HOME/pypoetry"
-            export POETRY_VENV_PATH="$POETRY_CACHE_DIR/virtualenvs"
+            # UV configuration
+            export UV_CACHE_DIR="$XDG_CACHE_HOME/uv"
+            export UV_PYTHON_INSTALL_DIR="$XDG_DATA_HOME/uv/python"
+            export UV_TOOL_DIR="$XDG_DATA_HOME/uv/tools"
+            export UV_TOOL_BIN_DIR="$XDG_DATA_HOME/uv/bin"
             
-            # Create Poetry directories
-            mkdir -p "$POETRY_CACHE_DIR" "$POETRY_DATA_DIR" "$POETRY_CONFIG_DIR" "$POETRY_VENV_PATH"
+            # Create UV directories
+            mkdir -p "$UV_CACHE_DIR" "$UV_PYTHON_INSTALL_DIR" "$UV_TOOL_DIR" "$UV_TOOL_BIN_DIR"
             
             # Python and virtual environment setup
             export VIRTUAL_ENV_DISABLE_PROMPT=1
             export PIP_CACHE_DIR="$XDG_CACHE_HOME/pip"
             mkdir -p "$PIP_CACHE_DIR"
             
+            # Add UV tools to PATH
+            export PATH="$UV_TOOL_BIN_DIR:$PATH"
+            
             # Make sure Kivy finds mtdev
             if [ -e "${pkgs.mtdev}/lib/libmtdev.so" ] && [ ! -e "${pkgs.mtdev}/lib/libmtdev.so.1" ]; then
               ln -sf "${pkgs.mtdev}/lib/libmtdev.so" "${pkgs.mtdev}/lib/libmtdev.so.1"
             fi
             
-            export LD_LIBRARY_PATH=${pkgs.libGL}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.xorg.libX11}/lib:${pkgs.xorg.libxcb}/lib:${pkgs.mtdev}/lib:$LD_LIBRARY_PATH
+            export LD_LIBRARY_PATH=${pkgs.libGL}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.xorg.libX11}/lib:${pkgs.xorg.libxcb}/lib:${pkgs.mtdev}/lib:${pkgs.SDL2}/lib:$LD_LIBRARY_PATH
             export PYTHONPATH=$PWD/src:$PYTHONPATH
             
-            # Configure Poetry to use local virtualenvs
-            poetry config virtualenvs.in-project false
-            poetry config virtualenvs.path "$POETRY_VENV_PATH"
-            poetry config cache-dir "$POETRY_CACHE_DIR"
-            
             echo "Development environment setup complete!"
-            echo "Poetry cache: $POETRY_CACHE_DIR"
-            echo "Virtual envs: $POETRY_VENV_PATH"
+            echo "UV cache: $UV_CACHE_DIR"
+            echo "Virtual env: .venv (managed by UV)"
             echo ""
-            echo "Try running: poetry install && poetry run poe dev"
-            echo "you must add (users.users.<youruser>.extraGroups = [ "dialout" ];) in your configuration.nix, and reboot your system!!!" 
+            echo "Try running: uv sync && uv run poe dev"
+            echo "you must add (users.users.<youruser>.extraGroups = [ \"dialout\" ];) in your configuration.nix, and reboot your system!!!" 
           '';
         };
       }

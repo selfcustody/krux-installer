@@ -19,25 +19,26 @@ jobs:
       
       - uses: actions/checkout@v6
 
-      - name: Install poetry
-        run: pipx install poetry
-        
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: './poetry.lock'
+          python-version: '3.14'
           architecture: x64
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
       
-      - name: Install poetry dependencies
-        run: poetry install
+      - name: Install uv dependencies
+        run: uv sync --all-extras
 
       - name: Check format/
         run: |
-          poetry run poe format-src --check --verbose
-          poetry run poe format-tests --check --verbose
-          poetry run poe format-e2e --check --verbose
-          poetry run poe format-installer --check --verbose
+          uv run poe format-src --check --verbose
+          uv run poe format-tests --check --verbose
+          uv run poe format-e2e --check --verbose
+          uv run poe format-installer --check --verbose
           
   pylint:
 
@@ -50,31 +51,23 @@ jobs:
       - uses: actions/checkout@v6
         with:
           submodules: recursive
-          
-      - name: Install poetry
-        run: pipx install poetry
 
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: './poetry.lock'
+          python-version: '3.14'
           architecture: x64
 
-      - name: Install poetry dependencies
-        run: poetry install
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
+
+      - name: Install uv dependencies
+        run: uv sync --all-extras
         
       - name: Lint src/
-        run: poetry run poe lint
-
-  # from xPsycHoWasPx in discord chat:
-  # "running macOS in none gpu accelerated mode, and that means no OpenGL,
-  # no OpenGL no kivy window…. if u need to use vm, you also need a dedicated
-  # seperate supported GPU passed through to the osx VM .."
-  # 
-  # TODO: find how to install properly libs for M1/M2 Macs
-  # they raise exceptions that numpy and others libs
-  # arent compiled for arm64 (macos-14 and macos-xlarge-*)
+        run: uv run poe lint
   
   pytest:
 
@@ -100,32 +93,27 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install poetry
-        run: pipx install poetry
-
       - uses: actions/setup-python@v6
-        if: ${{ matrix.arch != 'arm64' }}
         with:
-          python-version: '3.12'
-          cache: 'poetry'
-          cache-dependency-path: './poetry.lock'
+          python-version: '3.14'
           architecture: ${{ matrix.arch }}
 
-      - uses: actions/setup-python@v6
-        if: ${{ matrix.arch == 'arm64' }}
+      - name: Install uv
+        uses: astral-sh/setup-uv@v4
         with:
-          python-version: '3.12'
+          enable-cache: true
+          cache-dependency-glob: "uv.lock"
                  
       - name: Install project and its dependencies
-        run: poetry install
+        run: uv sync --all-extras
         
       - name: Run tests with coverage (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
+        uses: coactions/setup-xvfb@v1.0.1
         with:
           run: |
-            poetry add pytest-xvfb
-            poetry run poe coverage
+            uv add pytest-xvfb
+            uv run poe coverage
             
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v5
@@ -136,17 +124,10 @@ jobs:
 
       - name: Run tests (MacOS)
         if: ${{ runner.os == 'macOS' }}
-        run: poetry run poe test-unit
+        run: uv run poe test-unit
         
       - name: Run tests (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
           KIVY_GL_BACKEND: 'angle_sdl2'
-        run: poetry run poe test
-
-      #- name: Run tests (MacOS)
-      #  if: ${{ runner.os == 'macOS' }}
-      #  env:
-      #    KIVY_GL_DEBUG: 1
-      #    KIVY_GL_BACKEND: 'gl'
-      #  run: poetry run poe test
+        run: uv run poe test

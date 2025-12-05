@@ -1,8 +1,8 @@
 {
-   description = "Krux-installer flake";
+  description = "Krux-installer flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
     flake-utils.url = "github:numtide/flake-utils";
   };
 
@@ -11,87 +11,100 @@
       let
         pkgs = import nixpkgs { inherit system; };
         python = pkgs.python314;
+        
+        libs = with pkgs; [
+          libGL
+          stdenv.cc.cc.lib
+          xorg.libX11
+          xorg.libXext
+          xorg.libXrender
+          xorg.libxcb
+          xorg.libXrandr
+          xorg.libXinerama
+          xorg.libXcursor
+          xorg.libXi
+          xorg.libXxf86vm
+          mtdev
+          cairo
+          glib
+          gtk3
+          gdk-pixbuf
+          pango
+          atk
+          freetype
+          fontconfig
+          zlib
+          libffi
+        ];
+        
+        libPath = pkgs.lib.makeLibraryPath libs;
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = [
             python
-            pkgs.poetry  
-            pkgs.polkit
-            pkgs.openssl
-            #pkgs.uv
+            pkgs.uv
             pkgs.git
             pkgs.pkg-config
-            pkgs.zlib
-            pkgs.libffi
-            pkgs.cairo
-            pkgs.glib
-            pkgs.gtk3
-            pkgs.gobject-introspection
-            pkgs.freetype
+            pkgs.polkit
+            pkgs.openssl
             pkgs.libusb1
             pkgs.tcl
             pkgs.tk
-            pkgs.xorg.libX11
-            pkgs.xorg.libXext
-            pkgs.xorg.libXrender
-            pkgs.xorg.libxcb
-            pkgs.libGL           
-            pkgs.stdenv.cc.cc.lib 
-            pkgs.mtdev 
-            pkgs.shadow
-            pkgs.xorg.libXrandr
-            pkgs.xorg.libXinerama
-            pkgs.xorg.libXcursor
-            pkgs.xorg.libXi
-            pkgs.xorg.libXxf86vm
-            pkgs.fontconfig
-            pkgs.pango
-            pkgs.gdk-pixbuf
-            pkgs.atk
-          ];
+            pkgs.gobject-introspection
+          ] ++ libs;
+          
           shellHook = ''
-            # Set up proper directories for Poetry and Python
-            export HOME="''${HOME:-$(pwd)/.home}"
-            export XDG_DATA_HOME="$HOME/.local/share"
-            export XDG_CONFIG_HOME="$HOME/.config" 
-            export XDG_CACHE_HOME="$HOME/.cache"
+            # Project-specific directories
+            export PROJECT_ROOT="$(pwd)"
+            export PROJECT_DATA="$PROJECT_ROOT/.devenv"
             
-            # Create necessary directories
-            mkdir -p "$HOME" "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
-            
-            # Poetry configuration
-            export POETRY_CACHE_DIR="$XDG_CACHE_HOME/pypoetry"
-            export POETRY_DATA_DIR="$XDG_DATA_HOME/pypoetry"
-            export POETRY_CONFIG_DIR="$XDG_CONFIG_HOME/pypoetry"
-            export POETRY_VENV_PATH="$POETRY_CACHE_DIR/virtualenvs"
-            
-            # Create Poetry directories
-            mkdir -p "$POETRY_CACHE_DIR" "$POETRY_DATA_DIR" "$POETRY_CONFIG_DIR" "$POETRY_VENV_PATH"
-            
-            # Python and virtual environment setup
-            export VIRTUAL_ENV_DISABLE_PROMPT=1
-            export PIP_CACHE_DIR="$XDG_CACHE_HOME/pip"
-            mkdir -p "$PIP_CACHE_DIR"
-            
-            # Make sure Kivy finds mtdev
-            if [ -e "${pkgs.mtdev}/lib/libmtdev.so" ] && [ ! -e "${pkgs.mtdev}/lib/libmtdev.so.1" ]; then
-              ln -sf "${pkgs.mtdev}/lib/libmtdev.so" "${pkgs.mtdev}/lib/libmtdev.so.1"
+            # XDG directories (use existing HOME if set, otherwise use project)
+            if [ -z "$HOME" ]; then
+              export HOME="$PROJECT_DATA/home"
             fi
             
-            export LD_LIBRARY_PATH=${pkgs.libGL}/lib:${pkgs.stdenv.cc.cc.lib}/lib:${pkgs.xorg.libX11}/lib:${pkgs.xorg.libxcb}/lib:${pkgs.mtdev}/lib:$LD_LIBRARY_PATH
-            export PYTHONPATH=$PWD/src:$PYTHONPATH
+            export XDG_DATA_HOME="''${XDG_DATA_HOME:-$PROJECT_DATA/share}"
+            export XDG_CONFIG_HOME="''${XDG_CONFIG_HOME:-$PROJECT_DATA/config}" 
+            export XDG_CACHE_HOME="''${XDG_CACHE_HOME:-$PROJECT_DATA/cache}"
             
-            # Configure Poetry to use local virtualenvs
-            poetry config virtualenvs.in-project false
-            poetry config virtualenvs.path "$POETRY_VENV_PATH"
-            poetry config cache-dir "$POETRY_CACHE_DIR"
+            # Create necessary directories
+            mkdir -p "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
             
-            echo "Development environment setup complete!"
-            echo "Poetry cache: $POETRY_CACHE_DIR"
-            echo "Virtual envs: $POETRY_VENV_PATH"
+            # Python configuration
+            export VIRTUAL_ENV_DISABLE_PROMPT=1
+            export UV_CACHE_DIR="$XDG_CACHE_HOME/uv"
+            export PYTHONPATH="$PROJECT_ROOT/src:$PYTHONPATH"
+            mkdir -p "$UV_CACHE_DIR"
+            
+            # Library paths
+            export LD_LIBRARY_PATH="${libPath}:$LD_LIBRARY_PATH"
+            
+             # Kivy configuration
+            export KIVY_NO_CONSOLELOG=1
+            
+
+            # Check for dialout group (NixOS specific)
+            if command -v nixos-version &> /dev/null; then
+              if ! groups | grep -q dialout; then
+                echo ""
+                echo "⚠️  WARNING: You're not in the 'dialout' group!"
+                echo "This is required for USB device access."
+                echo ""
+                echo "Add this to your configuration.nix:"
+                echo "  users.users.<youruser>.extraGroups = ["dialout"];"
+                echo ""
+                echo "Then rebuild and reboot your system."
+                echo ""
+              fi
+            fi
+            
+            echo "✓ Development environment ready!"
+            echo "  UV cache: $UV_CACHE_DIR"
+            echo "  Project data: $PROJECT_DATA"
             echo ""
-            echo "Try running: poetry install && poetry run poe dev"
-            echo "you must add (users.users.<youruser>.extraGroups = [ "dialout" ];) in your configuration.nix, and reboot your system!!!" 
+            echo "Quick start:"
+            echo "  uv sync --all-extras && uv run poe dev"
+            echo ""
           '';
         };
       }

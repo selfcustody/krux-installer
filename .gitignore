@@ -93,3 +93,6 @@ simulator/sd
 
 # nix garbage
 .nix-bin 
+
+#uv garbage 
+.devenv/

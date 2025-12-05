@@ -13,13 +13,14 @@
           config.allowInsecure = true;
           config.allowUnsupportedSystem = true;
         };
-        python = pkgs.python314;
+        python = pkgs.python313;
         isLinux = pkgs.stdenv.isLinux;
+        isDarwin = pkgs.stdenv.isDarwin;
       in {
         devShells.default = pkgs.mkShell {
           buildInputs = [
             python
-            pkgs.poetry
+            pkgs.uv
             pkgs.openssl
             pkgs.git
             pkgs.pkg-config
@@ -43,6 +44,16 @@
             pkgs.libGL
             pkgs.mtdev
             pkgs.shadow
+            pkgs.fontconfig
+            pkgs.pango
+            pkgs.gdk-pixbuf
+            pkgs.atk
+            pkgs.stdenv.cc.cc.lib
+          ] ++ pkgs.lib.optionals isLinux [
+            pkgs.polkit
+            pkgs.libGL
+            pkgs.mtdev
+            pkgs.shadow
             pkgs.xorg.libX11
             pkgs.xorg.libXext
             pkgs.xorg.libXrender
@@ -52,26 +63,39 @@
             pkgs.xorg.libXcursor
             pkgs.xorg.libXi
             pkgs.xorg.libXxf86vm
+            pkgs.SDL2
+            pkgs.SDL2_image
+            pkgs.SDL2_mixer
+            pkgs.SDL2_ttf
+          ] ++ pkgs.lib.optionals isDarwin [
+            pkgs.darwin.apple_sdk.frameworks.Cocoa
+            pkgs.darwin.apple_sdk.frameworks.OpenGL
+            pkgs.darwin.apple_sdk.frameworks.IOKit
           ];
+
 
           shellHook = ''
             export HOME="''${HOME:-$(pwd)/.home}"
             export XDG_DATA_HOME="$HOME/.local/share"
             export XDG_CONFIG_HOME="$HOME/.config"
+            export XDG_CONFIG_HOME="$HOME/.config"
             export XDG_CACHE_HOME="$HOME/.cache"
+
 
             mkdir -p "$HOME" "$XDG_DATA_HOME" "$XDG_CONFIG_HOME" "$XDG_CACHE_HOME"
 
-            export POETRY_CACHE_DIR="$XDG_CACHE_HOME/pypoetry"
-            export POETRY_DATA_DIR="$XDG_DATA_HOME/pypoetry"
-            export POETRY_CONFIG_DIR="$XDG_CONFIG_HOME/pypoetry"
-            export POETRY_VENV_PATH="$POETRY_CACHE_DIR/virtualenvs"
+            export UV_CACHE_DIR="$XDG_CACHE_HOME/uv"
+            export UV_PYTHON_INSTALL_DIR="$XDG_DATA_HOME/uv/python"
+            export UV_TOOL_DIR="$XDG_DATA_HOME/uv/tools"
+            export UV_TOOL_BIN_DIR="$XDG_DATA_HOME/uv/bin"
 
-            mkdir -p "$POETRY_CACHE_DIR" "$POETRY_DATA_DIR" "$POETRY_CONFIG_DIR" "$POETRY_VENV_PATH"
+            mkdir -p "$UV_CACHE_DIR" "$UV_PYTHON_INSTALL_DIR" "$UV_TOOL_DIR" "$UV_TOOL_BIN_DIR"
 
             export VIRTUAL_ENV_DISABLE_PROMPT=1
             export PIP_CACHE_DIR="$XDG_CACHE_HOME/pip"
             mkdir -p "$PIP_CACHE_DIR"
+
+            export PATH="$UV_TOOL_BIN_DIR:$PATH"
 
             ${pkgs.lib.optionalString isLinux ''
               if [ -e "${pkgs.mtdev}/lib/libmtdev.so" ] && [ ! -e "${pkgs.mtdev}/lib/libmtdev.so.1" ]; then
@@ -84,20 +108,17 @@
               ${pkgs.xorg.libX11}/lib:\
               ${pkgs.xorg.libxcb}/lib:\
               ${pkgs.mtdev}/lib:\
+              ${pkgs.SDL2}/lib:\
               $LD_LIBRARY_PATH
             ''}
 
             export PYTHONPATH=$PWD/src:$PYTHONPATH
 
-            poetry config virtualenvs.in-project false
-            poetry config virtualenvs.path "$POETRY_VENV_PATH"
-            poetry config cache-dir "$POETRY_CACHE_DIR"
-
             echo "Development environment setup complete!"
-            echo "Poetry cache: $POETRY_CACHE_DIR"
-            echo "Virtual envs: $POETRY_VENV_PATH"
+            echo "UV cache: $UV_CACHE_DIR"
+            echo "Virtual env: .venv (managed by UV)"
             echo ""
-            echo "Try running: poetry install && poetry run poe dev"
+            echo "Try running: uv sync && uv run poe dev"
             echo "you must add (users.users.<youruser>.extraGroups = [ \"dialout\" ];) in your configuration.nix, and reboot your system!!!"
           '';
         };

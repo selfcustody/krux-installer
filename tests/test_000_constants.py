@@ -1,24 +1,34 @@
 import os
-
-# import sys
 from unittest import TestCase
 from unittest.mock import mock_open, patch, MagicMock
-from src.utils.constants import _open_pyproject, get_name, get_version, get_description
+from src.utils.constants import (
+    _open_pyproject,
+    get_name,
+    get_version,
+    get_description,
+)
 
 PYPROJECT_STR = """[tool.poetry]
 name = "test"
 version = "0.0.1"
-description = \"Hello World!\""""
+description = "Hello World!"
+"""
+
+PYPROJECT_INVALID = """Not a valid TOML format"""
+
+PYPROJECT_MISSING_KEYS = """[tool.poetry]
+name = "test"
+description = "Missing version key"
+"""
 
 MOCK_TOML_DATA = {
     "tool": {
         "poetry": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
-    }
+    },
 }
 
 
 class TestConstants(TestCase):
-
     @patch("sys.version_info")
     @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_STR)
     def test_open_pyproject_with_py_minor_version_10(
@@ -35,8 +45,11 @@ class TestConstants(TestCase):
             )
 
             data = _open_pyproject()
+
             open_mock.assert_called_once_with(pyproject_filename, "r", encoding="utf8")
-            mock_tomli.loads.assert_called_once_with(PYPROJECT_STR.strip())
+
+            mock_tomli.loads.assert_called_once_with(PYPROJECT_STR)
+
             self.assertEqual(data, MOCK_TOML_DATA)
 
     @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_STR)
@@ -108,3 +121,13 @@ class TestConstants(TestCase):
         description = get_description()
         open_mock.assert_called_once()
         self.assertEqual(description, "Hello World!")
+
+    @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_MISSING_KEYS)
+    def test_missing_version_key(self, _open_mock):
+        with self.assertRaises(KeyError):
+            get_version()
+
+    @patch("builtins.open", new_callable=mock_open, read_data=PYPROJECT_INVALID)
+    def test_invalid_toml_format(self, _open_mock):
+        with self.assertRaises(ValueError):
+            _open_pyproject()

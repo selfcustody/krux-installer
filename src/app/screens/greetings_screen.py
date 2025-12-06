@@ -175,7 +175,6 @@ class GreetingsScreen(BaseScreen):
         for _grp in grp.getgrall():
             gr_name = _grp.gr_name
             if gr_name == group:
-                # for _grpuser in _grp[3]:
                 for _grpuser in _grp.gr_mem:
                     if _grpuser == user:
                         self.info(f"'{user}' already in group '{gr_name}'")

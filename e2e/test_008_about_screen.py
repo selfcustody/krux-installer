@@ -30,7 +30,7 @@ class TestAboutScreen(GraphicUnitTest):
         pyproject_abs_path = os.path.abspath(pyproject_path)
         with open(pyproject_abs_path, "rb") as f:
             pyproject_data = tomllib.load(f)
-        cls.version = pyproject_data["tool"]["poetry"]["version"]
+        cls.version = pyproject_data["project"]["version"]
 
     @classmethod
     def teardown_class(cls):

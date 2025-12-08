@@ -10,7 +10,7 @@
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
-        python = pkgs.python314;
+        python = pkgs.python312;
         
         libs = with pkgs; [
           libGL

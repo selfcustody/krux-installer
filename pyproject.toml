@@ -7,7 +7,7 @@ authors = [
 ]
 license = {text = "LICENSE"}
 readme = "README.md"
-requires-python = ">=3.9.1,<3.13"
+requires-python = ">3.10,<=3.14"
 dependencies = [
     "kivy==2.3.1",
     "kivysome>=0.2.1,<1.0.0",

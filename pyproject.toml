@@ -28,7 +28,7 @@ urllib3 = "^2.6.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.11.0"
-pylint = "^3.3.9"
+pylint = "^4.0.4"
 pyinstaller = "^6.16.0"
 pytest-cov = "^6.3.0"
 poethepoet = "^0.33.1"

@@ -3,7 +3,7 @@ prefer-active-python = true
 
 [tool.poetry]
 name = "krux_installer"
-version = "0.0.21"
+version = "0.0.22"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = ["qlrd <qlrddev@gmail.com>"]
 license = "LICENSE"
@@ -12,7 +12,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = ">3.10,<=3.14"
 kivy = "2.3.1"
-kivysome = "^0.2.1"
 tomli = { version = "^2.2.1", python = "<3.11" }
 pyserial = "^3.5"
 requests = "^2.32.5"
@@ -25,6 +24,7 @@ pysudoer = { git = "https://github.com/qlrd/pysudoer.git" }
 pillow = "^11.3.0"
 pyinstaller = "^6.16.0"
 olefile = "^0.47"
+urllib3 = "^2.6.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.11.0"

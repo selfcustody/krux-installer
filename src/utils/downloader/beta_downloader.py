@@ -23,23 +23,12 @@
 beta_downloader.py
 """
 import tempfile
+from src.utils.constants import VALID_DEVICES
 from .asset_downloader import AssetDownloader
 
 
 class BetaDownloader(AssetDownloader):
     """Download beta assets from odudex/krux_binaries"""
-
-    VALID_DEVICES = (
-        "m5stickv",
-        "amigo",
-        "dock",
-        "bit",
-        "yahboom",
-        "cube",
-        "wonder_mv",
-        "tzt",
-        "embed_fire",
-    )
 
     VALID_BINARY_TYPES = ("firmware.bin", "kboot.kfpkg")
 
@@ -64,7 +53,7 @@ class BetaDownloader(AssetDownloader):
     @device.setter
     def device(self, value: str):
         """Setter for the device of beta version"""
-        if value in BetaDownloader.VALID_DEVICES:
+        if value in VALID_DEVICES:
             self.debug(f"device::setter={value}")
             self._device = value
         else:

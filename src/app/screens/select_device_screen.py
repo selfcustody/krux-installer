@@ -24,7 +24,11 @@ select_device_screen.py
 import re
 from functools import partial
 from kivy.clock import Clock
-from src.utils.constants import VALID_DEVICES_VERSIONS
+from src.utils.constants import (
+    VALID_DEVICES,
+    VALID_DEVICES_VERSIONS,
+    get_valid_devices_for_version,
+)
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -37,20 +41,7 @@ class SelectDeviceScreen(BaseScreen):
         )
         self.enabled_devices = []
         self.make_grid(wid="select_device_screen_grid", rows=9)
-
-        for row, device in enumerate(
-            [
-                "m5stickv",
-                "amigo",
-                "dock",
-                "bit",
-                "yahboom",
-                "cube",
-                "wonder_mv",
-                "tzt",
-                "embed_fire",
-            ]
-        ):
+        for row, device in enumerate(VALID_DEVICES):
 
             def on_press(instance):
                 if instance.id in self.enabled_devices:
@@ -97,29 +88,43 @@ class SelectDeviceScreen(BaseScreen):
             if key == "version":
                 self.enabled_devices = []
 
-                for device in (
-                    "m5stickv",
-                    "amigo",
-                    "dock",
-                    "bit",
-                    "yahboom",
-                    "cube",
-                    "wonder_mv",
-                    "tzt",
-                    "embed_fire",
-                ):
-                    cleanre = re.compile("\\[.*?\\]")
-                    clean_text = re.sub(cleanre, "", value)
-                    if (
-                        clean_text in VALID_DEVICES_VERSIONS
-                        and device not in VALID_DEVICES_VERSIONS.get(clean_text, [])
-                    ):
-                        self.ids[f"select_device_{device}"].text = "".join(
-                            ["[color=#333333]", device, "[/color]"]
+                cleanre = re.compile("\\[.*?\\]")
+                clean_version = re.sub(cleanre, "", value)
+
+                self.debug(f"Checking valid devices for version: {clean_version}")
+
+                # Check if this is a beta version
+                if re.match(r"^odudex/krux_binaries", clean_version):
+                    valid_devices_for_version = []
+                    for c in VALID_DEVICES:
+                        device = VALID_DEVICES_VERSIONS[c]
+                        if device["final"] is None:
+                            valid_devices_for_version.append(c)
+                else:
+                    valid_devices_for_version = get_valid_devices_for_version(
+                        clean_version
+                    )
+
+                self.debug(
+                    f"Valid devices for {clean_version}: {valid_devices_for_version}"
+                )
+
+                for device in VALID_DEVICES:
+                    button_id = f"select_device_{device}"
+
+                    if device in valid_devices_for_version:
+                        self.enabled_devices.append(button_id)
+                        self.ids[button_id].text = device
+                        self.debug(
+                            f"Device {device} enabled for version {clean_version}"
                         )
                     else:
-                        self.enabled_devices.append(f"select_device_{device}")
-                        self.ids[f"select_device_{device}"].text = device
+                        self.ids[button_id].text = "".join(
+                            ["[color=#333333]", device, "[/color]"]
+                        )
+                        self.debug(
+                            f"Device {device} disabled for version {clean_version}"
+                        )
 
         setattr(SelectDeviceScreen, "on_update", on_update)
         self.update_screen(

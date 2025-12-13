@@ -30,9 +30,15 @@ from .check_verifyer import CheckVerifyer
 
 
 class SigVerifyer(CheckVerifyer):
-    """Verify file signature agains .sig and .pem data"""
+    """Verify file signature against .sig and .pem data"""
 
-    def __init__(self, filename: str, signature: str, pubkey: str, regexp: typing.re):
+    def __init__(
+        self,
+        filename: str,
+        signature: bytes,
+        pubkey: str,
+        regexp: typing.Union[str, typing.Pattern[str]],
+    ):
         super().__init__(filename=filename, read_mode="rb", regexp=regexp)
         self.certificate = serialization.load_pem_public_key(pubkey)
         self.signature = signature

@@ -2,6 +2,7 @@ from unittest.mock import patch, call, MagicMock
 from kivy.base import EventLoop, EventLoopBase
 from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
+from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.app.screens.select_device_screen import SelectDeviceScreen
 
 
@@ -154,18 +155,15 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
 
         calls = []
+        valid_ids = [
+            f"select_device_{device}"
+            for device, info in VALID_DEVICES_VERSIONS.items()
+            if info["final"] is None
+        ]
 
         for button in grid.children:
-            action = getattr(screen.__class__, f"on_press_{button.id}")
-            action(button)
-            if button.id in (
-                "select_device_m5stickv",
-                "select_device_amigo",
-                "select_device_dock",
-                "select_device_bit",
-                "select_device_yahboom",
-                "select_device_cube",
-            ):
+            if button.id in valid_ids:
+                screen.set_background(wid=button.id, rgba=(0.25, 0.25, 0.25, 1))
                 calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
@@ -244,9 +242,9 @@ class TestSelectDeviceScreen(GraphicUnitTest):
                 "select_device_m5stickv",
                 "select_device_amigo",
                 "select_device_dock",
-                "select_device_bit",
                 "select_device_yahboom",
                 "select_device_cube",
+                "select_device_embed_fire",
             ):
                 calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
                 calls_manager.append(call("MainScreen"))

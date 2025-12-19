@@ -1,6 +1,7 @@
 from unittest import TestCase
 from unittest.mock import patch, call
 from src.utils.constants import VALID_DEVICES
+from src.utils.constants import VALID_DEVICES
 from src.utils.downloader import BetaDownloader
 from .shared_mocks import PropertyInstanceMock
 
@@ -21,6 +22,7 @@ class TestBetaDownloader(TestCase):
     def test_calls_init(self, mock_gettempdir, mock_binary_type, mock_device):
         mock_gettempdir.return_value = "/tmp/dir"
         for device in VALID_DEVICES:
+        for device in VALID_DEVICES:
             for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
@@ -31,6 +33,7 @@ class TestBetaDownloader(TestCase):
     @patch("tempfile.gettempdir")
     def test_init_url(self, mock_gettempdir):
         mock_gettempdir.return_value = "/tmp/dir"
+        for device in VALID_DEVICES:
         for device in VALID_DEVICES:
             for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 mock_url = f"{BASE_URL}/maixpy_{device}/{_bin}"
@@ -65,6 +68,7 @@ class TestBetaDownloader(TestCase):
     def test_init_destdir(self, mock_gettempdir):
         mock_gettempdir.return_value = "/tmp/dir"
         for device in VALID_DEVICES:
+        for device in VALID_DEVICES:
             for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 b = BetaDownloader(
                     device=device, binary_type=_bin, destdir=mock_gettempdir()
@@ -74,6 +78,7 @@ class TestBetaDownloader(TestCase):
     @patch("tempfile.gettempdir")
     def test_init_write_mode(self, mock_gettempdir):
         mock_gettempdir.return_value = "/tmp/dir"
+        for device in VALID_DEVICES:
         for device in VALID_DEVICES:
             for _bin in BetaDownloader.VALID_BINARY_TYPES:
                 b = BetaDownloader(

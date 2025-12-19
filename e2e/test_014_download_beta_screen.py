@@ -269,6 +269,10 @@ class TestDownloadBetaScreen(GraphicUnitTest):
             patch.object(screen, "trigger") as mock_trigger,
             patch.object(screen, "downloader") as mock_downloader,
         ):
+        with (
+            patch.object(screen, "trigger") as mock_trigger,
+            patch.object(screen, "downloader") as mock_downloader,
+        ):
 
             mock_downloader.destdir = "mockdir"
             screen.update(

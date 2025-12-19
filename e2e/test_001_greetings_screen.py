@@ -326,6 +326,7 @@ class TestAboutScreen(GraphicUnitTest):
         reason="does not run on windows",
     )
     @patch("sys.platform", "linux")
+    @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
@@ -337,6 +338,10 @@ class TestAboutScreen(GraphicUnitTest):
             MagicMock(gr_name="dialout", gr_passwd="x", gr_gid=1234, gr_mem=["brltty"])
         ]
 
+        # Initialize the screen FIRST
+        screen = GreetingsScreen()
+
+        # Then patch when calling the method
         # Initialize the screen FIRST
         screen = GreetingsScreen()
 
@@ -355,6 +360,7 @@ class TestAboutScreen(GraphicUnitTest):
         sys.platform in ("win32"),
         reason="does not run on windows",
     )
+    @patch("sys.platform", "linux")
     @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(
@@ -376,10 +382,15 @@ class TestAboutScreen(GraphicUnitTest):
         screen = GreetingsScreen()
 
         # Then patch when calling the method
+        # Initialize the screen FIRST
+        screen = GreetingsScreen()
+
+        # Then patch when calling the method
         with patch.dict("sys.modules", {"grp": mock_grp}):
             is_in_dialout = screen.is_user_in_dialout_group(
                 user="mockuser", group="dialout"
             )
+
 
             self.assertEqual(is_in_dialout, True)
             mock_get_locale.assert_called()
@@ -589,6 +600,11 @@ class TestAboutScreen(GraphicUnitTest):
         """Test that is_user_in_dialout_group returns False when grp import raises ImportError"""
         screen = GreetingsScreen()
 
+        # Get __import__ correctly whether __builtins__ is dict or module
+        if isinstance(__builtins__, dict):
+            original_import = __builtins__["__import__"]
+        else:
+            original_import = __builtins__.__import__
         # Get __import__ correctly whether __builtins__ is dict or module
         if isinstance(__builtins__, dict):
             original_import = __builtins__["__import__"]

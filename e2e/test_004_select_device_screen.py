@@ -3,6 +3,7 @@ from kivy.base import EventLoop, EventLoopBase
 from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 from src.utils.constants import VALID_DEVICES_VERSIONS
+from src.utils.constants import VALID_DEVICES_VERSIONS
 from src.app.screens.select_device_screen import SelectDeviceScreen
 
 
@@ -160,8 +161,15 @@ class TestSelectDeviceScreen(GraphicUnitTest):
             for device, info in VALID_DEVICES_VERSIONS.items()
             if info["final"] is None
         ]
+        valid_ids = [
+            f"select_device_{device}"
+            for device, info in VALID_DEVICES_VERSIONS.items()
+            if info["final"] is None
+        ]
 
         for button in grid.children:
+            if button.id in valid_ids:
+                screen.set_background(wid=button.id, rgba=(0.25, 0.25, 0.25, 1))
             if button.id in valid_ids:
                 screen.set_background(wid=button.id, rgba=(0.25, 0.25, 0.25, 1))
                 calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
@@ -244,6 +252,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
                 "select_device_dock",
                 "select_device_yahboom",
                 "select_device_cube",
+                "select_device_embed_fire",
                 "select_device_embed_fire",
             ):
                 calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 1)))

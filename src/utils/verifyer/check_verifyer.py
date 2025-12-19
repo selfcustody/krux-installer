@@ -32,7 +32,12 @@ from .base_verifyer import BaseVerifyer
 class CheckVerifyer(BaseVerifyer):
     """basic class for *CheckVerifyer class (do not use directly)"""
 
-    def __init__(self, filename: str, read_mode: str, regexp: typing.re):
+    def __init__(
+        self,
+        filename: str,
+        read_mode: str,
+        regexp: typing.Union[str, typing.Pattern[str]],
+    ):
         if not re.findall(regexp, filename):
             raise ValueError(f"Invalid file: {filename} do not assert with {regexp}")
 

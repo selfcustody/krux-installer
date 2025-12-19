@@ -28,6 +28,7 @@ from kivy.clock import Clock
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
 from src.utils.constants import VALID_DEVICES
+from src.utils.constants import VALID_DEVICES
 
 
 class DownloadBetaScreen(BaseDownloadScreen):
@@ -108,6 +109,7 @@ class DownloadBetaScreen(BaseDownloadScreen):
                     self.redirect_exception(exception=error)
 
             if key == "device":
+                if value in VALID_DEVICES:
                 if value in VALID_DEVICES:
                     self.device = value
                 else:

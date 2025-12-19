@@ -29,6 +29,7 @@ import typing
 from http.client import HTTPResponse
 import requests
 from src.utils.constants import VALID_DEVICES
+from src.utils.constants import VALID_DEVICES
 from ..trigger import Trigger
 
 

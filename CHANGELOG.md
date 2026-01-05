@@ -1,13 +1,40 @@
-# CHANGELOG
+# 0.0.22
+
+- Add Wonder K device support;
+- Add Tor proxy support for Tails OS;
+- Fix ESC button killing application and red circles on
+  non-primary mouse clicks;
+- Fix build issues;
+- Fix Artix Linux compatibility;
+- Replace deprecated `typing.re` with `typing.Pattern`;
+- Refactor how new devices are added to the installer;
+- Remove unused libs: `pyzbar`, `opencv`, `pillow`, `olefile`;
+- Update Python version for Nix;
+- Add Conventional Commits 1.0.0 enforcement to CI;
+
+## 0.0.21
+
+- Update outdated deps: `kivy`, `cryptography`, `black`, `poethepoet` and
+  their subdependencies;
+- Add Nix compatibility;
+- Add TZT device support;
+- Add Embed Fire device support;
+- Increase delay between requests;
+- Rename `krux-installer.py` to `krux_installer.py` for Poetry
+  compatibility;
+- Fix E2E test race conditions in CI;
+- Update build actions;
+- Update repository URL in README;
+- Update to Python 3.14 and bump `pysudoer`;
 
 ## 0.0.20
 
 - Automatic check of latest official firmware;
 - Optional selection of older firmware versions;
-- Supported devices: M5stickV, Sipeed Amigo, Sipeed Bit, Sipeed Dock, Sipeed Cube, Yahboom,
-WonderMV;
+- Supported devices: M5stickV, Sipeed Amigo, Sipeed Bit, Sipeed Dock,
+  Sipeed Cube, Yahboom, WonderMV;
 - Flash official firmware with automatic integrity/authenticity verification;
-- Flash beta firmware  devices;
+- Flash beta firmware devices;
 - Air-gap update devices with SDcard;
 - Wipe devices;
 - 12 locale support;
@@ -15,51 +42,51 @@ WonderMV;
 - Fixed Fedora crashes;
 - Better error handling during flash procedure;
 - Better error handling during wipe procedure;
-- Better error handling during air-gap update procedure;
+- Better error handling during air-gapped update procedure;
 
 ## 0.0.20-beta
 
-**Major update**
+### Major update
 
-* make an airgapped update: 
-  * user will be requested to insert a SDCard on computer;
-  * user can select among recognized removable drives;
-  * both `firmware.bin` and `firmware.bin.sig` will be copied to sdcard;
-  * after the copy, user will be requested to eject sdcard and insert it on device;
-  * at same time, the `firmware.bin`'s  computed hash will appear to compare with the computed hash
-  on device;
+- Make an airgapped update:
+  - user will be requested to insert a SDCard on computer;
+  - user can select among recognized removable drives;
+  - both `firmware.bin` and `firmware.bin.sig` will be copied to sdcard;
+  - after the copy, user will be requested to eject sdcard and insert it on
+    device;
+  - at same time, the `firmware.bin`'s computed hash will appear to compare
+    with the computed hash on device;
 
-**Minor updates**
+### Minor updates
 
-* added support to de_DE locale;
-* added support to ja_JP locale;
-* fixes on Windows bug that didn't allow users to select a custom asset folder;
+- Added support to de_DE locale;
+- Added support to ja_JP locale;
+- Fixes on Windows bug that didn't allow users to select a custom asset folder;
 
 ## 0.0.20-alpha-3
 
-- Fix the bug that crash when a new firmware version is added on `selfcustody/krux`, but not it
-isnt a valid one in `VALID_DEVICES_VERSIONS`;
-- The fix suggested by @odudex to manage new versions (good when a hot fix is made) in line 101 of
-`src/app/screens/select_device_screen.py`;
+- Fix the bug that crash when a new firmware version is added on
+  `selfcustody/krux`, but not it isnt a valid one in
+  `VALID_DEVICES_VERSIONS`;
+- The fix suggested by @odudex to manage new versions (good when a hot fix is
+  made) in line 101 of `src/app/screens/select_device_screen.py`;
 
 ## 0.0.20-alpha-2
 
-- Changed the version from `0.0.2-alpha` to `0.0.20-alpha-2` as suggested by @odudex;
+- Changed the version from `0.0.2-alpha` to `0.0.20-alpha-2` as suggested by
+  @odudex;
 - Refactored the code a little bit to be more pythonic;
 - Removed startup messages as suggested by @tadeubas:
   - On linux the `GreetingsScreen` class will check:
-    - if user is on `dialout`/`uucp` group (debian and fedora based / archlinux);
-    - internet connection
-  - On MacOS an Windows the `GreetingsScreen` class will check:
+    - if user is on `dialout`/`uucp` group
+    (debian and fedora based / archlinux);
+  - On MacOS and Windows the `GreetingsScreen` class will check:
     - internet connection
 - Added the window resize behaviour;
 - Removed fullscreen on startup;
-- Fedora and Ubuntu:
-  - fixed desktop icon entry on `.ci/create-deb`;
-  - fixed desktop icon entry on `.ci/create-rpm`;
-- Added more tests:
-  - ask_permissions_dialout_screen;
-  - error_screen.
+- fixed desktop icon entry on `.ci/create-deb`;
+- fixed desktop icon entry on `.ci/create-rpm`;
+- Added more tests.
 
 ## 0.0.2-alpha
 
@@ -112,5 +139,5 @@ isnt a valid one in `VALID_DEVICES_VERSIONS`;
   - to suit `wdio-electron-service` major updates that break E2E tests;
   - renamed extensions to `mts` to suit `vite-plugin-electron`;
   - updated krux firmware version checks to `23.09.1`;
-- Updated `openssl` for windows to `3.2.0` *;
+- Updated `openssl` for Windows to `3.2.0`;
 - Removed MacOS release since the current approach did not worked well on MacOS;

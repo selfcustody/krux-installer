@@ -5,20 +5,23 @@ on:
     branches:
       - main
       - develop
-
+      
   pull_request:
     branches:
       - main
 
 jobs:
+  
   black:
+
     runs-on: ubuntu-latest
     steps:
+      
       - uses: actions/checkout@v6
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.12.3"
+          python-version: '3.12.3'
           architecture: x64
 
       - name: Install uv
@@ -26,7 +29,7 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-
+      
       - name: Install uv dependencies
         run: uv sync --all-extras
 
@@ -36,20 +39,22 @@ jobs:
           uv run poe format-tests --check --verbose
           uv run poe format-e2e --check --verbose
           uv run poe format-installer --check --verbose
+          
+  lint:
 
-  pylint:
     needs: black
-
+    
     runs-on: ubuntu-latest
-
+    
     steps:
+      
       - uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.12.3"
+          python-version: '3.12.3'
           architecture: x64
 
       - name: Install uv
@@ -60,35 +65,37 @@ jobs:
 
       - name: Install uv dependencies
         run: uv sync --all-extras
-
+        
       - name: Lint src
         run: uv run poe lint
-
+  
   pytest:
-    needs: pylint
+
+    needs: lint
 
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
             arch: x64
-
+            
           - os: windows-latest
             arch: x64
-
+                        
           - os: macos-15
             arch: arm64
-
+        
     runs-on: ${{ matrix.os }}
-
+    
     steps:
+      
       - uses: actions/checkout@v6
         with:
           submodules: recursive
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.12.3"
+          python-version: '3.12.3'
           architecture: ${{ matrix.arch }}
 
       - name: Install uv
@@ -96,13 +103,10 @@ jobs:
         with:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
-
+                 
       - name: Install project and its dependencies
         run: uv sync --all-extras
-
-      - name: Fetch firmware binaries
-        run: uv sync --extra builder && uv run poe fetch-firmware
-
+        
       - name: Run tests with coverage (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: coactions/setup-xvfb@v1.0.1
@@ -121,9 +125,9 @@ jobs:
       - name: Run tests (MacOS)
         if: ${{ runner.os == 'macOS' }}
         run: uv run poe test-unit
-
+        
       - name: Run tests (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
-          KIVY_GL_BACKEND: "angle_sdl2"
+          KIVY_GL_BACKEND: 'angle_sdl2'
         run: uv run poe test

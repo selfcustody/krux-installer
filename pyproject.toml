@@ -28,6 +28,7 @@ pyinstaller = "^6.16.0"
 pytest-cov = "^6.3.0"
 poethepoet = "^0.39.0"
 demjson3 = "^3.0.6"
+pymarkdownlnt = "^0.9.34"
 
 [tool.poe.tasks]
 cli = "python src/krux_installer.py"
@@ -60,6 +61,7 @@ lint.sequence = [
   { cmd = "pylint --rcfile=.pylint/tests ./tests" },
   { cmd = "pylint --rcfile=.pylint/tests ./e2e" },
   { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives" },
+  { cmd = "pymarkdownlnt -d MD013,MD033,MD036 -e MD024 scan *.md" },
 ]
 
 build-linux.sequence = [

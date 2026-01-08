@@ -1,11 +1,30 @@
 # CHANGELOG
 
+## 0.0.21
+
+- Update outdated sources by @qlrd in [\#134](https://github.com/selfcustody/krux-installer/pull/134);
+- feat: making it compatible with nix by @j-moreno-c-r in [\#158](https://github.com/selfcustody/krux-installer/pull/158);
+- Add tzt device support to the installer by @j-moreno-c-r in [\#162](https://github.com/selfcustody/krux-installer/pull/162);
+- Bump qrcode from 8.0 to 8.2 by @dependabot[bot] in [\#145](https://github.com/selfcustody/krux-installer/pull/145);
+- Bump actions/checkout from 4 to 5 by @dependabot[bot] in [\#153](https://github.com/selfcustody/krux-installer/pull/153);
+- Bump actions/github-script from 7 to 8 by @dependabot[bot] in [\#154](https://github.com/selfcustody/krux-installer/pull/154);
+- Bump actions/setup-python from 5 to 6 by @dependabot[bot] in [\#155](https://github.com/selfcustody/krux-installer/pull/155);
+- Bump actions/upload-artifact from 4 to 5 by @dependabot[bot] in [\$164](https://github.com/selfcustody/krux-installer/pull/164);
+- Increase Delay Between Requests by @odudex in [\#165](https://github.com/selfcustody/krux-installer/pull/165);
+- Rename Main Python File for Poetry Compatibility by @odudex in [\#167](https://github.com/selfcustody/krux-installer/pull/167);
+- Fix Test Race Conditions by @odudex in [\#168](https://github.com/selfcustody/krux-installer/pull/168);
+- Update Build Actions by @odudex in [\#169](https://github.com/selfcustody/krux-installer/pull/169);
+- Add support for Embed Fire device by @odudex in [\#171](https://github.com/selfcustody/krux-installer/pull/171);
+- Update repository URL in README by @newtonick in [\#172](https://github.com/selfcustody/krux-installer/pull/172);
+- fix: update outdated packages by @qlrd in [\#174](https://github.com/selfcustody/krux-installer/pull/174);
+- fix: update to py314 by @qlrd in [\#176](https://github.com/selfcustody/krux-installer/pull/176);
+
 ## 0.0.20
 
 - Automatic check of latest official firmware;
 - Optional selection of older firmware versions;
-- Supported devices: M5stickV, Sipeed Amigo, Sipeed Bit, Sipeed Dock, Sipeed Cube, Yahboom,
-WonderMV;
+- Supported devices: M5stickV, Sipeed Amigo, Sipeed Bit, Sipeed Dock,
+Sipeed Cube, Yahboom, WonderMV;
 - Flash official firmware with automatic integrity/authenticity verification;
 - Flash beta firmware  devices;
 - Air-gap update devices with SDcard;
@@ -19,47 +38,39 @@ WonderMV;
 
 ## 0.0.20-beta
 
-**Major update**
-
-* make an airgapped update: 
-  * user will be requested to insert a SDCard on computer;
-  * user can select among recognized removable drives;
-  * both `firmware.bin` and `firmware.bin.sig` will be copied to sdcard;
-  * after the copy, user will be requested to eject sdcard and insert it on device;
-  * at same time, the `firmware.bin`'s  computed hash will appear to compare with the computed hash
-  on device;
-
-**Minor updates**
-
-* added support to de_DE locale;
-* added support to ja_JP locale;
-* fixes on Windows bug that didn't allow users to select a custom asset folder;
+- Make an airgapped update;
+- user will be requested to insert a SDCard on computer;
+- user can select among recognized removable drives;
+- both `firmware.bin` and `firmware.bin.sig` will be copied to sdcard;
+- after the copy, user will be requested to eject sdcard and insert it on
+  device;
+- at same time, the `firmware.bin`'s  computed hash will appear to compare
+with the computed hash on device;
+- added support to de_DE locale;
+- added support to ja_JP locale;
+- fixes on Windows bug that didn't allow users to select a custom asset folder;
 
 ## 0.0.20-alpha-3
 
-- Fix the bug that crash when a new firmware version is added on `selfcustody/krux`, but not it
-isnt a valid one in `VALID_DEVICES_VERSIONS`;
-- The fix suggested by @odudex to manage new versions (good when a hot fix is made) in line 101 of
-`src/app/screens/select_device_screen.py`;
+- Fix the bug that crash when a new firmware version is added on `selfcustody/krux`,
+but not it isnt a valid one in `VALID_DEVICES_VERSIONS`;
+- The fix suggested by @odudex to manage new versions (good when a hot fix is made)
+in line 101 of `src/app/screens/select_device_screen.py`;
 
 ## 0.0.20-alpha-2
 
 - Changed the version from `0.0.2-alpha` to `0.0.20-alpha-2` as suggested by @odudex;
 - Refactored the code a little bit to be more pythonic;
 - Removed startup messages as suggested by @tadeubas:
-  - On linux the `GreetingsScreen` class will check:
-    - if user is on `dialout`/`uucp` group (debian and fedora based / archlinux);
-    - internet connection
-  - On MacOS an Windows the `GreetingsScreen` class will check:
-    - internet connection
+- On linux the `GreetingsScreen` class will check:
+- if user is on `dialout`/`uucp` group (debian and fedora based / archlinux);
+- On MacOS an Windows the `GreetingsScreen` class will check
+internet connection
 - Added the window resize behaviour;
 - Removed fullscreen on startup;
-- Fedora and Ubuntu:
-  - fixed desktop icon entry on `.ci/create-deb`;
-  - fixed desktop icon entry on `.ci/create-rpm`;
-- Added more tests:
-  - ask_permissions_dialout_screen;
-  - error_screen.
+- fixed desktop icon entry on `.ci/create-deb`;
+- fixed desktop icon entry on `.ci/create-rpm`;
+- Added more tests.
 
 ## 0.0.2-alpha
 
@@ -112,5 +123,5 @@ isnt a valid one in `VALID_DEVICES_VERSIONS`;
   - to suit `wdio-electron-service` major updates that break E2E tests;
   - renamed extensions to `mts` to suit `vite-plugin-electron`;
   - updated krux firmware version checks to `23.09.1`;
-- Updated `openssl` for windows to `3.2.0` *;
+- Updated `openssl` for windows to `3.2.0`;
 - Removed MacOS release since the current approach did not worked well on MacOS;

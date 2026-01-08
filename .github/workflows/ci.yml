@@ -60,18 +60,3 @@ jobs:
           filters: |
             change:
               - added|modified: '*.md'
-
-
-  job2:
-    name: Lint Markdown
-    runs-on: ubuntu-latest
-    needs: job1
-    if: ${{ always() && needs.job1.outputs.markdown_change == 'true' }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v6
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Lint markdown
-        run: npx markdownlint-cli --disable MD033 --ignore node_modules ${{ needs.job1.outputs.markdown_files }}

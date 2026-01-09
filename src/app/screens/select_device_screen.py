@@ -40,7 +40,7 @@ class SelectDeviceScreen(BaseScreen):
             wid="select_device_screen", name="SelectDeviceScreen", **kwargs
         )
         self.enabled_devices = []
-        self.make_grid(wid="select_device_screen_grid", rows=9)
+        self.make_grid(wid="select_device_screen_grid", rows=10)
         for row, device in enumerate(VALID_DEVICES):
 
             def on_press(instance):

@@ -209,6 +209,19 @@ class TestBaseFlasher(TestCase):
     @patch(
         "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
     )
+    def test_set_port_wonder_k(self, mock_grep):
+        f = BaseFlasher()
+        f.port = "wonder_k"
+        mock_grep.assert_called_once_with("7523")
+
+    def test_set_board_wonder_k(self):
+        f = BaseFlasher()
+        f.board = "wonder_k"
+        self.assertEqual(f.board, "dan")
+
+    @patch(
+        "src.utils.flasher.base_flasher.list_ports.grep", new_callable=MockListPortsGrep
+    )
     def test_other_devices_no_baudrate_limit(self, mock_grep):
         """Test that other devices can use high baudrates without capping"""
         f = BaseFlasher()

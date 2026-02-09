@@ -43,6 +43,7 @@ VALID_DEVICES = [
     "wonder_mv",
     "tzt",
     "embed_fire",
+    "wonder_k",
 ]
 
 VALID_DEVICES_VERSIONS = {
@@ -79,6 +80,10 @@ VALID_DEVICES_VERSIONS = {
         "final": None,
     },
     "embed_fire": {
+        "initial": "v25.11.0",
+        "final": None,
+    },
+    "wonder_k": {
         "initial": "v25.11.0",
         "final": None,
     },

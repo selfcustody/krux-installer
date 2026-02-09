@@ -64,16 +64,18 @@ class TestSelectDeviceScreen(GraphicUnitTest):
         grid = window.children[0].children[0]
         buttons = grid.children
 
-        self.assertEqual(len(buttons), 9)
-        self.assertEqual(buttons[8].id, "select_device_m5stickv")
-        self.assertEqual(buttons[7].id, "select_device_amigo")
-        self.assertEqual(buttons[6].id, "select_device_dock")
-        self.assertEqual(buttons[5].id, "select_device_bit")
-        self.assertEqual(buttons[4].id, "select_device_yahboom")
-        self.assertEqual(buttons[3].id, "select_device_cube")
-        self.assertEqual(buttons[2].id, "select_device_wonder_mv")
-        self.assertEqual(buttons[1].id, "select_device_tzt")
-        self.assertEqual(buttons[0].id, "select_device_embed_fire")
+        self.assertEqual(len(buttons), 10)
+        self.assertEqual(buttons[9].id, "select_device_m5stickv")
+        self.assertEqual(buttons[8].id, "select_device_amigo")
+        self.assertEqual(buttons[7].id, "select_device_dock")
+        self.assertEqual(buttons[6].id, "select_device_bit")
+        self.assertEqual(buttons[5].id, "select_device_yahboom")
+        self.assertEqual(buttons[4].id, "select_device_cube")
+        self.assertEqual(buttons[3].id, "select_device_wonder_mv")
+        self.assertEqual(buttons[2].id, "select_device_tzt")
+        self.assertEqual(buttons[1].id, "select_device_embed_fire")
+        self.assertEqual(buttons[0].id, "select_device_wonder_k")
+
         mock_get_locale.assert_called_once()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -245,6 +247,7 @@ class TestSelectDeviceScreen(GraphicUnitTest):
                 "select_device_yahboom",
                 "select_device_cube",
                 "select_device_embed_fire",
+                "select_device_wonder_k",
             ):
                 calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
                 calls_manager.append(call("MainScreen"))

@@ -243,6 +243,10 @@ class TestIsDeviceValidForVersion(TestCase):
         result = is_device_valid_for_version("embed_fire", "v25.11.0")
         self.assertTrue(result)
 
+    def test_wonder_k_valid_at_initial(self):
+        result = is_device_valid_for_version("wonder_k", "v25.11.0")
+        self.assertTrue(result)
+
 
 class TestGetValidDevicesForVersion(TestCase):
     def test_get_valid_devices_early_version(self):
@@ -281,10 +285,12 @@ class TestGetValidDevicesForVersion(TestCase):
         self.assertIn("tzt", result)
         self.assertIn("bit", result)
         self.assertNotIn("embed_fire", result)
+        self.assertNotIn("wonder_k", result)
 
     def test_get_valid_devices_v25_11_0(self):
         result = get_valid_devices_for_version("v25.11.0")
         self.assertIn("embed_fire", result)
+        self.assertIn("wonder_k", result)
         self.assertNotIn("bit", result)
 
     def test_get_valid_devices_future_version(self):
@@ -312,6 +318,11 @@ class TestGetDeviceSupportInfo(TestCase):
 
     def test_get_device_support_info_embed_fire(self):
         result = get_device_support_info("embed_fire")
+        self.assertEqual(result["initial"], "v25.11.0")
+        self.assertIsNone(result["final"])
+
+    def test_get_device_support_info_wonder_k(self):
+        result = get_device_support_info("wonder_k")
         self.assertEqual(result["initial"], "v25.11.0")
         self.assertIsNone(result["final"])
 

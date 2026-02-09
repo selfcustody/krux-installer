@@ -64,6 +64,7 @@ class BaseFlasher(Trigger):
         "yahboom": "7523",
         "wonder_mv": "7523",
         "embed_fire": "7523",
+        "wonder_k": "7523",
         "tzt": "55d3",
     }
 
@@ -80,6 +81,7 @@ class BaseFlasher(Trigger):
         "wonder_mv": "dan",
         "tzt": "dan",
         "embed_fire": "dan",
+        "wonder_k": "dan",
     }
 
     def __init__(self):

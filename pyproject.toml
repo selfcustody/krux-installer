@@ -19,12 +19,12 @@ cryptography = "^46.0.4"
 qrcode = "^8.2"
 easy-i18n = "^1.2.0"
 pysudoer = { git = "https://github.com/qlrd/pysudoer.git" }
-pyinstaller = "^6.16.0"
+pyinstaller = "^6.18.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^25.11.0"
 pylint = "^4.0.4"
-pyinstaller = "^6.16.0"
+pyinstaller = "^6.18.0"
 pytest-cov = "^6.3.0"
 poethepoet = "^0.39.0"
 demjson3 = "^3.0.6"

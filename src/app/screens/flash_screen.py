@@ -21,6 +21,7 @@
 """
 main_screen.py
 """
+
 import threading
 import traceback
 from functools import partial

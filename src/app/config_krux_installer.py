@@ -21,6 +21,7 @@
 """
 config_krux_installer.py
 """
+
 import os
 import sys
 import json

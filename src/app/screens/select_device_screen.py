@@ -21,6 +21,7 @@
 """
 select_device_screen.py
 """
+
 import re
 from functools import partial
 from kivy.clock import Clock

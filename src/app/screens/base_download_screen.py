@@ -21,6 +21,7 @@
 """
 base_download_screen.py
 """
+
 import typing
 from functools import partial
 from threading import Thread

@@ -22,6 +22,7 @@
 """
 __init__.py
 """
+
 # pylint: disable=unused-import
 from .zip_downloader import ZipDownloader
 from .sha256_downloader import Sha256Downloader

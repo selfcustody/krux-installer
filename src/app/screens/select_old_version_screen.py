@@ -21,6 +21,7 @@
 """
 select_old_version_screen.py
 """
+
 # pylint: disable=no-name-in-module
 import typing
 from functools import partial

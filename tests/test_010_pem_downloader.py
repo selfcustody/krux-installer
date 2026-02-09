@@ -2,7 +2,6 @@ from unittest import TestCase
 from unittest.mock import patch
 from src.utils.downloader import PemDownloader
 
-
 URL = "https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem"
 
 

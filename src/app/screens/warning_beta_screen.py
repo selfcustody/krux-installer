@@ -21,6 +21,7 @@
 """
 about_screen.py
 """
+
 from functools import partial
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen

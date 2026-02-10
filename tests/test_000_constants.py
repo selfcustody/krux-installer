@@ -25,11 +25,13 @@ PYPROJECT_MISSING_KEYS = """[tool.poetry]
 name = "test"
 description = "Missing version key"
 """
+description = "Hello World!\""""
 
 MOCK_TOML_DATA = {
     "tool": {
         "poetry": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
     },
+    "project": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
 }
 
 
@@ -69,12 +71,10 @@ class TestConstants(TestCase):
         self.assertEqual(
             data,
             {
-                "tool": {
-                    "poetry": {
-                        "name": "test",
-                        "version": "0.0.1",
-                        "description": "Hello World!",
-                    }
+                "project": {
+                    "name": "test",
+                    "version": "0.0.1",
+                    "description": "Hello World!",
                 }
             },
         )

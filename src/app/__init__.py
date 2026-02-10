@@ -22,15 +22,18 @@
 __init__.py
 """
 
-# fix: red circles apearing when another inputs are received instead of the left mouse button.
-import os;
+import os
+import sys
+
+# fix: red circles appearing when other inputs are received instead of the left mouse button.
 
 os.environ.setdefault("KIVY_MOUSE_MODE", "disable_multitouch")
 
+# pylint: disable=wrong-import-position
 from kivy.config import Config
+
 Config.set("input", "mouse", "mouse,disable_multitouch")
 
-import sys
 from kivy.core.window import Window
 from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.about_screen import AboutScreen
@@ -64,6 +67,9 @@ from src.app.screens.warning_before_airgap_update_screen import (
 from src.app.screens.warning_after_airgap_update_screen import (
     WarningAfterAirgapUpdateScreen,
 )
+
+# pylint: enable=wrong-import-position
+
 
 class KruxInstallerApp(ConfigKruxInstaller):
     """KruxInstallerApp is the Root widget"""
@@ -120,13 +126,14 @@ class KruxInstallerApp(ConfigKruxInstaller):
 
         return self.screen_manager
 
-    def _on_current_screen(self, instance, value):
+    def _on_current_screen(self, _instance, value):
         if not hasattr(self, "_screen_history") or self._screen_history is None:
             self._screen_history = []
         if not self._screen_history or self._screen_history[-1] != value:
             self._screen_history.append(value)
 
-    def _on_key_down(self, window, key, scancode, codepoint, modifiers):
+    def _on_key_down(self, _window, key, *_):
+        # key == 27 is ESC
         if key == 27:
             if len(self._screen_history) > 1:
                 self._screen_history.pop()
@@ -135,3 +142,4 @@ class KruxInstallerApp(ConfigKruxInstaller):
                 self.screen_manager.current = prev
                 return True
             return False
+        return False

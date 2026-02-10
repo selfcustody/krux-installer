@@ -22,6 +22,14 @@
 __init__.py
 """
 
+# fix: red circles apearing when another inputs are received instead of the left mouse button.
+import os;
+
+os.environ.setdefault("KIVY_MOUSE_MODE", "disable_multitouch")
+
+from kivy.config import Config
+Config.set("input", "mouse", "mouse,disable_multitouch")
+
 import sys
 from kivy.core.window import Window
 from src.app.config_krux_installer import ConfigKruxInstaller
@@ -57,17 +65,15 @@ from src.app.screens.warning_after_airgap_update_screen import (
     WarningAfterAirgapUpdateScreen,
 )
 
-
 class KruxInstallerApp(ConfigKruxInstaller):
     """KruxInstallerApp is the Root widget"""
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Window.maximize()
-        # Window.fullscreen = 'auto'
         Window.size = (1000, 800)
         self.debug(f"Window.size={Window.size}")
         Window.clearcolor = (0.9, 0.9, 0.9, 1)
+        self._screen_history = []
 
     def build(self):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
@@ -106,4 +112,26 @@ class KruxInstallerApp(ConfigKruxInstaller):
             self.debug(msg)
             self.screen_manager.add_widget(screen)
 
+        self._screen_history = []
+        self.screen_manager.bind(current=self._on_current_screen)
+        if self.screen_manager.current is not None:
+            self._screen_history.append(self.screen_manager.current)
+        Window.bind(on_key_down=self._on_key_down)
+
         return self.screen_manager
+
+    def _on_current_screen(self, instance, value):
+        if not hasattr(self, "_screen_history") or self._screen_history is None:
+            self._screen_history = []
+        if not self._screen_history or self._screen_history[-1] != value:
+            self._screen_history.append(value)
+
+    def _on_key_down(self, window, key, scancode, codepoint, modifiers):
+        if key == 27:
+            if len(self._screen_history) > 1:
+                self._screen_history.pop()
+                prev = self._screen_history[-1]
+                self.screen_manager.transition.direction = "right"
+                self.screen_manager.current = prev
+                return True
+            return False

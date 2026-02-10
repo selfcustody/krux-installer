@@ -22,6 +22,7 @@
 """
 asset_downloader.py
 """
+
 import os
 import typing
 from .stream_downloader import StreamDownloader

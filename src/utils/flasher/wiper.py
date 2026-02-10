@@ -22,6 +22,7 @@
 """
 wiper.py
 """
+
 import sys
 from src.utils.flasher.base_flasher import BaseFlasher
 from src.utils.selector import VALID_DEVICES

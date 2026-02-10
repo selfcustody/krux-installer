@@ -13,7 +13,7 @@ from src.utils.constants import (
     get_device_support_info,
 )
 
-PYPROJECT_STR = """[tool.poetry]
+PYPROJECT_STR = """[project]
 name = "test"
 version = "0.0.1"
 description = "Hello World!"
@@ -21,17 +21,13 @@ description = "Hello World!"
 
 PYPROJECT_INVALID = """Not a valid TOML format"""
 
-PYPROJECT_MISSING_KEYS = """[tool.poetry]
+PYPROJECT_MISSING_KEYS = """[project]
 name = "test"
 description = "Missing version key"
 """
-description = "Hello World!\""""
 
 MOCK_TOML_DATA = {
-    "tool": {
-        "poetry": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
-    },
-    "project": {"name": "test", "version": "0.0.1", "description": "Hello World!"}
+    "project": {"name": "test", "version": "0.0.1", "description": "Hello World!"},
 }
 
 

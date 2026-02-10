@@ -22,12 +22,12 @@
 """
 base_signer.py
 """
+
 import os
 import re
 import base64
 import typing
 from ..trigger import Trigger
-
 
 ASN1_STRUCTURE_FOR_PUBKEY = "3036301006072A8648CE3D020106052B8104000A032200"
 """

@@ -22,6 +22,7 @@
 """
 base_flasher.py
 """
+
 import os
 from serial import Serial
 from serial.serialutil import SerialException

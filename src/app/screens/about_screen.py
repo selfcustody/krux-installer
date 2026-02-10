@@ -21,6 +21,7 @@
 """
 about_screen.py
 """
+
 import webbrowser
 from functools import partial
 from kivy.clock import Clock

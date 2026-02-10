@@ -22,6 +22,7 @@
 """
 __init__.py
 """
+
 # pylint: disable=unused-import
 from .sha256_check_verifyer import Sha256CheckVerifyer
 from .sig_check_verifyer import SigCheckVerifyer

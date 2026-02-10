@@ -30,7 +30,6 @@ import sys
 import os
 import re
 
-
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
 VALID_DEVICES = [

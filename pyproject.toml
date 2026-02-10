@@ -7,29 +7,31 @@ authors = [
 ]
 license = {text = "LICENSE"}
 readme = "README.md"
+requires-python = ">3.10,<=3.14"
 
-[tool.poetry.dependencies]
-python = ">3.10,<=3.14"
-kivy = "2.3.1"
-tomli = { version = "^2.4.0", python = "<3.11" }
-pyserial = "^3.5"
-requests = "^2.32.5"
-cryptography = "^46.0.4"
-qrcode = "^8.2"
-easy-i18n = "^1.2.0"
-pysudoer = { git = "https://github.com/qlrd/pysudoer.git" }
-pyinstaller = "^6.18.0"
+dependencies = [
+    "kivy==2.3.1",
+    "tomli>=2.4.0,<3.0.0; python_version<'3.11'",
+    "pyserial>=3.5,<4.0.0",
+    "requests>=2.32.5,<3.0.0",
+    "cryptography>=46.0.4,<47.0.0",
+    "qrcode>=8.2,<9.0",
+    "easy-i18n>=1.2.0,<2.0.0",
+    "pysudoer @ git+https://github.com/qlrd/pysudoer.git",
+    "pyinstaller>=6.18.0,<7.0.0",
+]
 
-[tool.poetry.group.dev.dependencies]
-black = "^26.1.0"
-pylint = "^4.0.4"
-pyinstaller = "^6.18.0"
-pytest-cov = "^6.3.0"
-poethepoet = "^0.41.0"
-demjson3 = "^3.0.6"
-
+[project.optional-dependencies]
+dev = [
+    "black>=26.1.0,<27.0.0",
+    "pylint>=4.0.4,<5.0.0",
+    "pyinstaller>=6.18.0,<7.0.0",
+    "pytest-cov>=6.3.0,<7.0.0",
+    "poethepoet>=0.41.0,<1.0.0",
+    "demjson3>=3.0.6,<4.0.0",
+]
 [tool.poe.tasks]
-cli = "python src/krux_installer.py"
+cli = "python krux_installer.py"
 format-src = "black ./src"
 format-tests = "black ./tests"
 format-e2e = "black ./e2e"
@@ -90,7 +92,7 @@ cmd = "python krux_installer.py"
 
 [tool.poe.tasks.dev]
 env = { LOGLEVEL = "info" }
-cmd = "python krux-installer.py"
+cmd = "python krux_installer.py"
 
 [tool.hatch.metadata]
 allow-direct-references = true

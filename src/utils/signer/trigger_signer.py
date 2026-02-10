@@ -22,6 +22,7 @@
 """
 signer.py
 """
+
 import hashlib
 from .base_signer import BaseSigner
 

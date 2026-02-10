@@ -4,7 +4,6 @@ from src.utils.constants import VALID_DEVICES
 from src.utils.downloader import BetaDownloader
 from .shared_mocks import PropertyInstanceMock
 
-
 BASE_URL = "https://raw.githubusercontent.com/odudex/krux_binaries/main"
 
 

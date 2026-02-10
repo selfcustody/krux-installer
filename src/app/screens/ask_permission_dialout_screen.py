@@ -21,6 +21,7 @@
 """
 check_permissions_screen.py
 """
+
 from functools import partial
 from pysudoer import SudoerLinux
 from kivy.clock import Clock

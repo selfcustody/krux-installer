@@ -21,6 +21,7 @@
 """
 verify_stable_zip_screen.py
 """
+
 import os
 from functools import partial
 import typing

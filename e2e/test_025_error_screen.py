@@ -6,6 +6,8 @@ from kivy.tests.common import GraphicUnitTest
 from kivy.core.text import LabelBase, DEFAULT_FONT
 from src.app.screens.error_screen import ErrorScreen
 
+os.environ.setdefault("KIVY_VISUALS", "none")
+
 
 class TestErrorScreen(GraphicUnitTest):
 
@@ -18,12 +20,20 @@ class TestErrorScreen(GraphicUnitTest):
         noto_sans_path = os.path.join(assets_path, font_name)
         LabelBase.register(DEFAULT_FONT, noto_sans_path)
 
+        cls._patch_bind = patch(
+            "kivy.core.window.Window.bind", new=lambda *a, **k: None
+        )
+        cls._patch_bind.start()
+
     @classmethod
     def teardown_class(cls):
-        # Unschedule all pending Clock events to prevent race conditions
-        # with subsequent tests
         for event in Clock.get_events():
             Clock.unschedule(event)
+        if getattr(cls, "_patch_bind", None):
+            try:
+                cls._patch_bind.stop()
+            except RuntimeError:
+                pass
         EventLoop.exit()
 
     @patch(
@@ -32,11 +42,9 @@ class TestErrorScreen(GraphicUnitTest):
     def test_init(self, mock_get_locale):
         screen = ErrorScreen()
 
-        # default assertions
         self.assertTrue("error_screen_grid" in screen.ids)
         self.assertTrue("error_screen_label" in screen.ids)
 
-        # patch assertions
         mock_get_locale.assert_called_once()
 
     @patch(
@@ -47,7 +55,6 @@ class TestErrorScreen(GraphicUnitTest):
         screen.manager = MagicMock()
         screen.manager.screen_names = ["KruxInstallerApp", screen.name]
 
-        # get your Window instance safely
         label = screen.ids[f"{screen.id}_label"]
 
         error = RuntimeError("Error: mocked error: at test")
@@ -83,7 +90,6 @@ class TestErrorScreen(GraphicUnitTest):
 
         self.assertEqual(label.text, text)
 
-        # patch assertions
         mock_get_locale.assert_called_once()
 
     @patch(

@@ -1,12 +1,11 @@
-[virtualenvs]
-prefer-active-python = true
-
-[tool.poetry]
-name = "krux_installer"
+[project]
+name = "krux-installer"
 version = "0.0.22"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
-authors = ["qlrd <qlrddev@gmail.com>"]
-license = "LICENSE"
+authors = [
+    {name = "qlrd", email = "qlrddev@gmail.com"}
+]
+license = {text = "LICENSE"}
 readme = "README.md"
 
 [tool.poetry.dependencies]
@@ -91,8 +90,14 @@ cmd = "python krux_installer.py"
 
 [tool.poe.tasks.dev]
 env = { LOGLEVEL = "info" }
-cmd = "python krux_installer.py"
+cmd = "python krux-installer.py"
+
+[tool.hatch.metadata]
+allow-direct-references = true
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

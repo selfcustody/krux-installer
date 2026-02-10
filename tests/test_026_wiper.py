@@ -22,6 +22,7 @@
 """
 base_flasher.py
 """
+
 from unittest import TestCase
 from unittest.mock import patch, call, MagicMock
 from src.utils.flasher import Wiper

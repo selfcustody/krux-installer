@@ -22,6 +22,7 @@
 """
 firmware_unzip.py
 """
+
 import tempfile
 from .base_unzip import BaseUnzip
 

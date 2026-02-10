@@ -21,6 +21,7 @@
 """
 about_screen.py
 """
+
 from typing import Any
 from functools import partial
 from kivy.clock import Clock

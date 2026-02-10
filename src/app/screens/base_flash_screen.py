@@ -21,6 +21,7 @@
 """
 base_flash__screen.py
 """
+
 import os
 import typing
 from threading import Thread

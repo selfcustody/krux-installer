@@ -22,4 +22,5 @@
 """
 __init__.py
 """
+
 from .trigger_signer import TriggerSigner

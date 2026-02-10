@@ -51,7 +51,14 @@ if __name__ == "__main__":
     ICON = join(ASSETS, "icon.png")
     I18NS = str(ROOT_PATH / "src" / "i18n")
 
-    BUILDER_ARGS = [ ]
+    if SYSTEM == "Darwin":
+        ICON = join(ASSETS, "icon.icns")
+    elif SYSTEM == "Windows":
+        ICON = join(ASSETS, "icon.ico")
+    else:
+        ICON = join(ASSETS, "icon.png")
+
+    BUILDER_ARGS = []
 
     # The app name
     BUILDER_ARGS.append(f"--name={PYNAME}")
@@ -67,7 +74,7 @@ if __name__ == "__main__":
     if SYSTEM == "Linux":
         # Tha application is a GUI
         BUILDER_ARGS.append("--onefile")
-    
+
     elif SYSTEM == "Windows":
         # Tha application is a GUI with a hidden console
         # to keep `sys` module enabled (necessary for Kboot)
@@ -75,12 +82,12 @@ if __name__ == "__main__":
         BUILDER_ARGS.append("--console")
         BUILDER_ARGS.append("--hidden-import=win32timezone")
         BUILDER_ARGS.append("--hide-console=minimize-early")
-        
+
     elif SYSTEM == "Darwin":
         # Tha application is a GUI in a bundled .app
         BUILDER_ARGS.append("--onefile")
         BUILDER_ARGS.append("--noconsole")
-        
+
         # For darwin system, will be necessary
         # to add a hidden import for ssl
         # (necessary for request module)
@@ -90,14 +97,14 @@ if __name__ == "__main__":
     # Necessary for get version and
     # another infos in application
     BUILDER_ARGS.append("--add-data=pyproject.toml:.")
-    
-    # some assets 
+
+    # some assets
     for f in listdir(ASSETS):
         asset = join(ASSETS, f)
         if isfile(asset):
             if asset.endswith("png") or asset.endswith("gif") or asset.endswith("ttf"):
-                BUILDER_ARGS.append(f"--add-data={asset}:assets")                
-        
+                BUILDER_ARGS.append(f"--add-data={asset}:assets")
+
     # Add i18n translations
     for f in listdir(I18NS):
         i18n_abs = join(I18NS, f)
@@ -105,7 +112,6 @@ if __name__ == "__main__":
         if isfile(i18n_abs):
             if findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
                 BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
-
 
     args = p.parse_args(BUILDER_ARGS)
 

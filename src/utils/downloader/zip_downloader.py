@@ -22,6 +22,7 @@
 """
 zip_downloader.py
 """
+
 import tempfile
 from .asset_downloader import AssetDownloader
 

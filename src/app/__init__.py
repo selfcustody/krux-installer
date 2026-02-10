@@ -21,6 +21,7 @@
 """
 __init__.py
 """
+
 import sys
 from kivy.core.window import Window
 from src.app.config_krux_installer import ConfigKruxInstaller

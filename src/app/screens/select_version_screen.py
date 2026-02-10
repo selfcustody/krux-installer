@@ -21,6 +21,7 @@
 """
 select_version_screen.py
 """
+
 # pylint: disable=no-name-in-module
 from functools import partial
 from kivy.clock import Clock

@@ -21,6 +21,7 @@
 """
 error_screen.py
 """
+
 import webbrowser
 from src.app.screens.base_screen import BaseScreen
 

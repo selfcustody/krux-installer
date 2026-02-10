@@ -22,6 +22,7 @@
 """
 trigger_downloader.py
 """
+
 import re
 from io import BytesIO
 from ..trigger import Trigger

@@ -24,6 +24,7 @@ trigger.py
 
 Base class to be used accross project
 """
+
 import os
 from kivy.logger import Logger
 from src.utils.info import mro

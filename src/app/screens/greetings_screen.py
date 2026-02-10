@@ -21,6 +21,7 @@
 """
 greetings_screen.py
 """
+
 import os
 import sys
 from functools import partial

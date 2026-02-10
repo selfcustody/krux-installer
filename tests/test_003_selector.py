@@ -3,7 +3,6 @@ from unittest.mock import MagicMock, patch
 import requests
 from src.utils.selector import Selector
 
-
 MOCKED_EMPTY_API = []
 MOCKED_WRONG_API = [
     {"author": "test"},

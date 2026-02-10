@@ -2,7 +2,6 @@ from unittest import TestCase
 from unittest.mock import patch
 from src.utils.downloader import SigDownloader
 
-
 URL = "https://github.com/selfcustody/krux/releases/download/v0.0.1/krux-v0.0.1.zip.sig"
 
 

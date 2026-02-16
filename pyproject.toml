@@ -15,7 +15,7 @@ kivy = "2.3.1"
 tomli = { version = "^2.4.0", python = "<3.11" }
 pyserial = "^3.5"
 requests = "^2.32.5"
-cryptography = "^46.0.4"
+cryptography = "^46.0.5"
 qrcode = "^8.2"
 easy-i18n = "^1.2.0"
 pysudoer = { git = "https://github.com/qlrd/pysudoer.git" }

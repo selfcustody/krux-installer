@@ -1,33 +1,49 @@
-[virtualenvs]
-prefer-active-python = true
-
-[tool.poetry]
-name = "krux_installer"
+[project]
+name = "krux-installer"
 version = "0.0.22"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
-authors = ["qlrd <qlrddev@gmail.com>"]
-license = "LICENSE"
+authors = [
+    {name = "qlrd", email = "qlrddev@gmail.com"}
+]
+license = {text = "MIT"}
 readme = "README.md"
+requires-python = ">3.10,<=3.14"
+dependencies = [
+    "kivy==2.3.1",
+    "pyserial>=3.5",
+    "requests>=2.32.5",
+    "cryptography>=46.0.5",
+    "qrcode>=8.2",
+    "easy-i18n>=1.2.0",
+    "pysudoer @ git+https://github.com/qlrd/pysudoer.git",
+    "pyinstaller>=6.19.0",
+    "pygame>=2.6.1",
+]
 
-[tool.poetry.dependencies]
-python = ">3.10,<=3.14"
-kivy = "2.3.1"
-tomli = { version = "^2.4.0", python = "<3.11" }
-pyserial = "^3.5"
-requests = "^2.32.5"
-cryptography = "^46.0.5"
-qrcode = "^8.2"
-easy-i18n = "^1.2.0"
-pysudoer = { git = "https://github.com/qlrd/pysudoer.git" }
-pyinstaller = "^6.19.0"
+[project.optional-dependencies]
+dev = [
+    "black>=26.1.0",
+    "pylint>=4.0.4",
+    "pytest-cov>=6.3.0",
+    "poethepoet>=0.41.0",
+    "demjson3>=3.0.6",
+]
 
-[tool.poetry.group.dev.dependencies]
-black = "^26.1.0"
-pylint = "^4.0.4"
-pyinstaller = "^6.19.0"
-pytest-cov = "^6.3.0"
-poethepoet = "^0.41.0"
-demjson3 = "^3.0.6"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.uv]
+dev-dependencies = [
+    "black>=26.1.0",
+    "pylint>=4.0.4",
+    "pytest-cov>=6.3.0",
+    "poethepoet>=0.41.0",
+    "demjson3>=3.0.6",
+]
 
 [tool.poe.tasks]
 cli = "python src/krux_installer.py"
@@ -92,7 +108,3 @@ cmd = "python krux_installer.py"
 [tool.poe.tasks.dev]
 env = { LOGLEVEL = "info" }
 cmd = "python krux_installer.py"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

@@ -22,7 +22,7 @@
 """
 constants.py
 
-Some constants to be used accros application
+Some constants to be used across application
 """
 
 from typing import Any, List
@@ -193,15 +193,14 @@ def get_device_support_info(device: str) -> dict:
 
 def _open_pyproject() -> dict[str, Any]:
     """
-    Open root pyprojet.toml file to get some constant datas
+    Open root pyproject.toml file to get some constant data
     like name, version and description
+
+    Note: With Python 3.11+, we use the built-in tomllib module
     """
-    if sys.version_info.minor <= 10:
-        # pylint: disable=import-outside-toplevel,import-error
-        from tomli import loads as load_toml
-    if sys.version_info.minor > 10:
-        # pylint: disable=import-outside-toplevel,import-error
-        from tomllib import loads as load_toml
+    # Python 3.11+ has tomllib built-in
+    # pylint: disable=import-outside-toplevel
+    from tomllib import loads as load_toml
 
     try:
         pyproject_filename = os.path.abspath(
@@ -209,31 +208,30 @@ def _open_pyproject() -> dict[str, Any]:
         )
         with open(pyproject_filename, "r", encoding="utf8") as pyproject_file:
             data = pyproject_file.read()
-            # pylint: disable=possibly-used-before-assignment
             return load_toml(data)
 
     except FileNotFoundError as exc:
-        raise FileNotFoundError(f"{pyproject_filename} isnt found") from exc
+        raise FileNotFoundError(f"{pyproject_filename} isn't found") from exc
     except ValueError as exc:
-        raise ValueError(f"{pyproject_filename} is not valid toml file") from exc
+        raise ValueError(f"{pyproject_filename} is not a valid toml file") from exc
 
 
 def get_name() -> str:
     """
     Get project name defined in pyproject.toml
     """
-    return _open_pyproject()["tool"]["poetry"]["name"]
+    return _open_pyproject()["project"]["name"]
 
 
 def get_version() -> str:
     """
     Get project version defined in pyproject.toml
     """
-    return _open_pyproject()["tool"]["poetry"]["version"]
+    return _open_pyproject()["project"]["version"]
 
 
 def get_description() -> str:
     """
     Get project description defined in pyproject.toml
     """
-    return _open_pyproject()["tool"]["poetry"]["description"]
+    return _open_pyproject()["project"]["description"]

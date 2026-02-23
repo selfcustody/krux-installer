@@ -23,7 +23,7 @@ pyinstaller = "^6.19.0"
 
 [tool.poetry.group.dev.dependencies]
 black = "^26.1.0"
-pylint = "^4.0.4"
+pylint = "^4.0.5"
 pyinstaller = "^6.19.0"
 pytest-cov = "^6.3.0"
 poethepoet = "^0.41.0"

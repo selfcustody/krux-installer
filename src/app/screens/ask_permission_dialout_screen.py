@@ -142,8 +142,14 @@ class AskPermissionDialoutScreen(BaseScreen):
             elif "ID" in os_data and "fedora" in os_data["ID"]:
                 bin_path = "/usr/sbin/usermod"
 
-            # Arch, Manjaro, Slackware, Gentoo
-            elif os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
+            # Arch, Artix, Manjaro, Slackware, Gentoo,
+            elif os_data.get("ID") in (
+                "arch",
+                "artix",
+                "manjaro",
+                "slackware",
+                "gentoo",
+            ):
                 bin_path = "/usr/bin/usermod"
 
             # For Alpine, Clear Linux, Solus, etc.

@@ -34,6 +34,7 @@ class TestSelector(TestCase):
                 "X-GitHub-Api-Version": "2022-11-28",
             },
             timeout=10,
+            proxies=None,
         )
 
         self.assertEqual(selector.releases[0], "v0.0.1")
@@ -175,3 +176,50 @@ class TestSelector(TestCase):
             selector.firmware = "v0.0.111"
 
         self.assertEqual(str(exc_info.exception), "Firmware 'v0.0.111' is not valid")
+
+    @patch("builtins.open", new_callable=MagicMock)
+    @patch("src.utils.selector.requests")
+    def test_init_tails_uses_tor_proxy(self, mock_requests, mock_open):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = MOCKED_FOUND_API
+        mock_requests.get.return_value = mock_response
+
+        mock_open.return_value.__enter__.return_value.read.return_value = (
+            'ID=tails\nNAME="Tails"\n'
+        )
+
+        Selector()
+
+        mock_requests.get.assert_called_once_with(
+            url="https://api.github.com/repos/selfcustody/krux/releases",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+            timeout=10,
+            proxies={
+                "http": "socks5h://127.0.0.1:9050",
+                "https": "socks5h://127.0.0.1:9050",
+            },
+        )
+
+    @patch("builtins.open", side_effect=FileNotFoundError)
+    @patch("src.utils.selector.requests")
+    def test_init_no_os_release_uses_no_proxy(self, mock_requests, _mock_open):
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = MOCKED_FOUND_API
+        mock_requests.get.return_value = mock_response
+
+        Selector()
+
+        mock_requests.get.assert_called_once_with(
+            url="https://api.github.com/repos/selfcustody/krux/releases",
+            headers={
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+            },
+            timeout=10,
+            proxies=None,
+        )

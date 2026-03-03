@@ -105,8 +105,27 @@ class Selector(Trigger):
             api = Selector.HEADERS["X-GitHub-Api-Version"]
             self.debug(f"releases::getter::HEADER=Accept: {accept}")
             self.debug(f"releases::getter::HEADER=X-Github-Api-Version: {api}")
+
+            # Tails OS routes all traffic through Tor.
+            # Detect Tails by checking /etc/os-release and use Tor's SOCKS5 proxy.
+            proxies = None
+            try:
+                with open("/etc/os-release", mode="r", encoding="utf-8") as f:
+                    os_release = f.read()
+                if "tails" in os_release.lower():
+                    self.debug("releases::getter::Tails OS detected, using Tor proxy")
+                    proxies = {
+                        "http": "socks5h://127.0.0.1:9050",
+                        "https": "socks5h://127.0.0.1:9050",
+                    }
+            except FileNotFoundError:
+                pass
+
             response = requests.get(
-                url=Selector.URL, headers=Selector.HEADERS, timeout=timeout
+                url=Selector.URL,
+                headers=Selector.HEADERS,
+                timeout=timeout,
+                proxies=proxies,
             )
             response.raise_for_status()
 
@@ -129,7 +148,6 @@ class Selector(Trigger):
         for data in res:
             if not data.get("tag_name"):
                 raise KeyError("Invalid key: 'tag_name' do not exist on api")
-
             obj.append(data["tag_name"])
 
         obj.append("odudex/krux_binaries")

@@ -22,7 +22,7 @@ pysudoer = { git = "https://github.com/qlrd/pysudoer.git" }
 pyinstaller = "^6.19.0"
 
 [tool.poetry.group.dev.dependencies]
-black = "^26.3.0"
+black = "^26.3.1"
 pylint = "^4.0.5"
 pyinstaller = "^6.19.0"
 pytest-cov = "^6.3.0"

@@ -24,6 +24,8 @@ __init__.py
 
 import os
 import sys
+from functools import partial
+from kivy.clock import Clock
 
 # fix: red circles appearing when other inputs are received instead of the left mouse button.
 
@@ -70,6 +72,35 @@ from src.app.screens.warning_after_airgap_update_screen import (
 
 # pylint: enable=wrong-import-position
 
+# Default screen parent map — used to initialize the instance attribute.
+# Maps each screen to its parent in the UI tree.
+# ESC navigates to the parent; None means ESC exits the app.
+# FlashScreen's parent is dynamic and set at runtime by the screen that navigates to it.
+SCREEN_PARENTS = {
+    "GreetingsScreen": None,
+    "MainScreen": "GreetingsScreen",
+    "SelectVersionScreen": "MainScreen",
+    "SelectOldVersionScreen": "SelectVersionScreen",
+    "WarningBetaScreen": "SelectVersionScreen",
+    "SelectDeviceScreen": "MainScreen",
+    "AboutScreen": "MainScreen",
+    "WarningAlreadyDownloadedScreen": "MainScreen",
+    "DownloadStableZipScreen": "MainScreen",
+    "DownloadStableZipSha256Screen": "DownloadStableZipScreen",
+    "DownloadStableZipSigScreen": "DownloadStableZipSha256Screen",
+    "DownloadSelfcustodyPemScreen": "DownloadStableZipSigScreen",
+    "VerifyStableZipScreen": "DownloadSelfcustodyPemScreen",
+    "UnzipStableScreen": "VerifyStableZipScreen",
+    "DownloadBetaScreen": "MainScreen",
+    "WarningWipeScreen": "MainScreen",
+    "WipeScreen": "WarningWipeScreen",
+    "WarningBeforeAirgapUpdateScreen": "MainScreen",
+    "AirgapUpdateScreen": "WarningBeforeAirgapUpdateScreen",
+    "WarningAfterAirgapUpdateScreen": "MainScreen",
+    "FlashScreen": None,  # set dynamically at runtime
+    "ErrorScreen": "GreetingsScreen",
+}
+
 
 class KruxInstallerApp(ConfigKruxInstaller):
     """KruxInstallerApp is the Root widget"""
@@ -79,7 +110,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
         Window.size = (1000, 800)
         self.debug(f"Window.size={Window.size}")
         Window.clearcolor = (0.9, 0.9, 0.9, 1)
-        self._screen_history = []
+        self.screen_parents = dict(SCREEN_PARENTS)
 
     def build(self):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
@@ -118,28 +149,36 @@ class KruxInstallerApp(ConfigKruxInstaller):
             self.debug(msg)
             self.screen_manager.add_widget(screen)
 
-        self._screen_history = []
-        self.screen_manager.bind(current=self._on_current_screen)
-        if self.screen_manager.current is not None:
-            self._screen_history.append(self.screen_manager.current)
         Window.bind(on_key_down=self._on_key_down)
 
         return self.screen_manager
 
-    def _on_current_screen(self, _instance, value):
-        if not hasattr(self, "_screen_history") or self._screen_history is None:
-            self._screen_history = []
-        if not self._screen_history or self._screen_history[-1] != value:
-            self._screen_history.append(value)
+    def _reset_main_screen(self):
+        """Reset MainScreen device to default when navigating back to GreetingsScreen"""
+        main_screen = self.screen_manager.get_screen("MainScreen")
+        fn = partial(
+            main_screen.update,
+            name="KruxInstallerApp",
+            key="device",
+            value="select a new one",
+        )
+        Clock.schedule_once(fn, 0)
 
     def _on_key_down(self, _window, key, *_):
         # key == 27 is ESC
         if key == 27:
-            if len(self._screen_history) > 1:
-                self._screen_history.pop()
-                prev = self._screen_history[-1]
-                self.screen_manager.transition.direction = "right"
-                self.screen_manager.current = prev
+            current = self.screen_manager.current
+            parent = self.screen_parents.get(current)
+
+            if parent is None:
+                self.stop()
                 return True
-            return False
+
+            if parent == "GreetingsScreen":
+                self._reset_main_screen()
+
+            self.screen_manager.transition.direction = "right"
+            self.screen_manager.current = parent
+            return True
+
         return False

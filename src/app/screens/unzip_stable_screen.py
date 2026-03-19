@@ -25,6 +25,7 @@ verify_stable_zip_screen.py
 import os
 import time
 from functools import partial
+from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_screen import BaseScreen
 from src.utils.unzip.kboot_unzip import KbootUnzip
@@ -144,6 +145,12 @@ class UnzipStableScreen(BaseScreen):
             )
 
             time.sleep(2.1)
+
+            # set FlashScreen's ESC parent dynamically
+            _app = App.get_running_app()
+            if _app is not None:
+                _app.screen_parents["FlashScreen"] = "UnzipStableScreen"
+
             self.set_screen(name="FlashScreen", direction="left")
 
         p = os.path.join(rel_path, "kboot.kfpkg")
@@ -202,7 +209,7 @@ class UnzipStableScreen(BaseScreen):
                 filename=zip_file, device=self.device, output=self.assets_dir
             )
 
-            # load variables to FlashScreen before get in
+            # load variables to AirgapUpdateScreen before get in
             screen = self.manager.get_screen("AirgapUpdateScreen")
             fns = [
                 partial(

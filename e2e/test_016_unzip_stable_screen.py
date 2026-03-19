@@ -418,7 +418,6 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_get_baudrate.assert_called()
         mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
-        mock_get_destdir_assets.assert_called_once()
         mock_kboot_unzip.assert_called_once_with(
             filename=os.path.join("mock", "krux-v0.0.1.zip"),
             device="mock",
@@ -488,3 +487,54 @@ class TestWarningAlreadyDownloadedScreen(GraphicUnitTest):
         mock_set_background.assert_called()
         mock_manager.get_screen.assert_called()
         mock_sleep.assert_called()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.get_baudrate", return_value=1500000)
+    @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.set_background")
+    @patch("src.app.screens.unzip_stable_screen.KbootUnzip")
+    @patch("src.app.screens.unzip_stable_screen.UnzipStableScreen.manager")
+    @patch("src.app.screens.unzip_stable_screen.time.sleep")
+    @patch("src.app.screens.unzip_stable_screen.App.get_running_app")
+    def test_on_release_flash_button_sets_screen_parent(
+        self,
+        mock_get_running_app,
+        mock_sleep,
+        mock_manager,
+        mock_kboot_unzip,
+        mock_set_background,
+        mock_get_baudrate,
+        mock_get_destdir_assets,
+        mock_get_locale,
+    ):
+        mock_kboot_unzip.load = MagicMock()
+        mock_manager.get_screen = MagicMock()
+        mock_app = MagicMock()
+        mock_app.screen_parents = {}
+        mock_get_running_app.return_value = mock_app
+
+        screen = UnzipStableScreen()
+        self.render(screen)
+
+        EventLoop.ensure_window()
+
+        screen.update(name="VerifyStableZipScreen", key="device", value="mock")
+        screen.update(name="VerifyStableZipScreen", key="version", value="v0.0.1")
+        screen.update(name="VerifyStableZipScreen", key="flash-button")
+        button = screen.ids[f"{screen.id}_flash_button"]
+        action = getattr(screen.__class__, f"on_release_{button.id}")
+        action(button)
+
+        # patch assertions
+        mock_get_running_app.assert_called_once()
+        self.assertEqual(mock_app.screen_parents["FlashScreen"], "UnzipStableScreen")
+        mock_sleep.assert_called_once_with(2.1)
+        mock_get_baudrate.assert_called()
+        mock_get_destdir_assets.assert_called()
+        mock_get_locale.assert_called()
+        mock_set_background.assert_called()

@@ -148,8 +148,6 @@ class TestDownloadBetaScreen(GraphicUnitTest):
         # do tests
         screen.update(name=screen.name, key="device", value="mock")
 
-        # default assertions
-
         # patch assertions
         mock_redirect_exception.assert_called_once()
         mock_get_locale.assert_any_call()
@@ -423,3 +421,52 @@ class TestDownloadBetaScreen(GraphicUnitTest):
                     ),
                 ]
             )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.base_screen.BaseScreen.get_baudrate", return_value=1500000)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets",
+        return_value="mockdir",
+    )
+    @patch("src.app.screens.download_beta_screen.time.sleep")
+    @patch("src.app.screens.download_beta_screen.DownloadBetaScreen.manager")
+    @patch("src.app.screens.download_beta_screen.DownloadBetaScreen.set_screen")
+    @patch("src.app.screens.download_beta_screen.App.get_running_app")
+    def test_on_trigger_sets_screen_parent(
+        self,
+        mock_get_running_app,
+        mock_set_screen,
+        mock_manager,
+        mock_sleep,
+        mock_get_destdir_assets,
+        mock_get_baudrate,
+        mock_get_locale,
+    ):
+        mock_manager.get_screen = MagicMock()
+        mock_app = MagicMock()
+        mock_app.screen_parents = {}
+        mock_get_running_app.return_value = mock_app
+
+        screen = DownloadBetaScreen()
+        screen.baudrate = 1500000
+        screen.device = "amigo"
+        screen.firmware = "kboot.kfpkg"
+        on_trigger = getattr(screen.__class__, "on_trigger")
+        screen.trigger = on_trigger
+        self.render(screen)
+
+        EventLoop.ensure_window()
+
+        # pylint: disable=no-member
+        DownloadBetaScreen.on_trigger(0)
+
+        mock_get_running_app.assert_called_once()
+        self.assertEqual(mock_app.screen_parents["FlashScreen"], "DownloadBetaScreen")
+        mock_set_screen.assert_called_once_with(name="FlashScreen", direction="left")
+        mock_get_baudrate.assert_any_call()
+        mock_get_destdir_assets.assert_any_call()
+        mock_sleep.assert_called_once_with(2.1)
+        mock_get_locale.assert_any_call()

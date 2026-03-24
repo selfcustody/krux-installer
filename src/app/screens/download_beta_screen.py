@@ -25,6 +25,7 @@ main_screen.py
 import os
 import time
 from functools import partial
+from kivy.app import App
 from kivy.clock import Clock
 from src.app.screens.base_download_screen import BaseDownloadScreen
 from src.utils.downloader.beta_downloader import BetaDownloader
@@ -66,6 +67,11 @@ class DownloadBetaScreen(BaseDownloadScreen):
 
             for fn in partials:
                 Clock.schedule_once(fn, 0)
+
+            # set FlashScreen's ESC parent dynamically
+            _app = App.get_running_app()
+            if _app is not None:
+                _app.screen_parents["FlashScreen"] = "DownloadBetaScreen"
 
             self.set_screen(name=self.to_screen, direction="left")
 

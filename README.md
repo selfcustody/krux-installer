@@ -19,10 +19,11 @@ Available for:
 * Linux:
   * Debian-like;
   * Fedora-like;
+  * In the experimental phase, we have a nix flake for development.
 * Windows;
 * MacOS:
   * intel processors;
-  * arm64 processors (M1/M2/M3).
+  * arm64 processors (M1/M2/M3/M4).
   
 ## Build from source
 

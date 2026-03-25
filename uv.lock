@@ -1,6 +1,6 @@
 version = 1
 revision = 3
-requires-python = ">3.10, <=3.14"
+requires-python = ">3.10, <=3.14.3"
 resolution-markers = [
     "python_full_version >= '3.12'",
     "python_full_version == '3.11.*'",
@@ -710,9 +710,6 @@ dev = [
     { name = "pymarkdownlnt" },
     { name = "pytest-cov" },
 ]
-dev-dependencies = [
-    { name = "pymarkdownlnt" },
-]
 
 [package.metadata]
 requires-dist = [
@@ -726,7 +723,7 @@ requires-dist = [
     { name = "pyinstaller", specifier = ">=6.20.0" },
     { name = "pylint", marker = "extra == 'dev'", specifier = ">=4.0.5" },
     { name = "pyserial", specifier = ">=3.5" },
-    { name = "pysudoer", git = "https://github.com/qlrd/pysudoer.git" },
+    { name = "pysudoer", git = "https://github.com/qlrd/pysudoer.git?rev=v0.0.3" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=7.1.0" },
     { name = "requests", marker = "extra == 'builder'", specifier = ">=2.32.5" },
 ]
@@ -741,7 +738,6 @@ dev = [
     { name = "pymarkdownlnt", specifier = ">=0.9.34" },
     { name = "pytest-cov", specifier = ">=7.1.0" },
 ]
-dev-dependencies = [{ name = "pymarkdownlnt", specifier = ">=0.9.36" }]
 
 [[package]]
 name = "macholib"
@@ -1135,7 +1131,7 @@ wheels = [
 [[package]]
 name = "pysudoer"
 version = "0.0.3"
-source = { git = "https://github.com/qlrd/pysudoer.git#4738b19743dc6aeb328ededc08960a967cf0bd91" }
+source = { git = "https://github.com/qlrd/pysudoer.git?rev=v0.0.3#4738b19743dc6aeb328ededc08960a967cf0bd91" }
 
 [[package]]
 name = "pytest"

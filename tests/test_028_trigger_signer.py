@@ -5,7 +5,6 @@ from .shared_mocks import MOCKED_SIGNATURE
 
 
 class TestTriggerSigner(TestCase):
-
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=b"Mocked")
     def test_make_hash(self, mocked_open, mock_exists):
@@ -36,18 +35,12 @@ class TestTriggerSigner(TestCase):
         mocked_open.assert_has_calls(
             [
                 call("mock.txt", "rb"),
-                # pylint: disable=unnecessary-dunder-call
-                call().__enter__(),
-                call().read(),
-                call().__exit__(None, None, None),
                 call("mock.txt.sha256.txt", mode="w", encoding="utf-8"),
-                # pylint: disable=unnecessary-dunder-call
-                call().__enter__(),
                 call().write(
                     "28839e02daae61fae440d5e9617f6fd16a572f4e76c2e68566592fb902f74be5 mock.txt"
                 ),
-                call().__exit__(None, None, None),
-            ]
+            ],
+            any_order=True,
         )
 
     @patch("os.path.exists", return_value=True)

@@ -52,8 +52,9 @@ and pass tests.
 
 ## Code style
 
-- **Formatter:** Black (max line length follows Black defaults)
-- **Linter:** Pylint (max line: 100, max statements: 50, see `.pylint/src`)
+- **Formatter:** Black (enforces 88-char line length for all code)
+- **Linter:** Pylint (max line: 100 as a lenient upper bound for non-Black-managed cases,
+  max statements: 50, see `.pylint/src`)
 - **Python:** >=3.12.0 required
 - **Naming:** `snake_case` (functions, variables), `PascalCase` (classes),
   `UPPER_CASE` (constants)
@@ -100,7 +101,7 @@ To add a new device:
 
 ## Testing
 
-- Framework: `pytest` with `unittest.TestCase`
+- **Test runner:** `pytest`; some test classes use `unittest.TestCase`-style structure
 - Mocking: `unittest.mock` (`patch`, `MagicMock`)
 - E2E: `kivy.tests.common.GraphicUnitTest`
 - Shared mocks in `tests/shared_mocks.py`

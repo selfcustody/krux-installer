@@ -1,7 +1,7 @@
 name: Conventional Commits
 
 on:
-  pull_request: # We only need to check commit messages in PRs
+  pull_request:  # We only need to check commit messages in PRs
 
 jobs:
   conventional-commits:

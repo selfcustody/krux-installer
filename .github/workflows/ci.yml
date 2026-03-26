@@ -17,6 +17,9 @@ jobs:
       markdown_files: ${{ steps.filter_markdown.outputs.change_files }}
     steps:
 
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
       - name: Check Not Allowed File Changes
         uses: dorny/paths-filter@v4
         id: filter_not_allowed
@@ -30,26 +33,13 @@ jobs:
       - name: Comment About Changes We Can't Accept
         if: ${{ steps.filter_not_allowed.outputs.change == 'true' }}
         uses: actions/github-script@v8
+        id: filter_author_permissions
+        env:
+          CHANGE_FILES: ${{ steps.filter_not_allowed.outputs.change_files }}
         with:
           script: |
-            let workflowFailMessage = "It looks like you've modified some files that we can't accept as contributions."
-            try {
-              const badFilesArr = [
-                'LICENSE'  
-              ]
-              const badFiles = badFilesArr.join('\n- ')
-              const reviewMessage = `👋 Hey there kruxer. It looks like you've modified some files that we can't accept as contributions. The complete list of files we can't accept are:\n- ${badFiles}\n\nYou'll need to revert all of the files you changed in that list using [GitHub Desktop](https://docs.github.com/en/free-pro-team@latest/desktop/contributing-and-collaborating-using-github-desktop/managing-commits/reverting-a-commit) or \`git checkout origin/main <file name>\`. Once you get those files reverted, we can continue with the review process. :octocat:`
-              createdComment = await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.payload.number,
-                body: reviewMessage,
-              })
-              workflowFailMessage = `${workflowFailMessage} Please see ${createdComment.data.html_url} for details.`
-            } catch(err) {
-              console.log("Error creating comment.", err)
-            }
-            core.setFailed(workflowFailMessage)
+            const script = require('.ci/filter-author-permissions');
+            await script({github, context, core});
 
       - name: Check Not Linted Markdown
         if: ${{ always() }}

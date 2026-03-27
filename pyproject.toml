@@ -28,6 +28,7 @@ pyinstaller = "^6.19.0"
 pytest-cov = "^7.1.0"
 poethepoet = "^0.42.1"
 demjson3 = "^3.0.6"
+yamllint = "^1.35.0"
 
 [tool.poe.tasks]
 cli = "python src/krux_installer.py"
@@ -56,10 +57,11 @@ coverage = ["coverage-unit", "coverage-e2e", "coverage-drives"]
 
 lint.sequence = [
   { cmd = "jsonlint src/i18n/*.json" },
+  { cmd = "yamllint .github/workflows/" },
   { cmd = "pylint --rcfile=.pylint/src ./src" },
   { cmd = "pylint --rcfile=.pylint/tests ./tests" },
   { cmd = "pylint --rcfile=.pylint/tests ./e2e" },
-  { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives" },
+  { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives" }
 ]
 
 build-linux.sequence = [

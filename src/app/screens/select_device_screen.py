@@ -22,19 +22,20 @@
 select_device_screen.py
 """
 
-import re
 from functools import partial
+
 from kivy.clock import Clock
+
+from src.app.screens.base_screen import BaseScreen
 from src.utils.constants import (
+    FIRMWARE_VERSION,
     VALID_DEVICES,
-    VALID_DEVICES_VERSIONS,
     get_valid_devices_for_version,
 )
-from src.app.screens.base_screen import BaseScreen
 
 
 class SelectDeviceScreen(BaseScreen):
-    """SelectDeviceScreen is where versions can be selected"""
+    """SelectDeviceScreen is where the device can be selected"""
 
     def __init__(self, **kwargs):
         super().__init__(
@@ -42,6 +43,7 @@ class SelectDeviceScreen(BaseScreen):
         )
         self.enabled_devices = []
         self.make_grid(wid="select_device_screen_grid", rows=10)
+
         for row, device in enumerate(VALID_DEVICES):
 
             def on_press(instance):
@@ -78,60 +80,19 @@ class SelectDeviceScreen(BaseScreen):
                 on_ref_press=None,
             )
 
-    # pylint: disable=unused-argument
-    def update(self, *args, **kwargs):
-        """Update buttons according the valid devices for each compatible version"""
-        name = str(kwargs.get("name"))
-        key = str(kwargs.get("key"))
-        value = kwargs.get("value")
+        # Populate device buttons based on the embedded firmware version
+        valid_devices = get_valid_devices_for_version(FIRMWARE_VERSION)
+        self.debug(f"Valid devices for {FIRMWARE_VERSION}: {valid_devices}")
 
-        def on_update():
-            if key == "version":
-                self.enabled_devices = []
+        for device in VALID_DEVICES:
+            button_id = f"select_device_{device}"
 
-                cleanre = re.compile("\\[.*?\\]")
-                clean_version = re.sub(cleanre, "", value)
-
-                self.debug(f"Checking valid devices for version: {clean_version}")
-
-                # Check if this is a beta version
-                if re.match(r"^odudex/krux_binaries", clean_version):
-                    valid_devices_for_version = []
-                    for c in VALID_DEVICES:
-                        device = VALID_DEVICES_VERSIONS[c]
-                        if device["final"] is None:
-                            valid_devices_for_version.append(c)
-                else:
-                    valid_devices_for_version = get_valid_devices_for_version(
-                        clean_version
-                    )
-
-                self.debug(
-                    f"Valid devices for {clean_version}: {valid_devices_for_version}"
+            if device in valid_devices:
+                self.enabled_devices.append(button_id)
+                self.ids[button_id].text = device
+                self.debug(f"Device {device} enabled for {FIRMWARE_VERSION}")
+            else:
+                self.ids[button_id].text = "".join(
+                    ["[color=#333333]", device, "[/color]"]
                 )
-
-                for device in VALID_DEVICES:
-                    button_id = f"select_device_{device}"
-
-                    if device in valid_devices_for_version:
-                        self.enabled_devices.append(button_id)
-                        self.ids[button_id].text = device
-                        self.debug(
-                            f"Device {device} enabled for version {clean_version}"
-                        )
-                    else:
-                        self.ids[button_id].text = "".join(
-                            ["[color=#333333]", device, "[/color]"]
-                        )
-                        self.debug(
-                            f"Device {device} disabled for version {clean_version}"
-                        )
-
-        setattr(SelectDeviceScreen, "on_update", on_update)
-        self.update_screen(
-            name=name,
-            key=key,
-            value=value,
-            allowed_screens=("ConfigKruxInstaller", "SelectDeviceScreen", "MainScreen"),
-            on_update=getattr(SelectDeviceScreen, "on_update"),
-        )
+                self.debug(f"Device {device} disabled for {FIRMWARE_VERSION}")

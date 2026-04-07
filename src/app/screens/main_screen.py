@@ -22,13 +22,12 @@
 main_screen.py
 """
 
-import os
-import re
-import typing
 from functools import partial
+
 from kivy.clock import Clock
-from src.utils.selector import VALID_DEVICES
+
 from src.app.screens.base_screen import BaseScreen
+from src.utils.constants import VALID_DEVICES, get_firmware_path
 
 
 class MainScreen(BaseScreen):
@@ -43,13 +42,11 @@ class MainScreen(BaseScreen):
 
         # Prepare some variables
         self.device = "select a new one"
-        self.version = "select a new one"
         self.will_flash = False
         self.will_wipe = False
 
         # Build grid where buttons will be placed
-        self.make_grid(wid="main_screen_grid", rows=6)
-        self.build_select_version_button()
+        self.make_grid(wid="main_screen_grid", rows=5)
         self.build_select_device_button()
         self.build_flash_button()
         self.build_wipe_button()
@@ -65,17 +62,6 @@ class MainScreen(BaseScreen):
     def device(self, value: str):
         self.debug(f"device = {value}")
         self._device = value
-
-    @property
-    def version(self) -> str:
-        """Getter for version property"""
-        return self._version
-
-    @version.setter
-    def version(self, value: str):
-        """Setter for version property"""
-        self.debug(f"version = {value}")
-        self._version = value
 
     @property
     def will_flash(self) -> bool:
@@ -99,54 +85,6 @@ class MainScreen(BaseScreen):
         self.debug(f"will_wipe = {value}")
         self._will_wipe = value
 
-    def build_select_version_button(self):
-        """Create a staticmethod using instance variables to control the select_version button"""
-        url = "https://api.github.com/repos/selfcustody/krux/releases"
-        wid = "main_select_version"
-        msg = self.translate("Version")
-
-        def on_press(instance):
-            self.debug(f"Calling {instance.id}::on_press")
-            self.set_background(wid=instance.id, rgba=(0.25, 0.25, 0.25, 1))
-            fetch_msg = self.translate("Fetching data from")
-            self.ids[instance.id].text = "".join(
-                [
-                    "[color=#efcc00]",
-                    f"[b]{fetch_msg}[/b]",
-                    "\n",
-                    url,
-                    "[/color]",
-                ]
-            )
-
-        def on_release(instance):
-            self.debug(f"Calling {instance.id}::on_release")
-            select_version = self.manager.get_screen("SelectVersionScreen")
-            select_version.clear()
-            select_version.fetch_releases()
-            self.set_background(wid="main_select_version", rgba=(0, 0, 0, 1))
-            self.set_screen(name="SelectVersionScreen", direction="left")
-            self.update(name=self.name, key="version", value=self.version)
-
-        self.make_button(
-            row=0,
-            wid=wid,
-            root_widget="main_screen_grid",
-            text="".join(
-                [
-                    f"{msg}: ",
-                    "[color=#00AABB]",
-                    self.translate(self.version),
-                    "[/color]",
-                ]
-            ),
-            halign=None,
-            font_factor=28,
-            on_press=on_press,
-            on_release=on_release,
-            on_ref_press=None,
-        )
-
     def build_select_device_button(self):
         """Create staticmethods using instance variables to control the select_device button"""
         wid = "main_select_device"
@@ -158,14 +96,6 @@ class MainScreen(BaseScreen):
 
         def on_release_select_device(instance):
             self.debug(f"Calling {instance.id}::on_release")
-            select_device = self.manager.get_screen("SelectDeviceScreen")
-            fn = partial(
-                select_device.update,
-                name=self.name,
-                key="version",
-                value=self.version,
-            )
-            Clock.schedule_once(fn, 0)
             self.set_background(wid="main_select_device", rgba=(0, 0, 0, 1))
             self.set_screen(name="SelectDeviceScreen", direction="left")
 
@@ -173,7 +103,7 @@ class MainScreen(BaseScreen):
         setattr(MainScreen, "on_release_select_device", on_release_select_device)
 
         self.make_button(
-            row=1,
+            row=0,
             wid=wid,
             root_widget="main_screen_grid",
             text="".join(
@@ -192,71 +122,6 @@ class MainScreen(BaseScreen):
         )
         self.ids[wid].size_hint = (1, 1)
 
-    def on_check_any_official_release(
-        self, partial_list: typing.List[typing.Callable]
-    ) -> str:
-        """Check if any official release file exists"""
-        resources = MainScreen.get_destdir_assets()
-        zipfile = os.path.join(resources, f"krux-{self.version}.zip")
-        to_screen = None
-
-        if os.path.isfile(zipfile):
-            to_screen = "WarningAlreadyDownloadedScreen"
-        else:
-            to_screen = "DownloadStableZipScreen"
-
-        screen = self.manager.get_screen(to_screen)
-        partial_list.append(
-            partial(
-                screen.update,
-                name=self.name,
-                key="canvas",
-            )
-        )
-        partial_list.append(
-            partial(
-                screen.update,
-                name=self.name,
-                key="version",
-                value=self.version,
-            )
-        )
-
-        return to_screen
-
-    def on_check_any_beta_release(
-        self, partial_list: typing.List[typing.Callable]
-    ) -> str:
-        """Check if release is beta"""
-        to_screen = "DownloadBetaScreen"
-        screen = self.manager.get_screen(to_screen)
-        partial_list.append(
-            partial(
-                screen.update,
-                name=self.name,
-                key="canvas",
-            )
-        )
-        partial_list.append(
-            partial(
-                screen.update,
-                name=self.name,
-                key="firmware",
-                value="kboot.kfpkg",
-            )
-        )
-        partial_list.append(
-            partial(
-                screen.update,
-                name=self.name,
-                key="device",
-                value=self.device,
-            )
-        )
-
-        partial_list.append(partial(screen.update, name=self.name, key="downloader"))
-        return to_screen
-
     def build_flash_button(self):
         """Create staticmethods using instance variables to control the flash button"""
         wid = "main_flash"
@@ -273,42 +138,43 @@ class MainScreen(BaseScreen):
             if not self.will_flash:
                 self.warning(f"Button::{instance.id} disabled")
             else:
-                # do a click effect
                 self.set_background(wid="main_flash", rgba=(0, 0, 0, 1))
 
-                # partials are functions that call `update`
-                # method in screen before go to them
-                partial_list = []
-                err = None
-
-                if re.match(r"^v\d+\.\d+\.\d$", self.version):
-                    to_screen = self.on_check_any_official_release(
-                        partial_list=partial_list
-                    )
-
-                elif re.match("^odudex/krux_binaries", self.version):
-                    to_screen = self.on_check_any_beta_release(
-                        partial_list=partial_list
-                    )
-
-                else:
-                    err = RuntimeError(f"version '{self.version}' not supported")
+                try:
+                    firmware = get_firmware_path(self.device)
+                except (ValueError, FileNotFoundError) as err:
                     self.redirect_exception(exception=err)
                     return
 
-                # Execute the partials
-                for fn in partial_list:
+                baudrate = MainScreen.get_baudrate()
+                screen = self.manager.get_screen("FlashScreen")
+                fns = [
+                    partial(
+                        screen.update,
+                        name=self.name,
+                        key="firmware",
+                        value=firmware,
+                    ),
+                    partial(
+                        screen.update,
+                        name=self.name,
+                        key="baudrate",
+                        value=baudrate,
+                    ),
+                    partial(screen.update, name=self.name, key="flasher"),
+                ]
+
+                for fn in fns:
                     Clock.schedule_once(fn, 0)
 
-                # Goto the selected screen
-                self.set_screen(name=to_screen, direction="left")
+                self.set_screen(name="FlashScreen", direction="left")
 
         setattr(MainScreen, f"on_press_{wid}", on_press_flash)
         setattr(MainScreen, f"on_release_{wid}", on_release_flash)
 
         flash_msg = self.translate("Flash")
         self.make_button(
-            row=2,
+            row=1,
             wid=wid,
             root_widget="main_screen_grid",
             text=f"[color=#333333]{flash_msg}[/color]",
@@ -343,7 +209,7 @@ class MainScreen(BaseScreen):
 
         wipe_msg = self.translate("Wipe")
         self.make_button(
-            row=3,
+            row=2,
             wid=wid,
             root_widget="main_screen_grid",
             text=f"[color=#333333]{wipe_msg}[/color]",
@@ -371,7 +237,7 @@ class MainScreen(BaseScreen):
         setattr(MainScreen, "on_release_settings", on_release_settings)
 
         self.make_button(
-            row=4,
+            row=3,
             wid=wid,
             root_widget="main_screen_grid",
             text=self.translate("Settings"),
@@ -399,7 +265,7 @@ class MainScreen(BaseScreen):
         setattr(MainScreen, "on_release_about", on_release_about)
 
         self.make_button(
-            row=5,
+            row=4,
             wid=wid,
             root_widget="main_screen_grid",
             text=self.translate("About"),
@@ -410,24 +276,10 @@ class MainScreen(BaseScreen):
             on_ref_press=None,
         )
 
-    def update_version(self, value: str):
-        """Update the version shown in button. To be used on update method"""
-        version_msg = self.translate("Version")
-        self.version = MainScreen.sanitize_markup(value)
-        self.ids["main_select_version"].text = "".join(
-            [
-                f"{version_msg}: ",
-                "[color=#00AABB]",
-                self.version,
-                "[/color]",
-            ]
-        )
-
     def update_device(self, value: str):
         """Update the device shown in button. To be used on update method"""
         self.device = MainScreen.sanitize_markup(value)
 
-        # check if update to given values
         if value in VALID_DEVICES:
             self.device = value
             self.will_flash = True
@@ -447,9 +299,6 @@ class MainScreen(BaseScreen):
                 ["[color=#333333]", self.translate("Wipe"), "[/color]"]
             )
 
-        # translate device type value even if it is a vXX.YY.Z
-        # the translator will try to translate and if a proper
-        # value isnt found, use the raw one
         device_type = self.translate(value)
         device_msg = self.translate("Device")
         self.ids["main_select_device"].text = "".join(
@@ -463,20 +312,12 @@ class MainScreen(BaseScreen):
 
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
-        """Update buttons from selected device/versions on related screens"""
+        """Update buttons from selected device on related screens"""
         name = str(kwargs.get("name"))
         key = str(kwargs.get("key"))
         value = kwargs.get("value")
 
         def on_update():
-            # Check if update to given key
-            if key == "version":
-                if value is not None:
-                    self.update_version(value)
-                else:
-                    error = RuntimeError(f"Invalid value for key '{key}': {value}")
-                    self.redirect_exception(exception=error)
-
             if key == "device":
                 if value is not None:
                     self.update_device(value)
@@ -517,8 +358,6 @@ class MainScreen(BaseScreen):
                 "GreetingsScreen",
                 "MainScreen",
                 "SelectDeviceScreen",
-                "SelectVersionScreen",
-                "SelectOldVersionScreen",
             ),
             on_update=getattr(MainScreen, "on_update"),
         )

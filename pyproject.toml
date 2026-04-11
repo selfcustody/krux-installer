@@ -12,7 +12,7 @@ dependencies = [
     "kivy==2.3.1",
     "pyserial>=3.5",
     "requests>=2.32.5",
-    "cryptography>=46.0.5",
+    "cryptography>=46.0.7",
     "qrcode>=8.2",
     "easy-i18n>=1.2.0",
     "pysudoer @ git+https://github.com/qlrd/pysudoer.git",

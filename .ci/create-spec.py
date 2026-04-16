@@ -22,13 +22,17 @@
 """
 build.py
 """
-from re import findall
+
+import argparse
 from os import listdir
-from os.path import join, isfile
+from os.path import isfile, join
 from pathlib import Path
 from platform import system
-import argparse
+from re import findall
+
 import PyInstaller.building.makespec
+
+from src.utils.constants import FIRMWARE_VERSION
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
@@ -112,6 +116,14 @@ if __name__ == "__main__":
         if isfile(i18n_abs):
             if findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
                 BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
+
+    # Add embedded firmware binaries
+    FIRMWARE_PATH = str(ROOT_PATH / "src" / "utils" / "firmware" / FIRMWARE_VERSION)
+    FIRMWARE_DEST = join("src", "utils", "firmware", FIRMWARE_VERSION)
+    for f in listdir(FIRMWARE_PATH):
+        fw_abs = join(FIRMWARE_PATH, f)
+        if isfile(fw_abs) and f.endswith(".kfpkg"):
+            BUILDER_ARGS.append(f"--add-data={fw_abs}:{FIRMWARE_DEST}")
 
     args = p.parse_args(BUILDER_ARGS)
 

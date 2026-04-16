@@ -27,6 +27,7 @@ dev = [
     "pytest-cov>=7.1.0",
     "poethepoet>=0.44.0",
     "demjson3>=3.0.6",
+    "pymarkdownlnt>=0.9.34"
 ]
 
 [build-system]
@@ -43,6 +44,7 @@ dev-dependencies = [
     "pytest-cov>=7.1.0",
     "poethepoet>=0.44.0",
     "demjson3>=3.0.6",
+    "pymarkdownlnt>=0.9.34"
 ]
 
 [tool.poe.tasks]
@@ -71,6 +73,7 @@ coverage-drives = "pytest --cov-append --cov=src/app --cov-branch --cov-report x
 coverage = ["coverage-unit", "coverage-e2e", "coverage-drives"]
 
 lint.sequence = [
+  { cmd = "pymarkdownlnt -d MD013,MD033,MD036 -e MD024 scan *.md" },
   { cmd = "jsonlint src/i18n/*.json" },
   { cmd = "pylint --rcfile=.pylint/src ./src" },
   { cmd = "pylint --rcfile=.pylint/tests ./tests" },

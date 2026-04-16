@@ -40,7 +40,7 @@ jobs:
           uv run poe format-e2e --check --verbose
           uv run poe format-installer --check --verbose
           
-  pylint:
+  lint:
 
     needs: black
     
@@ -71,7 +71,7 @@ jobs:
   
   pytest:
 
-    needs: pylint
+    needs: lint
 
     strategy:
       matrix:
@@ -114,141 +114,9 @@ jobs:
           run: |
             uv add pytest-xvfb
             uv run poe coverage
-            
-      - name: Upload coverage reports to Codecov with GitHub Action
-        uses: codecov/codecov-action@v5name: Tests
 
-on:
-  push:
-    branches:
-      - main
-      - develop
-      
-  pull_request:
-    branches:
-      - main
-
-jobs:
-  
-  black:
-
-    runs-on: ubuntu-latest
-    steps:
-      
-      - uses: actions/checkout@v6
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.12.3'
-          architecture: x64
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
-      
-      - name: Install uv dependencies
-        run: uv sync --all-extras
-
-      - name: Check format
-        run: |
-          uv run poe format-src --check --verbose
-          uv run poe format-tests --check --verbose
-          uv run poe format-e2e --check --verbose
-          uv run poe format-installer --check --verbose
-          
-  pylint:
-
-    needs: black
-    
-    runs-on: ubuntu-latest
-    
-    steps:
-      
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.12.3'
-          architecture: x64
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
-
-      - name: Install uv dependencies
-        run: uv sync --all-extras
-        
-      - name: Lint src
-        run: uv run poe lint
-  
-  pytest:
-
-    needs: pylint
-
-    strategy:
-      matrix:
-        include:
-          - os: ubuntu-latest
-            arch: x64
-            
-          - os: windows-latest
-            arch: x64
-                        
-          - os: macos-15
-            arch: arm64
-        
-    runs-on: ${{ matrix.os }}
-    
-    steps:
-      
-      - uses: actions/checkout@v6
-        with:
-          submodules: recursive
-
-      - uses: actions/setup-python@v6
-        with:
-          python-version: '3.12.3'
-          architecture: ${{ matrix.arch }}
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v4
-        with:
-          enable-cache: true
-          cache-dependency-glob: "uv.lock"
-                 
-      - name: Install project and its dependencies
-        run: uv sync --all-extras
-        
-      - name: Run tests with coverage (Linux)
-        if: ${{ runner.os == 'Linux' }}
-        uses: coactions/setup-xvfb@v1.0.1
-        with:
-          run: |
-            uv add pytest-xvfb
-            uv run poe coverage
-            
       - name: Upload coverage reports to Codecov with GitHub Action
         uses: codecov/codecov-action@v6
-        if: ${{ runner.os == 'Linux' }}
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          verbose: true
-
-      - name: Run tests (MacOS)
-        if: ${{ runner.os == 'macOS' }}
-        run: uv run poe test-unit
-        
-      - name: Run tests (Windows)
-        if: ${{ runner.os == 'Windows' }}
-        env:
-          KIVY_GL_BACKEND: 'angle_sdl2'
-        run: uv run poe test
         if: ${{ runner.os == 'Linux' }}
         with:
           token: ${{ secrets.CODECOV_TOKEN }}

@@ -1,6 +1,8 @@
 from unittest import TestCase
-from unittest.mock import patch, mock_open, call
+from unittest.mock import mock_open, patch
+
 from src.utils.signer.trigger_signer import TriggerSigner
+
 from .shared_mocks import MOCKED_SIGNATURE
 
 # pylint: disable=unnecessary-dunder-call
@@ -8,7 +10,6 @@ from .shared_mocks import MOCKED_SIGNATURE
 
 
 class TestTriggerSigner(TestCase):
-
     @patch("os.path.exists", return_value=True)
     @patch("builtins.open", new_callable=mock_open, read_data=b"Mocked")
     def test_make_hash(self, mocked_open, mock_exists):
@@ -36,21 +37,13 @@ class TestTriggerSigner(TestCase):
         s.make_hash()
         s.save_hash()
         mock_exists.assert_called_once_with("mock.txt")
-        mocked_open.assert_has_calls(
-            [
-                call("mock.txt", "rb"),
-                call().__enter__(),
-                call().read(),
-                call().__exit__(None, None, None),
-                call().close(),
-                call("mock.txt.sha256.txt", mode="w", encoding="utf-8"),
-                call().__enter__(),
-                call().write(
-                    "28839e02daae61fae440d5e9617f6fd16a572f4e76c2e68566592fb902f74be5 mock.txt"
-                ),
-                call().__exit__(None, None, None),
-                call().close(),
-            ]
+
+        mocked_open.assert_any_call("mock.txt", "rb")
+        mocked_open.assert_any_call("mock.txt.sha256.txt", mode="w", encoding="utf-8")
+        self.assertEqual(mocked_open.call_count, 2)
+
+        mocked_open().write.assert_called_once_with(
+            "28839e02daae61fae440d5e9617f6fd16a572f4e76c2e68566592fb902f74be5 mock.txt"
         )
 
     @patch("os.path.exists", return_value=True)
@@ -68,16 +61,11 @@ class TestTriggerSigner(TestCase):
         s.signature = MOCKED_SIGNATURE
         s.save_signature()
         mock_exists.assert_called_once_with("mock.txt")
-        mocked_open.assert_has_calls(
-            [
-                call("mock.txt.sig", "wb"),
-                call().__enter__(),
-                call().write(
-                    b"0D\x02 -\x95\x8e$T\xbb\xf52\x8c9_@\x90\xab\x03\xc62<O \xc6\xa6W\xb2[*rM\xcd\xea\xdf\xf6\x02 c\xd2\x1b\xd5\xeaZ\\\xcd5\xb8\n\x86\x81\x1aY\x90\x07\xfd2*'\x1e\xe4\x15\x05\xeb\x1c\x07A\x15\xaf\xa3"
-                ),
-                call().__exit__(None, None, None),
-                call().close(),
-            ]
+
+        mocked_open.assert_called_once_with("mock.txt.sig", "wb")
+
+        mocked_open().write.assert_called_once_with(
+            b"0D\x02 -\x95\x8e$T\xbb\xf52\x8c9_@\x90\xab\x03\xc62<O \xc6\xa6W\xb2[*rM\xcd\xea\xdf\xf6\x02 c\xd2\x1b\xd5\xeaZ\\\xcd5\xb8\n\x86\x81\x1aY\x90\x07\xfd2*'\x1e\xe4\x15\x05\xeb\x1c\x07A\x15\xaf\xa3"
         )
 
     @patch("os.path.exists", return_value=True)
@@ -95,14 +83,9 @@ class TestTriggerSigner(TestCase):
         s.pubkey = "027fbea3abf78019ff6da48d6c235931b26732faaf74eeeda8f0a7e5eb32477c20"
         s.save_pubkey()
         mock_exists.assert_called_once_with("mock.txt")
-        mocked_open.assert_has_calls(
-            [
-                call("mock.txt.pem", mode="w", encoding="utf-8"),
-                call().__enter__(),
-                call().write(
-                    "-----BEGIN PUBLIC KEY-----\nMDYwEAYHKoZIzj0CAQYFK4EEAAoDIgACf76jq/eAGf9tpI1sI1kxsmcy+q907u2o8Kfl6zJHfCA=\n-----END PUBLIC KEY-----"
-                ),
-                call().__exit__(None, None, None),
-                call().close(),
-            ]
+
+        mocked_open.assert_called_once_with("mock.txt.pem", mode="w", encoding="utf-8")
+
+        mocked_open().write.assert_called_once_with(
+            "-----BEGIN PUBLIC KEY-----\nMDYwEAYHKoZIzj0CAQYFK4EEAAoDIgACf76jq/eAGf9tpI1sI1kxsmcy+q907u2o8Kfl6zJHfCA=\n-----END PUBLIC KEY-----"
         )

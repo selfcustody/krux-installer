@@ -19,13 +19,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-main_screen.py
+flash_screen.py
 """
 
 import threading
 import traceback
 from functools import partial
+
 from kivy.clock import Clock
+
 from src.app.screens.base_flash_screen import BaseFlashScreen
 from src.utils.flasher import Flasher
 
@@ -253,8 +255,7 @@ class FlashScreen(BaseFlashScreen):
             value=value,
             allowed_screens=(
                 "ConfigKruxInstaller",
-                "UnzipStableScreen",
-                "DownloadBetaScreen",
+                "MainScreen",
                 "FlashScreen",
             ),
             on_update=getattr(FlashScreen, "on_update"),

@@ -25,12 +25,18 @@ constants.py
 Some constants to be used across application
 """
 
-from typing import Any, List
-import sys
 import os
 import re
+import sys
+from typing import Any, List
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
+
+FIRMWARE_VERSION = "v26.03.0"
+
+FIRMWARE_DIR = os.path.abspath(
+    os.path.join(ROOT_DIRNAME, "..", "firmware", FIRMWARE_VERSION)
+)
 
 VALID_DEVICES = [
     "m5stickv",
@@ -191,6 +197,34 @@ def get_device_support_info(device: str) -> dict:
     return VALID_DEVICES_VERSIONS[device].copy()
 
 
+def get_firmware_path(device: str) -> str:
+    """
+    Get the absolute path to the embedded kboot.kfpkg for a given device.
+
+    Args:
+        device: Device name (e.g., 'amigo', 'm5stickv', etc.)
+
+    Returns:
+        Absolute path to the device's kboot.kfpkg file
+
+    Raises:
+        ValueError: If device is not in VALID_DEVICES
+        FileNotFoundError: If the firmware file is not present
+    """
+    if device not in VALID_DEVICES:
+        raise ValueError(f"Unknown device '{device}'. Valid devices: {VALID_DEVICES}")
+
+    firmware_path = os.path.join(FIRMWARE_DIR, f"{device}.kfpkg")
+
+    if not os.path.exists(firmware_path):
+        raise FileNotFoundError(
+            f"Firmware not found for device '{device}' at {firmware_path}. "
+            f"Run: uv run --extra builder poe fetch-firmware"
+        )
+
+    return firmware_path
+
+
 def _open_pyproject() -> dict[str, Any]:
     """
     Open root pyproject.toml file to get some constant data
@@ -198,7 +232,6 @@ def _open_pyproject() -> dict[str, Any]:
 
     Note: With Python 3.11+, we use the built-in tomllib module
     """
-    # Python 3.11+ has tomllib built-in
     # pylint: disable=import-outside-toplevel
     from tomllib import loads as load_toml
 
@@ -217,21 +250,15 @@ def _open_pyproject() -> dict[str, Any]:
 
 
 def get_name() -> str:
-    """
-    Get project name defined in pyproject.toml
-    """
+    """Get project name defined in pyproject.toml"""
     return _open_pyproject()["project"]["name"]
 
 
 def get_version() -> str:
-    """
-    Get project version defined in pyproject.toml
-    """
+    """Get project version defined in pyproject.toml"""
     return _open_pyproject()["project"]["version"]
 
 
 def get_description() -> str:
-    """
-    Get project description defined in pyproject.toml
-    """
+    """Get project description defined in pyproject.toml"""
     return _open_pyproject()["project"]["description"]

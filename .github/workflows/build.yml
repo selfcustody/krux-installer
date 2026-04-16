@@ -11,29 +11,26 @@ on:
   workflow_dispatch:
 
 jobs:
-  
   build:
-    
     strategy:
       matrix:
         include:
           - os: ubuntu-latest
             arch: x64
-            
+
           - os: windows-latest
             arch: x64
 
           - os: macos-15
             arch: arm64
-     
+
     runs-on: ${{ matrix.os }}
-    
+
     steps:
-      
       - uses: actions/checkout@v6
         with:
           submodules: recursive
-          
+
       - name: Install uv
         uses: astral-sh/setup-uv@v4
         with:
@@ -42,7 +39,7 @@ jobs:
 
       - uses: actions/setup-python@v6
         with:
-          python-version: '3.12'
+          python-version: "3.12"
 
       - name: Setup (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -56,7 +53,7 @@ jobs:
           echo "name=${NAME}" >> $GITHUB_OUTPUT
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "description=${DESCRIPTION}" >> $GITHUB_OUTPUT
-      
+
       - name: Setup (MacOS)
         if: ${{ runner.os == 'macOS' }}
         id: setup-macos
@@ -64,14 +61,16 @@ jobs:
           brew install create-dmg
           brew reinstall openssl@3
           brew unlink openssl@3 && brew link openssl@3
-          #OPENSSL_MAJOR_VERSION=`$(which openssl) -version | awk '{ print $2}' | cut -d . -f1` 
           OPENSSL_FULL_VERSION=`$(which openssl) -version | awk '{ print $2}'`
           OPENSSL_PATH="/opt/homebrew/Cellar/openssl@3/${OPENSSL_FULL_VERSION}"
           echo "dyld-path=${OPENSSL_PATH}/lib" >> $GITHUB_OUTPUT
-         
+
       - name: Install project and its dependencies
         run: uv sync
-     
+
+      - name: Fetch firmware binaries
+        run: uv sync --extra builder && uv run poe fetch-firmware
+
       - name: Build dist (Linux)
         if: ${{ runner.os == 'Linux' }}
         uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
@@ -85,13 +84,13 @@ jobs:
         env:
           DYLD_LIBRARY_PATH: ${{ steps.setup-macos.outputs.dyld-path }}
         run: uv run poe build-macos
-        
+
       - name: Build dist (Windows)
         if: ${{ runner.os == 'Windows' }}
         env:
-          KIVY_GL_BACKEND: 'angle_sdl2'
+          KIVY_GL_BACKEND: "angle_sdl2"
         run: uv run poe build-win
-          
+
       - name: Build release deb (Linux)
         if: ${{ runner.os == 'Linux' }}
         id: release-deb
@@ -100,7 +99,6 @@ jobs:
           VERSION: ${{ steps.setup-linux.outputs.version }}
           DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
         run: |
-          # PyInstaller creates krux-installer (with hyphen), not krux_installer
           BINARY_PATH="./dist/krux-installer"
           sh .ci/create-deb.sh \
             -a "${NAME}" \
@@ -115,7 +113,7 @@ jobs:
           tree ./release
           echo "build-path=$(pwd)/release" >> $GITHUB_OUTPUT
           echo "pkg=${NAME}_${VERSION}_amd64.deb" >> $GITHUB_OUTPUT
-  
+
       - name: Build release rpm (Linux)
         if: ${{ runner.os == 'Linux' }}
         id: release-rpm
@@ -125,7 +123,6 @@ jobs:
           DESCRIPTION: ${{ steps.setup-linux.outputs.description }}
         run: |
           RPM_VERSION=$(sed -e 's/-/_/g' <<< $VERSION)
-          # PyInstaller creates krux-installer (with hyphen), not krux_installer
           BINARY_PATH="./dist/krux-installer"
           sh .ci/create-rpm.sh \
             -a "${NAME}" \
@@ -142,7 +139,7 @@ jobs:
           cp $HOME/rpmbuild/RPMS/x86_64/${NAME}-${RPM_VERSION}-1.x86_64.rpm ./release/${NAME}-${RPM_VERSION}-1.x86_64.rpm4
           echo "build-path=${HOME}/rpmbuild/RPMS/x86_64" >> $GITHUB_OUTPUT
           echo "pkg=${NAME}-${RPM_VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
-      
+
       - name: Build release dmg (MacOS)
         if: ${{ runner.os == 'macOS' }}
         id: release-macos
@@ -162,7 +159,6 @@ jobs:
         shell: pwsh
         run: |
           choco install nsis -y
-          # NSIS is installed to Program Files (x86)
           $nsisPath = "C:\Program Files (x86)\NSIS\makensis.exe"
           if (-not (Test-Path $nsisPath)) {
             throw "NSIS not found at expected location: $nsisPath"
@@ -172,11 +168,8 @@ jobs:
           $name = uv run python -c 'from src.utils.constants import get_name; print(get_name())'
           $version = uv run python -c 'from src.utils.constants import get_version; print(get_version())'
           $description = uv run python -c 'from src.utils.constants import get_description; print(get_description())'
-          # create-nsis.py creates {app_name}.nsi file, so it will be krux_installer.nsi
           uv run python .ci/create-nsis.py -a $name -b .\dist\krux-installer.exe -o selfcustody -V $version -d "$description" -l .\LICENSE -i .\assets\icon.ico -O .
-          # Compile the NSI file (it's named after $name, which is krux_installer)
           & $nsisPath ".\${name}.nsi"
-          # NSIS creates the installer with the app name (krux_installer), not with hyphen
           $setupFile = ".\${name} Setup.exe"
           Write-Host "Looking for setup file: $setupFile"
           if (-not (Test-Path $setupFile)) {
@@ -185,8 +178,8 @@ jobs:
           }
           Move-Item -Path $setupFile -Destination ".\release\${name}_v${version}_Setup.exe"
           echo "build-path=$pwd\release" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-          echo "pkg=${name}_v${version}_Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append 
-            
+          echo "pkg=${name}_v${version}_Setup.exe" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+
       - name: Hash (Linux deb)
         if: ${{ runner.os == 'Linux' }}
         uses: qlrd/sha256sum-action@v3
@@ -194,8 +187,8 @@ jobs:
         with:
           working-directory: ${{ steps.release-deb.outputs.build-path }}
           file: ${{ steps.release-deb.outputs.pkg }}
-          ext: 'sha256.txt'
-          
+          ext: "sha256.txt"
+
       - name: Hash (Linux rpm)
         if: ${{ runner.os == 'Linux' }}
         uses: qlrd/sha256sum-action@v3
@@ -203,8 +196,8 @@ jobs:
         with:
           working-directory: ${{ steps.release-rpm.outputs.build-path }}
           file: ${{ steps.release-rpm.outputs.pkg }}
-          ext: 'sha256.txt'
-          
+          ext: "sha256.txt"
+
       - name: Hash (MacOS)
         if: ${{ runner.os == 'macOS' }}
         uses: qlrd/sha256sum-action@v3
@@ -212,7 +205,7 @@ jobs:
         with:
           working-directory: ${{ steps.release-macos.outputs.build-path }}
           file: ${{ steps.release-macos.outputs.pkg }}
-          ext: 'sha256.txt'
+          ext: "sha256.txt"
 
       - name: Hash (Windows)
         if: ${{ runner.os == 'Windows' }}
@@ -221,38 +214,38 @@ jobs:
         with:
           working-directory: ${{ steps.release-windows.outputs.build-path }}
           file: ${{ steps.release-windows.outputs.pkg }}
-          ext: 'sha256.txt'
+          ext: "sha256.txt"
 
       - name: Upload artifact deb (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: actions/upload-artifact@v7         
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.release-deb.outputs.pkg }}
           path: |
             ${{ steps.release-deb.outputs.build-path}}/${{ steps.release-deb.outputs.pkg }}
             ${{ steps.release-deb.outputs.build-path}}/${{ steps.release-deb.outputs.pkg }}.sha256.txt
-      
+
       - name: Upload artifact rpm (Linux)
         if: ${{ runner.os == 'Linux' }}
-        uses: actions/upload-artifact@v7         
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.release-rpm.outputs.pkg }}
           path: |
             ${{ steps.release-rpm.outputs.build-path}}/${{ steps.release-rpm.outputs.pkg }}
             ${{ steps.release-rpm.outputs.build-path}}/${{ steps.release-rpm.outputs.pkg }}.sha256.txt
-            
+
       - name: Upload artifacts (MacOS)
         if: ${{ runner.os == 'macOS' }}
-        uses: actions/upload-artifact@v7         
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.release-macos.outputs.pkg }}
           path: |
             ${{ steps.release-macos.outputs.build-path}}/${{ steps.release-macos.outputs.pkg }}
             ${{ steps.release-macos.outputs.build-path}}/${{ steps.release-macos.outputs.pkg }}.sha256.txt
-      
+
       - name: Upload artifacts (Windows)
         if: ${{ runner.os == 'Windows' }}
-        uses: actions/upload-artifact@v7         
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.release-windows.outputs.pkg }}
           path: |

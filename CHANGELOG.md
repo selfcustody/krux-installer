@@ -1,16 +1,18 @@
-# 0.0.22
+# CHANGELOG
 
-- Add Wonder K device support;
-- Add Tor proxy support for Tails OS;
-- Fix ESC button killing application and red circles on
-  non-primary mouse clicks;
-- Fix build issues;
-- Fix Artix Linux compatibility;
-- Replace deprecated `typing.re` with `typing.Pattern`;
-- Refactor how new devices are added to the installer;
-- Remove unused libs: `pyzbar`, `opencv`, `pillow`, `olefile`;
-- Update Python version for Nix;
-- Add Conventional Commits 1.0.0 enforcement to CI;
+## 0.0.22
+
+### BREAKING CHANGE
+
+- Krux firmware binaries are now bundled inside the installer at build time
+  (closes #233);
+- The installer no longer fetches firmware from GitHub at runtime;
+- Dependencies `requests` and `cryptography` are now optional and only
+  required for local builds (use `uv sync --extra builder` to install them);
+- Added `prebuild/fetch_firmware.py` script to fetch and embed firmware
+  binaries before building;
+- CI pipelines updated to run `uv run poe fetch-firmware` before building
+  the installer.
 
 ## 0.0.21
 
@@ -79,7 +81,8 @@
 - Removed startup messages as suggested by @tadeubas:
   - On linux the `GreetingsScreen` class will check:
     - if user is on `dialout`/`uucp` group
-    (debian and fedora based / archlinux);
+      (debian and fedora based / archlinux);
+    - internet connection
   - On MacOS and Windows the `GreetingsScreen` class will check:
     - internet connection
 - Added the window resize behaviour;
@@ -119,7 +122,7 @@
   - pt_BR (Brazilian portuguese);
   - ru_RU (Russian cyrillic);
   - zh_CN (Simplified chinese)
-  
+
 ## 0.0.1
 
 - Major updates dependencies:

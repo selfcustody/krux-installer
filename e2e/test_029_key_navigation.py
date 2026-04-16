@@ -1,16 +1,17 @@
 import os
 from unittest.mock import patch
+
 from kivy.base import EventLoop
 from kivy.clock import Clock
+from kivy.core.text import DEFAULT_FONT, LabelBase
 from kivy.tests.common import GraphicUnitTest
-from kivy.core.text import LabelBase, DEFAULT_FONT
-from src.app import KruxInstallerApp, SCREEN_PARENTS
+
+from src.app import SCREEN_PARENTS, KruxInstallerApp
 
 # pylint: disable=unused-argument,protected-access
 
 
 class TestAppKeyNavigation(GraphicUnitTest):
-
     @classmethod
     def setUpClass(cls):
         cwd_path = os.path.dirname(__file__)
@@ -48,22 +49,12 @@ class TestAppKeyNavigation(GraphicUnitTest):
         self.assertEqual(SCREEN_PARENTS["ErrorScreen"], "GreetingsScreen")
 
     def test_screen_parents_all_expected_screens_present(self):
+        # New minimal screen set — no download/verify/unzip pipeline
         expected = {
             "GreetingsScreen",
             "MainScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
             "SelectDeviceScreen",
             "AboutScreen",
-            "WarningAlreadyDownloadedScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
             "WarningWipeScreen",
             "WipeScreen",
             "WarningBeforeAirgapUpdateScreen",
@@ -87,7 +78,7 @@ class TestAppKeyNavigation(GraphicUnitTest):
         app = KruxInstallerApp()
         self.assertEqual(app.screen_parents, SCREEN_PARENTS)
         # mutating instance does not affect module-level map
-        app.screen_parents["FlashScreen"] = "UnzipStableScreen"
+        app.screen_parents["FlashScreen"] = "SomeScreen"
         self.assertIsNone(SCREEN_PARENTS["FlashScreen"])
 
     @patch(
@@ -126,61 +117,6 @@ class TestAppKeyNavigation(GraphicUnitTest):
         self.assertEqual(app.screen_manager.current, "GreetingsScreen")
         self.assertEqual(app.screen_manager.transition.direction, "right")
         mock_reset.assert_called_once()
-
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_on_key_down_esc_from_select_version_goes_to_main(
-        self, mock_destdir, mock_get_locale
-    ):
-        app = KruxInstallerApp()
-        app.build()
-        app.screen_manager.current = "SelectVersionScreen"
-
-        result = app._on_key_down(None, 27, None)
-
-        self.assertTrue(result)
-        self.assertEqual(app.screen_manager.current, "MainScreen")
-        self.assertEqual(app.screen_manager.transition.direction, "right")
-
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_on_key_down_esc_from_select_old_version_goes_to_select_version(
-        self, mock_destdir, mock_get_locale
-    ):
-        app = KruxInstallerApp()
-        app.build()
-        app.screen_manager.current = "SelectOldVersionScreen"
-
-        result = app._on_key_down(None, 27, None)
-
-        self.assertTrue(result)
-        self.assertEqual(app.screen_manager.current, "SelectVersionScreen")
-
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_on_key_down_esc_from_warning_beta_goes_to_select_version(
-        self, mock_destdir, mock_get_locale
-    ):
-        app = KruxInstallerApp()
-        app.build()
-        app.screen_manager.current = "WarningBetaScreen"
-
-        result = app._on_key_down(None, 27, None)
-
-        self.assertTrue(result)
-        self.assertEqual(app.screen_manager.current, "SelectVersionScreen")
 
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
@@ -312,44 +248,6 @@ class TestAppKeyNavigation(GraphicUnitTest):
 
         self.assertTrue(result)
         mock_stop.assert_called_once()
-
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_on_key_down_esc_on_flash_screen_stable_path(
-        self, mock_destdir, mock_get_locale
-    ):
-        app = KruxInstallerApp()
-        app.build()
-        app.screen_parents["FlashScreen"] = "UnzipStableScreen"
-        app.screen_manager.current = "FlashScreen"
-
-        result = app._on_key_down(None, 27, None)
-
-        self.assertTrue(result)
-        self.assertEqual(app.screen_manager.current, "UnzipStableScreen")
-
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_on_key_down_esc_on_flash_screen_beta_path(
-        self, mock_destdir, mock_get_locale
-    ):
-        app = KruxInstallerApp()
-        app.build()
-        app.screen_parents["FlashScreen"] = "DownloadBetaScreen"
-        app.screen_manager.current = "FlashScreen"
-
-        result = app._on_key_down(None, 27, None)
-
-        self.assertTrue(result)
-        self.assertEqual(app.screen_manager.current, "DownloadBetaScreen")
 
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"

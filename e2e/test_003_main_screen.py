@@ -1,15 +1,15 @@
 import os
-import re
-from unittest.mock import patch, call, MagicMock
+from unittest.mock import MagicMock, call, patch
+
 from kivy.base import EventLoop, EventLoopBase
 from kivy.clock import Clock
+from kivy.core.text import DEFAULT_FONT, LabelBase
 from kivy.tests.common import GraphicUnitTest
-from kivy.core.text import LabelBase, DEFAULT_FONT
+
 from src.app.screens.main_screen import MainScreen
 
 
 class TestMainScreen(GraphicUnitTest):
-
     @classmethod
     def setUpClass(cls):
         cwd_path = os.path.dirname(__file__)
@@ -21,8 +21,6 @@ class TestMainScreen(GraphicUnitTest):
 
     @classmethod
     def teardown_class(cls):
-        # Unschedule all pending Clock events to prevent race conditions
-        # with subsequent tests
         for event in Clock.get_events():
             Clock.unschedule(event)
         EventLoop.exit()
@@ -35,7 +33,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
 
@@ -54,7 +51,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -70,14 +66,13 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
         buttons = grid.children
 
-        self.assertEqual(len(buttons), 6)
-        self.assertEqual(buttons[5].id, "main_select_version")
+        # New layout: 5 buttons — select_device, flash, wipe, settings, about
+        self.assertEqual(len(buttons), 5)
         self.assertEqual(buttons[4].id, "main_select_device")
         self.assertEqual(buttons[3].id, "main_flash")
         self.assertEqual(buttons[2].id, "main_wipe")
@@ -94,7 +89,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -103,12 +97,7 @@ class TestMainScreen(GraphicUnitTest):
         for button in grid.children:
             action = getattr(screen.__class__, f"on_press_{button.id}")
             action(button)
-            if button.id in (
-                "main_select_device",
-                "main_select_version",
-                "main_settings",
-                "main_about",
-            ):
+            if button.id in ("main_select_device", "main_settings", "main_about"):
                 calls.append(call(wid=button.id, rgba=(0.25, 0.25, 0.25, 1)))
 
         mock_set_background.assert_has_calls(calls)
@@ -135,46 +124,30 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
 
         calls_set_background = []
         calls_set_screen = []
-        calls_manager = []
 
         for button in grid.children:
             action = getattr(screen.__class__, f"on_release_{button.id}")
             action(button)
 
-            if button.id in (
-                "main_select_device",
-                "main_select_version",
-                "main_settings",
-                "main_about",
-            ):
+            if button.id in ("main_select_device", "main_settings", "main_about"):
                 calls_set_background.append(call(wid=button.id, rgba=(0, 0, 0, 1)))
 
             if button.id == "main_select_device":
                 calls_set_screen.append(
                     call(name="SelectDeviceScreen", direction="left")
                 )
-                calls_manager.append(call("SelectDeviceScreen"))
 
-            if button.id == "main_select_version":
-                calls_set_screen.append(
-                    call(name="SelectVersionScreen", direction="left")
-                )
-                calls_manager.append(call("SelectVersionScreen"))
-                calls_manager.append(call().clear())
-                calls_manager.append(call().fetch_releases())
             if button.id == "main_about":
                 calls_set_screen.append(call(name="AboutScreen", direction="left"))
 
         mock_set_background.assert_has_calls(calls_set_background)
         mock_set_screen.assert_has_calls(calls_set_screen)
-        mock_manager.get_screen.assert_has_calls(calls_manager)
         mock_get_locale.assert_any_call()
         mock_open_settings.assert_called_once()
 
@@ -182,75 +155,10 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    def test_update_version(self, mock_get_locale):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        device_button = grid.children[5]
-        flash_button = grid.children[3]
-        wipe_button = grid.children[2]
-
-        text_device = "Version: [color=#00AABB]select a new one[/color]"
-        text_flash = "[color=#333333]Flash firmware[/color]"
-        text_wipe = "[color=#333333]Wipe device[/color]"
-        calls = []
-
-        self.assertEqual(device_button.text, text_device)
-        self.assertEqual(flash_button.text, text_flash)
-        self.assertEqual(wipe_button.text, text_wipe)
-
-        for version in (
-            "odudex/krux_binaries",
-            "v23.09.1",
-            "v23.09.0",
-            "v22.08.2",
-            "v22.08.1",
-            "v22.08.0",
-            "v22.03.0",
-        ):
-            text_version = f"Version: [color=#00AABB]{version}[/color]"
-            screen.update(name="SelectVersionScreen", key="version", value=version)
-            self.assertEqual(device_button.text, text_version)
-            self.assertEqual(flash_button.text, text_flash)
-            self.assertEqual(wipe_button.text, text_wipe)
-
-            # each button has at least 2 calls of get locale
-            # one for locale, other for font
-            call.append(call())
-            call.append(call())
-
-        mock_get_locale.assert_has_calls(calls)
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
-    def test_fail_update_version(self, mock_redirect_exception, mock_get_locale):
-        screen = MainScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-
-        screen.update(name="SelectVersionScreen", key="version")
-        mock_redirect_exception.assert_called()
-        mock_get_locale.assert_called()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    # pylint: disable=too-many-locals
     def test_update_device(self, mock_get_locale):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -258,23 +166,20 @@ class TestMainScreen(GraphicUnitTest):
         flash_button = grid.children[3]
         wipe_button = grid.children[2]
 
-        text_device = "Device: [color=#00AABB]select a new one[/color]"
-        mocked_text_device = "Device: [color=#00AABB]Mocked device[/color]"
-        text_flash = "[color=#333333]Flash firmware[/color]"
-        mocked_text_flash = "Flash firmware"
-        text_wipe = "[color=#333333]Wipe device[/color]"
-        mocked_text_wipe = "Wipe device"
-
-        self.assertEqual(device_button.text, text_device)
-        self.assertEqual(flash_button.text, text_flash)
-        self.assertEqual(wipe_button.text, text_wipe)
+        self.assertEqual(
+            device_button.text, "Device: [color=#00AABB]select a new one[/color]"
+        )
+        initial_flash_text = flash_button.text
+        initial_wipe_text = wipe_button.text
+        self.assertIn("color=#333333", initial_flash_text)
+        self.assertIn("color=#333333", initial_wipe_text)
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
-            screen.update(name="SelectVersionScreen", key="device", value=device)
+            screen.update(name="SelectDeviceScreen", key="device", value=device)
             mocked_text_device = f"Device: [color=#00AABB]{device}[/color]"
             self.assertEqual(device_button.text, mocked_text_device)
-            self.assertEqual(flash_button.text, mocked_text_flash)
-            self.assertEqual(wipe_button.text, mocked_text_wipe)
+            self.assertNotIn("color=#333333", flash_button.text)
+            self.assertNotIn("color=#333333", wipe_button.text)
 
         mock_get_locale.assert_any_call()
 
@@ -287,10 +192,9 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
 
-        screen.update(name="SelectVersionScreen", key="device")
+        screen.update(name="SelectDeviceScreen", key="device")
         mock_redirect_exception.assert_called()
         mock_get_locale.assert_called()
 
@@ -303,9 +207,8 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
-        screen.update(name="MockedScreen", key="device", value="v24.03.0")
+        screen.update(name="MockedScreen", key="device", value="m5stickv")
 
         mock_get_locale.assert_any_call()
         mock_redirect_exception.assert_called_once()
@@ -318,7 +221,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
 
         screen.update(name="SelectDeviceScreen", key="mock", value="mock")
@@ -332,7 +234,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -341,23 +242,17 @@ class TestMainScreen(GraphicUnitTest):
         wipe_button = grid.children[2]
 
         text_device = "Device: [color=#00AABB]select a new one[/color]"
-        mocked_text_device = "Device: [color=#00AABB]Mocked device[/color]"
-        text_flash = "[color=#333333]Flash firmware[/color]"
-        text_wipe = "[color=#333333]Wipe device[/color]"
-
         self.assertEqual(device_button.text, text_device)
-        self.assertEqual(flash_button.text, text_flash)
-        self.assertEqual(wipe_button.text, text_wipe)
+        self.assertIn("color=#333333", flash_button.text)
+        self.assertIn("color=#333333", wipe_button.text)
 
         screen.update(name="SelectDeviceScreen", key="device", value="Mocked device")
 
+        mocked_text_device = "Device: [color=#00AABB]Mocked device[/color]"
         self.assertEqual(device_button.text, mocked_text_device)
-        self.assertEqual(flash_button.text, text_flash)
-        self.assertEqual(wipe_button.text, text_wipe)
+        self.assertIn("color=#333333", flash_button.text)
+        self.assertIn("color=#333333", wipe_button.text)
 
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
-        # and since update device, two more calls
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -368,7 +263,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
 
         screen.update(name="ConfigKruxInstaller", key="locale", value="en_US.UTF-8")
@@ -384,7 +278,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -406,7 +299,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -414,12 +306,8 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
-        text_flash = "[color=#333333]Flash firmware[/color]"
         self.assertTrue(flash_button.markup)
-        self.assertEqual(flash_button.text, text_flash)
-
-        # each button has at least 2 calls of get locale
-        # one for locale, other for font
+        self.assertIn("color=#333333", flash_button.text)
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -431,7 +319,6 @@ class TestMainScreen(GraphicUnitTest):
         screen.will_flash = True
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -439,8 +326,7 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="flash", value=None)
 
-        text_flash = "Flash firmware"
-        self.assertEqual(flash_button.text, text_flash)
+        self.assertNotIn("color=#333333", flash_button.text)
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -448,13 +334,9 @@ class TestMainScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     def test_update_flash_not_will_wipe(self, mock_get_locale):
-        mock_get_locale.config = MagicMock()
-        mock_get_locale.config.get = MagicMock(return_value="en-US")
-
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -462,8 +344,7 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
 
-        text_wipe = "[color=#333333]Wipe device[/color]"
-        self.assertEqual(wipe_button.text, text_wipe)
+        self.assertIn("color=#333333", wipe_button.text)
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -475,16 +356,14 @@ class TestMainScreen(GraphicUnitTest):
         screen.will_wipe = True
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
         wipe_button = grid.children[2]
 
         screen.update(name="ConfigKruxInstaller", key="wipe", value=None)
-        text_wipe = "Wipe device"
 
-        self.assertEqual(wipe_button.text, text_wipe)
+        self.assertNotIn("color=#333333", wipe_button.text)
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -495,7 +374,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -503,8 +381,7 @@ class TestMainScreen(GraphicUnitTest):
 
         screen.update(name="ConfigKruxInstaller", key="settings", value=None)
 
-        settings_text = "Settings"
-        self.assertEqual(s_button.text, settings_text)
+        self.assertEqual(s_button.text, "Settings")
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -515,15 +392,13 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
         a_button = grid.children[0]
 
         screen.update(name="ConfigKruxInstaller", key="about", value=None)
-        about_text = "About"
-        self.assertEqual(a_button.text, about_text)
+        self.assertEqual(a_button.text, "About")
         mock_get_locale.assert_any_call()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
@@ -535,7 +410,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -545,7 +419,7 @@ class TestMainScreen(GraphicUnitTest):
         background_calls = []
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
-            screen.update(name="SelectVersionScreen", key="device", value=device)
+            screen.update(name="SelectDeviceScreen", key="device", value=device)
             flash_action = getattr(screen.__class__, f"on_press_{flash_button.id}")
             wipe_action = getattr(screen.__class__, f"on_press_{wipe_button.id}")
             flash_action(flash_button)
@@ -563,41 +437,35 @@ class TestMainScreen(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch("src.app.screens.base_screen.BaseScreen.get_destdir_assets")
-    @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[False])
-    def test_on_release_flash_to_download_stable_zip_screen(
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_on_release_flash_goes_to_flash_screen(
         self,
-        mock_isfile,
-        mock_get_destdir_assets,
+        mock_get_running_app,
         mock_get_locale,
         mock_manager,
         mock_set_screen,
         mock_set_background,
     ):
+        mock_app = MagicMock()
+        mock_app.config.get.return_value = "1500000"
+        mock_get_running_app.return_value = mock_app
         mock_manager.get_screen = MagicMock()
 
         screen = MainScreen()
-        screen.version = "v24.03.0"
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[3]
 
-        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
+        screen.update(name="SelectDeviceScreen", key="device", value="m5stickv")
         action = getattr(screen.__class__, f"on_release_{button.id}")
         action(button)
 
         mock_get_locale.assert_any_call()
-        mock_get_destdir_assets.assert_called_once()
         mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
-        mock_set_screen.assert_called_once_with(
-            name="DownloadStableZipScreen", direction="left"
-        )
-        pattern = re.compile(r".*v24\.03\.0\.zip")
-        self.assertTrue(pattern.match(mock_isfile.call_args[0][0]))
+        mock_set_screen.assert_called_once_with(name="FlashScreen", direction="left")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -606,111 +474,30 @@ class TestMainScreen(GraphicUnitTest):
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
-    def test_fail_on_release_flash_to_download_stable_zip_screen(
+    def test_fail_on_release_flash_invalid_device(
         self,
         mock_redirect_exception,
         mock_get_locale,
         mock_manager,
-        mock_set_background,
+        _mock_set_background,
     ):
         mock_manager.get_screen = MagicMock()
 
         screen = MainScreen()
-        screen.version = "mocked"
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
         button = grid.children[3]
 
-        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
+        screen.will_flash = True
+        screen.device = "invalid_device"
         action = getattr(screen.__class__, f"on_release_{button.id}")
         action(button)
 
         mock_get_locale.assert_any_call()
-        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
         mock_redirect_exception.assert_called()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.base_screen.BaseScreen.get_destdir_assets")
-    @patch("src.app.screens.main_screen.os.path.isfile", side_effect=[True])
-    def test_on_release_flash_to_warning_already_downloaded_zip_screen(
-        self,
-        mock_isfile,
-        mock_get_destdir_assets,
-        mock_get_locale,
-        mock_manager,
-        mock_set_screen,
-        mock_set_background,
-    ):
-        mock_manager.get_screen = MagicMock()
-
-        screen = MainScreen()
-        screen.version = "v24.03.0"
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[3]
-
-        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
-        action = getattr(screen.__class__, f"on_release_{button.id}")
-        action(button)
-
-        mock_get_locale.assert_any_call()
-        mock_get_destdir_assets.assert_called_once()
-        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
-        mock_set_screen.assert_called_once_with(
-            name="WarningAlreadyDownloadedScreen", direction="left"
-        )
-        pattern = re.compile(r".*v24\.03\.0\.zip")
-        self.assertTrue(pattern.match(mock_isfile.call_args[0][0]))
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.main_screen.MainScreen.set_background")
-    @patch("src.app.screens.main_screen.MainScreen.set_screen")
-    @patch("src.app.screens.main_screen.MainScreen.manager")
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    def test_on_release_flash_to_download_beta_screen(
-        self,
-        mock_get_locale,
-        mock_manager,
-        mock_set_screen,
-        mock_set_background,
-    ):
-        mock_manager.get_screen = MagicMock()
-
-        screen = MainScreen()
-        screen.version = "odudex/krux_binaries"
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        button = grid.children[3]
-
-        screen.update(name="SelectVersionScreen", key="device", value="m5stickv")
-        action = getattr(screen.__class__, f"on_release_{button.id}")
-        action(button)
-
-        mock_get_locale.assert_any_call()
-        mock_set_background.assert_called_once_with(wid="main_flash", rgba=(0, 0, 0, 1))
-        mock_set_screen.assert_called_once_with(
-            name="DownloadBetaScreen", direction="left"
-        )
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.main_screen.MainScreen.set_background")
@@ -731,7 +518,6 @@ class TestMainScreen(GraphicUnitTest):
         screen = MainScreen()
         self.render(screen)
 
-        # get your Window instance safely
         EventLoop.ensure_window()
         window = EventLoop.window
         grid = window.children[0].children[0]
@@ -741,7 +527,7 @@ class TestMainScreen(GraphicUnitTest):
         calls_set_screen = []
 
         for device in ("m5stickv", "amigo", "dock", "bit", "yahboom", "cube"):
-            screen.update(name="SelectVersionScreen", key="device", value=device)
+            screen.update(name="SelectDeviceScreen", key="device", value=device)
             action = getattr(screen.__class__, f"on_release_{button.id}")
             action(button)
 

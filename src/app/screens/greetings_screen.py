@@ -25,8 +25,9 @@ greetings_screen.py
 import os
 import sys
 from functools import partial
+
 from kivy.clock import Clock
-from src.utils.selector import Selector
+
 from src.app.screens.base_screen import BaseScreen
 
 
@@ -66,8 +67,7 @@ class GreetingsScreen(BaseScreen):
         """
         After show krux logo, verify:
         - in linux, if the current user is in dialout group to allow sudoless flash
-        - check the internet connection
-            - if have, update the firmware version to the latest
+        - then go directly to MainScreen
         """
         name = str(kwargs.get("name"))
         key = str(kwargs.get("key"))
@@ -76,9 +76,6 @@ class GreetingsScreen(BaseScreen):
         def on_update():
             if key == "check-permission":
                 self.check_dialout_permission()
-
-            if key == "check-internet-connection":
-                self.check_internet_connection()
 
         setattr(GreetingsScreen, "on_update", on_update)
         self.update_screen(
@@ -93,7 +90,6 @@ class GreetingsScreen(BaseScreen):
         """Detect OS and properly return the 'dialout' group (in some distros can be 'uucp')"""
         detected = (None, None)
         try:
-
             with open("/etc/os-release", mode="r", encoding="utf-8") as f:
                 os_info = f.readlines()
 
@@ -108,21 +104,21 @@ class GreetingsScreen(BaseScreen):
                 detected = (
                     os_data["ID_LIKE"],
                     "dialout",
-                )  # Pop!_OS will fall under this
+                )
 
             # Check for Red Hat-based systems (CentOS, Rocky Linux, etc.)
             if "ID_LIKE" in os_data and "rhel" in os_data["ID_LIKE"]:
                 detected = (
                     os_data["ID_LIKE"],
                     "dialout",
-                )  # Red Hat-based systems often use `dialout`
+                )
 
             # Check for SUSE-based systems (openSUSE, SUSE Linux Enterprise)
             if "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
                 detected = (
                     os_data["ID_LIKE"],
                     "dialout",
-                )  # SUSE systems also often use `dialout`
+                )
 
             # Check for Fedora, to fix issue #115
             # see https://github.com/selfcustody/krux-installer/issues/115
@@ -130,7 +126,7 @@ class GreetingsScreen(BaseScreen):
                 detected = (
                     os_data["ID"],
                     "dialout",
-                )  # FEDORA systems also often use `dialout`
+                )
 
             # Arch, Manjaro, Slackware, Gentoo
             if os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
@@ -145,8 +141,8 @@ class GreetingsScreen(BaseScreen):
                 id_version = os_data.get("VERSION_ID", "unknown version")
                 detected = (os_data["ID"], "dialout")
                 print(f"Allowing NixOS {id_version} (experimental support)")
+
             if not detected[0]:
-                # If none of the conditions match, fall back to the default group
                 exc = RuntimeError(
                     f"{os_data.get('PRETTY_NAME', 'Unknown Linux distribution')} not supported"
                 )
@@ -164,15 +160,11 @@ class GreetingsScreen(BaseScreen):
         """Check if the provided user is in dialout"""
         _in_dialout = False
 
-        # grp module is only available on Unix systems
         try:
             import grp  # pylint: disable=import-outside-toplevel
         except ImportError:
-            # grp not available (e.g., on Windows)
             return _in_dialout
 
-        # loop throug all linux groups and check
-        # if the user is registered in the "dialout" group
         for _grp in grp.getgrall():
             gr_name = _grp.gr_name
             if gr_name == group:
@@ -185,23 +177,14 @@ class GreetingsScreen(BaseScreen):
 
     def check_dialout_permission(self):
         """
-        Here's where the check process start
-        first get the current user, then verify
-        the linux distribution used and use the
-        proper command to add the user in 'dialout'
-        group (in some distros, can be 'uucp')
+        Check dialout permission on Linux then proceed to MainScreen.
+        On non-Linux systems, go directly to MainScreen.
         """
         if sys.platform.startswith("linux"):
-            # get current user
             _user = str(os.environ.get("USER"))
-            _in_dialout = False
 
-            # Set default group in case no match is found
             _distro, _group = self.get_os_dialout_group()
 
-            # if user is not in dialout group, warn user
-            # and then redirect to a screen that will
-            # proceed with the proper operation
             if not self.is_user_in_dialout_group(user=_user, group=_group):
                 ask = self.manager.get_screen("AskPermissionDialoutScreen")
                 fns = [
@@ -216,34 +199,7 @@ class GreetingsScreen(BaseScreen):
 
                 self.set_screen(name="AskPermissionDialoutScreen", direction="left")
             else:
-                fn = partial(
-                    self.update, name=self.name, key="check-internet-connection"
-                )
-                Clock.schedule_once(fn, 0)
+                self.set_screen(name="MainScreen", direction="left")
 
         else:
-            fn = partial(self.update, name=self.name, key="check-internet-connection")
-            Clock.schedule_once(fn, 0)
-
-    def check_internet_connection(self):
-        """
-        In reality, this method get the latest version and set to
-        select version button on main_screen. But it can work as
-        internet connection check
-        """
-        try:
-            selector = Selector()
-            main_screen = self.manager.get_screen("MainScreen")
-            fn = partial(
-                main_screen.update,
-                name=self.name,
-                key="version",
-                value=selector.releases[0],
-            )
-            Clock.schedule_once(fn, 0)
             self.set_screen(name="MainScreen", direction="left")
-
-        # pylint: disable=broad-exception-caught
-        except Exception as exc:
-            self.error(str(exc))
-            self.redirect_exception(exception=exc)

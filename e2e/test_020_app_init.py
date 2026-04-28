@@ -1,17 +1,47 @@
 import os
 import sys
-from unittest.mock import patch, mock_open, MagicMock
-from pytest import mark
+from unittest.mock import MagicMock, mock_open, patch
+
 from kivy.base import EventLoop, EventLoopBase
 from kivy.clock import Clock
+from kivy.core.text import DEFAULT_FONT, LabelBase
 from kivy.tests.common import GraphicUnitTest
 from kivy.uix.screenmanager import ScreenManager
-from kivy.core.text import LabelBase, DEFAULT_FONT
+from pytest import mark
+
 from src.app import KruxInstallerApp
+
+EXPECTED_SCREENS_LINUX = (
+    "GreetingsScreen",
+    "AskPermissionDialoutScreen",
+    "MainScreen",
+    "SelectDeviceScreen",
+    "AboutScreen",
+    "WarningWipeScreen",
+    "FlashScreen",
+    "WarningBeforeAirgapUpdateScreen",
+    "WarningAfterAirgapUpdateScreen",
+    "AirgapUpdateScreen",
+    "WipeScreen",
+    "ErrorScreen",
+)
+
+EXPECTED_SCREENS_NON_LINUX = (
+    "GreetingsScreen",
+    "MainScreen",
+    "SelectDeviceScreen",
+    "AboutScreen",
+    "WarningWipeScreen",
+    "FlashScreen",
+    "WarningBeforeAirgapUpdateScreen",
+    "WarningAfterAirgapUpdateScreen",
+    "AirgapUpdateScreen",
+    "WipeScreen",
+    "ErrorScreen",
+)
 
 
 class TestConfigKruxInstaller(GraphicUnitTest):
-
     @classmethod
     def setUpClass(cls):
         cwd_path = os.path.dirname(__file__)
@@ -46,40 +76,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_build_debian(self, mock_get_destdir_assets, mock_get_locale, open_mock):
+    def test_build_debian(self, mock_get_locale, open_mock):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
         open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
 
     @mark.skipif(
@@ -92,40 +96,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_build_rhel(self, mock_get_destdir_assets, mock_get_locale, open_mock):
+    def test_build_rhel(self, mock_get_locale, open_mock):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
         open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
 
     @mark.skipif(
@@ -138,40 +116,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_build_suse(self, mock_get_destdir_assets, mock_get_locale, open_mock):
+    def test_build_suse(self, mock_get_locale, open_mock):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
         open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
 
     @mark.skipif(
@@ -184,40 +136,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_build_arch(self, mock_get_destdir_assets, mock_get_locale, open_mock):
+    def test_build_arch(self, mock_get_locale, open_mock):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
         open_mock.assert_called()
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
 
     @mark.skipif(
@@ -230,40 +156,14 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_build_alpine(self, mock_get_destdir_assets, mock_get_locale, open_mock):
+    def test_build_alpine(self, mock_get_locale, open_mock):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
         open_mock.assert_called()
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
 
     @mark.skipif(
@@ -280,47 +180,20 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
     def test_fail_build_unrecognized(
         self,
         mock_redirect_exception,
-        mock_get_destdir_assets,
         mock_get_locale,
         open_mock,
     ):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
         open_mock.assert_called()
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
         mock_redirect_exception.assert_called()
 
@@ -334,14 +207,10 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
     @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
     def test_fail_build_linux_filenotfound(
         self,
         mock_redirect_exception,
-        mock_get_destdir_assets,
         mock_get_locale,
         open_mock,
     ):
@@ -349,33 +218,10 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "AskPermissionDialoutScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
         open_mock.assert_called()
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
         mock_redirect_exception.assert_called()
 
@@ -383,74 +229,24 @@ class TestConfigKruxInstaller(GraphicUnitTest):
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_build_win32(self, mock_get_destdir_assets, mock_get_locale):
+    def test_build_win32(self, mock_get_locale):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_NON_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()
 
     @patch("sys.platform", "darwin")
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
-    )
-    def test_build_darwin(self, mock_get_destdir_assets, mock_get_locale):
+    def test_build_darwin(self, mock_get_locale):
         app = KruxInstallerApp()
         app.build()
 
-        screens = (
-            "GreetingsScreen",
-            "MainScreen",
-            "SelectDeviceScreen",
-            "SelectVersionScreen",
-            "SelectOldVersionScreen",
-            "WarningBetaScreen",
-            "AboutScreen",
-            "DownloadStableZipScreen",
-            "DownloadStableZipSha256Screen",
-            "DownloadStableZipSigScreen",
-            "DownloadSelfcustodyPemScreen",
-            "VerifyStableZipScreen",
-            "UnzipStableScreen",
-            "DownloadBetaScreen",
-            "WarningAlreadyDownloadedScreen",
-            "WarningWipeScreen",
-            "FlashScreen",
-            "WipeScreen",
-            "ErrorScreen",
-        )
-        for screen in screens:
+        for screen in EXPECTED_SCREENS_NON_LINUX:
             self.assertFalse(app.screen_manager.get_screen(screen) is None)
 
-        mock_get_destdir_assets.assert_called_once()
         mock_get_locale.assert_called()

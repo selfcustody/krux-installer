@@ -11,9 +11,6 @@ requires-python = ">3.10,<=3.14"
 dependencies = [
     "kivy==2.3.1",
     "pyserial>=3.5",
-    "requests>=2.33.1",
-    "cryptography>=46.0.7",
-    "qrcode>=8.2",
     "easy-i18n>=1.2.0",
     "pysudoer @ git+https://github.com/qlrd/pysudoer.git",
     "pyinstaller>=6.19.0",
@@ -27,6 +24,10 @@ dev = [
     "pytest-cov>=7.1.0",
     "poethepoet>=0.44.0",
     "demjson3>=3.0.6",
+]
+builder = [
+    "requests>=2.32.5",
+    "cryptography>=46.0.7",
 ]
 
 [build-system]
@@ -59,6 +60,8 @@ format = [
   "format-drives",
   "format-installer",
 ]
+
+fetch-firmware = "python prebuild/fetch_firmware.py"
 
 test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"
 test-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e"
@@ -108,3 +111,6 @@ cmd = "python krux_installer.py"
 [tool.poe.tasks.dev]
 env = { LOGLEVEL = "info" }
 cmd = "python krux_installer.py"
+
+[tool.black]
+target-version = ["py312"]

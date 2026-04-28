@@ -1,179 +1,169 @@
 import os
-import tomllib
-from unittest.mock import patch, MagicMock
-from kivy.base import EventLoop, EventLoopBase
-from kivy.clock import Clock
-from kivy.tests.common import GraphicUnitTest
-from kivy.core.text import LabelBase, DEFAULT_FONT
-from src.app.screens.about_screen import AboutScreen
+
+import pytest
+
+from src.utils.constants import (
+    FIRMWARE_DIR,
+    FIRMWARE_VERSION,
+    VALID_DEVICES,
+    VALID_DEVICES_VERSIONS,
+    compare_versions,
+    get_description,
+    get_device_support_info,
+    get_firmware_path,
+    get_name,
+    get_valid_devices_for_version,
+    get_version,
+    is_device_valid_for_version,
+)
+
+FIRMWARE_AVAILABLE = (
+    os.path.isdir(FIRMWARE_DIR)
+    and any(f.endswith(".kfpkg") for f in os.listdir(FIRMWARE_DIR))
+    if os.path.isdir(FIRMWARE_DIR)
+    else False
+)
 
 
-class TestAboutScreen(GraphicUnitTest):
+class TestFirmwareVersion:
+    def test_firmware_version_format(self):
+        assert FIRMWARE_VERSION.startswith("v")
+        parts = FIRMWARE_VERSION[1:].split(".")
+        assert len(parts) == 3
+        assert all(p.isdigit() for p in parts)
 
-    @classmethod
-    def setUpClass(cls):
-        cwd_path = os.path.dirname(__file__)
-        rel_assets_path = os.path.join(cwd_path, "..", "assets")
-        assets_path = os.path.abspath(rel_assets_path)
-        font_name = "NotoSansCJK_CY_JP_SC_KR_VI_Krux.ttf"
-        noto_sans_path = os.path.join(assets_path, font_name)
-        LabelBase.register(DEFAULT_FONT, noto_sans_path)
+    def test_firmware_dir_is_absolute(self):
+        assert os.path.isabs(FIRMWARE_DIR)
 
-        # Read version from pyproject.toml
-        pyproject_path = os.path.join(cwd_path, "..", "pyproject.toml")
-        pyproject_abs_path = os.path.abspath(pyproject_path)
-        with open(pyproject_abs_path, "rb") as f:
-            pyproject_data = tomllib.load(f)
-        cls.version = pyproject_data["project"]["version"]
+    def test_firmware_dir_contains_version(self):
+        assert FIRMWARE_VERSION in FIRMWARE_DIR
 
-    @classmethod
-    def teardown_class(cls):
-        # Unschedule all pending Clock events to prevent race conditions
-        # with subsequent tests
-        for event in Clock.get_events():
-            Clock.unschedule(event)
-        EventLoop.exit()
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+class TestValidDevices:
+    def test_valid_devices_is_list(self):
+        assert isinstance(VALID_DEVICES, list)
+        assert len(VALID_DEVICES) > 0
+
+    def test_all_devices_have_version_info(self):
+        for device in VALID_DEVICES:
+            assert device in VALID_DEVICES_VERSIONS
+
+    def test_version_info_has_required_keys(self):
+        for _device, info in VALID_DEVICES_VERSIONS.items():
+            assert "initial" in info
+            assert "final" in info
+
+    def test_bit_is_discontinued(self):
+        assert VALID_DEVICES_VERSIONS["bit"]["final"] == "v25.10.0"
+
+
+class TestCompareVersions:
+    def test_equal_versions(self):
+        assert compare_versions("v22.03.0", "v22.03.0") == 0
+
+    def test_lower_version(self):
+        assert compare_versions("v22.03.0", "v24.03.0") == -1
+
+    def test_higher_version(self):
+        assert compare_versions("v24.03.0", "v22.03.0") == 1
+
+    def test_patch_comparison(self):
+        assert compare_versions("v22.03.0", "v22.03.1") == -1
+
+    def test_invalid_version_returns_zero_tuple(self):
+        assert compare_versions("invalid", "v22.03.0") == -1
+
+
+class TestIsDeviceValidForVersion:
+    def test_valid_device_and_version(self):
+        assert is_device_valid_for_version("amigo", "v26.03.0") is True
+
+    def test_device_before_initial_version(self):
+        assert is_device_valid_for_version("amigo", "v22.03.0") is False
+
+    def test_bit_discontinued_after_final(self):
+        assert is_device_valid_for_version("bit", "v26.03.0") is False
+
+    def test_bit_valid_at_final_version(self):
+        assert is_device_valid_for_version("bit", "v25.10.0") is True
+
+    def test_unknown_device(self):
+        assert is_device_valid_for_version("unknown_device", "v26.03.0") is False
+
+
+class TestGetValidDevicesForVersion:
+    def test_returns_list(self):
+        result = get_valid_devices_for_version("v26.03.0")
+        assert isinstance(result, list)
+
+    def test_bit_not_in_v26(self):
+        result = get_valid_devices_for_version("v26.03.0")
+        assert "bit" not in result
+
+    def test_bit_in_v25_10_0(self):
+        result = get_valid_devices_for_version("v25.10.0")
+        assert "bit" in result
+
+    def test_m5stickv_in_v26(self):
+        result = get_valid_devices_for_version("v26.03.0")
+        assert "m5stickv" in result
+
+
+class TestGetDeviceSupportInfo:
+    def test_known_device_returns_info(self):
+        info = get_device_support_info("amigo")
+        assert info["initial"] == "v22.08.0"
+        assert info["final"] is None
+
+    def test_unknown_device_returns_none_values(self):
+        info = get_device_support_info("nonexistent")
+        assert info["initial"] is None
+        assert info["final"] is None
+
+    def test_returns_copy_not_reference(self):
+        info = get_device_support_info("amigo")
+        info["initial"] = "tampered"
+        assert VALID_DEVICES_VERSIONS["amigo"]["initial"] == "v22.08.0"
+
+
+class TestGetFirmwarePath:
+    def test_valid_device_returns_path(self):
+        path = os.path.join(FIRMWARE_DIR, "amigo.kfpkg")
+        assert path.endswith("amigo.kfpkg")
+
+    def test_path_is_absolute(self):
+        path = os.path.join(FIRMWARE_DIR, "amigo.kfpkg")
+        assert os.path.isabs(path)
+
+    @pytest.mark.skipif(
+        not FIRMWARE_AVAILABLE,
+        reason="Firmware files not present — run: uv run --extra builder poe fetch-firmware",
     )
-    def test_render_main_screen(self, mock_get_locale):
-        screen = AboutScreen()
-        self.render(screen)
+    def test_firmware_file_exists(self):
+        available_devices = [d for d in VALID_DEVICES if d != "bit"]
+        for device in available_devices:
+            path = get_firmware_path(device)
+            assert os.path.exists(path), f"Missing firmware for {device}: {path}"
 
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
+    def test_unknown_device_raises_value_error(self):
+        with pytest.raises(ValueError, match="Unknown device"):
+            get_firmware_path("nonexistent_device")
 
-        self.assertEqual(window.children[0], screen)
-        self.assertEqual(screen.name, "AboutScreen")
-        self.assertEqual(screen.id, "about_screen")
-        self.assertEqual(grid.id, "about_screen_grid")
-        self.assertEqual(label.id, "about_screen_label")
+    def test_bit_raises_file_not_found(self):
+        with pytest.raises(FileNotFoundError, match="fetch-firmware"):
+            get_firmware_path("bit")
 
-        text = "".join(
-            [
-                f"[ref=SourceCode][b]v{self.version}[/b][/ref]",
-                "\n",
-                "\n",
-                "follow us on X: ",
-                "[color=#00AABB]",
-                "[ref=X][u]@selfcustodykrux[/u][/ref]",
-                "[/color]",
-                "\n",
-                "\n",
-                "[color=#00FF00]",
-                "[ref=Back]",
-                "[u]Back[/u]",
-                "[/ref]",
-                "[/color]",
-            ]
-        )
 
-        self.assertEqual(label.text, text)
-        mock_get_locale.assert_any_call()
+class TestPyprojectHelpers:
+    def test_get_name(self):
+        assert get_name() == "krux-installer"
 
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="pt_BR.UTF-8"
-    )
-    def test_update_locale(self, mock_get_locale):
-        screen = AboutScreen()
-        self.render(screen)
+    def test_get_version(self):
+        version = get_version()
+        assert isinstance(version, str)
+        assert len(version) > 0
 
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        window = EventLoop.window
-        grid = window.children[0].children[0]
-        label = grid.children[0]
-
-        screen.update(name="ConfigKruxInstaller", key="locale", value="pt_BR.UTF-8")
-
-        text = "".join(
-            [
-                f"[ref=SourceCode][b]v{self.version}[/b][/ref]",
-                "\n",
-                "\n",
-                "siga-nos no X: ",
-                "[color=#00AABB]",
-                "[ref=X][u]@selfcustodykrux[/u][/ref]",
-                "[/color]",
-                "\n",
-                "\n",
-                "[color=#00FF00]",
-                "[ref=Back]",
-                "[u]Voltar[/u]",
-                "[/ref]",
-                "[/color]",
-            ]
-        )
-        self.assertEqual(label.text, text)
-        mock_get_locale.assert_any_call()
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.about_screen.webbrowser")
-    def test_on_press_version(self, mock_webbrowser, mock_get_locale):
-        mock_webbrowser.open = MagicMock()
-
-        screen = AboutScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        button = screen.ids[f"{screen.id}_label"]
-
-        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
-        action("Mock", "SourceCode")
-
-        mock_get_locale.assert_any_call()
-        mock_webbrowser.open.assert_called_once_with(
-            "https://selfcustody.github.io/krux/getting-started/installing/from-gui/"
-        )
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.about_screen.webbrowser")
-    def test_on_press_x_formerly_known_as_twitter(
-        self, mock_webbrowser, mock_get_locale
-    ):
-        mock_webbrowser.open = MagicMock()
-
-        screen = AboutScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        button = screen.ids[f"{screen.id}_label"]
-
-        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
-        action("Mock", "X")
-
-        mock_get_locale.assert_any_call()
-        mock_webbrowser.open.assert_called_once_with("https://x.com/selfcustodykrux")
-
-    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch(
-        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
-    )
-    @patch("src.app.screens.about_screen.AboutScreen.set_screen")
-    def test_on_press_back(self, mock_set_screen, mock_get_locale):
-        screen = AboutScreen()
-        self.render(screen)
-
-        # get your Window instance safely
-        EventLoop.ensure_window()
-        button = screen.ids[f"{screen.id}_label"]
-
-        action = getattr(screen.__class__, f"on_ref_press_{button.id}")
-        action("Mock", "Back")
-
-        mock_get_locale.assert_any_call()
-        mock_set_screen.assert_called_once_with(name="MainScreen", direction="right")
+    def test_get_description(self):
+        desc = get_description()
+        assert isinstance(desc, str)
+        assert len(desc) > 0

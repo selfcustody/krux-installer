@@ -54,6 +54,7 @@ format-tests = "black ./tests"
 format-e2e = "black ./e2e"
 format-drives = "black ./e2e_drives"
 format-installer = "black ./krux_installer.py"
+
 format = [
   "format-src",
   "format-tests",
@@ -116,3 +117,27 @@ cmd = "python krux_installer.py"
 
 [tool.black]
 target-version = ["py312"]
+
+[tool.poe.tasks.format-license]
+args = [
+  { name = "check", options = ["-c", "--check"], type = "boolean", default = true },
+  { name = "to_year", options = ["-t", "--to-year"], type = "integer", default = 2024 },
+  { name = "replace_year", options = ["-r", "--replace-year"], type = "integer", default = 0 }
+]
+shell = '''
+set -o pipefail
+
+from_year=2021
+check="${check:-True}"
+to_year="${to_year:-2024}"
+replace_year="${replace_year:-0}"
+
+if [ "${replace_year}" -gt "${from_year}" ] && [ "${replace_year}" -gt "${to_year}" ]; then
+  printf 'WARNING: rewriting license year %s-%s -> %s-%s in all *.py files\n' "${from_year}" "${to_year}" "${from_year}" "${replace_year}"
+  find . -name "*.py" -exec sed -i.bak "s/${from_year}-${to_year} Krux contributors/${from_year}-${replace_year} Krux contributors/g" {} +
+  find . -name "*.py.bak" -delete
+elif [ "${check}" = "True" ]; then
+  printf 'WARNING: scanning ./src for %s-%s Krux contributors (no files modified)\n' "${from_year}" "${to_year}"
+  grep -rnw './src/' -e "${from_year}-${to_year} Krux contributors" --include='*.py' || true
+fi
+'''

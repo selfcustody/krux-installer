@@ -1,5 +1,20 @@
 # CHANGELOG
 
+## 0.0.23
+
+- Replace `requests` with `curl` in the firmware fetch step, eliminating the
+  `requests` dependency from the `builder` extra;
+- `prebuild/fetch_firmware.sh` is now the canonical script to download,
+  verify and embed firmware binaries before building;
+- SHA256 verification uses `sha256sum` (Linux) or `shasum` (macOS);
+- ECDSA signature verification uses `openssl` when available; the script
+  warns and continues if `openssl` is not found in `PATH`;
+- `cryptography` remains as a `builder` dependency for other verification
+  steps;
+- Improved documentation on the firmware embedding workflow and the location
+  of binaries at `src/utils/firmware/<version>/` for developers working on
+  dev mode or testing unreleased binaries (closes #255).
+
 ## 0.0.22
 
 ### BREAKING CHANGE

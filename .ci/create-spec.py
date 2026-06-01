@@ -20,10 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 """
-build.py
+create-spec.py
+
+Generates the PyInstaller .spec file for krux-installer.
+
+Terminal output is controlled by the BUILD_LOGLEVEL environment variable,
+set automatically by the poe build tasks via the --debug flag:
+
+    poetry run poe build-macos              # silent (default: WARN)
+    poetry run poe build-macos --debug=INFO # prints spec args summary
+    poetry run poe build-macos --debug=DEBUG  # prints spec args summary
+    poetry run poe build-macos --debug=TRACE  # prints spec args summary
+
+Allowed values: TRACE | DEBUG | INFO | WARN | ERROR | CRITICAL
 """
 
 import argparse
+import os
+import sys
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
@@ -33,6 +47,37 @@ from re import findall
 import PyInstaller.building.makespec
 
 from src.utils.constants import FIRMWARE_VERSION
+
+_VALID_LEVELS = {"TRACE", "DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL"}
+_VERBOSE_LEVELS = {"TRACE", "DEBUG", "INFO"}
+
+
+def _parse_loglevel() -> str:
+    """Read --loglevel from CLI args, fallback to BUILD_LOGLEVEL env var."""
+    parser = argparse.ArgumentParser(add_help=False)
+    parser.add_argument(
+        "--loglevel",
+        default=os.environ.get("BUILD_LOGLEVEL", "WARN"),
+        choices=list(_VALID_LEVELS),
+        type=str.upper,
+    )
+    args, _ = parser.parse_known_args()
+    return args.loglevel
+
+
+_LOGLEVEL = _parse_loglevel()
+
+
+def _is_verbose() -> bool:
+    """Return True if loglevel is INFO or below."""
+    return _LOGLEVEL in _VERBOSE_LEVELS
+
+
+def _log(msg: str = "") -> None:
+    """Print only when running in verbose mode."""
+    if _is_verbose():
+        print(msg)
+
 
 if __name__ == "__main__":
     p = argparse.ArgumentParser()
@@ -76,11 +121,11 @@ if __name__ == "__main__":
     # Specifics about operational system
     # on how will behave as file or bundled app
     if SYSTEM == "Linux":
-        # Tha application is a GUI
+        # The application is a GUI
         BUILDER_ARGS.append("--onefile")
 
     elif SYSTEM == "Windows":
-        # Tha application is a GUI with a hidden console
+        # The application is a GUI with a hidden console
         # to keep `sys` module enabled (necessary for Kboot)
         BUILDER_ARGS.append("--onefile")
         BUILDER_ARGS.append("--console")
@@ -88,7 +133,7 @@ if __name__ == "__main__":
         BUILDER_ARGS.append("--hide-console=minimize-early")
 
     elif SYSTEM == "Darwin":
-        # Tha application is a GUI in a bundled .app
+        # The application is a GUI in a bundled .app
         BUILDER_ARGS.append("--onefile")
         BUILDER_ARGS.append("--noconsole")
 
@@ -127,13 +172,29 @@ if __name__ == "__main__":
 
     args = p.parse_args(BUILDER_ARGS)
 
-    # Now generate spec
-    print("============================")
-    print("create-spec.py")
-    print("============================")
-    print()
+    # Print spec summary only when running in verbose mode
+    _log("============================")
+    _log("create-spec.py")
+    _log("============================")
+    _log()
     for k, v in vars(args).items():
-        print(f"{k}: {v}")
+        _log(f"{k}: {v}")
+    _log()
 
-    print()
-    PyInstaller.building.makespec.main(["krux_installer.py"], **vars(args))
+    import os as _os
+
+    if _is_verbose():
+        PyInstaller.building.makespec.main(["krux_installer.py"], **vars(args))
+    else:
+        # PyInstaller writes DEPRECATION warnings directly to the stderr file
+        # descriptor — contextlib.redirect_stderr is not enough. We redirect
+        # fd 2 to /dev/null at the OS level for the duration of this call.
+        devnull_fd = _os.open(_os.devnull, _os.O_WRONLY)
+        old_stderr_fd = _os.dup(2)
+        try:
+            _os.dup2(devnull_fd, 2)
+            PyInstaller.building.makespec.main(["krux_installer.py"], **vars(args))
+        finally:
+            _os.dup2(old_stderr_fd, 2)
+            _os.close(old_stderr_fd)
+            _os.close(devnull_fd)

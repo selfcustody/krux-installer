@@ -65,6 +65,8 @@ format = [
 
 fetch-firmware = "python prebuild/fetch_firmware.py"
 
+clean = "python .ci/clean.py"
+
 test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/selector --cov=src/utils/downloader --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/unzip --cov=src/utils/signer --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"
 test-e2e = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e"
 test-drives = "pytest --cov-append --cov=src/app --cov-branch --cov-report html ./e2e_drives"
@@ -84,27 +86,49 @@ lint.sequence = [
   { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives" },
 ]
 
-build-linux.sequence = [
+# ------------------------------------------------------------
+# Build tasks — all accept an optional --debug flag.
+#
+# Allowed values (case-sensitive, matches PyInstaller levels):
+#   TRACE | DEBUG | INFO | WARN | ERROR | CRITICAL
+#
+# Default is WARN so normal builds stay quiet.
+#
+# The --debug value is passed directly as a CLI argument to the
+# Python build scripts to avoid poe env interpolation issues
+# with sequence tasks.
+#
+# Usage examples:
+#   uv run poe build-macos
+#   uv run poe build-macos --debug=TRACE
+#   uv run poe build-linux --debug=DEBUG
+#   uv run poe build-win   --debug=INFO
+# ------------------------------------------------------------
+
+[tool.poe.tasks.build-linux]
+args = [{ name = "debug", default = "WARN", positional = false }]
+sequence = [
   { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
-  { cmd = "python .ci/create-spec.py" },
-  { cmd = "python -m PyInstaller krux-installer.spec" },
+  { cmd = "python .ci/create-spec.py --loglevel=${debug}" },
+  { cmd = "python .ci/build.py --loglevel=${debug}" },
 ]
 
-build-macos.sequence = [
+[tool.poe.tasks.build-macos]
+args = [{ name = "debug", default = "WARN", positional = false }]
+sequence = [
   { cmd = "find . -name '.DS_Store' -delete" },
   { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
-  { cmd = "python .ci/create-spec.py" },
-  { cmd = "python -m PyInstaller krux-installer.spec" },
+  { cmd = "python .ci/create-spec.py --loglevel=${debug}" },
+  { cmd = "python .ci/build.py --loglevel=${debug}" },
 ]
 
-build-win.sequence = [
+[tool.poe.tasks.build-win]
+args = [{ name = "debug", default = "WARN", positional = false }]
+sequence = [
   { cmd = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1" },
-  { cmd = "python .ci/create-spec.py" },
-  { interpreter = [
-    "powershell",
-    "pwsh",
-  ], shell = "& .ci/edit-spec.ps1" },
-  { cmd = "python -m PyInstaller krux-installer.spec" },
+  { cmd = "python .ci/create-spec.py --loglevel=${debug}" },
+  { interpreter = ["powershell", "pwsh"], shell = "& .ci/edit-spec.ps1" },
+  { cmd = "python .ci/build.py --loglevel=${debug}" },
 ]
 
 [tool.poe.tasks.dev-debug]

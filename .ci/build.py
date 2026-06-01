@@ -83,19 +83,18 @@ _TERMINAL_LEVELS = {"ERROR", "CRITICAL"}
 _VALID_LEVELS = {"TRACE", "DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL"}
 _VERBOSE_LEVELS = {"TRACE", "DEBUG"}
 
-_NOISE_PATTERNS = [
-    re.compile(r"Spelling.*Unable to find any valuable Spelling provider", re.IGNORECASE),
-    re.compile(r"enchant.*ModuleNotFoundError", re.IGNORECASE),
-    re.compile(r"osxappkit.*ModuleNotFoundError", re.IGNORECASE),
-    re.compile(r"DEPRECATION.*Onefile mode.*macOS", re.IGNORECASE),
-    re.compile(r"Library libmtdev", re.IGNORECASE),
-    re.compile(r"Library setupapi", re.IGNORECASE),
-    re.compile(r"Library Cfgmgr32", re.IGNORECASE),
-    re.compile(r"Library Advapi32", re.IGNORECASE),
-    re.compile(r"Ignoring.*IOKit.*only basenames are supported", re.IGNORECASE),
-    re.compile(r"Ignoring.*CoreFoundation.*only basenames are supported", re.IGNORECASE),
-    re.compile(r"Could not find GStreamer", re.IGNORECASE),
-]
+_NOISE_PATTERN = re.compile(
+    r"|".join([
+        r"Spelling.*Unable to find any valuable Spelling provider",
+        r"enchant.*ModuleNotFoundError",
+        r"osxappkit.*ModuleNotFoundError",
+        r"DEPRECATION.*Onefile mode.*macOS",
+        r"Library (libmtdev|setupapi|Cfgmgr32|Advapi32)",
+        r"Ignoring.*(IOKit|CoreFoundation).*only basenames are supported",
+        r"Could not find GStreamer",
+    ]),
+    re.IGNORECASE,
+)
 
 _PATTERN = re.compile(
     r"^\s*(?:\d+\s+)?"
@@ -166,7 +165,7 @@ def _detect_level(line: str) -> str:
 
 
 def _is_noise(line: str) -> bool:
-    return any(p.search(line) for p in _NOISE_PATTERNS)
+    return _NOISE_PATTERN.search(line)
 
 
 def _make_json_entry(level: str, message: str) -> str:

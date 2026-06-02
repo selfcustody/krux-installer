@@ -1,0 +1,76 @@
+name: "Nix: Linux (NixOS)"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "e2e/**"
+      - "e2e_drives/**"
+      - ".github/workflows/nix_linux.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "e2e/**"
+      - "e2e_drives/**"
+      - ".github/workflows/nix_linux.yml"
+
+jobs:
+  nix-linux:
+    name: "Test (NixOS / x86_64-linux)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          github_access_token: ${{ secrets.GITHUB_TOKEN }}
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+
+      - name: Install Xvfb
+        run: sudo apt-get install -y xvfb
+
+      - name: Install Python dependencies
+        run: nix develop .# --command uv sync --all-extras
+
+      - name: Install pytest-xvfb
+        run: nix develop .# --command uv add pytest-xvfb
+
+      - name: Fetch firmware
+        run: nix develop .# --command uv run poe fetch-firmware
+
+      - name: Lint
+        run: nix develop .# --command uv run poe lint
+
+      - name: Test (unit)
+        run: nix develop .# --command uv run poe coverage-unit
+
+      - name: Test (e2e)
+        run: nix develop .# --command uv run poe coverage-e2e
+
+      - name: Test (drives)
+        run: nix develop .# --command uv run poe coverage-drives
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true

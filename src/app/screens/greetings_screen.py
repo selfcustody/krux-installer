@@ -99,10 +99,13 @@ class GreetingsScreen(BaseScreen):
                 if "=" in line
             }
 
-            # Check for Debian-like systems (PopOS, Ubuntu, Linux Mint, etc.)
-            if "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]:
+            # Check for Debian and Debian-based systems (PopOS, Ubuntu, Linux Mint, etc.)
+            # On non-standard derivative, check for both "ID" and "ID_LIKE"
+            if os_data.get("ID") == "debian" or (
+                "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]
+            ):
                 detected = (
-                    os_data["ID_LIKE"],
+                    os_data.get("ID") or os_data.get("ID_LIKE"),
                     "dialout",
                 )
 

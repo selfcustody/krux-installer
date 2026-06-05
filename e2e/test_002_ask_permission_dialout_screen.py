@@ -650,3 +650,22 @@ class TestAskPermissionDialoutScreen(GraphicUnitTest):
 
         open_mock.assert_called()
         mock_get_locale.assert_called_once()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.open",
+        new_callable=mock_open,
+        read_data="ID=mockos\nPRETTY_NAME=MockOS",
+    )
+    @patch(
+        "src.app.screens.ask_permission_dialout_screen.AskPermissionDialoutScreen.redirect_exception"
+    )
+    def test_detect_usermod_bin_unsupported(
+        self, mock_redirect_exception, _open_mock, mock_get_locale
+    ):
+        AskPermissionDialoutScreen()
+        mock_get_locale.assert_called()
+        mock_redirect_exception.assert_called_once()

@@ -125,8 +125,11 @@ class AskPermissionDialoutScreen(BaseScreen):
             # Default path if not identified
             bin_path = "/usr/sbin/usermod"
 
-            # Check for Debian-based systems (PopOS, Ubuntu, Linux Mint, etc.)
-            if "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]:
+            # Check for Debian and Debian-based systems (PopOS, Ubuntu, Linux Mint, etc.)
+            # On non-standard derivative, check for both "ID" and "ID_LIKE"
+            if os_data.get("ID") == "debian" or (
+                "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]
+            ):
                 bin_path = "/usr/sbin/usermod"
 
             # Check for Red Hat-based systems (Fedora, CentOS, Rocky Linux, etc.)
@@ -142,7 +145,7 @@ class AskPermissionDialoutScreen(BaseScreen):
             elif "ID" in os_data and "fedora" in os_data["ID"]:
                 bin_path = "/usr/sbin/usermod"
 
-            # Arch, Artix, Manjaro, Slackware, Gentoo,
+            # Arch, Artix, Manjaro, Slackware, Gentoo
             elif os_data.get("ID") in (
                 "arch",
                 "artix",
@@ -155,12 +158,12 @@ class AskPermissionDialoutScreen(BaseScreen):
             # For Alpine, Clear Linux, Solus, etc.
             elif os_data.get("ID") in ("alpine", "clear-linux", "solus"):
                 bin_path = "/usr/bin/usermod"
+
             # For NixOS
             elif os_data.get("ID") == "nixos":
                 bin_path = "/run/current-system/sw/bin/usermod"
 
             else:
-                # Default to /usr/sbin/usermod if no match is found
                 exc = RuntimeError(
                     f"Unrecognized distro: {os_data.get('PRETTY_NAME', 'Unknown')}"
                 )

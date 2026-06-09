@@ -37,6 +37,18 @@ jobs:
         with:
           submodules: recursive
 
+      # KVM is available on GitHub's free runners for public repos.
+      # This udev rule grants group-level access so QEMU can use it.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Install Nix on the Ubuntu host — only used to build and boot the VM.
+      # sandbox=false lets the VM process reach the internet (needed for
+      # uv sync and firmware fetch that run inside the VM).
       - name: Install Nix
         uses: cachix/install-nix-action@v31
         with:
@@ -44,30 +56,97 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
             accept-flake-config = true
+            sandbox = false
+            system-features = nixos-test kvm
 
-      - name: Install Xvfb
-        run: sudo apt-get install -y xvfb
+      # Install sshpass on the host to supply the VM root password
+      # non-interactively. Password is set in the flake ("ci").
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      # Build the ciTest NixOS VM image from the flake.
+      # Produces result/bin/run-nixos-vm which boots the VM via QEMU.
+      - name: Build NixOS VM
+        run: nix build .#nixosConfigurations.ciTest.config.system.build.vm
+
+      # Boot the VM in the background (daemonized, no display window).
+      # -virtfs mounts the host workspace into the VM via 9p with tag
+      # "workspace" — the flake declares the corresponding fileSystems entry.
+      - name: Boot NixOS VM
+        run: |
+          result/bin/run-nixos-vm \
+            -daemonize \
+            -display none \
+            -virtfs local,path=${{ github.workspace }},mount_tag=workspace,security_model=mapped-xattr
+
+      # Wait until SSH is reachable on the forwarded host port 2222.
+      - name: Wait for VM to be ready
+        run: |
+          for i in $(seq 1 30); do
+            sshpass -p ci ssh \
+              -o StrictHostKeyChecking=no \
+              -o ConnectTimeout=5 \
+              -p 2222 root@localhost \
+              "echo ready" 2>/dev/null && break
+            echo "Waiting for VM... attempt $i"
+            sleep 5
+          done
+
+      # The flake's fileSystems entry mounts the 9p tag at /workspace on boot.
+      # We also try an explicit mount here in case automount hasn't fired yet,
+      # then verify the directory is accessible before proceeding.
+      - name: Mount workspace in VM
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "mkdir -p /workspace && \
+             mount -t 9p -o trans=virtio,version=9p2000.L,msize=131072 workspace /workspace 2>/dev/null || true && \
+             mountpoint /workspace && \
+             ls /workspace | head -3"
+
+      # All remaining steps run inside the NixOS VM via SSH.
+
+      # The workspace is owned by the host runner user but accessed as root
+      # inside the VM. Git and nix refuse to operate on it without this.
+      - name: Fix git safe directory
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "git config --global --add safe.directory /workspace"
 
       - name: Install Python dependencies
-        run: nix develop .# --command uv sync --all-extras
-
-      - name: Install pytest-xvfb
-        run: nix develop .# --command uv add pytest-xvfb
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "cd /workspace && nix develop .# --command uv sync --all-extras"
 
       - name: Fetch firmware
-        run: nix develop .# --command uv run poe fetch-firmware
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "cd /workspace && nix develop .# --command uv run poe fetch-firmware"
 
       - name: Lint
-        run: nix develop .# --command uv run poe lint
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "cd /workspace && nix develop .# --command uv run poe lint"
 
       - name: Test (unit)
-        run: nix develop .# --command uv run poe coverage-unit
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "cd /workspace && nix develop .# --command uv run poe coverage-unit"
 
       - name: Test (e2e)
-        run: nix develop .# --command uv run poe coverage-e2e
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "cd /workspace && nix develop .# --command uv run poe coverage-e2e"
 
       - name: Test (drives)
-        run: nix develop .# --command uv run poe coverage-drives
+        run: |
+          sshpass -p ci ssh -o StrictHostKeyChecking=no -p 2222 root@localhost \
+            "cd /workspace && nix develop .# --command uv run poe coverage-drives"
+
+      # Copy coverage XML from the VM back to the host for Codecov upload.
+      - name: Copy coverage report from VM
+        run: |
+          sshpass -p ci scp -o StrictHostKeyChecking=no -P 2222 \
+            root@localhost:/workspace/coverage.xml ./coverage.xml
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v6

@@ -26,7 +26,6 @@ dev = [
     "demjson3>=3.0.6",
 ]
 builder = [
-    "requests>=2.34.2",
     "cryptography>=48.0.0",
 ]
 
@@ -63,7 +62,7 @@ format = [
   "format-installer",
 ]
 
-fetch-firmware = "python prebuild/fetch_firmware.py"
+fetch-firmware = "bash prebuild/fetch_firmware.sh"
 
 clean = "python .ci/clean.py"
 
@@ -108,6 +107,7 @@ lint.sequence = [
 [tool.poe.tasks.build-linux]
 args = [{ name = "debug", default = "WARN", positional = false }]
 sequence = [
+  { cmd = "bash prebuild/fetch_firmware.sh" },
   { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
   { cmd = "python .ci/create-spec.py --loglevel=${debug}" },
   { cmd = "python .ci/build.py --loglevel=${debug}" },
@@ -116,6 +116,7 @@ sequence = [
 [tool.poe.tasks.build-macos]
 args = [{ name = "debug", default = "WARN", positional = false }]
 sequence = [
+  { cmd = "bash prebuild/fetch_firmware.sh" },
   { cmd = "find . -name '.DS_Store' -delete" },
   { cmd = "sh .ci/patch-pyinstaller-kivy-hook.sh" },
   { cmd = "python .ci/create-spec.py --loglevel=${debug}" },
@@ -125,6 +126,7 @@ sequence = [
 [tool.poe.tasks.build-win]
 args = [{ name = "debug", default = "WARN", positional = false }]
 sequence = [
+  { cmd = "bash prebuild/fetch_firmware.sh" },
   { cmd = "powershell.exe -File .ci/patch-pyinstaller-kivy-hook.ps1" },
   { cmd = "python .ci/create-spec.py --loglevel=${debug}" },
   { interpreter = ["powershell", "pwsh"], shell = "& .ci/edit-spec.ps1" },

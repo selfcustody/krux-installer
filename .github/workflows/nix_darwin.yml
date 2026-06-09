@@ -1,0 +1,59 @@
+name: "Nix: macOS (nix-darwin)"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "e2e/**"
+      - "e2e_drives/**"
+      - ".github/workflows/nix_darwin.yml"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "flake.nix"
+      - "flake.lock"
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "e2e/**"
+      - "e2e_drives/**"
+      - ".github/workflows/nix_darwin.yml"
+
+jobs:
+  nix-darwin:
+    name: "Test (nix-darwin / aarch64-darwin)"
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install Nix (Determinate Systems)
+        uses: DeterminateSystems/nix-installer-action@v17
+
+      - name: Install Python dependencies
+        run: nix develop .# --command uv sync --all-extras
+
+      - name: Fetch firmware
+        run: nix develop .# --command uv run poe fetch-firmware
+
+      - name: Lint
+        run: nix develop .# --command uv run poe lint
+
+      - name: Test (unit)
+        run: nix develop .# --command uv run poe coverage-unit
+
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v6
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          verbose: true

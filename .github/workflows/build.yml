@@ -60,16 +60,14 @@ jobs:
         run: |
           brew install create-dmg
           brew reinstall openssl@3
-          brew unlink openssl@3 && brew link openssl@3
-          OPENSSL_FULL_VERSION=`$(which openssl) -version | awk '{ print $2}'`
+          brew unlink openssl@3 && brew link --force --overwrite openssl@3
+          OPENSSL_FULL_VERSION=$(openssl version | awk '{ print $2}')
           OPENSSL_PATH="/opt/homebrew/Cellar/openssl@3/${OPENSSL_FULL_VERSION}"
           echo "dyld-path=${OPENSSL_PATH}/lib" >> $GITHUB_OUTPUT
 
       - name: Install project and its dependencies
         run: uv sync
 
-      - name: Fetch firmware binaries
-        run: uv sync --extra builder && uv run poe fetch-firmware
 
       - name: Build dist (Linux)
         if: ${{ runner.os == 'Linux' }}

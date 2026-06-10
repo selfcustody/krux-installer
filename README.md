@@ -217,3 +217,96 @@ It will export all project in a
 
 To more options see [.ci/create-spec.py](./.ci/create-spec.py) against the PyInstaller
 [options](https://pyinstaller.org).
+
+## Firmware embedding (for developers)
+
+The installer ships with firmware binaries embedded at build time.
+This section documents how the embedding pipeline works and how to
+use locally built binaries for development or testing.
+
+### Directory layout
+
+```text
+prebuild/
+└── fetch_firmware.sh     # canonical script: download → verify → embed
+
+.firmware_download/       # landing folder (gitignored)
+├── krux-<version>.zip
+├── krux-<version>.zip.sha256.txt
+├── krux-<version>.zip.sig
+└── selfcustody.pem
+
+src/utils/firmware/       # packing folder (committed, embedded in the binary)
+└── <version>/
+    ├── amigo.kfpkg
+    ├── bit.kfpkg          # not present in all releases
+    ├── cube.kfpkg
+    ├── dock.kfpkg
+    ├── embed_fire.kfpkg
+    ├── m5stickv.kfpkg
+    ├── tzt.kfpkg
+    ├── wonder_k.kfpkg
+    ├── wonder_mv.kfpkg
+    └── yahboom.kfpkg
+```
+
+The `.firmware_download/` landing folder holds the raw assets from GitHub
+(zip, checksum, signature and public key). It is gitignored and can be
+deleted after a successful build.
+
+The `src/utils/firmware/<version>/` packing folder contains only the
+extracted `.kfpkg` files — one per supported device. These are committed
+to the repository and embedded into the installer binary by PyInstaller
+at build time.
+
+### Fetching official firmware
+
+```bash
+uv sync --extra builder
+uv run poe fetch-firmware
+```
+
+This runs `prebuild/fetch_firmware.sh`, which:
+
+1. Downloads the release zip, SHA256 checksum, ECDSA signature and
+   `selfcustody.pem` from GitHub into `.firmware_download/`;
+2. Verifies the SHA256 checksum (`sha256sum` on Linux, `shasum` on macOS);
+3. Verifies the ECDSA signature with `openssl` (warns and continues if
+   `openssl` is not available);
+4. Extracts `kboot.kfpkg` for each supported device and saves it as
+   `src/utils/firmware/<version>/<device>.kfpkg`.
+
+Required tools in `PATH`: `curl`, `unzip`.
+Optional (for full verification): `sha256sum`/`shasum`, `openssl`.
+
+### Using locally built binaries (dev mode)
+
+If you are developing Krux firmware and want to test your locally compiled
+binaries with the installer, place your `.kfpkg` files directly into the
+packing folder — no download step needed:
+
+```text
+src/utils/firmware/<version>/
+├── amigo.kfpkg      ← your locally built binary
+└── ...
+```
+
+The version directory must match the `FIRMWARE_VERSION` constant in
+`src/utils/constants/__init__.py`. When running the installer from source
+(`uv run poe dev`), it will pick up whatever `.kfpkg` files are present
+in that folder.
+
+> **Note:** locally built binaries are unsigned. The installer will still
+> flash them correctly; only the pre-build verification step (`fetch_firmware.sh`)
+> requires a valid signature. No signature is checked at flash time.
+
+### Cleaning up
+
+After building the installer, the landing folder is no longer needed:
+
+```bash
+rm -rf .firmware_download/
+```
+
+The packing folder (`src/utils/firmware/`) should be kept as-is if you
+want to commit the firmware files for reproducible builds.

@@ -20,7 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black>=26.5.1",
-    "pylint>=4.0.5",
+    "pylint>=4.0.6",
     "pytest-cov>=7.1.0",
     "poethepoet>=0.46.0",
     "demjson3>=3.0.6",
@@ -39,7 +39,7 @@ allow-direct-references = true
 [tool.uv]
 dev-dependencies = [
     "black>=26.5.1",
-    "pylint>=4.0.5",
+    "pylint>=4.0.6",
     "pytest-cov>=7.1.0",
     "poethepoet>=0.46.0",
     "demjson3>=3.0.6",

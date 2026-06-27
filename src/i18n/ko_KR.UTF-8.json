@@ -15,9 +15,6 @@
     "Allow": "Allow",
     "Deny": "Deny"
   },
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "인터넷 연결 확인"
-  },
   "main_screen": {
     "Version": "버전",
     "Device": "장치",

@@ -15,9 +15,6 @@
     "Allow": "Toestaan",
     "Deny": "Annuleren"
   },
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "Je internetverbinding controleren"
-  },
   "main_screen": {
     "Version": "Versie",
     "Device": "Apparaat",

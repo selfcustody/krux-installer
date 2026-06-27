@@ -15,9 +15,6 @@
     "Allow": "Laat",
     "Deny": "Weier"
   }, 
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "Kontroleer jou internetverbinding"
-  },
   "main_screen": {
     "Version": "Weergawe",
     "Device": "Toestel",

@@ -15,9 +15,6 @@
     "Allow": "許可する",
     "Deny": "拒否する"
   }, 
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "インターネット接続を確認しています。"
-  },
   "main_screen": {
     "Version": "バージョン",
     "Device": "デバイス",

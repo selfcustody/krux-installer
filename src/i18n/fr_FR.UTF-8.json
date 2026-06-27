@@ -15,9 +15,6 @@
     "Allow": "Autoriser",
     "Deny": "Nier"
   }, 
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "Vérification de votre connexion Internet"
-  },
   "main_screen": {
     "Version": "Version",
     "Device": "Appareil",

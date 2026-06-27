@@ -28,8 +28,7 @@ from src.app.screens.base_screen import BaseScreen
 
 class ErrorScreen(BaseScreen):
     """
-    CheckInternetConnectionScreen will check internet connection and get the
-    latest release if ok
+    ErrorScreen renders an exception/error message to the user.
     """
 
     def __init__(self, **kwargs):

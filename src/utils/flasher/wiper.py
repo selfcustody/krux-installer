@@ -25,7 +25,7 @@ wiper.py
 
 import sys
 from src.utils.flasher.base_flasher import BaseFlasher
-from src.utils.selector import VALID_DEVICES
+from src.utils.constants import VALID_DEVICES
 
 
 class Wiper(BaseFlasher):

@@ -15,9 +15,6 @@
     "Allow": "允许",
     "Deny": "否认"
   },
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "检查您的互联网连接"
-  },
   "main_screen": {
     "Version": "版本",
     "Device": "设备",

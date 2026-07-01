@@ -15,9 +15,6 @@
     "Allow": "Permitir",
     "Deny": "Negar"
   },
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "Comprobando tu conexión a Internet"
-  },
   "main_screen": {
     "Version": "Versión",
     "Device": "Dispositivo",

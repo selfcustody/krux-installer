@@ -25,84 +25,6 @@
     "About": "Over",
     "Fetching data from": "Gegevens ophalen van"
   },
-  "select_version_screen": {
-    "Old versions": "Oude versies",
-    "Back": "Terug"
-  },
-  "select_old_version_screen": {
-    "Back": "Terug"
-  },
-  "warning_beta_screen": {
-    "WARNING": "WAARSCHUWING",
-    "This is our test repository": "Dit is onze test omgeving",
-    "These are unsigned binaries for the latest and most experimental features": "Dit zijn niet ondergetekende binaire bestanden voor\nde nieuwste en meest experimentele functies",
-    "and it's just for trying new things and providing feedback.": "om nieuwe dingen te proberen en feedback te geven.",
-    "Proceed": "Doorgaan",
-    "Back": "Terug"
-  },
-  "download_beta_screen": {
-    "Connecting": "Verbinden",
-    "Downloading": "Downloaden van",
-    "to": "naar",
-    "of": "van",
-    "downloaded": "gedownload"
-  },
-  "warning_already_downloaded_screen": {
-    "Assets already downloaded": "Eerder gedownloade items",
-    "Do you want to proceed with the same file or do you want to download it again?": "Wil je doorgaan met hetzelfde bestand of wil je het opnieuw downloaden?",
-    "Download again": "Opnieuw downloaden",
-    "Proceed with current file": "Ga verder met het huidige bestand"
-  },
-  "download_stable_zip_screen": {
-    "Connecting": "Verbinden",
-    "Downloading": "Downloaden van",
-    "to": "naar",
-    "of": "van",
-    "downloaded": "gedownload"
-  },
-  "download_stable_zip_sha256_screen": {
-    "Connecting": "Verbinden",
-    "Downloading": "Downloaden van",
-    "to": "naar",
-    "of": "van",
-    "downloaded": "gedownload"
-  },
-  "download_stable_zip_sig_screen": {
-    "Connecting": "Verbinden",
-    "Downloading": "Downloaden van",
-    "to": "naar",
-    "of": "van",
-    "downloaded": "gedownload"
-  },
-  "download_selfcustody_pem_screen": {
-    "Connecting": "Verbinden",
-    "Downloading": "Downloaden van",
-    "to": "naar",
-    "of": "van",
-    "downloaded": "gedownload"
-  },
-  "verify_stable_zip_screen": {
-    "Verifying integrity and authenticity": "Integriteit en authenticiteit verifiëren",
-    "Integrity verification": "Verificatie van de integriteit",
-    "computed hash from": "berekende hash van",
-    "provided hash from": "verstrekte hash van",
-    "SUCCESS": "SUCCES",
-    "FAILED": "MISLUKT",
-    "Authenticity verification": "Verificatie van echtheid",
-    "GOOD": "GOED",
-    "BAD": "SLECHT",
-    "SIGNATURE": "HANDTEKENING",
-    "If you have openssl installed on your system": "Als je openssl op je systeem hebt geïnstalleerd",
-    "you can check manually with the following command": "kan je dit controleren met de volgende commando",
-    "Proceed": "Doorgaan",
-    "Back": "Terug"
-  },
-  "unzip_stable_screen": {
-    "Flash with": "Flash met",
-    "Air-gapped update with": "Update zonder computer met",
-    "Unziping": "Uitpakken",
-    "Unziped": "Uitgepakt"
-  },
   "flash_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL HET APPARAAT NIET LOS",
     "DONE": "KLAAR",
@@ -121,7 +43,7 @@
     "This operation will": "Deze operatie is zal",
     "Permanently erase all saved data": "Alle opgeslagen gegevens permanent wissen",
     "Remove the existing firmware": "Verwijderen van de bestaande firmware",
-    "Render the device non-functional until new firmware is re-flashed": "Maakt het apparaat niet meer functioneel totdat de nieuwste firmware opnieuw geflasht is",    
+    "Render the device non-functional until new firmware is re-flashed": "Maakt het apparaat niet meer functioneel totdat de nieuwste firmware opnieuw geflasht is",
     "Proceed": "Doorgaan",
     "Back": "Terug"
   },

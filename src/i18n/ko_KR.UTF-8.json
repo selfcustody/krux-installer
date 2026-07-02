@@ -25,84 +25,6 @@
     "About": "요약",
     "Fetching data from": "데이터 가져오기"
   },
-  "select_version_screen": {
-    "Old versions": "이전 버전",
-    "Back": "뒤로"
-  },
-  "select_old_version_screen": {
-    "Back": "뒤로"
-  },
-  "warning_beta_screen": {
-    "WARNING": "경고",
-    "This is our test repository": "이것은 우리의 테스트 저장소입니다",
-    "These are unsigned binaries for the latest and most experimental features": "이는 최신 및 가장 실험적인 기능에 대한 서명되지 않은 이진 파일입니다",
-    "and it's just for trying new things and providing feedback.": "그리고 그것은 단지 새로운 것을 \n시도하고 피드백을 제공하기 위한 것입니다.",
-    "Proceed": "진행",
-    "Back": "뒤로"
-  },
-  "download_beta_screen": {
-    "Connecting": "연결",
-    "Downloading": "다운로드",
-    "to": "l에",
-    "of": "의",
-    "downloaded": "다운로드한 파일"
-  },
-  "warning_already_downloaded_screen": {
-    "Assets already downloaded": "이미 다운로드한 자산",
-    "Do you want to proceed with the same file or do you want to download it again?": "동일한 파일로 계속 진행하시겠습니까, 아니면 다시 다운로드하시겠습니까?",
-    "Download again": "다시 다운로드",
-    "Proceed with current file": "현재 파일로 계속"
-  },
-  "download_stable_zip_screen": {
-    "Connecting": "연결",
-    "Downloading": "다운로드",
-    "to": "l에",
-    "of": "의",
-    "downloaded": "다운로드한 파일"
-  },
-  "download_stable_zip_sha256_screen": {
-    "Connecting": "연결",
-    "Downloading": "다운로드",
-    "to": "l에",
-    "of": "의",
-    "downloaded": "다운로드한 파일"
-  },
-  "download_stable_zip_sig_screen": {
-    "Connecting": "연결",
-    "Downloading": "다운로드",
-    "to": "l에",
-    "of": "의",
-    "downloaded": "다운로드한 파일"
-  },
-  "download_selfcustody_pem_screen": {
-    "Connecting": "연결",
-    "Downloading": "다운로드",
-    "to": "l에",
-    "of": "의",
-    "downloaded": "다운로드한 파일"
-  },
-  "verify_stable_zip_screen": {
-    "Verifying integrity and authenticity": "무결성 및 신뢰성 확인",
-    "Integrity verification": "무결성 검증",
-    "computed hash from": "계산된 해시",
-    "provided hash from": "다음에서 제공된 해시",
-    "SUCCESS": "성공",
-    "FAILED": "실패",
-    "Authenticity verification": "진위 여부 확인",
-    "GOOD": "좋다",
-    "BAD": "나쁘다",
-    "SIGNATURE": "서명",
-    "If you have openssl installed on your system": "시스템에 openssl이 설치되어 있는 경우",
-    "you can check manually with the following command": "다음 명령으로 확인할 수 있습니다",
-    "Proceed": "진행",
-    "Back": "뒤로"
-  },
-  "unzip_stable_screen": {
-    "Flash with": "플래시 사용",
-    "Air-gapped update with": "격리 업데이트",
-    "Unziping": "추출",
-    "Unziped": "추출"
-  },
   "flash_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "장치의 플러그를 뽑지 마십시오.",
     "DONE": "수행",
@@ -123,14 +45,14 @@
     "This operation will": "이 작업은 다음을 수행합니다.",
     "Permanently erase all saved data": "저장된 모든 데이터를 영구적으로 지우기",
     "Remove the existing firmware": "기존 펌웨어를 제거합니다",
-    "Render the device non-functional until new firmware is re-flashed": "새 펌웨어가 다시 플래시될 때까지 장치를 작동하지 않게 만듭니다.",    
+    "Render the device non-functional until new firmware is re-flashed": "새 펌웨어가 다시 플래시될 때까지 장치를 작동하지 않게 만듭니다.",
     "Proceed": "진행",
     "Back": "뒤로"
   },
   "about_screen": {
     "follow us on X": "X에서 우리를 따르십시오",
     "Back": "뒤로"
-  }, 
+  },
   "warning_before_airgap_update_screen": {
     "Before proceeding with the air-gapped update": "에어 갭 업데이트를 진행하기 전에",
     "Insert a FAT32 formatted SDCard into your computer": "FAT32로 포맷 된 SDCard를 컴퓨터에 삽입하십시오.",

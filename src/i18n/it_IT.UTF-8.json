@@ -15,9 +15,6 @@
     "Allow": "Consenti",
     "Deny": "Negare"
   }, 
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "Controllare la tua connessione Internet"
-  },
   "main_screen": {
     "Version": "Versione",
     "Device": "Dispositivo",

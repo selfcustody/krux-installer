@@ -15,9 +15,6 @@
     "Allow": "Разрешать",
     "Deny": "Отрицать"
   }, 
-  "check_internet_connection_screen": {
-    "Checking your internet connection": "Проверка подключения к Интернету"
-  },
   "main_screen": {
     "Version": "Версия",
     "Device": "Устройство",

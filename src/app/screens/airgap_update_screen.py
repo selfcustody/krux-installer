@@ -172,7 +172,6 @@ class AirgapUpdateScreen(BaseScreen):
             value=value,
             allowed_screens=(
                 "ConfigKruxInstaller",
-                "UnzipStableScreen",
                 "WarningBeforeAirgapUpdateScreen",
                 "AirgapUpdateScreen",
             ),

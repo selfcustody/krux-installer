@@ -24,7 +24,7 @@ flasher.py
 """
 
 from collections.abc import Callable
-from src.utils.selector import VALID_DEVICES
+from src.utils.constants import VALID_DEVICES
 from src.utils.flasher.base_flasher import BaseFlasher
 
 

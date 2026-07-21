@@ -22,7 +22,7 @@ dev = [
     "black>=26.5.1",
     "pylint>=4.0.6",
     "pytest-cov>=7.1.0",
-    "poethepoet>=0.47.0",
+    "poethepoet>=0.48.0",
     "demjson3>=3.0.6",
 ]
 builder = [
@@ -41,7 +41,7 @@ dev-dependencies = [
     "black>=26.5.1",
     "pylint>=4.0.6",
     "pytest-cov>=7.1.0",
-    "poethepoet>=0.47.0",
+    "poethepoet>=0.48.0",
     "demjson3>=3.0.6",
     "pymarkdownlnt>=0.9.34"
 ]

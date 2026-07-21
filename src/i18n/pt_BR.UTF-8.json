@@ -11,10 +11,10 @@
     "to execute the following command": "para executar o seguinte comando",
     "You may need to logout (or even reboot)": "Talvez você precise fazer logout (ou até mesmo reiniciar)",
     "and back in for the new group to take effect": "e fazer login novamente para que o novo grupo tenha efeito",
-    "Do not worry, this message won't appear again": "Não se preocupe, essa mensagem não aparecerá novamente",    
+    "Do not worry, this message won't appear again": "Não se preocupe, essa mensagem não aparecerá novamente",
     "Allow": "Permitir",
     "Deny": "Negar"
-  }, 
+  },
   "main_screen": {
     "Version": "Versão",
     "Device": "Dispositivo",
@@ -22,86 +22,8 @@
     "Flash": "Gravar firmware",
     "Wipe": "Limpar dispositivo",
     "Settings": "Configurações",
-    "About": "Sobre",     
+    "About": "Sobre",
     "Fetching data from": "Buscando dados de"
-  },
-  "select_version_screen": {
-    "Old versions": "Versões antigas",
-    "Back": "Voltar"
-  },
-  "select_old_version_screen": {
-    "Back": "Voltar"
-  },
-  "warning_beta_screen": {
-    "WARNING": "ADVERTÊNCIA",
-    "This is our test repository": "Este é nosso repositório de testes",
-    "These are unsigned binaries for the latest and most experimental features": "Estes são binários não assinados dos recursos mais experimentais",
-    "and it's just for trying new things and providing feedback.": "e serve apenas para experimentar coisas novas e dar opiniões.",
-    "Proceed": "Continuar",
-    "Back": "Voltar"
-  },
-  "download_beta_screen": {
-    "Connecting": "Conectando",
-    "Downloading": "Baixando",
-    "to": "para",
-    "of": "de",
-    "downloaded": "baixado"
-  },
-  "warning_already_downloaded_screen": {
-    "Assets already downloaded": "Arquivos já baixados",
-    "Do you want to proceed with the same file or do you want to download it again?": "Você quer continuar com o mesmo arquivo ou baixá-lo novamente?",
-    "Download again": "Baixe novamente",
-    "Proceed with current file": "Continue com o arquivo atual"
-  },
-  "download_stable_zip_screen": {
-    "Connecting": "Conectando",
-    "Downloading": "Baixando",
-    "to": "para",
-    "of": "de",
-    "downloaded": "baixado"
-  },
-  "download_stable_zip_sha256_screen": {
-    "Connecting": "Conectando",
-    "Downloading": "Baixando",
-    "to": "para",
-    "of": "de",
-    "downloaded": "baixado"
-  },
-  "download_stable_zip_sig_screen": {
-    "Connecting": "Conectando",
-    "Downloading": "Baixando",
-    "to": "para",
-    "of": "de",
-    "downloaded": "baixado"
-  },
-  "download_selfcustody_pem_screen": {
-    "Connecting": "Conectando",
-    "Downloading": "Baixando",
-    "to": "para",
-    "of": "de",
-    "downloaded": "baixado"
-  },
-  "verify_stable_zip_screen": {
-    "Verifying integrity and authenticity": "Verificando integridade e autenticidade",
-    "Integrity verification": "Verificação de integridade",
-    "computed hash from": "hash computado de",
-    "provided hash from": "hash fornecido de",
-    "SUCCESS": "SUCESSO",
-    "FAILED": "FALHOU",
-    "Authenticity verification": "Verificação de autenticidade",
-    "GOOD": "BOA",
-    "BAD": "MÁ",
-    "SIGNATURE": "ASSINATURA",
-    "If you have openssl installed on your system": "Se você tiver o openssl instalado no seu sistema,",
-    "you can check manually with the following command": "você pode verificar manualmente com o seguinte comando",
-    "Proceed": "Continuar",
-    "Back": "Voltar"
-  },  
-  "unzip_stable_screen": {
-    "Flash with": "Flash com",
-    "Air-gapped update with": "Atualização isolada com",
-    "Unziping": "Descompactando",
-    "Unziped": "Descompactado"
   },
   "flash_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR, NÃO DESCONECTE SEU DISPOSITIVO",
@@ -123,7 +45,7 @@
     "This operation will": "Esta operação irá",
     "Permanently erase all saved data": "Apagar permanentemente todos os dados salvos",
     "Remove the existing firmware": "Remover o firmware existente",
-    "Render the device non-functional until new firmware is re-flashed": "Tornar o dispositivo não funcional até que o novo firmware seja atualizado novamente",    
+    "Render the device non-functional until new firmware is re-flashed": "Tornar o dispositivo não funcional até que o novo firmware seja atualizado novamente",
     "Proceed": "Continuar",
     "Back": "Voltar"
   },

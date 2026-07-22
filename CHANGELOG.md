@@ -1,5 +1,19 @@
 # CHANGELOG
 
+## Unreleased
+
+- Removed the entire runtime download pipeline left over from the
+  online workflow, now that firmware is embedded at build time:
+  - download screens (`base_download_screen`, `download_stable_zip_screen`,
+    `download_beta_screen`), version selection screens
+    (`select_version_screen`, `select_old_version_screen`) and the
+    `warning_beta` / `warning_already_downloaded` / `unzip_stable` screens;
+  - `downloader`, `selector` and `unzip` utils, plus the `check_verifyer`;
+  - the associated unit and E2E tests and their orphaned i18n strings;
+- With this cleanup the installer makes **no network calls at runtime** and
+  no longer checks the internet connection on startup — the user flow is now
+  just: open the installer, select a device and flash.
+
 ## 0.0.23
 
 - Replace `requests` with `curl` in the firmware fetch step, eliminating the

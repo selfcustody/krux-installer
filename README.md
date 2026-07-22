@@ -14,8 +14,25 @@ without typing any command in terminal for [flash the firmware onto the device](
 
 Since `v0.0.22`, Krux Installer runs **fully offline**. The Krux firmware
 binaries are bundled inside the installer at build time, so it no longer
-downloads anything from GitHub at runtime — no internet connection is
-required to flash your device.
+contacts GitHub at runtime — no internet connection is required to flash
+your device.
+
+### What changed
+
+Earlier versions fetched the firmware over the network: the installer queried
+GitHub for the available releases, let you pick a version, then downloaded,
+verified and unzipped the assets before flashing. All of that runtime
+networking has been removed. The installer no longer:
+
+- checks your internet connection on startup;
+- queries GitHub for the list of available firmware versions;
+- downloads, verifies or unzips firmware assets on your machine.
+
+Instead, each release ships with a single firmware version already embedded,
+verified and unpacked inside the binary. The user flow is now simply:
+**open the installer → select your device → flash**.
+
+### Choosing a firmware version
 
 Each release ships with a fixed firmware version embedded in the binary
 (the current one is `v26.03.0`). To flash a different firmware version,
@@ -28,25 +45,25 @@ your desired version (see [Firmware embedding (for developers)](/#firmware-embed
 
 Available for:
 
-* Linux:
-  * Debian-like;
-  * Fedora-like;
-  * In the experimental phase, we have a nix flake for development.
-* Windows;
-* MacOS:
-  * intel processors;
-  * arm64 processors (M1/M2/M3/M4).
+- Linux:
+  - Debian-like;
+  - Fedora-like;
+  - In the experimental phase, we have a nix flake for development.
+- Windows;
+- MacOS:
+  - intel processors;
+  - arm64 processors (M1/M2/M3/M4).
   
 ## Build from source
 
-* [System setup](/#system-setup)
-  * [Linux](/#linux)
-  * [Windows](/#windows)
-  * [MacOS](/#macos)
-  * [Install UV](/#install-UV)
-* [Download sources](/#download-sources)
-* [Update code](/#update-code)
-* [Developing](/#developing)
+- [System setup](/#system-setup)
+  - [Linux](/#linux)
+  - [Windows](/#windows)
+  - [MacOS](/#macos)
+  - [Install UV](/#install-UV)
+- [Download sources](/#download-sources)
+- [Update code](/#update-code)
+- [Developing](/#developing)
   
 ## System setup
 
@@ -223,9 +240,9 @@ uv run poe build-win
 It will export all project in a
 [`one-file`](https://pyinstaller.org/en/stable/usage.html#cmdoption-F) binary:
 
-* linux: `./dist/krux-installer`
-* macOS: `./dist/krux-installer.app/Contents/MacOS/krux-installer`
-* windows: `./dist/krux-installer.exe`
+- linux: `./dist/krux-installer`
+- macOS: `./dist/krux-installer.app/Contents/MacOS/krux-installer`
+- windows: `./dist/krux-installer.exe`
 
 To more options see [.ci/create-spec.py](./.ci/create-spec.py) against the PyInstaller
 [options](https://pyinstaller.org).

@@ -60,16 +60,23 @@ jobs:
             change:
               - added|modified: '*.md'
 
-  job2:
-    name: Lint Markdown
-    runs-on: ubuntu-latest
-    needs: job1
-    if: ${{ always() && needs.job1.outputs.markdown_change == 'true' }}
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v7
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Lint markdown
-        run: npx markdownlint-cli --disable MD033 --ignore node_modules ${{ needs.job1.outputs.markdown_files }}
+  # DISABLED: actions/checkout@v7 now refuses to check out fork code in
+  # 'pull_request_target' workflows (guard against "pwn request"). This job
+  # checked out the PR head (github.event.pull_request.head.sha) and so broke
+  # with "Refusing to check out fork pull request code". Kept off until we
+  # decide the final path (pin checkout back to v6, or run the lint with a
+  # read-only token + persist-credentials:false).
+  #
+  # job2:
+  #   name: Lint Markdown
+  #   runs-on: ubuntu-latest
+  #   needs: job1
+  #   if: ${{ always() && needs.job1.outputs.markdown_change == 'true' }}
+  #   steps:
+  #     - name: Checkout Code
+  #       uses: actions/checkout@v7
+  #       with:
+  #         ref: ${{ github.event.pull_request.head.sha }}
+  #
+  #     - name: Lint markdown
+  #       run: npx markdownlint-cli --disable MD033 --ignore node_modules ${{ needs.job1.outputs.markdown_files }}

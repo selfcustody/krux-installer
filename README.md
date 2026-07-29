@@ -12,25 +12,17 @@ without typing any command in terminal for [flash the firmware onto the device](
 
 ## Works offline
 
-Since `v0.0.22`, Krux Installer runs **fully offline**. The Krux firmware
-binaries are bundled inside the installer at build time, so it no longer
-contacts GitHub at runtime — no internet connection is required to flash
-your device.
+Since `v0.0.22`, Krux Installer runs **fully offline**. The Krux firmware binaries are bundled inside the installer at build time, so it no longer contacts GitHub at runtime — no internet connection is required to flash your device.
 
 ### What changed
 
-Earlier versions fetched the firmware over the network: the installer queried
-GitHub for the available releases, let you pick a version, then downloaded,
-verified and unzipped the assets before flashing. All of that runtime
-networking has been removed. The installer no longer:
+Earlier versions fetched the firmware over the network: the installer queried GitHub for the available releases, let you pick a version, then downloaded, verified and unzipped the assets before flashing. All of that runtime networking has been removed. The installer no longer:
 
 - checks your internet connection on startup;
 - queries GitHub for the list of available firmware versions;
 - downloads, verifies or unzips firmware assets on your machine.
 
-Instead, each release ships with a single firmware version already embedded,
-verified and unpacked inside the binary. The user flow is now simply:
-**open the installer → select your device → flash**.
+Instead, each release ships with a single firmware version already embedded, verified and unpacked inside the binary. The user flow is now simply: **open the installer → select your device → flash**.
 
 ### Choosing a firmware version
 

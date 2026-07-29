@@ -3,7 +3,8 @@ name = "krux-installer"
 version = "0.0.22"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = [
-    {name = "qlrd", email = "qlrddev@gmail.com"}
+    {name = "qlrd", email = "qlrddev@gmail.com"},
+    {name = "joaozinhom", email = "joaomcr@proton.me"}
 ]
 license = {text = "MIT"}
 readme = "README.md"

@@ -9,35 +9,37 @@
 # cryptography Python package (uv sync --extra builder).
 #
 # Required tools (must be available in PATH):
-#   curl     - download files
-#   unzip    - extract firmware zip
-#
-# Optional tools (signature verification):
+#   curl       - download files
+#   unzip      - extract firmware zip
 #   sha256sum  (Linux) or shasum (macOS) - SHA256 checksum verification
 #   openssl    - ECDSA signature verification
 #
-# If sha256sum/shasum or openssl are not found, the script will warn and
-# continue without that verification step.
+# Verification fails closed: if sha256sum/shasum or openssl are missing the
+# script aborts. Pass --allow-unverified to downgrade that to a warning and
+# continue without the affected verification step.
+#
+# After extraction, each device's kboot.kfpkg SHA256 is printed in the same
+# "device: hash" format as selfcustody/krux's reproducibility.py, so the
+# embedded binaries can be cross-checked against independently reproduced
+# builds.
 #
 # Usage:
-#   bash prebuild/fetch_firmware.sh
+#   bash prebuild/fetch_firmware.sh [--allow-unverified]
 #
 # From the project root (recommended):
-#   uv run poe fetch-firmware
+#   uv run poe fetch-firmware [--allow-unverified]
 
 set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
-
+ALLOW_UNVERIFIED=0
 FIRMWARE_VERSION="v26.03.0"
 BASE_URL="https://github.com/selfcustody/krux/releases/download/${FIRMWARE_VERSION}"
 PEM_URL="https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem"
-
 ZIP_NAME="krux-${FIRMWARE_VERSION}.zip"
 SHA256_NAME="${ZIP_NAME}.sha256.txt"
 SIG_NAME="${ZIP_NAME}.sig"
 PEM_NAME="selfcustody.pem"
-
 VALID_DEVICES=(
     "m5stickv"
     "amigo"
@@ -88,16 +90,40 @@ _download() {
 
 # ── Verification ─────────────────────────────────────────────────────────────
 
+# Since the 2026 Coldcard incident, some users may want to verify everything
+# themselves but lack a full OS setup with the required tools. We do not
+# recommend --allow-unverified, but you can run it locally with
+# `uv run poe fetch-firmware --allow-unverified` if you find yourself in
+# trouble and do not know what to do. Any attempt to add --allow-unverified
+# to CI (e.g. via a PR) will be CLOSED.
+_missing_tool() {
+    local tool="$1"
+    local what="$2"
+
+    if [[ "${ALLOW_UNVERIFIED}" -eq 1 ]]; then
+        warn "${tool} not found — skipping ${what} (--allow-unverified)"
+        return 0
+    fi
+    die "${tool} not found — refusing to continue without ${what}.
+Install ${tool}, or re-run with --allow-unverified to skip this check."
+}
+
+_sha256_of() {
+    local file_path="$1"
+
+    if command -v sha256sum &>/dev/null; then
+        sha256sum "${file_path}" | awk '{print $1}' | tr '[:upper:]' '[:lower:]'
+    elif command -v shasum &>/dev/null; then
+        shasum -a 256 "${file_path}" | awk '{print $1}' | tr '[:upper:]' '[:lower:]'
+    fi
+}
+
 _verify_sha256() {
     local zip_path="$1"
     local sha256_path="$2"
 
-    if command -v sha256sum &>/dev/null; then
-        local checker="sha256sum"
-    elif command -v shasum &>/dev/null; then
-        local checker="shasum -a 256"
-    else
-        warn "sha256sum/shasum not found — skipping SHA256 verification"
+    if ! command -v sha256sum &>/dev/null && ! command -v shasum &>/dev/null; then
+        _missing_tool "sha256sum/shasum" "SHA256 verification"
         return
     fi
 
@@ -106,10 +132,12 @@ _verify_sha256() {
     expected=$(awk '{print $1}' "${sha256_path}" | tr '[:upper:]' '[:lower:]')
 
     local actual
-    actual=$(${checker} "${zip_path}" | awk '{print $1}' | tr '[:upper:]' '[:lower:]')
+    actual=$(_sha256_of "${zip_path}")
 
     if [[ "${actual}" != "${expected}" ]]; then
-        die "SHA256 mismatch!\n  expected: ${expected}\n  got:      ${actual}"
+        die "SHA256 mismatch!
+  expected: ${expected}
+  got:      ${actual}"
     fi
     info "SHA256 matches: ${actual}"
 }
@@ -120,8 +148,7 @@ _verify_signature() {
     local pem_path="$3"
 
     if ! command -v openssl &>/dev/null; then
-        warn "openssl not found — skipping ECDSA signature verification"
-        warn "To enable signature verification, install openssl and re-run this script."
+        _missing_tool "openssl" "ECDSA signature verification"
         return
     fi
 
@@ -158,6 +185,24 @@ _extract_kfpkg() {
             || die "Failed to extract ${zip_entry}"
         info "extracted ${device}.kfpkg -> ${dest_path}"
     done
+
+    _kfpkg_hashes
+}
+
+_kfpkg_hashes() {
+    if ! command -v sha256sum &>/dev/null && ! command -v shasum &>/dev/null; then
+        _missing_tool "sha256sum/shasum" "kfpkg SHA256 report"
+        return
+    fi
+
+    printf '\nDevice: SHA256 of .kfpkg file\n'
+    local device dest_path hash
+    for device in $(printf '%s\n' "${VALID_DEVICES[@]}" | sort); do
+        dest_path="${PACKING_DIR}/${device}.kfpkg"
+        [[ -f "${dest_path}" ]] || continue
+        hash=$(_sha256_of "${dest_path}")
+        printf '%s: %s\n' "${device}" "${hash}"
+    done
 }
 
 _write_gitkeep() {
@@ -170,10 +215,23 @@ _write_gitkeep() {
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 main() {
+    local arg
+    for arg in "$@"; do
+        case "${arg}" in
+            --allow-unverified) ALLOW_UNVERIFIED=1 ;;
+            *) die "Unknown option: ${arg}
+Usage: bash prebuild/fetch_firmware.sh [--allow-unverified]" ;;
+        esac
+    done
+
     printf '=== Krux Firmware Fetcher — %s ===\n' "${FIRMWARE_VERSION}"
 
     _require_cmd curl
     _require_cmd unzip
+
+    if [[ "${ALLOW_UNVERIFIED}" -eq 1 ]]; then
+        warn "--allow-unverified: missing verification tools will be skipped, not fatal. But remember what happened."
+    fi
 
     mkdir -p "${LANDING_DIR}"
 

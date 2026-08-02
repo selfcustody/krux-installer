@@ -50,7 +50,15 @@ class WarningWipeScreen(BaseScreen):
                 partials = []
                 main_screen = self.manager.get_screen("MainScreen")
                 wipe_screen = self.manager.get_screen(args[1])
-                baudrate = WarningWipeScreen.get_baudrate()
+
+                # Same reason as MainScreen: past this point the value is
+                # applied inside a Clock callback, where it cannot be refused
+                try:
+                    baudrate = WarningWipeScreen.get_baudrate()
+                except ValueError as err:
+                    self.redirect_exception(exception=err)
+                    return
+
                 partials.append(
                     partial(
                         wipe_screen.update,

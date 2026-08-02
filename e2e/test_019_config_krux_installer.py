@@ -8,6 +8,7 @@ from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 
 from src.app.config_krux_installer import ConfigKruxInstaller
+from src.utils.constants import VALID_BAUDRATES
 
 
 class TestConfigKruxInstaller(GraphicUnitTest):
@@ -397,11 +398,12 @@ class TestConfigKruxInstaller(GraphicUnitTest):
                 "key": "assets",
             },
             {
-                "type": "numeric",
+                "type": "options",
                 "title": "Flash baudrate",
                 "desc": "Applied baudrate during the flash process",
                 "section": "flash",
                 "key": "baudrate",
+                "options": [str(baudrate) for baudrate in VALID_BAUDRATES],
             },
             {
                 "type": "options",

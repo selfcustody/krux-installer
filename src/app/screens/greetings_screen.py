@@ -99,50 +99,49 @@ class GreetingsScreen(BaseScreen):
                 if "=" in line
             }
 
-            # Check for Debian and Debian-based systems (PopOS, Ubuntu, Linux Mint, etc.)
-            # On non-standard derivative, check for both "ID" and "ID_LIKE"
-            if os_data.get("ID") == "debian" or (
-                "ID_LIKE" in os_data and "debian" in os_data["ID_LIKE"]
-            ):
-                detected = (
-                    os_data.get("ID") or os_data.get("ID_LIKE"),
-                    "dialout",
-                )
+            # Every family is matched on both "ID" and "ID_LIKE", and the
+            # branches form one chain rather than a run of independent ifs.
+            # Testing "ID_LIKE" alone left Red Hat Enterprise Linux out: it
+            # sets ID="rhel" with ID_LIKE="fedora", so the app ended on the
+            # error screen at startup while its derivatives, which carry
+            # "rhel" inside ID_LIKE, worked. The Fedora test was also an elif
+            # hanging off the SUSE one, and matched only because Fedora ships
+            # no ID_LIKE at all.
+            distro = os_data.get("ID", "")
+            like = os_data.get("ID_LIKE", "")
+            name = distro or like
 
-            # Check for Red Hat-based systems (CentOS, Rocky Linux, etc.)
-            if "ID_LIKE" in os_data and "rhel" in os_data["ID_LIKE"]:
-                detected = (
-                    os_data["ID_LIKE"],
-                    "dialout",
-                )
+            # Debian and Debian-based systems (PopOS, Ubuntu, Linux Mint, etc.)
+            if distro == "debian" or "debian" in like:
+                detected = (name, "dialout")
 
-            # Check for SUSE-based systems (openSUSE, SUSE Linux Enterprise)
-            if "ID_LIKE" in os_data and "suse" in os_data["ID_LIKE"]:
-                detected = (
-                    os_data["ID_LIKE"],
-                    "dialout",
-                )
+            # Red Hat Enterprise Linux and its rebuilds (CentOS, Rocky, Alma)
+            elif distro == "rhel" or "rhel" in like:
+                detected = (name, "dialout")
 
-            # Check for Fedora, to fix issue #115
+            # Fedora, to fix issue #115
             # see https://github.com/selfcustody/krux-installer/issues/115
-            elif "ID" in os_data and "fedora" in os_data["ID"]:
-                detected = (
-                    os_data["ID"],
-                    "dialout",
-                )
+            elif "fedora" in distro or "fedora" in like:
+                detected = (name, "dialout")
 
-            # Arch, Manjaro, Slackware, Gentoo
-            if os_data.get("ID") in ("arch", "manjaro", "slackware", "gentoo"):
-                detected = (os_data["ID"], "uucp")
+            # SUSE-based systems (openSUSE, SUSE Linux Enterprise)
+            elif "suse" in distro or "suse" in like:
+                detected = (name, "dialout")
+
+            # Arch, Artix, Manjaro, Slackware, Gentoo. Artix was already
+            # handled by AskPermissionDialoutScreen.detect_usermod_bin, but
+            # this check runs first and ended the flow before it
+            elif distro in ("arch", "artix", "manjaro", "slackware", "gentoo"):
+                detected = (name, "uucp")
 
             # For Alpine, Clear Linux, Solus, etc.
-            if os_data.get("ID") in ("alpine", "clear-linux", "solus"):
-                detected = (os_data["ID"], "dialout")
+            elif distro in ("alpine", "clear-linux", "solus"):
+                detected = (name, "dialout")
 
             # Check for NixOS 25.11 and allow it
-            if os_data.get("ID") == "nixos":
+            elif distro == "nixos":
                 id_version = os_data.get("VERSION_ID", "unknown version")
-                detected = (os_data["ID"], "dialout")
+                detected = (name, "dialout")
                 print(f"Allowing NixOS {id_version} (experimental support)")
 
             if not detected[0]:
@@ -164,9 +163,23 @@ class GreetingsScreen(BaseScreen):
         _in_dialout = False
 
         try:
-            import grp  # pylint: disable=import-outside-toplevel
+            # pylint: disable=import-outside-toplevel
+            import grp
+            import pwd
         except ImportError:
             return _in_dialout
+
+        # gr_mem lists supplementary members only, so an account whose primary
+        # group is the target one was reported as absent even though it already
+        # holds serial access. The app then asked for a root usermod on every
+        # launch, and that usermod does not add the account to gr_mem when the
+        # group is its primary, so the prompt returned on the next launch.
+        try:
+            if pwd.getpwnam(user).pw_gid == grp.getgrnam(group).gr_gid:
+                self.info(f"'{user}' has '{group}' as primary group")
+                return True
+        except KeyError:
+            pass
 
         for _grp in grp.getgrall():
             gr_name = _grp.gr_name
@@ -184,7 +197,16 @@ class GreetingsScreen(BaseScreen):
         On non-Linux systems, go directly to MainScreen.
         """
         if sys.platform.startswith("linux"):
-            _user = str(os.environ.get("USER"))
+            # pylint: disable=import-outside-toplevel
+            import pwd
+
+            # Resolved from the running process, not from $USER. That value is
+            # set by whatever launched the application -- a .profile, a
+            # .desktop entry, a wrapper on PATH -- and it ends up as the
+            # argument of a usermod run as root, so a session-level change
+            # could hand permanent access to every serial device on the host
+            # to an account the user never named.
+            _user = pwd.getpwuid(os.getuid()).pw_name
 
             _distro, _group = self.get_os_dialout_group()
 

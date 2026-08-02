@@ -85,10 +85,38 @@ class TestBaseScreen(GraphicUnitTest):
         mock_get_ruunning_app.return_value = MagicMock()
         mock_get_ruunning_app.return_value.config = MagicMock()
         mock_get_ruunning_app.return_value.config.get = MagicMock()
-        mock_get_ruunning_app.return_value.config.get.side_effect = [15000000]
+        mock_get_ruunning_app.return_value.config.get.side_effect = ["1500000"]
 
         # your asserts
-        self.assertEqual(BaseScreen.get_baudrate(), 15000000)
+        self.assertEqual(BaseScreen.get_baudrate(), 1500000)
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_static_get_baudrate_not_accepted(self, mock_get_ruunning_app):
+        # config.ini is editable by hand, and this value is later applied
+        # inside a Clock callback where a rejection cannot be reported
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = ["500000"]
+
+        with self.assertRaises(ValueError) as exc_info:
+            BaseScreen.get_baudrate()
+
+        self.assertEqual(str(exc_info.exception), "Invalid baudrate: 500000")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch("src.app.screens.base_screen.App.get_running_app")
+    def test_fail_static_get_baudrate_not_a_number(self, mock_get_ruunning_app):
+        mock_get_ruunning_app.return_value = MagicMock()
+        mock_get_ruunning_app.return_value.config = MagicMock()
+        mock_get_ruunning_app.return_value.config.get = MagicMock()
+        mock_get_ruunning_app.return_value.config.get.side_effect = ["fast"]
+
+        with self.assertRaises(ValueError) as exc_info:
+            BaseScreen.get_baudrate()
+
+        self.assertEqual(str(exc_info.exception), "Invalid baudrate: fast")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("src.app.screens.base_screen.App.get_running_app")

@@ -31,7 +31,9 @@
     "Back": "返回",
     "Quit": "退出",
     "Flashing": "刷入中",
-    "at": "在"
+    "at": "在",
+    "Firmware SHA256 verified against the build-time hash": "固件 SHA256 已与构建时的哈希值校验一致",
+    "A compromised computer can still compromise the firmware being flashed": "被入侵的电脑仍可能危及正在烧录的固件"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "请不要拔下您的设备",

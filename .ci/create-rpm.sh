@@ -203,7 +203,7 @@ if [ -n "\$SUDO_USER" ] && [ "\$SUDO_USER" != "root" ]; then
   echo "Adding user \$SUDO_USER to 'dialout' group to enable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
   usermod -a -G dialout \$SUDO_USER
-elif [ -n "\$USER" ] && [ "\$USER" != "root"]; then
+elif [ -n "\$USER" ] && [ "\$USER" != "root" ]; then
   echo "Adding user \$USER to 'dialout' group to enable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
   usermod -a -G dialout \$USER
@@ -222,11 +222,11 @@ echo ""
 if [ -n "\$SUDO_USER" ] && [ "\$SUDO_USER" != "root" ]; then
   echo "Removing user \$SUDO_USER from 'dialout' group to disable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
-  usermod -a -G dialout \$SUDO_USER
-elif [ -n "\$USER" ] && [ "\$USER" != "root"]; then
+  gpasswd -d \$SUDO_USER dialout || true
+elif [ -n "\$USER" ] && [ "\$USER" != "root" ]; then
   echo "Removing user \$USER from 'dialout' group to disable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
-  usermod -a -G dialout \$USER
+  gpasswd -d \$USER dialout || true
 fi
 echo ""
 echo ""

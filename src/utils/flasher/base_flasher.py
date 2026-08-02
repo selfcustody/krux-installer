@@ -27,6 +27,7 @@ import os
 from serial import Serial
 from serial.serialutil import SerialException
 from serial.tools import list_ports
+from src.utils.constants import VALID_BAUDRATES as _VALID_BAUDRATES
 from src.utils.trigger import Trigger
 from src.utils.kboot.build.ktool import KTool
 
@@ -37,21 +38,7 @@ class BaseFlasher(Trigger):
     """
 
     VALID_BOARDS = ("goE", "dan")
-    VALID_BAUDRATES = (
-        9600,
-        19200,
-        28800,
-        38400,
-        57600,
-        76800,
-        115200,
-        230400,
-        400000,
-        460800,
-        576000,
-        921600,
-        1500000,
-    )
+    VALID_BAUDRATES = _VALID_BAUDRATES
 
     # Device to VID mapping
     DEVICE_VID_MAP = {
@@ -91,6 +78,7 @@ class BaseFlasher(Trigger):
         self.stop_thread = False
         self.print_callback = None
         self._firmware = None
+        self._device = None
         self._port = None
         self._board = None
         self._baudrate = None

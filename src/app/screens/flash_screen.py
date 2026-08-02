@@ -201,7 +201,16 @@ class FlashScreen(BaseFlashScreen):
                     ]
                 )
 
-                if "StopIteration" in msg:
+                # An integrity failure is not a connection problem: the
+                # firmware stopped matching its build-time hash between the
+                # check on MainScreen and the write, so the device advice
+                # below would only mislead. Report it on its own.
+                if "FirmwareIntegrityError" in msg:
+                    self.fail_msg = msg
+                    integrity_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")
+                    self.redirect_exception(exception=integrity_fail)
+
+                elif "StopIteration" in msg:
                     self.fail_msg = msg
                     self.fail_msg += f"\n\n{general_msg}"
                     not_conn_fail = RuntimeError(f"Flash failed:\n{self.fail_msg}\n")

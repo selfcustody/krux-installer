@@ -33,7 +33,7 @@ set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
 ALLOW_UNVERIFIED=0
-FIRMWARE_VERSION="v26.03.0"
+FIRMWARE_VERSION="v26.08.0"
 BASE_URL="https://github.com/selfcustody/krux/releases/download/${FIRMWARE_VERSION}"
 PEM_URL="https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem"
 ZIP_NAME="krux-${FIRMWARE_VERSION}.zip"

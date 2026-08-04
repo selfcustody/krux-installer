@@ -46,7 +46,7 @@ from re import findall
 
 import PyInstaller.building.makespec
 
-from src.utils.constants import FIRMWARE_MANIFEST, FIRMWARE_VERSION
+from src.utils.constants import FIRMWARE_VERSION
 
 _VALID_LEVELS = {"TRACE", "DEBUG", "INFO", "WARN", "WARNING", "ERROR", "CRITICAL"}
 _VERBOSE_LEVELS = {"TRACE", "DEBUG", "INFO"}
@@ -162,22 +162,21 @@ if __name__ == "__main__":
             if findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
                 BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
 
-    # Add embedded firmware binaries, plus the SHA256SUMS manifest that
-    # fetch_firmware.sh wrote after verifying the release zip. Without the
-    # manifest the app cannot re-check the .kfpkg files it unpacks into its
-    # temporary directory at runtime, so a build missing it is refused here
-    # rather than producing a binary that flashes unverified firmware.
+    # Add embedded firmware binaries. The expected SHA256 of each one lives in
+    # src/utils/firmware_hashes.py, which PyInstaller collects into the PYZ
+    # archive inside the executable — deliberately not shipped as --add-data,
+    # which would unpack it into the same writable temp directory as the
+    # .kfpkg files it vouches for. Refuse to build without it rather than
+    # produce a binary that flashes unverified firmware.
     FIRMWARE_PATH = str(ROOT_PATH / "src" / "utils" / "firmware" / FIRMWARE_VERSION)
     FIRMWARE_DEST = join("src", "utils", "firmware", FIRMWARE_VERSION)
-    MANIFEST = join(FIRMWARE_PATH, FIRMWARE_MANIFEST)
+    HASHES_MODULE = str(ROOT_PATH / "src" / "utils" / "firmware_hashes.py")
 
-    if not isfile(MANIFEST):
+    if not isfile(HASHES_MODULE):
         raise FileNotFoundError(
-            f"Firmware manifest not found at {MANIFEST}. "
+            f"Firmware hashes not found at {HASHES_MODULE}. "
             f"Run: uv run --extra builder poe fetch-firmware"
         )
-
-    BUILDER_ARGS.append(f"--add-data={MANIFEST}:{FIRMWARE_DEST}")
 
     for f in listdir(FIRMWARE_PATH):
         fw_abs = join(FIRMWARE_PATH, f)

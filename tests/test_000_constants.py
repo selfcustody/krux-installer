@@ -6,7 +6,7 @@ import pytest
 
 from src.utils.constants import (
     FIRMWARE_DIR,
-    FIRMWARE_MANIFEST,
+    FIRMWARE_SHA256,
     FIRMWARE_VERSION,
     VALID_DEVICES,
     VALID_DEVICES_VERSIONS,
@@ -31,7 +31,7 @@ FIRMWARE_AVAILABLE = (
     else False
 )
 
-MANIFEST_AVAILABLE = os.path.isfile(os.path.join(FIRMWARE_DIR, FIRMWARE_MANIFEST))
+MANIFEST_AVAILABLE = bool(FIRMWARE_SHA256)
 
 
 class TestFirmwareVersion:
@@ -187,7 +187,12 @@ class TestFirmwareManifest:
         manifest = load_firmware_manifest()
         for name in os.listdir(FIRMWARE_DIR):
             if name.endswith(".kfpkg"):
-                assert name in manifest, f"{name} missing from {FIRMWARE_MANIFEST}"
+                assert name in manifest, f"{name} has no recorded SHA256"
+
+    def test_hashes_are_not_read_from_the_unpacked_directory(self, monkeypatch):
+        """The reference must survive a wiped firmware dir — it lives in code."""
+        monkeypatch.setattr("src.utils.constants.FIRMWARE_DIR", "/nonexistent")
+        assert load_firmware_manifest()
 
     def test_manifest_hashes_are_valid_digests(self):
         for digest in load_firmware_manifest().values():
@@ -223,22 +228,28 @@ class TestFirmwareManifest:
 
 
 class TestFirmwareManifestMissing:
-    def test_missing_manifest_raises(self, monkeypatch, tmp_path):
-        monkeypatch.setattr("src.utils.constants.FIRMWARE_DIR", str(tmp_path))
-        with pytest.raises(FirmwareIntegrityError, match="manifest not found"):
+    def test_missing_module_raises(self, monkeypatch):
+        monkeypatch.setattr("src.utils.constants.FIRMWARE_SHA256", None)
+        with pytest.raises(FirmwareIntegrityError, match="hashes not found"):
             load_firmware_manifest()
 
-    def test_empty_manifest_raises(self, monkeypatch, tmp_path):
-        (tmp_path / FIRMWARE_MANIFEST).write_text("", encoding="utf8")
-        monkeypatch.setattr("src.utils.constants.FIRMWARE_DIR", str(tmp_path))
-        with pytest.raises(FirmwareIntegrityError, match="empty or malformed"):
+    def test_empty_hashes_raise(self, monkeypatch):
+        monkeypatch.setattr("src.utils.constants.FIRMWARE_SHA256", {})
+        with pytest.raises(FirmwareIntegrityError, match="hashes are empty"):
             load_firmware_manifest()
 
-    def test_manifest_is_parsed_into_mapping(self, monkeypatch, tmp_path):
-        (tmp_path / FIRMWARE_MANIFEST).write_text(
-            "AABB1122  amigo.kfpkg\nccdd3344  dock.kfpkg\n", encoding="utf8"
+    def test_stale_version_raises(self, monkeypatch):
+        monkeypatch.setattr("src.utils.constants.FIRMWARE_SHA256", {"a.kfpkg": "ab"})
+        monkeypatch.setattr("src.utils.constants.HASHED_VERSION", "v0.0.0")
+        with pytest.raises(FirmwareIntegrityError, match="stale reference"):
+            load_firmware_manifest()
+
+    def test_hashes_are_normalised_to_lowercase(self, monkeypatch):
+        monkeypatch.setattr(
+            "src.utils.constants.FIRMWARE_SHA256",
+            {"amigo.kfpkg": "AABB1122", "dock.kfpkg": "ccdd3344"},
         )
-        monkeypatch.setattr("src.utils.constants.FIRMWARE_DIR", str(tmp_path))
+        monkeypatch.setattr("src.utils.constants.HASHED_VERSION", FIRMWARE_VERSION)
         manifest = load_firmware_manifest()
         assert manifest == {"amigo.kfpkg": "aabb1122", "dock.kfpkg": "ccdd3344"}
 

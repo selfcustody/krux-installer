@@ -32,7 +32,7 @@ from typing import Any, List
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
-FIRMWARE_VERSION = "v26.03.0"
+FIRMWARE_VERSION = "v26.08.0"
 
 FIRMWARE_DIR = os.path.abspath(
     os.path.join(ROOT_DIRNAME, "..", "firmware", FIRMWARE_VERSION)

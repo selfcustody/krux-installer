@@ -21,7 +21,10 @@
 # After extraction, each device's kboot.kfpkg SHA256 is printed in the same
 # "device: hash" format as selfcustody/krux's reproducibility.py, so the
 # embedded binaries can be cross-checked against independently reproduced
-# builds.
+# builds. The same hashes are written to a SHA256SUMS manifest next to the
+# .kfpkg files, which gets embedded in the bundle and re-checked at flash
+# time — the build-time proof would otherwise stop here and never reach the
+# user running the packaged app.
 #
 # Usage:
 #   bash prebuild/fetch_firmware.sh [--allow-unverified]
@@ -40,6 +43,7 @@ ZIP_NAME="krux-${FIRMWARE_VERSION}.zip"
 SHA256_NAME="${ZIP_NAME}.sha256.txt"
 SIG_NAME="${ZIP_NAME}.sig"
 PEM_NAME="selfcustody.pem"
+MANIFEST_NAME="SHA256SUMS"
 VALID_DEVICES=(
     "m5stickv"
     "amigo"
@@ -195,6 +199,20 @@ _kfpkg_hashes() {
         return
     fi
 
+    # The manifest is written only after the zip's SHA256 and ECDSA signature
+    # have been verified, so every hash in it descends from a release that was
+    # proven authentic at build time. It is embedded into the bundle by
+    # .ci/create-spec.py and re-checked at flash time by
+    # src.utils.constants.get_firmware_path() — the extracted .kfpkg lives in a
+    # throwaway PyInstaller temp dir on the user's machine, and this is what
+    # lets the app detect a truncated or altered extraction before writing to
+    # the device.
+    #
+    # Format is plain `sha256sum -c` input, so users can audit it by hand:
+    #   cd src/utils/firmware/<version> && sha256sum -c SHA256SUMS
+    local manifest="${PACKING_DIR}/${MANIFEST_NAME}"
+    : > "${manifest}"
+
     printf '\nDevice: SHA256 of .kfpkg file\n'
     local device dest_path hash
     for device in $(printf '%s\n' "${VALID_DEVICES[@]}" | sort); do
@@ -202,7 +220,10 @@ _kfpkg_hashes() {
         [[ -f "${dest_path}" ]] || continue
         hash=$(_sha256_of "${dest_path}")
         printf '%s: %s\n' "${device}" "${hash}"
+        printf '%s  %s.kfpkg\n' "${hash}" "${device}" >> "${manifest}"
     done
+
+    info "wrote ${manifest}"
 }
 
 _write_gitkeep() {

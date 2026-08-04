@@ -25,10 +25,11 @@ constants.py
 Some constants to be used across application
 """
 
+import hashlib
 import os
 import re
 import sys
-from typing import Any, List
+from typing import Any, Dict, List
 
 ROOT_DIRNAME = os.path.abspath(os.path.dirname(__file__))
 
@@ -37,6 +38,14 @@ FIRMWARE_VERSION = "v26.08.0"
 FIRMWARE_DIR = os.path.abspath(
     os.path.join(ROOT_DIRNAME, "..", "firmware", FIRMWARE_VERSION)
 )
+
+# Manifest of SHA256 hashes for the embedded .kfpkg files, written by
+# prebuild/fetch_firmware.sh only after the release zip's SHA256 and ECDSA
+# signature were verified against selfcustody's public key.
+FIRMWARE_MANIFEST = "SHA256SUMS"
+
+# Read in blocks so hashing does not depend on the .kfpkg fitting in memory.
+_HASH_CHUNK_SIZE = 64 * 1024
 
 VALID_DEVICES = [
     "m5stickv",
@@ -197,9 +206,110 @@ def get_device_support_info(device: str) -> dict:
     return VALID_DEVICES_VERSIONS[device].copy()
 
 
+class FirmwareIntegrityError(Exception):
+    """Raised when an embedded firmware fails its SHA256 check."""
+
+
+def sha256_of_file(file_path: str) -> str:
+    """
+    Compute the SHA256 of a file.
+
+    Args:
+        file_path: Absolute path to the file to hash
+
+    Returns:
+        Lowercase hexadecimal digest
+    """
+    digest = hashlib.sha256()
+
+    with open(file_path, "rb") as file_handler:
+        for chunk in iter(lambda: file_handler.read(_HASH_CHUNK_SIZE), b""):
+            digest.update(chunk)
+
+    return digest.hexdigest()
+
+
+def load_firmware_manifest() -> Dict[str, str]:
+    """
+    Read the SHA256SUMS manifest shipped alongside the embedded firmware.
+
+    The file is plain `sha256sum -c` input, one '<hash>  <name>.kfpkg' per line.
+
+    Returns:
+        Mapping of file name to expected lowercase hexadecimal digest
+
+    Raises:
+        FirmwareIntegrityError: If the manifest is missing or unreadable
+    """
+    manifest_path = os.path.join(FIRMWARE_DIR, FIRMWARE_MANIFEST)
+
+    if not os.path.exists(manifest_path):
+        raise FirmwareIntegrityError(
+            f"Firmware manifest not found at {manifest_path}. "
+            f"Refusing to flash unverified firmware. "
+            f"Run: uv run --extra builder poe fetch-firmware"
+        )
+
+    manifest = {}
+
+    with open(manifest_path, "r", encoding="utf8") as manifest_file:
+        for line in manifest_file:
+            entry = line.split()
+            if len(entry) == 2:
+                manifest[entry[1]] = entry[0].lower()
+
+    if not manifest:
+        raise FirmwareIntegrityError(
+            f"Firmware manifest at {manifest_path} is empty or malformed. "
+            f"Refusing to flash unverified firmware."
+        )
+
+    return manifest
+
+
+def verify_firmware(device: str, firmware_path: str) -> None:
+    """
+    Check an embedded firmware against the build-time SHA256 manifest.
+
+    The .kfpkg files are unpacked to a temporary directory every time the
+    packaged app starts, so the verification done while building cannot vouch
+    for what is on disk at flash time. Re-hashing here catches a truncated or
+    altered extraction before anything is written to the device.
+
+    Args:
+        device: Device name (e.g., 'amigo', 'm5stickv', etc.)
+        firmware_path: Absolute path to the device's kboot.kfpkg file
+
+    Raises:
+        FirmwareIntegrityError: If the device is absent from the manifest or
+            the file's hash does not match the expected one
+    """
+    manifest = load_firmware_manifest()
+    firmware_name = f"{device}.kfpkg"
+
+    if firmware_name not in manifest:
+        raise FirmwareIntegrityError(
+            f"No SHA256 recorded for '{firmware_name}' in {FIRMWARE_MANIFEST}. "
+            f"Refusing to flash unverified firmware."
+        )
+
+    expected = manifest[firmware_name]
+    actual = sha256_of_file(firmware_path)
+
+    if actual != expected:
+        raise FirmwareIntegrityError(
+            f"Firmware integrity check failed for '{device}' at {firmware_path}."
+            f"\n  expected: {expected}"
+            f"\n  got:      {actual}"
+            f"\nThe firmware was corrupted or modified after the build. "
+            f"Do not flash it. Re-install the application from an official "
+            f"release and try again."
+        )
+
+
 def get_firmware_path(device: str) -> str:
     """
-    Get the absolute path to the embedded kboot.kfpkg for a given device.
+    Get the absolute path to the verified embedded kboot.kfpkg for a device.
 
     Args:
         device: Device name (e.g., 'amigo', 'm5stickv', etc.)
@@ -210,6 +320,7 @@ def get_firmware_path(device: str) -> str:
     Raises:
         ValueError: If device is not in VALID_DEVICES
         FileNotFoundError: If the firmware file is not present
+        FirmwareIntegrityError: If the firmware does not match the manifest
     """
     if device not in VALID_DEVICES:
         raise ValueError(f"Unknown device '{device}'. Valid devices: {VALID_DEVICES}")
@@ -221,6 +332,8 @@ def get_firmware_path(device: str) -> str:
             f"Firmware not found for device '{device}' at {firmware_path}. "
             f"Run: uv run --extra builder poe fetch-firmware"
         )
+
+    verify_firmware(device, firmware_path)
 
     return firmware_path
 

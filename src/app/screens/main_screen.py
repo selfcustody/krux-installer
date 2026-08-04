@@ -27,7 +27,11 @@ from functools import partial
 from kivy.clock import Clock
 
 from src.app.screens.base_screen import BaseScreen
-from src.utils.constants import VALID_DEVICES, get_firmware_path
+from src.utils.constants import (
+    VALID_DEVICES,
+    FirmwareIntegrityError,
+    get_firmware_path,
+)
 
 
 class MainScreen(BaseScreen):
@@ -142,7 +146,11 @@ class MainScreen(BaseScreen):
 
                 try:
                     firmware = get_firmware_path(self.device)
-                except (ValueError, FileNotFoundError) as err:
+                except (
+                    ValueError,
+                    FileNotFoundError,
+                    FirmwareIntegrityError,
+                ) as err:
                     self.redirect_exception(exception=err)
                     return
 

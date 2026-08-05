@@ -37,7 +37,6 @@ set -euo pipefail
 ALLOW_UNVERIFIED=0
 FIRMWARE_VERSION="v26.08.0"
 BASE_URL="https://github.com/selfcustody/krux/releases/download/${FIRMWARE_VERSION}"
-PEM_URL="https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem"
 ZIP_NAME="krux-${FIRMWARE_VERSION}.zip"
 SHA256_NAME="${ZIP_NAME}.sha256.txt"
 SIG_NAME="${ZIP_NAME}.sig"
@@ -63,6 +62,16 @@ ROOT_DIR="$(dirname "${SCRIPT_DIR}")"
 LANDING_DIR="${ROOT_DIR}/.firmware_download"
 PACKING_DIR="${ROOT_DIR}/src/utils/firmware/${FIRMWARE_VERSION}"
 
+# selfcustody's public key, committed to this repository rather than fetched.
+# It used to be downloaded from the main branch of selfcustody/krux on every
+# run, which made the signature check self-referential: whoever supplied the
+# release also supplied the key it was verified against, and a pre-seeded
+# landing directory holding an attacker's zip, signature and key passed while
+# reporting "Signature is valid". Pinning it here means the trust anchor ships
+# with the code, is reviewed in pull requests, and does not move when a branch
+# does.
+PINNED_PEM="${ROOT_DIR}/${PEM_NAME}"
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 info()  { printf '  [ok]   %s\n' "$*"; }
@@ -81,8 +90,14 @@ _download() {
     local name
     name="$(basename "${dest}")"
 
+    # A file already in the landing directory is reused rather than fetched
+    # again, which only holds because every one of them is re-verified on each
+    # run against the committed public key: a zip and signature planted here
+    # cannot be signed for, so they are rejected before extraction. The key
+    # itself is never downloaded — see PINNED_PEM. Under --allow-unverified
+    # that guarantee is gone, along with every other one.
     if [[ -f "${dest}" ]]; then
-        skip "${name} already downloaded"
+        skip "${name} already downloaded (will be re-verified)"
         return
     fi
 
@@ -170,14 +185,24 @@ _extract_kfpkg() {
     step "extract kboot.kfpkg files"
     mkdir -p "${PACKING_DIR}"
 
+    # Everything the previous run left behind is removed first, so what gets
+    # embedded and hashed can only have come out of the zip verified above.
+    # This used to skip extraction when a .kfpkg was already present, which
+    # meant a file placed here beforehand — by hand, or by a merged pull
+    # request, since this directory is gitignored — survived untouched while
+    # the script reported "SHA256 matches" and "Signature is valid" for a
+    # release it never wrote. _kfpkg_hashes then recorded that file's hash as
+    # the reference the app checks before flashing, so the runtime check
+    # certified it all the way to the device.
+    #
+    # Devices dropped from a release must be cleared as well: a leftover
+    # .kfpkg for one of them is picked up by both create-spec.py's glob and
+    # the hash table below.
+    rm -f "${PACKING_DIR}"/*.kfpkg "${PACKING_DIR}/${MANIFEST_NAME}"
+
     for device in "${VALID_DEVICES[@]}"; do
         local zip_entry="krux-${FIRMWARE_VERSION}/maixpy_${device}/kboot.kfpkg"
         local dest_path="${PACKING_DIR}/${device}.kfpkg"
-
-        if [[ -f "${dest_path}" ]]; then
-            skip "${device}.kfpkg already exists"
-            continue
-        fi
 
         # Check if entry exists inside the zip
         if ! unzip -l "${zip_path}" "${zip_entry}" &>/dev/null; then
@@ -199,9 +224,12 @@ _kfpkg_hashes() {
         return
     fi
 
-    # Hashes are captured only after the zip's SHA256 and ECDSA signature have
-    # been verified, so every value below descends from a release proven
-    # authentic at build time. They are written to two places:
+    # Hashes are captured after the zip's SHA256 and ECDSA signature have been
+    # verified against the committed public key, from a packing directory that
+    # _extract_kfpkg emptied and repopulated from that same zip, so every value
+    # below descends from a release proven authentic at build time. Both halves
+    # matter: verifying the zip says nothing about a file that was never
+    # written from it. They are written to two places:
     #
     #   1. SHA256SUMS next to the .kfpkg files — plain `sha256sum -c` input,
     #      for auditing the source tree by hand:
@@ -288,17 +316,20 @@ Usage: bash prebuild/fetch_firmware.sh [--allow-unverified]" ;;
     local zip_path="${LANDING_DIR}/${ZIP_NAME}"
     local sha256_path="${LANDING_DIR}/${SHA256_NAME}"
     local sig_path="${LANDING_DIR}/${SIG_NAME}"
-    local pem_path="${LANDING_DIR}/${PEM_NAME}"
+
+    [[ -f "${PINNED_PEM}" ]] \
+        || die "Public key not found at ${PINNED_PEM}.
+It is committed to this repository and must not be fetched at build time."
 
     step "step 1 — downloading assets"
     _download "${BASE_URL}/${ZIP_NAME}"    "${zip_path}"
     _download "${BASE_URL}/${SHA256_NAME}" "${sha256_path}"
     _download "${BASE_URL}/${SIG_NAME}"    "${sig_path}"
-    _download "${PEM_URL}"                 "${pem_path}"
+    info "using committed public key ${PINNED_PEM}"
 
     step "step 2 — verifying integrity"
     _verify_sha256    "${zip_path}" "${sha256_path}"
-    _verify_signature "${zip_path}" "${sig_path}" "${pem_path}"
+    _verify_signature "${zip_path}" "${sig_path}" "${PINNED_PEM}"
 
     step "step 3 — extracting firmware"
     _extract_kfpkg "${zip_path}"

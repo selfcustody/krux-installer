@@ -31,7 +31,9 @@
     "Back": "Retour",
     "Quit": "Fermer",
     "Flashing": "Réalisation du flash",
-    "at": "à"
+    "at": "à",
+    "Firmware SHA256 verified against the build-time hash": "SHA256 du firmware vérifié avec l'empreinte générée à la compilation",
+    "A compromised operating system can still compromise the firmware being flashed": "Un système d'exploitation compromis peut encore compromettre le firmware en cours de flashage"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "VEUILLEZ NE PAS DÉBRANCHER VOTRE APPAREIL",

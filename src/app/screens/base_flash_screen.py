@@ -141,16 +141,32 @@ class BaseFlashScreen(BaseScreen):
             back = self.translate("Back")
             _quit = self.translate("Quit")
 
-            # If the done step occurs in FlashScreen,
-            # just put a line break
-            # It it occurs in WipeScreen,
+            # If the done step occurs in WipeScreen,
             # add a message to remove device and re-plug
-            # it again before flash
+            # it again before flash.
+            # If it occurs in FlashScreen, state the limit of the
+            # SHA256 check done before flashing: it proves the .kfpkg
+            # unpacked from the bundle was the one embedded at build
+            # time, but nothing the app does can outlive a machine that
+            # is already under someone else's control
             below_done = "\n"
             if self.name == "WipeScreen":
                 below_done += self.translate(
                     "disconnect and reconnect device before flash again"
                 )
+                below_done += "\n"
+
+            if self.name == "FlashScreen":
+                verified = self.translate(
+                    "Firmware SHA256 verified against the build-time hash"
+                )
+                caveat = self.translate(
+                    "A compromised operating system can still compromise "
+                    "the firmware being flashed"
+                )
+                below_done += f"[color=#00FF00]{verified}[/color]"
+                below_done += "\n"
+                below_done += f"[color=#EFCC00]{caveat}[/color]"
                 below_done += "\n"
 
             self.ids[f"{self.id}_progress"].text = "".join(

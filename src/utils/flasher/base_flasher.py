@@ -91,6 +91,7 @@ class BaseFlasher(Trigger):
         self.stop_thread = False
         self.print_callback = None
         self._firmware = None
+        self._device = None
         self._port = None
         self._board = None
         self._baudrate = None

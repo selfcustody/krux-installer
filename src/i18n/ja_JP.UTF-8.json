@@ -31,7 +31,9 @@
     "Back": "戻る",
     "Quit": "終了",
     "Flashing": "フラッシュ中",
-    "at": "で"
+    "at": "で",
+    "Firmware SHA256 verified against the build-time hash": "ファームウェアのSHA256をビルド時のハッシュと照合しました",
+    "A compromised operating system can still compromise the firmware being flashed": "侵害されたオペレーティングシステムは、書き込まれるファームウェアを依然として侵害する可能性があります"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "デバイスの電源を切らないでください。",

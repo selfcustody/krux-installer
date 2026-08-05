@@ -160,8 +160,13 @@ class BaseFlashScreen(BaseScreen):
                 verified = self.translate(
                     "Firmware SHA256 verified against the build-time hash"
                 )
+                # "computer", not "operating system": the check is defeated by
+                # any code running as the same user as the installer, which can
+                # write the temporary directory the .kfpkg is unpacked into.
+                # No privilege escalation is needed, and naming the OS suggests
+                # a higher bar than the one that actually applies
                 caveat = self.translate(
-                    "A compromised operating system can still compromise "
+                    "A compromised computer can still compromise "
                     "the firmware being flashed"
                 )
                 below_done += f"[color=#00FF00]{verified}[/color]"

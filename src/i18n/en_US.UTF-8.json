@@ -29,7 +29,7 @@
     "Flashing": "Flashing",
     "at": "at",
     "Firmware SHA256 verified against the build-time hash": "Firmware SHA256 verified against the build-time hash",
-    "A compromised operating system can still compromise the firmware being flashed": "A compromised operating system can still compromise the firmware being flashed"
+    "A compromised computer can still compromise the firmware being flashed": "A compromised computer can still compromise the firmware being flashed"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "PLEASE DO NOT UNPLUG YOUR DEVICE",

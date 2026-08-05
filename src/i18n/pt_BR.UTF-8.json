@@ -33,7 +33,7 @@
     "Flashing": "Fazendo flash do",
     "at": "a",
     "Firmware SHA256 verified against the build-time hash": "SHA256 do firmware verificado com o hash gerado na compilação",
-    "A compromised operating system can still compromise the firmware being flashed": "Um sistema operacional comprometido ainda pode comprometer o firmware que está sendo gravado"
+    "A compromised computer can still compromise the firmware being flashed": "Um computador comprometido ainda pode comprometer o firmware que está sendo gravado"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "POR FAVOR, NÃO DESCONECTE SEU DISPOSITIVO",

@@ -374,7 +374,7 @@ class TestFlashScreen(GraphicUnitTest):
                 "[/color]",
                 "\n",
                 "[color=#EFCC00]",
-                "A compromised operating system can still compromise "
+                "A compromised computer can still compromise "
                 "the firmware being flashed",
                 "[/color]",
                 "\n",

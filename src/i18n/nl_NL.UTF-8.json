@@ -31,7 +31,7 @@
     "Back": "Terug",
     "Quit": "Stoppen",
     "Firmware SHA256 verified against the build-time hash": "Firmware-SHA256 geverifieerd tegen de hash van de build",
-    "A compromised operating system can still compromise the firmware being flashed": "Een gecompromitteerd besturingssysteem kan de geflashte firmware nog steeds compromitteren"
+    "A compromised computer can still compromise the firmware being flashed": "Een gecompromitteerde computer kan de geflashte firmware nog steeds compromitteren"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "KOPPEL HET APPARAAT NIET LOS",

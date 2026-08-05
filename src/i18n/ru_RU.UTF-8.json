@@ -33,7 +33,7 @@
     "Flashing": "Перепрошивка на",
     "at": "на",
     "Firmware SHA256 verified against the build-time hash": "SHA256 прошивки проверен по хешу, созданному при сборке",
-    "A compromised operating system can still compromise the firmware being flashed": "Скомпрометированная операционная система всё равно может скомпрометировать прошиваемую прошивку"
+    "A compromised computer can still compromise the firmware being flashed": "Скомпрометированный компьютер всё равно может скомпрометировать прошиваемую прошивку"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "ПОЖАЛУЙСТА, НЕ ОТКЛЮЧАЙТЕ УСТРОЙСТВО ОТ СЕТИ",

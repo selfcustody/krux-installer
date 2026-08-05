@@ -174,7 +174,7 @@ if [ -n "\$SUDO_USER" ] && [ "\$SUDO_USER" != "root" ]; then
   echo "Adding user \$SUDO_USER to 'dialout' group to enable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
   usermod -a -G dialout \$SUDO_USER
-elif [ -n "\$USER" ] && [ "\$USER" != "root"]; then
+elif [ -n "\$USER" ] && [ "\$USER" != "root" ]; then
   echo "Adding user \$USER to 'dialout' group to enable flash procedure..."
   echo "You'll need to reboot your system to enable changes"
   usermod -a -G dialout \$USER
@@ -188,6 +188,40 @@ echo ""
 echo "Resulting $FULL_OUTPUT_PATH/DEBIAN/postinst"
 echo "----------------------------------------------------------------------"
 cat $FULL_OUTPUT_PATH/DEBIAN/postinst
+
+# create postrm file: without it, removing the package leaves the user in the
+# 'dialout' group, holding read and write access to every serial device on the
+# host after the package that asked for it is gone
+cat <<EOF > $FULL_OUTPUT_PATH/DEBIAN/postrm
+#!/bin/sh
+
+case "\$1" in
+  remove|purge)
+    echo ""
+    echo "                                   -------------"
+    echo "                                   !!!WARNING!!!"
+    echo "                                   -------------"
+    echo ""
+    if [ -n "\$SUDO_USER" ] && [ "\$SUDO_USER" != "root" ]; then
+      echo "Removing user \$SUDO_USER from 'dialout' group to disable flash procedure..."
+      echo "You'll need to reboot your system to enable changes"
+      gpasswd -d \$SUDO_USER dialout || true
+    elif [ -n "\$USER" ] && [ "\$USER" != "root" ]; then
+      echo "Removing user \$USER from 'dialout' group to disable flash procedure..."
+      echo "You'll need to reboot your system to enable changes"
+      gpasswd -d \$USER dialout || true
+    fi
+    echo ""
+    echo ""
+    ;;
+esac
+EOF
+chmod 0755 $FULL_OUTPUT_PATH/DEBIAN/postrm
+
+echo ""
+echo "Resulting $FULL_OUTPUT_PATH/DEBIAN/postrm"
+echo "----------------------------------------------------------------------"
+cat $FULL_OUTPUT_PATH/DEBIAN/postrm
 
 # create desktop entry
 cat <<EOF > $FULL_OUTPUT_PATH/usr/share/applications/${app_name}.desktop

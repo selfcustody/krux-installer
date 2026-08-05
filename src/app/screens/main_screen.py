@@ -144,8 +144,12 @@ class MainScreen(BaseScreen):
             else:
                 self.set_background(wid="main_flash", rgba=(0, 0, 0, 1))
 
+                # The baudrate is read here, not in FlashScreen, because from
+                # this point on it travels through Clock callbacks where a
+                # rejected value cannot be reported
                 try:
                     firmware = get_firmware_path(self.device)
+                    baudrate = MainScreen.get_baudrate()
                 except (
                     ValueError,
                     FileNotFoundError,
@@ -154,7 +158,6 @@ class MainScreen(BaseScreen):
                     self.redirect_exception(exception=err)
                     return
 
-                baudrate = MainScreen.get_baudrate()
                 screen = self.manager.get_screen("FlashScreen")
                 fns = [
                     partial(

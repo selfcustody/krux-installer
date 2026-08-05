@@ -35,6 +35,7 @@ from kivy.clock import Clock
 from kivy.core.text import DEFAULT_FONT, LabelBase
 
 from src.app.base_krux_installer import BaseKruxInstaller
+from src.utils.constants import VALID_BAUDRATES
 from src.utils.trigger import Trigger
 
 
@@ -195,11 +196,16 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 "key": "assets",
             },
             {
-                "type": "numeric",
+                # Offer the accepted values instead of a free numeric entry.
+                # Anything else is rejected by the flasher's setter, which runs
+                # in a Clock callback with no handler above it, so a typed 500000
+                # used to take the application down on the next frame
+                "type": "options",
                 "title": "Flash baudrate",
                 "desc": "Applied baudrate during the flash process",
                 "section": "flash",
                 "key": "baudrate",
+                "options": [str(baudrate) for baudrate in VALID_BAUDRATES],
             },
             {
                 "type": "options",

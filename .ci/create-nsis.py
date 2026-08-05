@@ -266,6 +266,31 @@ def make_install_section(args: Namespace) -> str:
 
 def make_uninstaller(args: Namespace) -> str:
     print("* make uninstaller section")
+
+    # Remove exactly what the install section wrote, then take the directory
+    # only if it ends up empty. It used to run 'RmDir /r $INSTDIR', which
+    # deletes recursively regardless of what else is in there -- with admin
+    # rights, on a path the user typed into MUI_PAGE_DIRECTORY. Installing
+    # into an existing folder therefore meant uninstalling took everything
+    # under it with the application.
+    removals = [
+        "\t; Remove the files this installer wrote, and nothing else",
+        f"\tDelete \"$INSTDIR\\{os.path.basename(args.binary)}\"",
+    ]
+
+    if args.asset is not None and len(args.asset) > 0:
+        for asset in args.asset:
+            _asset_filename = os.path.basename(asset.split(":")[1])
+            removals.append(f"\tDelete \"$INSTDIR\\{_asset_filename}\"")
+
+    removals.extend([
+        "\tDelete \"$INSTDIR\\uninstall.exe\"",
+        "\tDelete \"$INSTDIR\\Uninstall.exe\"",
+        "",
+        "\t; Non-recursive on purpose: anything the user kept here survives",
+        "\tRmDir \"$INSTDIR\"",
+    ])
+
     return "\n".join([
         ";--------------------------------",
         "; Uninstaller",
@@ -291,12 +316,7 @@ def make_uninstaller(args: Namespace) -> str:
         "\t; Delete desktop shortcut",
         "\tDelete \"$DESKTOP\\${APP_NAME}.lnk\"",
         "",
-        "\t; Remove files",
-        "\tDelete $INSTDIR\\*",
-        "\tDelete $INSTDIR\\uninstall.exe",
-        "",
-        "\t; Try to remove the install directory - this will only happen if it is empty",
-        "\tRmDir /r $INSTDIR",
+        *removals,
         "",
         "\t; Remove uninstaller information from the registry",
         "\tDeleteRegKey HKLM \"Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\${ORG_NAME} ${APP_NAME}\"",

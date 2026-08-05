@@ -63,6 +63,26 @@ except ImportError:  # pragma: no cover - absent until fetch-firmware is run
 # Read in blocks so hashing does not depend on the .kfpkg fitting in memory.
 _HASH_CHUNK_SIZE = 64 * 1024
 
+# Baudrates KTool accepts. Lives here rather than only on BaseFlasher so the
+# settings panel can offer exactly these without importing the flasher stack:
+# the value it stores is applied to a validating setter later, inside a Clock
+# callback, where a rejected value has nowhere to surface.
+VALID_BAUDRATES = (
+    9600,
+    19200,
+    28800,
+    38400,
+    57600,
+    76800,
+    115200,
+    230400,
+    400000,
+    460800,
+    576000,
+    921600,
+    1500000,
+)
+
 VALID_DEVICES = [
     "m5stickv",
     "amigo",

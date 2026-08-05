@@ -16,7 +16,10 @@
 #
 # Verification fails closed: if sha256sum/shasum or openssl are missing the
 # script aborts. Pass --allow-unverified to downgrade that to a warning and
-# continue without the affected verification step.
+# continue without the affected verification step. Such a run extracts the
+# firmware but does not write src/utils/firmware_hashes.py, so .ci/create-spec.py
+# refuses to build from it: only a verified release can become an installer
+# whose flash screen reports the firmware as matching its build-time hash.
 #
 # After extraction, each device's kboot.kfpkg SHA256 is printed in the same
 # "device: hash" format as selfcustody/krux's reproducibility.py, so the
@@ -35,6 +38,7 @@ set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
 ALLOW_UNVERIFIED=0
+VERIFICATION_SKIPPED=0
 FIRMWARE_VERSION="v26.08.0"
 BASE_URL="https://github.com/selfcustody/krux/releases/download/${FIRMWARE_VERSION}"
 ZIP_NAME="krux-${FIRMWARE_VERSION}.zip"
@@ -115,12 +119,18 @@ _download() {
 # `uv run poe fetch-firmware --allow-unverified` if you find yourself in
 # trouble and do not know what to do. Any attempt to add --allow-unverified
 # to CI (e.g. via a PR) will be CLOSED.
+#
+# Skipping a check is recorded rather than only warned about: _kfpkg_hashes
+# will not write the hash table the packaged app checks before flashing, so
+# the run can still produce firmware to use locally but cannot produce a
+# build that certifies a zip nobody verified.
 _missing_tool() {
     local tool="$1"
     local what="$2"
 
     if [[ "${ALLOW_UNVERIFIED}" -eq 1 ]]; then
         warn "${tool} not found — skipping ${what} (--allow-unverified)"
+        VERIFICATION_SKIPPED=1
         return 0
     fi
     die "${tool} not found — refusing to continue without ${what}.
@@ -247,6 +257,31 @@ _kfpkg_hashes() {
     #      anything able to rewrite one could rewrite the other.
     local manifest="${PACKING_DIR}/${MANIFEST_NAME}"
     local module="${ROOT_DIR}/${HASHES_MODULE}"
+
+    # Neither is written when a verification step was skipped. The digests are
+    # still printed, so firmware fetched with --allow-unverified can be checked
+    # by hand and used locally, but without the module create-spec.py refuses to
+    # build: a zip nobody verified must not become a distributable binary whose
+    # flash screen reports the firmware as matching its build-time hash. Any
+    # module left by an earlier run is removed, so this cannot fall back to a
+    # stale reference either.
+    if [[ "${VERIFICATION_SKIPPED}" -eq 1 ]]; then
+        rm -f "${manifest}" "${module}"
+
+        printf '\nDevice: SHA256 of .kfpkg file\n'
+        local device dest_path hash
+        for device in $(printf '%s\n' "${VALID_DEVICES[@]}" | sort); do
+            dest_path="${PACKING_DIR}/${device}.kfpkg"
+            [[ -f "${dest_path}" ]] || continue
+            hash=$(_sha256_of "${dest_path}")
+            printf '%s: %s\n' "${device}" "${hash}"
+        done
+
+        warn "verification was skipped — ${HASHES_MODULE} not written"
+        warn "this firmware can be used locally, but no build can be made from it"
+        return
+    fi
+
     : > "${manifest}"
 
     cat > "${module}" <<EOF
@@ -309,6 +344,7 @@ Usage: bash prebuild/fetch_firmware.sh [--allow-unverified]" ;;
 
     if [[ "${ALLOW_UNVERIFIED}" -eq 1 ]]; then
         warn "--allow-unverified: missing verification tools will be skipped, not fatal. But remember what happened."
+        warn "a run that skips a check cannot produce a build — see _kfpkg_hashes"
     fi
 
     mkdir -p "${LANDING_DIR}"

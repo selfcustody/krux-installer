@@ -31,7 +31,9 @@
     "Back": "뒤로",
     "Quit": "사임하다",
     "Flashing": "플래시 수행 중",
-    "at": "에"
+    "at": "에",
+    "Firmware SHA256 verified against the build-time hash": "펌웨어 SHA256이 빌드 시점 해시와 일치함을 확인했습니다",
+    "A compromised computer can still compromise the firmware being flashed": "손상된 컴퓨터는 여전히 플래싱되는 펌웨어를 손상시킬 수 있습니다"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "장치의 플러그를 뽑지 마십시오.",

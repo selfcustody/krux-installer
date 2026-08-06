@@ -280,7 +280,7 @@ class TestAboutScreen(GraphicUnitTest):
     )
     @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.greetings_screen.os.environ.get", return_value="mockuser")
+    @patch("pwd.getpwuid", return_value=MagicMock(pw_name="mockuser"))
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -299,7 +299,7 @@ class TestAboutScreen(GraphicUnitTest):
         mock_in_dialout,
         mock_get_os,
         mock_get_locale,
-        mock_environ_get,
+        mock_getpwuid,
     ):
         mock_manager.get_screen = MagicMock()
         mock_manager.get_screen.update = MagicMock()
@@ -310,10 +310,11 @@ class TestAboutScreen(GraphicUnitTest):
 
         screen.check_dialout_permission()
 
-        mock_environ_get.assert_called()
+        # the account comes from the process, not from $USER
+        mock_getpwuid.assert_called_once_with(os.getuid())
         mock_get_locale.assert_called()
         mock_get_os.assert_called()
-        mock_in_dialout.assert_called()
+        mock_in_dialout.assert_called_once_with(user="mockuser", group="dialout")
 
     @mark.skipif(
         sys.platform in ("win32"),
@@ -321,7 +322,7 @@ class TestAboutScreen(GraphicUnitTest):
     )
     @patch("sys.platform", "linux")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
-    @patch("src.app.screens.greetings_screen.os.environ.get", return_value="mockuser")
+    @patch("pwd.getpwuid", return_value=MagicMock(pw_name="mockuser"))
     @patch(
         "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
     )
@@ -340,7 +341,7 @@ class TestAboutScreen(GraphicUnitTest):
         mock_in_dialout,
         mock_get_os,
         mock_get_locale,
-        mock_environ_get,
+        mock_getpwuid,
     ):
         mock_manager.get_screen = MagicMock()
         mock_manager.get_screen.update = MagicMock()
@@ -351,10 +352,11 @@ class TestAboutScreen(GraphicUnitTest):
 
         screen.check_dialout_permission()
 
-        mock_environ_get.assert_called()
+        # the account comes from the process, not from $USER
+        mock_getpwuid.assert_called_once_with(os.getuid())
         mock_get_locale.assert_called()
         mock_get_os.assert_called()
-        mock_in_dialout.assert_called()
+        mock_in_dialout.assert_called_once_with(user="mockuser", group="dialout")
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch("sys.platform", "linux")
@@ -375,6 +377,114 @@ class TestAboutScreen(GraphicUnitTest):
         self.assertEqual(group, "dialout")
         mock_get_locale.assert_called()
         open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=rhel\nID_LIKE=fedora",
+    )
+    def test_get_os_dialout_group_rhel_by_id(self, open_mock, mock_get_locale):
+        # RHEL 8 and 9 carry the marker in ID, not ID_LIKE, so testing ID_LIKE
+        # alone ended the app on the error screen at startup
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "rhel")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=nobara\nID_LIKE=fedora",
+    )
+    def test_get_os_dialout_group_fedora_derivative(self, open_mock, mock_get_locale):
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "nobara")
+        self.assertEqual(group[1], "dialout")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.greetings_screen.open",
+        new_callable=mock_open,
+        read_data="ID=artix",
+    )
+    def test_get_os_dialout_group_artix(self, open_mock, mock_get_locale):
+        # AskPermissionDialoutScreen already knew Artix, but this check runs
+        # first and used to end the flow before it
+        screen = GreetingsScreen()
+        group = screen.get_os_dialout_group()
+        self.assertEqual(group[0], "artix")
+        self.assertEqual(group[1], "uucp")
+
+        mock_get_locale.assert_called()
+        open_mock.assert_called_once_with("/etc/os-release", mode="r", encoding="utf-8")
+
+    @mark.skipif(
+        sys.platform in ("win32"),
+        reason="does not run on windows",
+    )
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("grp.getgrnam", return_value=MagicMock(gr_gid=20))
+    @patch("pwd.getpwnam", return_value=MagicMock(pw_gid=20))
+    def test_is_user_in_dialout_group_as_primary_group(
+        self, mock_getpwnam, mock_getgrnam, mock_get_locale
+    ):
+        # gr_mem lists supplementary members only: an account whose primary
+        # group is dialout already has access, and used to be asked for a root
+        # usermod on every launch
+        screen = GreetingsScreen()
+        self.assertTrue(
+            screen.is_user_in_dialout_group(user="mockuser", group="dialout")
+        )
+
+        mock_getpwnam.assert_called_once_with("mockuser")
+        mock_getgrnam.assert_called_once_with("dialout")
+        mock_get_locale.assert_called()
+
+    @mark.skipif(
+        sys.platform in ("win32"),
+        reason="does not run on windows",
+    )
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("grp.getgrall", return_value=[])
+    @patch("grp.getgrnam", return_value=MagicMock(gr_gid=20))
+    @patch("pwd.getpwnam", return_value=MagicMock(pw_gid=1000))
+    def test_is_user_not_in_dialout_group_by_any_means(
+        self, mock_getpwnam, mock_getgrnam, mock_getgrall, mock_get_locale
+    ):
+        screen = GreetingsScreen()
+        self.assertFalse(
+            screen.is_user_in_dialout_group(user="mockuser", group="dialout")
+        )
+
+        # the primary group was consulted first, then the member lists
+        mock_getpwnam.assert_called_once_with("mockuser")
+        mock_getgrnam.assert_called_once_with("dialout")
+        mock_getgrall.assert_called_once()
+        mock_get_locale.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

@@ -27,7 +27,9 @@
     "Back": "Zurück",
     "Quit": "Beenden",
     "Flashing": "Flashen",
-    "at": "bei"
+    "at": "bei",
+    "Firmware SHA256 verified against the build-time hash": "Firmware-SHA256 gegen den beim Build erzeugten Hash geprüft",
+    "A compromised computer can still compromise the firmware being flashed": "Ein kompromittierter Computer kann die geflashte Firmware trotzdem kompromittieren"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "BITTE NICHT DAS GERÄT TRENNEN",

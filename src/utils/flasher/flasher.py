@@ -23,8 +23,13 @@
 flasher.py
 """
 
+import os
 from collections.abc import Callable
-from src.utils.constants import VALID_DEVICES
+from src.utils.constants import (
+    VALID_DEVICES,
+    FirmwareIntegrityError,
+    verify_firmware,
+)
 from src.utils.flasher.base_flasher import BaseFlasher
 
 
@@ -36,20 +41,59 @@ class Flasher(BaseFlasher):
     """
 
     def _detect_device_from_firmware(self) -> None:
-        """Detect device type from firmware filename and set port/board"""
-        for device in VALID_DEVICES:
-            if device in self.firmware:
-                self.set_device(device)
-                return
+        """
+        Detect device type from the firmware file name and set port/board.
+
+        Only the file name is inspected. Searching the whole path let the
+        directories above it decide: under PyInstaller the path carries the
+        temporary directory and the account name, so a user named 'rabbit'
+        resolved to 'bit' before the device that was actually selected, which
+        picks the wrong USB vendor id and board, and now also hashes the
+        firmware against the wrong device's entry. get_firmware_path() always
+        names the file '<device>.kfpkg', so the basename is the only part of
+        the path that says anything about the device.
+
+        Raises:
+            ValueError: If the file name does not name a supported device
+        """
+        device = os.path.basename(self.firmware).removesuffix(".kfpkg")
+
+        if device not in VALID_DEVICES:
+            raise ValueError(f"Unknown device for firmware: {self.firmware}")
+
+        self._device = device
+        self.set_device(device)
 
     def _flash_with_port(self, port: str, callback: Callable) -> None:
         """
         Attempt to flash firmware using the specified port.
 
+        The .kfpkg is re-hashed here, on the last line before KTool opens it.
+        MainScreen already verified it when the Flash button was pressed, but a
+        screen transition and however long the user took to react sit between
+        that check and this write. Hashing again leaves no user-paced window in
+        which the file unpacked to the temporary directory could be swapped.
+        KTool takes a path and opens it itself, so a check adjacent to the call
+        is as close as this can get — the residual microseconds are only
+        reachable by something already running as the user, which is the limit
+        FlashScreen states when it is done.
+
         Args:
             port: Serial port path
             callback: Progress callback function
+
+        Raises:
+            FirmwareIntegrityError: If the firmware no longer matches the
+                SHA256 recorded at build time, or its device is unknown
         """
+        if self._device is None:
+            raise FirmwareIntegrityError(
+                f"Could not tell which device '{self.firmware}' belongs to. "
+                f"Refusing to flash unverified firmware."
+            )
+
+        verify_firmware(self._device, self.firmware)
+
         self.ktool.process(
             terminal=False,
             dev=port,
@@ -66,6 +110,9 @@ class Flasher(BaseFlasher):
 
         Args:
             callback: Progress callback function
+
+        Raises:
+            FirmwareIntegrityError: If the firmware fails its SHA256 check
         """
         self._detect_device_from_firmware()
 
@@ -76,6 +123,12 @@ class Flasher(BaseFlasher):
 
         try:
             self._flash_with_port(self.port, callback)
+
+        # A firmware that does not match its recorded hash is not a port
+        # problem: retrying on another port would flash the same altered
+        # file. Let it out so FlashScreen can say what actually happened.
+        except FirmwareIntegrityError:
+            raise
 
         except StopIteration as stop_exc:
             self._log_error(str(stop_exc))
@@ -89,6 +142,9 @@ class Flasher(BaseFlasher):
                     self._flash_with_port(newport.device, callback)
                 else:
                     self._log_error(f"Port {newport.device} not working")
+
+            except FirmwareIntegrityError:
+                raise
 
             except StopIteration as stop_exc:
                 self._log_error(str(stop_exc))

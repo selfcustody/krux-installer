@@ -4,6 +4,7 @@ from kivy.base import EventLoop, EventLoopBase
 from kivy.clock import Clock
 from kivy.tests.common import GraphicUnitTest
 from src.app.screens.flash_screen import FlashScreen
+from src.utils.constants import FirmwareIntegrityError
 
 
 class TestFlashScreen(GraphicUnitTest):
@@ -369,6 +370,15 @@ class TestFlashScreen(GraphicUnitTest):
                 "[b]DONE![/b]",
                 "\n",
                 "[color=#00FF00]",
+                "Firmware SHA256 verified against the build-time hash",
+                "[/color]",
+                "\n",
+                "[color=#EFCC00]",
+                "A compromised computer can still compromise "
+                "the firmware being flashed",
+                "[/color]",
+                "\n",
+                "[color=#00FF00]",
                 "[ref=Back][u]Back[/u][/ref]",
                 "[/color]",
                 "        ",
@@ -528,6 +538,56 @@ class TestFlashScreen(GraphicUnitTest):
         mock_partial.assert_called()
         mock_thread.assert_called_once_with(name=screen.name, target=mock_partial())
         mock_redirect_exception.assert_called()
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.flash_screen.partial")
+    @patch("src.app.screens.flash_screen.threading.Thread")
+    @patch("src.utils.flasher.Flasher")
+    @patch("src.app.screens.base_screen.BaseScreen.redirect_exception")
+    def test_on_enter_fail_firmware_integrity(
+        self,
+        mock_redirect_exception,
+        mock_flasher,
+        mock_thread,
+        mock_partial,
+        mock_get_locale,
+    ):
+        mock_flasher.__class__.print_callback = MagicMock()
+
+        screen = FlashScreen()
+        screen.flasher = MagicMock()
+        screen.flasher.ktool = MagicMock()
+        screen.flasher.flash = MagicMock()
+        setattr(FlashScreen, "on_done", MagicMock())
+        setattr(FlashScreen, "on_data", MagicMock())
+        setattr(FlashScreen, "on_process", MagicMock())
+
+        screen.on_enter()
+
+        # Run the real hook: a hash mismatch raised by the flasher must be
+        # reported as what it is, not as a device connection problem
+        hook = getattr(FlashScreen, "on_except_hook")
+        hook(
+            threading.ExceptHookArgs(
+                sequence=(
+                    FirmwareIntegrityError,
+                    FirmwareIntegrityError("mocked integrity failure"),
+                    None,
+                    mock_thread,
+                )
+            )
+        )
+
+        message = str(mock_redirect_exception.call_args.kwargs["exception"])
+        self.assertIn("mocked integrity failure", message)
+        self.assertNotIn("Ensure that you have selected the correct device", message)
+
+        # patch assertions
+        mock_get_locale.assert_called()
+        mock_partial.assert_called()
 
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

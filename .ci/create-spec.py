@@ -162,9 +162,22 @@ if __name__ == "__main__":
             if findall(r"^[a-z]+\_[A-Z]+\.UTF-8\.json$", f):
                 BUILDER_ARGS.append(f"--add-data={i18n_abs}:{i18n_rel}")
 
-    # Add embedded firmware binaries
+    # Add embedded firmware binaries. The expected SHA256 of each one lives in
+    # src/utils/firmware_hashes.py, which PyInstaller collects into the PYZ
+    # archive inside the executable — deliberately not shipped as --add-data,
+    # which would unpack it into the same writable temp directory as the
+    # .kfpkg files it vouches for. Refuse to build without it rather than
+    # produce a binary that flashes unverified firmware.
     FIRMWARE_PATH = str(ROOT_PATH / "src" / "utils" / "firmware" / FIRMWARE_VERSION)
     FIRMWARE_DEST = join("src", "utils", "firmware", FIRMWARE_VERSION)
+    HASHES_MODULE = str(ROOT_PATH / "src" / "utils" / "firmware_hashes.py")
+
+    if not isfile(HASHES_MODULE):
+        raise FileNotFoundError(
+            f"Firmware hashes not found at {HASHES_MODULE}. "
+            f"Run: uv run --extra builder poe fetch-firmware"
+        )
+
     for f in listdir(FIRMWARE_PATH):
         fw_abs = join(FIRMWARE_PATH, f)
         if isfile(fw_abs) and f.endswith(".kfpkg"):

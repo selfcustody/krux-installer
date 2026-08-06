@@ -16,12 +16,17 @@
 #
 # Verification fails closed: if sha256sum/shasum or openssl are missing the
 # script aborts. Pass --allow-unverified to downgrade that to a warning and
-# continue without the affected verification step.
+# continue without the affected verification step. Such a run extracts the
+# firmware but does not write src/utils/firmware_hashes.py, so .ci/create-spec.py
+# refuses to build from it: only a verified release can become an installer
+# whose flash screen reports the firmware as matching its build-time hash.
 #
 # After extraction, each device's kboot.kfpkg SHA256 is printed in the same
 # "device: hash" format as selfcustody/krux's reproducibility.py, so the
 # embedded binaries can be cross-checked against independently reproduced
-# builds.
+# builds. The same hashes are also generated into src/utils/firmware_hashes.py,
+# which the app re-checks before flashing — the build-time proof would
+# otherwise stop here and never reach the user running the packaged app.
 #
 # Usage:
 #   bash prebuild/fetch_firmware.sh [--allow-unverified]
@@ -33,13 +38,15 @@ set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────────────
 ALLOW_UNVERIFIED=0
-FIRMWARE_VERSION="v26.03.0"
+VERIFICATION_SKIPPED=0
+FIRMWARE_VERSION="v26.08.0"
 BASE_URL="https://github.com/selfcustody/krux/releases/download/${FIRMWARE_VERSION}"
-PEM_URL="https://raw.githubusercontent.com/selfcustody/krux/main/selfcustody.pem"
 ZIP_NAME="krux-${FIRMWARE_VERSION}.zip"
 SHA256_NAME="${ZIP_NAME}.sha256.txt"
 SIG_NAME="${ZIP_NAME}.sig"
 PEM_NAME="selfcustody.pem"
+MANIFEST_NAME="SHA256SUMS"
+HASHES_MODULE="src/utils/firmware_hashes.py"
 VALID_DEVICES=(
     "m5stickv"
     "amigo"
@@ -59,6 +66,16 @@ ROOT_DIR="$(dirname "${SCRIPT_DIR}")"
 LANDING_DIR="${ROOT_DIR}/.firmware_download"
 PACKING_DIR="${ROOT_DIR}/src/utils/firmware/${FIRMWARE_VERSION}"
 
+# selfcustody's public key, committed to this repository rather than fetched.
+# It used to be downloaded from the main branch of selfcustody/krux on every
+# run, which made the signature check self-referential: whoever supplied the
+# release also supplied the key it was verified against, and a pre-seeded
+# landing directory holding an attacker's zip, signature and key passed while
+# reporting "Signature is valid". Pinning it here means the trust anchor ships
+# with the code, is reviewed in pull requests, and does not move when a branch
+# does.
+PINNED_PEM="${ROOT_DIR}/${PEM_NAME}"
+
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
 info()  { printf '  [ok]   %s\n' "$*"; }
@@ -77,8 +94,14 @@ _download() {
     local name
     name="$(basename "${dest}")"
 
+    # A file already in the landing directory is reused rather than fetched
+    # again, which only holds because every one of them is re-verified on each
+    # run against the committed public key: a zip and signature planted here
+    # cannot be signed for, so they are rejected before extraction. The key
+    # itself is never downloaded — see PINNED_PEM. Under --allow-unverified
+    # that guarantee is gone, along with every other one.
     if [[ -f "${dest}" ]]; then
-        skip "${name} already downloaded"
+        skip "${name} already downloaded (will be re-verified)"
         return
     fi
 
@@ -96,12 +119,18 @@ _download() {
 # `uv run poe fetch-firmware --allow-unverified` if you find yourself in
 # trouble and do not know what to do. Any attempt to add --allow-unverified
 # to CI (e.g. via a PR) will be CLOSED.
+#
+# Skipping a check is recorded rather than only warned about: _kfpkg_hashes
+# will not write the hash table the packaged app checks before flashing, so
+# the run can still produce firmware to use locally but cannot produce a
+# build that certifies a zip nobody verified.
 _missing_tool() {
     local tool="$1"
     local what="$2"
 
     if [[ "${ALLOW_UNVERIFIED}" -eq 1 ]]; then
         warn "${tool} not found — skipping ${what} (--allow-unverified)"
+        VERIFICATION_SKIPPED=1
         return 0
     fi
     die "${tool} not found — refusing to continue without ${what}.
@@ -166,14 +195,24 @@ _extract_kfpkg() {
     step "extract kboot.kfpkg files"
     mkdir -p "${PACKING_DIR}"
 
+    # Everything the previous run left behind is removed first, so what gets
+    # embedded and hashed can only have come out of the zip verified above.
+    # This used to skip extraction when a .kfpkg was already present, which
+    # meant a file placed here beforehand — by hand, or by a merged pull
+    # request, since this directory is gitignored — survived untouched while
+    # the script reported "SHA256 matches" and "Signature is valid" for a
+    # release it never wrote. _kfpkg_hashes then recorded that file's hash as
+    # the reference the app checks before flashing, so the runtime check
+    # certified it all the way to the device.
+    #
+    # Devices dropped from a release must be cleared as well: a leftover
+    # .kfpkg for one of them is picked up by both create-spec.py's glob and
+    # the hash table below.
+    rm -f "${PACKING_DIR}"/*.kfpkg "${PACKING_DIR}/${MANIFEST_NAME}"
+
     for device in "${VALID_DEVICES[@]}"; do
         local zip_entry="krux-${FIRMWARE_VERSION}/maixpy_${device}/kboot.kfpkg"
         local dest_path="${PACKING_DIR}/${device}.kfpkg"
-
-        if [[ -f "${dest_path}" ]]; then
-            skip "${device}.kfpkg already exists"
-            continue
-        fi
 
         # Check if entry exists inside the zip
         if ! unzip -l "${zip_path}" "${zip_entry}" &>/dev/null; then
@@ -195,6 +234,73 @@ _kfpkg_hashes() {
         return
     fi
 
+    # Hashes are captured after the zip's SHA256 and ECDSA signature have been
+    # verified against the committed public key, from a packing directory that
+    # _extract_kfpkg emptied and repopulated from that same zip, so every value
+    # below descends from a release proven authentic at build time. Both halves
+    # matter: verifying the zip says nothing about a file that was never
+    # written from it. They are written to two places:
+    #
+    #   1. SHA256SUMS next to the .kfpkg files — plain `sha256sum -c` input,
+    #      for auditing the source tree by hand:
+    #        cd src/utils/firmware/<version> && sha256sum -c SHA256SUMS
+    #      This file is NOT embedded into the bundle and is NOT trusted at
+    #      runtime.
+    #
+    #   2. src/utils/firmware_hashes.py — the reference the app actually
+    #      checks against before flashing. It has to be Python source rather
+    #      than a data file: we build --onefile on all three platforms, so
+    #      pure-Python modules stay in the PYZ archive inside the executable
+    #      and are imported from there, while --add-data files are unpacked
+    #      to a temporary directory. A data-file manifest would sit in that
+    #      same writable temp dir as the .kfpkg files it vouches for, and
+    #      anything able to rewrite one could rewrite the other.
+    local manifest="${PACKING_DIR}/${MANIFEST_NAME}"
+    local module="${ROOT_DIR}/${HASHES_MODULE}"
+
+    # Neither is written when a verification step was skipped. The digests are
+    # still printed, so firmware fetched with --allow-unverified can be checked
+    # by hand and used locally, but without the module create-spec.py refuses to
+    # build: a zip nobody verified must not become a distributable binary whose
+    # flash screen reports the firmware as matching its build-time hash. Any
+    # module left by an earlier run is removed, so this cannot fall back to a
+    # stale reference either.
+    if [[ "${VERIFICATION_SKIPPED}" -eq 1 ]]; then
+        rm -f "${manifest}" "${module}"
+
+        printf '\nDevice: SHA256 of .kfpkg file\n'
+        local device dest_path hash
+        for device in $(printf '%s\n' "${VALID_DEVICES[@]}" | sort); do
+            dest_path="${PACKING_DIR}/${device}.kfpkg"
+            [[ -f "${dest_path}" ]] || continue
+            hash=$(_sha256_of "${dest_path}")
+            printf '%s: %s\n' "${device}" "${hash}"
+        done
+
+        warn "verification was skipped — ${HASHES_MODULE} not written"
+        warn "this firmware can be used locally, but no build can be made from it"
+        return
+    fi
+
+    : > "${manifest}"
+
+    cat > "${module}" <<EOF
+# Generated by prebuild/fetch_firmware.sh — do not edit by hand.
+#
+# SHA256 of every embedded <device>.kfpkg, captured after the release zip's
+# SHA256 and ECDSA signature were verified against selfcustody's public key.
+#
+# This lives in Python source on purpose. With --onefile, pure-Python modules
+# stay in the PYZ archive embedded in the executable and are never unpacked to
+# the runtime temp directory, so these values cannot be rewritten by whatever
+# could rewrite the extracted .kfpkg files.
+"""firmware_hashes.py"""
+
+FIRMWARE_VERSION = "${FIRMWARE_VERSION}"
+
+FIRMWARE_SHA256 = {
+EOF
+
     printf '\nDevice: SHA256 of .kfpkg file\n'
     local device dest_path hash
     for device in $(printf '%s\n' "${VALID_DEVICES[@]}" | sort); do
@@ -202,7 +308,14 @@ _kfpkg_hashes() {
         [[ -f "${dest_path}" ]] || continue
         hash=$(_sha256_of "${dest_path}")
         printf '%s: %s\n' "${device}" "${hash}"
+        printf '%s  %s.kfpkg\n' "${hash}" "${device}" >> "${manifest}"
+        printf '    "%s.kfpkg": "%s",\n' "${device}" "${hash}" >> "${module}"
     done
+
+    printf '}\n' >> "${module}"
+
+    info "wrote ${manifest}"
+    info "wrote ${module}"
 }
 
 _write_gitkeep() {
@@ -231,6 +344,7 @@ Usage: bash prebuild/fetch_firmware.sh [--allow-unverified]" ;;
 
     if [[ "${ALLOW_UNVERIFIED}" -eq 1 ]]; then
         warn "--allow-unverified: missing verification tools will be skipped, not fatal. But remember what happened."
+        warn "a run that skips a check cannot produce a build — see _kfpkg_hashes"
     fi
 
     mkdir -p "${LANDING_DIR}"
@@ -238,17 +352,20 @@ Usage: bash prebuild/fetch_firmware.sh [--allow-unverified]" ;;
     local zip_path="${LANDING_DIR}/${ZIP_NAME}"
     local sha256_path="${LANDING_DIR}/${SHA256_NAME}"
     local sig_path="${LANDING_DIR}/${SIG_NAME}"
-    local pem_path="${LANDING_DIR}/${PEM_NAME}"
+
+    [[ -f "${PINNED_PEM}" ]] \
+        || die "Public key not found at ${PINNED_PEM}.
+It is committed to this repository and must not be fetched at build time."
 
     step "step 1 — downloading assets"
     _download "${BASE_URL}/${ZIP_NAME}"    "${zip_path}"
     _download "${BASE_URL}/${SHA256_NAME}" "${sha256_path}"
     _download "${BASE_URL}/${SIG_NAME}"    "${sig_path}"
-    _download "${PEM_URL}"                 "${pem_path}"
+    info "using committed public key ${PINNED_PEM}"
 
     step "step 2 — verifying integrity"
     _verify_sha256    "${zip_path}" "${sha256_path}"
-    _verify_signature "${zip_path}" "${sig_path}" "${pem_path}"
+    _verify_signature "${zip_path}" "${sig_path}" "${PINNED_PEM}"
 
     step "step 3 — extracting firmware"
     _extract_kfpkg "${zip_path}"

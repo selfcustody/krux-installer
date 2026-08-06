@@ -27,7 +27,11 @@ from functools import partial
 from kivy.clock import Clock
 
 from src.app.screens.base_screen import BaseScreen
-from src.utils.constants import VALID_DEVICES, get_firmware_path
+from src.utils.constants import (
+    VALID_DEVICES,
+    FirmwareIntegrityError,
+    get_firmware_path,
+)
 
 
 class MainScreen(BaseScreen):
@@ -140,13 +144,20 @@ class MainScreen(BaseScreen):
             else:
                 self.set_background(wid="main_flash", rgba=(0, 0, 0, 1))
 
+                # The baudrate is read here, not in FlashScreen, because from
+                # this point on it travels through Clock callbacks where a
+                # rejected value cannot be reported
                 try:
                     firmware = get_firmware_path(self.device)
-                except (ValueError, FileNotFoundError) as err:
+                    baudrate = MainScreen.get_baudrate()
+                except (
+                    ValueError,
+                    FileNotFoundError,
+                    FirmwareIntegrityError,
+                ) as err:
                     self.redirect_exception(exception=err)
                     return
 
-                baudrate = MainScreen.get_baudrate()
                 screen = self.manager.get_screen("FlashScreen")
                 fns = [
                     partial(

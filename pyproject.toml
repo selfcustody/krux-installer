@@ -1,6 +1,6 @@
 [project]
 name = "krux-installer"
-version = "0.0.22"
+version = "0.0.23"
 description = "A GUI based application to flash Krux firmware on K210 based devices"
 authors = [
     {name = "qlrd", email = "qlrddev@gmail.com"},

@@ -24,6 +24,7 @@ base_screen.py
 
 import os
 import re
+import shlex
 import sys
 import typing
 from math import sqrt
@@ -41,6 +42,7 @@ from kivy.uix.image import Image
 from kivy.uix.screenmanager import Screen
 from kivy.weakproxy import WeakProxy
 from src.i18n import T
+from src.utils.constants import VALID_BAUDRATES
 from src.utils.trigger import Trigger
 
 if sys.platform.startswith("win32"):
@@ -280,9 +282,15 @@ class BaseScreen(Screen, Trigger):
             for line in lines:
                 # Parse key-value pairs (lsblk -P outputs in NAME="value" format)
                 if 'RM="1"' in line and 'TYPE="part"' in line:
-                    # Split by spaces and parse each key-value pair
+                    # shlex honours the quoting lsblk -P emits, so a mount
+                    # point containing a space stays one token. Splitting on
+                    # whitespace produced a trailing fragment with no '=',
+                    # and the unpack below then aborted enumeration for every
+                    # drive, including ones already collected. Removable media
+                    # is mounted at /media/<user>/<label>, and FAT32 labels
+                    # commonly contain spaces
                     attributes = {}
-                    parts = line.split()
+                    parts = shlex.split(line)
 
                     for part in parts:
                         key, value = part.split("=", 1)
@@ -469,9 +477,30 @@ class BaseScreen(Screen, Trigger):
 
     @staticmethod
     def get_baudrate() -> int:
-        """Return the current selected baudrate"""
+        """
+        Return the current selected baudrate.
+
+        Validated here because this is the last point where a bad value can
+        still be reported: it is applied to the flasher inside a Clock
+        callback, which has no handler above it, so a rejection there takes
+        the application down on the next frame. The settings panel offers
+        only accepted values, but config.ini is a plain file.
+
+        Raises:
+            ValueError: If the stored value is not a baudrate KTool accepts
+        """
         app = App.get_running_app()
-        return int(app.config.get("flash", "baudrate"))
+        stored = app.config.get("flash", "baudrate")
+
+        try:
+            baudrate = int(stored)
+        except (TypeError, ValueError) as exc:
+            raise ValueError(f"Invalid baudrate: {stored}") from exc
+
+        if baudrate not in VALID_BAUDRATES:
+            raise ValueError(f"Invalid baudrate: {baudrate}")
+
+        return baudrate
 
     @staticmethod
     def get_locale() -> str:

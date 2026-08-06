@@ -31,7 +31,9 @@
     "Back": "Terug",
     "Quit": "Sluit",
     "Flashing": "Doen flash",
-    "at": "op"
+    "at": "op",
+    "Firmware SHA256 verified against the build-time hash": "Fermware-SHA256 geverifieer teen die bou-tyd hash",
+    "A compromised computer can still compromise the firmware being flashed": "'n Gekompromitteerde rekenaar kan die fermware wat geflits word steeds kompromitteer"
   },
   "wipe_screen": {
     "PLEASE DO NOT UNPLUG YOUR DEVICE": "MOET ASSEBLIEF NIE U TOESTEL ONTKOPPEL NIE",

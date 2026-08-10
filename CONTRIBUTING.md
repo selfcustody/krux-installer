@@ -1,8 +1,9 @@
 # Contributing to `Krux-Installer`
 
 The development of `Krux-Installer` is a free and open-source, community-driven
-effort that welcomes contributions from anyone. We are excited that you are
-interested in helping us bring sovereign and private self-custody to everyone.
+effort that welcomes contributions from anyone. It is a research and development
+project, made by nerds building tools for their own interests, open to the
+world. It is not a product, and nothing here is owed to anyone.
 
 We welcome contributions in many forms, including bug reports, feature
 requests, code contributions, and documentation improvements, from contributors
@@ -63,10 +64,9 @@ your commits.
 
 ## Peer review
 
-To make sure our code has the highest quality and is maintainable for
-posterity, we have a thorough peer review process, where pull requests need
-to be reviewed by at least one maintainer, and must not have any outstanding
-comments from regular contributors.
+To keep the code readable and maintainable, we have a thorough peer review
+process, where pull requests need to be reviewed by at least one maintainer,
+and must not have any outstanding comments from regular contributors.
 
 ### Conceptual Review
 
@@ -129,9 +129,9 @@ class Foo:
 ```
 
 All new features require testing. Tests should be unique and self-describing.
-When it comes to error handling, we prefer exact and meaningful error handling
-to deliver consumers (developers and users) an accurate error that describes
-exactly what went wrong. Instead of:
+When it comes to error handling, we prefer exact and meaningful error handling,
+so that whoever hits it (developer or user) gets an accurate error that
+describes exactly what went wrong. Instead of:
 
 ```python
 # bad: missing return statement, silently returns None instead of str

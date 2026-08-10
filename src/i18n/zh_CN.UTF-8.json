@@ -1,4 +1,11 @@
 {
+  "disclaimer_screen": {
+    "Krux is a research and development project, made by nerds building tools for their own interests, open to the world": "Krux 是一个研究与开发项目，由极客们为自己的兴趣而打造，并向全世界开放",
+    "Innovative features may have undiscovered flaws that endanger funds": "创新功能可能存在尚未发现的缺陷，从而危及资金安全",
+    "Use it at your own risk": "使用风险自负",
+    "Close": "关闭",
+    "I understand": "我明白了"
+  },
   "check_permissions_screen": {
     "Setup": "初始化",
     "for": "为",

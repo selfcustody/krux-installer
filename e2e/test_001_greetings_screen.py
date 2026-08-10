@@ -74,6 +74,44 @@ class TestAboutScreen(GraphicUnitTest):
         mock_get_locale.assert_called_once()
         mock_check_permission.assert_called_once()
 
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.greetings_screen.GreetingsScreen.set_screen")
+    def test_update_disclaimer_screen(self, mock_set_screen, mock_get_locale):
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        EventLoop.ensure_window()
+
+        screen.update(name=screen.name, key="disclaimer")
+
+        mock_get_locale.assert_called_once()
+        mock_set_screen.assert_called_once_with(
+            name="DisclaimerScreen", direction="left"
+        )
+
+    @patch.object(EventLoopBase, "ensure_window", lambda x: None)
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch("src.app.screens.greetings_screen.GreetingsScreen.check_dialout_permission")
+    def test_update_check_permission_from_disclaimer(
+        self, mock_check_permission, mock_get_locale
+    ):
+        # the accepted disclaimer is what asks for the check, so its name is
+        # accepted here
+        screen = GreetingsScreen()
+        self.render(screen)
+
+        EventLoop.ensure_window()
+
+        screen.update(name="DisclaimerScreen", key="check-permission")
+
+        mock_get_locale.assert_called_once()
+        mock_check_permission.assert_called_once()
+
     @patch("sys.platform", "win32")
     @patch.object(EventLoopBase, "ensure_window", lambda x: None)
     @patch(

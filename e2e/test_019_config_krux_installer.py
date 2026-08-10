@@ -445,6 +445,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app.screen_manager = MagicMock()
         app.screen_manager.get_screen = MagicMock()
         app.screens = [
+            MagicMock(name="DisclaimerScreen"),
             MagicMock(name="MainScreen"),
             MagicMock(name="FlashScreen"),
             MagicMock(name="WarningWipeScreen"),
@@ -460,6 +461,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         # on linux, value stays as-is (no .UTF-8 appended by on_config_change)
         calls_get_screen = [
+            call("DisclaimerScreen"),
             call("AskPermissionDialoutScreen"),
             call("MainScreen"),
             call("FlashScreen"),
@@ -481,6 +483,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app.screen_manager = MagicMock()
         app.screen_manager.get_screen = MagicMock()
         app.screens = [
+            MagicMock(name="DisclaimerScreen"),
             MagicMock(name="MainScreen"),
             MagicMock(name="FlashScreen"),
             MagicMock(name="WarningWipeScreen"),
@@ -495,6 +498,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
 
         # on win32, value gets .UTF-8 appended
         calls_get_screen = [
+            call("DisclaimerScreen"),
             call("MainScreen"),
             call("FlashScreen"),
             call("WarningWipeScreen"),
@@ -515,6 +519,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app.screen_manager = MagicMock()
         app.screen_manager.get_screen = MagicMock()
         app.screens = [
+            MagicMock(name="DisclaimerScreen"),
             MagicMock(name="MainScreen"),
             MagicMock(name="FlashScreen"),
             MagicMock(name="WarningWipeScreen"),
@@ -528,6 +533,7 @@ class TestConfigKruxInstaller(GraphicUnitTest):
         app.on_config_change(None, "locale", key="lang", value="mock")
 
         calls_get_screen = [
+            call("DisclaimerScreen"),
             call("MainScreen"),
             call("FlashScreen"),
             call("WarningWipeScreen"),

@@ -10,6 +10,10 @@
 Krux Installer is a GUI based tool to flash [Krux](https://github.com/selfcustody/krux)
 without typing any command in terminal for [flash the firmware onto the device](https://selfcustody.github.io/krux/getting-started/installing/#flash-the-firmware-onto-the-device).
 
+Like Krux itself, this is a research and development project, made by nerds
+building tools for their own interests, open to the world. Innovative features
+may have undiscovered flaws that endanger funds. Use it at your own risk.
+
 ## Works offline
 
 Since `v0.0.22`, Krux Installer runs **fully offline**. The Krux firmware binaries are bundled inside the installer at build time, so it no longer contacts GitHub at runtime — no internet connection is required to flash your device.
@@ -22,7 +26,7 @@ Earlier versions fetched the firmware over the network: the installer queried Gi
 - queries GitHub for the list of available firmware versions;
 - downloads, verifies or unzips firmware assets on your machine.
 
-Instead, each release ships with a single firmware version already embedded, verified and unpacked inside the binary. The user flow is now simply: **open the installer → select your device → flash**.
+Instead, each release ships with a single firmware version already embedded, verified and unpacked inside the binary. Flashing is now: open the installer → select your device → flash.
 
 ### Choosing a firmware version
 

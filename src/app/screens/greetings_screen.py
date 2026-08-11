@@ -52,20 +52,22 @@ class GreetingsScreen(BaseScreen):
     # pylint: disable=unused-argument
     def on_enter(self, *args):
         """
-        When application start, after greeting user with the krux logo, it will need to check if
-        user is running app in linux or non-linux. If running in linux, the user will be
-        redirect to CheckPermissionsScreen and then to MainScreen. Win32 and Mac will be
-        redirect to MainScreen.
+        When application start, after greeting user with the krux logo, it will
+        show the disclaimer. Only when the user accepts it the app will need to
+        check if user is running app in linux or non-linux. If running in linux,
+        the user will be redirect to CheckPermissionsScreen and then to
+        MainScreen. Win32 and Mac will be redirect to MainScreen.
         """
         fn_0 = partial(self.update, name=self.name, key="canvas")
-        fn_1 = partial(self.update, name=self.name, key="check-permission")
+        fn_1 = partial(self.update, name=self.name, key="disclaimer")
         Clock.schedule_once(fn_0, 0)
         Clock.schedule_once(fn_1, 2.1)
 
     # pylint: disable=unused-argument
     def update(self, *args, **kwargs):
         """
-        After show krux logo, verify:
+        After show krux logo, show the disclaimer. Once DisclaimerScreen is
+        accepted it asks back for the permission check:
         - in linux, if the current user is in dialout group to allow sudoless flash
         - then go directly to MainScreen
         """
@@ -74,6 +76,9 @@ class GreetingsScreen(BaseScreen):
         value = kwargs.get("value")
 
         def on_update():
+            if key == "disclaimer":
+                self.set_screen(name="DisclaimerScreen", direction="left")
+
             if key == "check-permission":
                 self.check_dialout_permission()
 
@@ -82,7 +87,7 @@ class GreetingsScreen(BaseScreen):
             name=name,
             key=key,
             value=value,
-            allowed_screens=("KruxInstallerApp", self.name),
+            allowed_screens=("KruxInstallerApp", "DisclaimerScreen", self.name),
             on_update=getattr(GreetingsScreen, "on_update"),
         )
 

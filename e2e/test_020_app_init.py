@@ -13,6 +13,7 @@ from src.app import KruxInstallerApp
 
 EXPECTED_SCREENS_LINUX = (
     "GreetingsScreen",
+    "DisclaimerScreen",
     "AskPermissionDialoutScreen",
     "MainScreen",
     "SelectDeviceScreen",
@@ -28,6 +29,7 @@ EXPECTED_SCREENS_LINUX = (
 
 EXPECTED_SCREENS_NON_LINUX = (
     "GreetingsScreen",
+    "DisclaimerScreen",
     "MainScreen",
     "SelectDeviceScreen",
     "AboutScreen",

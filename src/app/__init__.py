@@ -42,6 +42,7 @@ from src.app.config_krux_installer import ConfigKruxInstaller
 from src.app.screens.about_screen import AboutScreen
 from src.app.screens.airgap_update_screen import AirgapUpdateScreen
 from src.app.screens.ask_permission_dialout_screen import AskPermissionDialoutScreen
+from src.app.screens.disclaimer_screen import DisclaimerScreen
 from src.app.screens.error_screen import ErrorScreen
 from src.app.screens.flash_screen import FlashScreen
 from src.app.screens.greetings_screen import GreetingsScreen
@@ -64,6 +65,8 @@ from src.app.screens.wipe_screen import WipeScreen
 # FlashScreen's parent is dynamic and set at runtime by the screen that navigates to it.
 SCREEN_PARENTS = {
     "GreetingsScreen": None,
+    # ESC exits the app, the same as the disclaimer's "Close" choice
+    "DisclaimerScreen": None,
     "MainScreen": "GreetingsScreen",
     "SelectDeviceScreen": "MainScreen",
     "AboutScreen": "MainScreen",
@@ -91,6 +94,7 @@ class KruxInstallerApp(ConfigKruxInstaller):
         """Create the Root widget with an ScreenManager as manager for its sub-widgets"""
         screens = []
         screens.append(GreetingsScreen())
+        screens.append(DisclaimerScreen())
 
         if sys.platform == "linux":
             screens.append(AskPermissionDialoutScreen())

@@ -39,6 +39,10 @@ class TestAppKeyNavigation(GraphicUnitTest):
     def test_screen_parents_has_greetings_as_root(self):
         self.assertIsNone(SCREEN_PARENTS["GreetingsScreen"])
 
+    def test_screen_parents_has_disclaimer_as_root(self):
+        # "Close" quits the app, and so does ESC
+        self.assertIsNone(SCREEN_PARENTS["DisclaimerScreen"])
+
     def test_screen_parents_flash_screen_starts_as_none(self):
         self.assertIsNone(SCREEN_PARENTS["FlashScreen"])
 
@@ -52,6 +56,7 @@ class TestAppKeyNavigation(GraphicUnitTest):
         # New minimal screen set — no download/verify/unzip pipeline
         expected = {
             "GreetingsScreen",
+            "DisclaimerScreen",
             "MainScreen",
             "SelectDeviceScreen",
             "AboutScreen",
@@ -242,6 +247,25 @@ class TestAppKeyNavigation(GraphicUnitTest):
         app.build()
         app.screen_parents["FlashScreen"] = None
         app.screen_manager.current = "FlashScreen"
+
+        with patch.object(app, "stop") as mock_stop:
+            result = app._on_key_down(None, 27, None)
+
+        self.assertTrue(result)
+        mock_stop.assert_called_once()
+
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_locale", return_value="en_US.UTF-8"
+    )
+    @patch(
+        "src.app.screens.base_screen.BaseScreen.get_destdir_assets", return_value="mock"
+    )
+    def test_on_key_down_esc_on_disclaimer_stops_app(
+        self, mock_destdir, mock_get_locale
+    ):
+        app = KruxInstallerApp()
+        app.build()
+        app.screen_manager.current = "DisclaimerScreen"
 
         with patch.object(app, "stop") as mock_stop:
             result = app._on_key_down(None, 27, None)

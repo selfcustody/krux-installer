@@ -1,4 +1,11 @@
 {
+  "disclaimer_screen": {
+    "Krux is a research and development project, made by nerds building tools for their own interests, open to the world": "Krux ist ein Forschungs- und Entwicklungsprojekt, gemacht von Nerds, die Werkzeuge für ihre eigenen Interessen bauen, offen für die Welt",
+    "Innovative features may have undiscovered flaws that endanger funds": "Innovative Funktionen können unentdeckte Fehler haben, die Gelder gefährden",
+    "Use it at your own risk": "Benutzung auf eigene Gefahr",
+    "Close": "Schließen",
+    "I understand": "Ich verstehe"
+  },
   "check_permissions_screen": {
     "WARNING": "WARNUNG",
     "This is the first run of KruxInstaller in": "Dies ist der erste Start von KruxInstaller in",

@@ -1,4 +1,11 @@
 {
+  "disclaimer_screen": {
+    "Krux is a research and development project, made by nerds building tools for their own interests, open to the world": "Kruxは研究開発プロジェクトであり、自分たちの興味のためにツールを作るオタクたちによって作られ、世界に公開されています",
+    "Innovative features may have undiscovered flaws that endanger funds": "革新的な機能には、資金を危険にさらす未発見の欠陥がある可能性があります",
+    "Use it at your own risk": "自己責任でご使用ください",
+    "Close": "閉じる",
+    "I understand": "理解しました"
+  },
   "check_permissions_screen": {
     "Setup": "設定中です。",
     "for": "のため",

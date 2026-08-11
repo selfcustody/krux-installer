@@ -234,6 +234,17 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
         self.debug(f"{settings}.data={json_str}")
         settings.add_json_panel("Settings", self.config, data=json_str)
 
+    def make_disclaimer_partials(
+        self, partials: typing.List[typing.Callable], loc: str
+    ):
+        """Update locales for DisclaimerScreen"""
+        disclaimer = self.screen_manager.get_screen("DisclaimerScreen")
+        partials.append(
+            partial(
+                disclaimer.update, name="ConfigKruxInstaller", key="locale", value=loc
+            )
+        )
+
     def make_main_partials(self, partials: typing.List[typing.Callable], loc: str):
         """Update locales for MainScreen"""
         main = self.screen_manager.get_screen("MainScreen")
@@ -347,6 +358,7 @@ class ConfigKruxInstaller(BaseKruxInstaller, Trigger):
                 value = f"{value}.UTF-8"
 
             partials = []
+            self.make_disclaimer_partials(partials=partials, loc=value)
             self.make_ask_permission_partials(partials=partials, loc=value)
             self.make_main_partials(partials=partials, loc=value)
             self.make_flash_partials(partials=partials, loc=value)

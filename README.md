@@ -176,6 +176,14 @@ coverage and build.
 uv run poe
 ```
 
+### Before committing
+
+Run formatting, linting and tests together:
+
+```bash
+uv run poe pre-commit
+```
+
 ### Format code
 
 ```bash

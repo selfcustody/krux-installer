@@ -37,8 +37,8 @@ build-backend = "hatchling.build"
 [tool.hatch.metadata]
 allow-direct-references = true
 
-[tool.uv]
-dev-dependencies = [
+[dependency-groups]
+dev = [
     "black>=26.5.1",
     "pylint>=4.0.6",
     "pytest-cov>=7.1.0",

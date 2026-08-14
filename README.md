@@ -157,7 +157,7 @@ git clone --recurse-submodules https://github.com/selfcustody/krux-installer.git
 Install python dependencies:
 
 ```bash
-uv sync
+uv sync --frozen
 ```
 
 ## Update code
@@ -212,7 +212,7 @@ You can see all coverage results opening you browser and type
 ### Build for any Linux distribution
 
 ```bash
-uv sync --extra builder
+uv sync --frozen --extra builder
 uv run poe fetch-firmware
 uv run poe build-linux
 ```
@@ -220,7 +220,7 @@ uv run poe build-linux
 ### Build for MacOS
 
 ```bash
-uv sync --extra builder
+uv sync --frozen --extra builder
 uv run poe fetch-firmware
 uv run poe build-macos
 ```
@@ -228,7 +228,7 @@ uv run poe build-macos
 ### Build for Windows
 
 ```bash
-uv sync --extra builder
+uv sync --frozen --extra builder
 uv run poe fetch-firmware
 uv run poe build-win
 ```
@@ -287,7 +287,7 @@ at build time.
 ### Fetching official firmware
 
 ```bash
-uv sync --extra builder
+uv sync --frozen --extra builder
 uv run poe fetch-firmware
 ```
 

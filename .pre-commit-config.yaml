@@ -1,0 +1,38 @@
+default_install_hook_types: [pre-commit, commit-msg, pre-push]
+default_stages: [pre-commit]
+
+repos:
+  # Run the existing poe quality tasks before each commit.
+  - repo: local
+    hooks:
+      - id: poe-lint
+        name: poe lint
+        entry: uv run poe lint
+        language: system
+        types_or: [python, markdown, json]
+        pass_filenames: false
+
+      - id: poe-format-check
+        name: poe format-check
+        entry: uv run poe format-check
+        language: system
+        types: [python]
+        pass_filenames: false
+
+      # The full suite (unit + e2e + e2e_drives) is too slow for every
+      # commit; it gates pushes instead.
+      - id: poe-test
+        name: poe test
+        entry: uv run poe test
+        language: system
+        stages: [pre-push]
+        types_or: [python, toml]
+        files: ^(pyproject\.toml$|src/|tests/|e2e/|e2e_drives/)
+        pass_filenames: false
+
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: [feat, fix, docs, style, refactor, test, i18n, ci, chore, perf]

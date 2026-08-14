@@ -44,7 +44,8 @@ dev = [
     "pytest-cov>=7.1.0",
     "poethepoet>=0.48.0",
     "demjson3>=3.0.6",
-    "pymarkdownlnt>=0.9.39"
+    "pymarkdownlnt>=0.9.39",
+    "pre-commit>=4.6.2",
 ]
 
 [tool.poe.tasks]
@@ -62,6 +63,8 @@ format = [
   "format-drives",
   "format-installer",
 ]
+
+format-check = "black --check ./src ./tests ./e2e ./e2e_drives ./krux_installer.py"
 
 fetch-firmware = "bash prebuild/fetch_firmware.sh"
 

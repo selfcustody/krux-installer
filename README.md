@@ -180,6 +180,19 @@ coverage and build.
 uv run poe
 ```
 
+### Before committing
+
+Run formatting, linting and tests together:
+
+```bash
+uv run poe pre-commit
+```
+
+Running this locally mirrors the core CI code checks, except for commit message
+format and changelog requirements. It helps prevent failed PR builds and ensures
+that changes follow the [contribution guidelines](./CONTRIBUTING.md). Depending
+on the change, a [changelog](./CHANGELOG.md) entry may also be required.
+
 ### Format code
 
 ```bash

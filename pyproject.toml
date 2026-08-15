@@ -86,6 +86,8 @@ lint.sequence = [
   { cmd = "pylint --rcfile=.pylint/tests ./e2e_drives" },
 ]
 
+pre-commit = ["format", "lint", "test"]
+
 # ------------------------------------------------------------
 # Build tasks — all accept an optional --debug flag.
 #

@@ -182,7 +182,8 @@ uv run poe
 
 ### Before committing
 
-Run formatting, linting and tests together:
+Running formatting, linting and tests together before commiting is a good way to
+mitigate before commit it:
 
 ```bash
 uv run poe pre-commit
@@ -192,6 +193,26 @@ Running this locally mirrors the core CI code checks, except for commit message
 format and changelog requirements. It helps prevent failed PR builds and ensures
 that changes follow the [contribution guidelines](./CONTRIBUTING.md). Depending
 on the change, a [changelog](./CHANGELOG.md) entry may also be required.
+
+### Install git hooks (optional)
+
+To run these checks automatically, install the [pre-commit](https://pre-commit.com)
+hooks:
+
+```bash
+uv run pre-commit install
+```
+
+Afterwards, each commit runs lint and format checks and each commit message is
+checked against the [conventional-commits](https://www.conventionalcommits.org).
+
+Each push additionally runs the full test suite, mirroring what CI enforces.
+This also encourages reviewing your own changes before pushing. You can run
+mannually with:
+
+```bash
+uv run pre-commit run --all-files
+```
 
 ### Format code
 

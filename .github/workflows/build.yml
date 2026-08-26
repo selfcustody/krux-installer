@@ -156,10 +156,20 @@ jobs:
         id: release-windows
         shell: pwsh
         run: |
-          choco install nsis -y
           $nsisPath = "C:\Program Files (x86)\NSIS\makensis.exe"
-          if (-not (Test-Path $nsisPath)) {
-            throw "NSIS not found at expected location: $nsisPath"
+          $maxAttempts = 3
+          for ($attempt = 1; $attempt -le $maxAttempts; $attempt++) {
+            choco install nsis --yes --no-progress --ignore-http-cache
+            $chocoExitCode = $LASTEXITCODE
+            if (Test-Path -LiteralPath $nsisPath) {
+              break
+            }
+            if ($attempt -eq $maxAttempts) {
+              throw "NSIS installation failed after $maxAttempts attempts. Last Chocolatey exit code: $chocoExitCode; expected executable: $nsisPath"
+            }
+            $delaySeconds = 15 * $attempt
+            Write-Warning "NSIS installation attempt $attempt failed (Chocolatey exit code: $chocoExitCode). Retrying in $delaySeconds seconds..."
+            Start-Sleep -Seconds $delaySeconds
           }
           Write-Host "Found NSIS at: $nsisPath"
           New-Item ".\release" -Type Directory -ErrorAction SilentlyContinue

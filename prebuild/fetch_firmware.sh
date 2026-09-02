@@ -39,7 +39,7 @@ set -euo pipefail
 # ── Configuration ────────────────────────────────────────────────────────────
 ALLOW_UNVERIFIED=0
 VERIFICATION_SKIPPED=0
-FIRMWARE_VERSION="v26.08.0"
+FIRMWARE_VERSION="v26.09.0"
 BASE_URL="https://github.com/selfcustody/krux/releases/download/${FIRMWARE_VERSION}"
 ZIP_NAME="krux-${FIRMWARE_VERSION}.zip"
 SHA256_NAME="${ZIP_NAME}.sha256.txt"

@@ -31,7 +31,7 @@ Instead, each release ships with a single firmware version already embedded, ver
 ### Choosing a firmware version
 
 Each release ships with a fixed firmware version embedded in the binary
-(the current one is `v26.03.0`). To flash a different firmware version,
+(the current one is `v26.09.0`). To flash a different firmware version,
 download the installer release that bundles it, or build from source with
 your desired version (see [Firmware embedding (for developers)](/#firmware-embedding-for-developers)).
 

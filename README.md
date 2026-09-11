@@ -359,6 +359,11 @@ in that folder.
 > flash them correctly; only the pre-build verification step (`fetch_firmware.sh`)
 > requires a valid signature. No signature is checked at flash time.
 
+To test a release before its tag is published — when `fetch_firmware.sh` has
+nothing to download — use `uv run poe generate-checksums --source <krux-build-dir>`
+to embed a local build and generate its hash table. See
+[pre-release-workaround.md](pre-release-workaround.md).
+
 ### Cleaning up
 
 After building the installer, the landing folder is no longer needed:

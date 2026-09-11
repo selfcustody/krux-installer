@@ -68,6 +68,9 @@ format-check = "black --check ./src ./tests ./e2e ./e2e_drives ./krux_installer.
 
 fetch-firmware = "bash prebuild/fetch_firmware.sh"
 
+# Pre-release only — see pre-release-workaround.md
+generate-checksums = "bash prebuild/generate_checksums.sh"
+
 clean = "python .ci/clean.py"
 
 test-unit = "pytest --cache-clear --cov=src/utils/constants --cov=src/utils/info --cov=src/utils/trigger --cov=src/utils/flasher --cov=src/utils/verifyer --cov=src/i18n --cov-branch --cov-report html ./tests"

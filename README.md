@@ -290,10 +290,10 @@ prebuild/
 └── fetch_firmware.sh     # canonical script: download → verify → embed
 
 .firmware_download/       # landing folder (gitignored)
-├── krux-<version>.zip
-├── krux-<version>.zip.sha256.txt
-├── krux-<version>.zip.sig
-└── selfcustody.pem
+└── <version>/
+    ├── krux-<version>.zip
+    ├── SHA256SUMS
+    └── SHA256SUMS.sig
 
 src/utils/firmware/       # packing folder (committed, embedded in the binary)
 └── <version>/
@@ -309,9 +309,10 @@ src/utils/firmware/       # packing folder (committed, embedded in the binary)
     └── yahboom.kfpkg
 ```
 
-The `.firmware_download/` landing folder holds the raw assets from GitHub
-(zip, checksum, signature and public key). It is gitignored and can be
-deleted after a successful build.
+The `.firmware_download/<version>/` landing folder holds the raw assets from
+GitHub (zip, `SHA256SUMS` and its signature). It is gitignored and can be
+deleted after a successful build. The public key is not downloaded: the
+script uses the `selfcustody.pem` committed to this repository.
 
 The `src/utils/firmware/<version>/` packing folder contains only the
 extracted `.kfpkg` files — one per supported device. These are committed
@@ -327,16 +328,22 @@ uv run poe fetch-firmware
 
 This runs `prebuild/fetch_firmware.sh`, which:
 
-1. Downloads the release zip, SHA256 checksum, ECDSA signature and
-   `selfcustody.pem` from GitHub into `.firmware_download/`;
-2. Verifies the SHA256 checksum (`sha256sum` on Linux, `shasum` on macOS);
-3. Verifies the ECDSA signature with `openssl` (warns and continues if
-   `openssl` is not available);
+1. Downloads the release zip, `SHA256SUMS` and `SHA256SUMS.sig` from GitHub
+   into `.firmware_download/<version>/`;
+2. Verifies the ECDSA signature of `SHA256SUMS` with `openssl`, against the
+   committed `selfcustody.pem`;
+3. Verifies the zip against its entry in `SHA256SUMS` (`sha256sum` on Linux,
+   `shasum` on macOS);
 4. Extracts `kboot.kfpkg` for each supported device and saves it as
-   `src/utils/firmware/<version>/<device>.kfpkg`.
+   `src/utils/firmware/<version>/<device>.kfpkg`;
+5. Writes `src/utils/firmware/<version>/SHA256SUMS` and
+   `src/utils/firmware_hashes.py`, the table the app checks before flashing.
 
-Required tools in `PATH`: `curl`, `unzip`.
-Optional (for full verification): `sha256sum`/`shasum`, `openssl`.
+Since v26.09.0 the signature covers `SHA256SUMS`, not the zip itself.
+`SHA256SUMS.asc` (the release manager's GPG signature) is not used.
+
+Required tools in `PATH`: `curl`, `unzip`, `openssl`, `sha256sum`/`shasum`.
+Verification fails closed if any of them is missing.
 
 ### Using locally built binaries (dev mode)
 

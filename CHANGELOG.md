@@ -1,12 +1,26 @@
 # CHANGELOG
 
-## Unreleased
+## 0.0.24
 
+- Embedded firmware bumped to `v26.09.0` (`prebuild/fetch_firmware.sh` and
+  `FIRMWARE_VERSION` in `src/utils/constants/__init__.py`);
 - Removed the entire runtime download pipeline left over from the online workflow, now that firmware is embedded at build time:
-  - download screens (`base_download_screen`, `download_stable_zip_screen`, `download_beta_screen`), version selection screens (`select_version_screen`, `select_old_version_screen`) and the `warning_beta` / `warning_already_downloaded` / `unzip_stable` screens`;
+  - download screens (`base_download_screen`, `download_stable_zip_screen`, `download_beta_screen`), version selection screens (`select_version_screen`, `select_old_version_screen`) and the `warning_beta` / `warning_already_downloaded` / `unzip_stable` screens;
   - `downloader`, `selector` and `unzip` utils, plus the `check_verifyer`;
   - the associated unit and E2E tests and their orphaned i18n strings;
-- With this cleanup the installer makes **no network calls at runtime** and no longer checks the internet connection on startup — the user flow is now just: open the installer, select a device and flash.
+- With this cleanup the installer makes **no network calls at runtime** and no longer checks the internet connection on startup — the user flow is now just: open the installer, select a device and flash;
+- Added `SECURITY.md` with the supported versions and the vulnerability
+  reporting process;
+- Added the mission-hardening disclaimer to the greetings screen;
+- Added pre-commit hooks running the `poe` quality tasks, so the same checks
+  CI runs happen before a commit is made;
+- Migrated dev dependencies to a `uv` dependency group and documented the
+  frozen `uv sync` commands;
+- Fixed Dependabot picking a release that a later patch release had already
+  fixed;
+- CI now retries the NSIS install after transient Chocolatey failures;
+- Bumped `cryptography` to 50.0.1, `pylint` to 4.0.7, `pymarkdownlnt` to
+  0.9.39 and `actions/setup-python` to 7.
 
 ## 0.0.23
 

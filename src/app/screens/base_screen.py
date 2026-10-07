@@ -137,7 +137,6 @@ class BaseScreen(Screen, Trigger):
     def make_grid(self, wid: str, rows: int, **kwargs):
         """Build grid where buttons will be placed"""
         if wid not in self.ids:
-
             self.debug(f"Building GridLayout::{wid}")
             grid = GridLayout(cols=1, rows=rows)
             grid.id = wid
@@ -260,6 +259,7 @@ class BaseScreen(Screen, Trigger):
         self.ids[root_widget].add_widget(btn)
         self.ids[btn.id] = WeakProxy(btn)
 
+    # pylint: disable=broad-exception-caught
     def on_get_removable_drives_linux(self) -> typing.List[str]:
         """
         Linux put their removable drives on /mnt or /media
@@ -268,7 +268,6 @@ class BaseScreen(Screen, Trigger):
         drive_list = []
         # Use the 'lsblk' command to list block devices and their mount points
         try:
-
             # pylint: disable=possibly-used-before-assignment
             result = subprocess.run(
                 ["lsblk", "-P", "-o", "NAME,TYPE,RM,MOUNTPOINT"],
@@ -304,7 +303,6 @@ class BaseScreen(Screen, Trigger):
             exc = RuntimeError(f"Error detecting removable drives:\n{e}")
             self.redirect_exception(exception=exc)
 
-        # pylint: disable=broad-exception-caught
         except Exception as e:
             exc = RuntimeError(f"Unknow error while detecting removable drives:\n{e}")
             self.redirect_exception(exception=exc)

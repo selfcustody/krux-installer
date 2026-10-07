@@ -42,6 +42,7 @@ class Wiper(BaseFlasher):
             self.info(f"Detected valid {device} to be wiped")
             self.set_device(device)
 
+    # pylint: disable=broad-exception-caught
     def wipe(self, device: str) -> None:
         """
         Detect available ports, try default erase process and
@@ -66,7 +67,6 @@ class Wiper(BaseFlasher):
         except StopIteration as stop_exc:
             self._log_error(str(stop_exc))
 
-        # pylint: disable=broad-exception-caught
         except Exception:
             # Try alternative port on any error
             try:

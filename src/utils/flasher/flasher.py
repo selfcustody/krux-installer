@@ -103,6 +103,7 @@ class Flasher(BaseFlasher):
             callback=callback,
         )
 
+    # pylint: disable=broad-exception-caught
     def flash(self, callback: Callable) -> None:
         """
         Detect available ports, try default flash process and
@@ -133,7 +134,6 @@ class Flasher(BaseFlasher):
         except StopIteration as stop_exc:
             self._log_error(str(stop_exc))
 
-        # pylint: disable=broad-exception-caught
         except Exception:
             # Try alternative port on any error
             try:

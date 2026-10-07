@@ -50,6 +50,7 @@ class AirgapUpdateScreen(BaseScreen):
 
         setattr(AirgapUpdateScreen, f"on_press_{self.id}_button_{row}", on_press)
 
+        # pylint: disable=broad-exception-caught
         def on_release(instance):
             new_firmware_bin = os.path.normpath(os.path.join(drive, "firmware.bin"))
             new_firmware_sig = os.path.normpath(os.path.join(drive, "firmware.bin.sig"))
@@ -92,7 +93,6 @@ class AirgapUpdateScreen(BaseScreen):
             except shutil.ExecError as exec_exc:
                 self.redirect_exception(exception=exec_exc)
 
-            # pylint: disable=broad-exception-caught
             except Exception as exc:
                 self.redirect_exception(exception=exc)
 

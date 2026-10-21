@@ -2,9 +2,10 @@
   description = "Krux-installer flake";
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.05";
+    uv-nixpkgs.url = "github:NixOS/nixpkgs/707f67849735090eb91059cd6c8c558d1bef093e";
     flake-utils.url = "github:numtide/flake-utils";
   };
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, uv-nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
@@ -13,6 +14,8 @@
           config.allowInsecure = true;
           config.allowUnsupportedSystem = true;
         };
+        uvPkgs = import uv-nixpkgs { inherit system; };
+        uv = assert pkgs.lib.versionAtLeast uvPkgs.uv.version "0.13.4"; uvPkgs.uv;
         python = pkgs.python313;
         isLinux = pkgs.stdenv.isLinux;
         isDarwin = pkgs.stdenv.isDarwin;
@@ -20,7 +23,7 @@
         devShells.default = pkgs.mkShell {
           buildInputs = [
             python
-            pkgs.uv
+            uv
             pkgs.openssl
             pkgs.git
             pkgs.pkg-config

@@ -144,7 +144,8 @@ export DYLD_LIBRARY_PATH="/opt/homebrew/Cellar/openssl@$OPENSSL_MAJOR_VERSION/$O
 
 ### Install UV
 
-Follow the steps to install UV on [https://docs.astral.sh/uv/reference/storage/]
+Install uv 0.13.4 or newer by following the steps at
+[https://docs.astral.sh/uv/reference/storage/]
 
 ## Download sources
 

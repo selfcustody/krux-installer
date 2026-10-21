@@ -13,7 +13,7 @@ dependencies = [
     "kivy==2.3.1",
     "pyserial>=3.5",
     "easy-i18n>=1.2.0",
-    "pysudoer @ git+https://github.com/qlrd/pysudoer.git@v0.0.3",
+    "pysudoer @ git+https://github.com/qlrd/pysudoer.git@4738b19743dc6aeb328ededc08960a967cf0bd91",
     "pyinstaller>=6.22.2",
     "pygame>=2.6.1",
 ]
@@ -47,6 +47,10 @@ dev = [
     "pymarkdownlnt>=0.9.39",
     "pre-commit>=4.6.2",
 ]
+
+[tool.uv]
+required-version = ">=0.13.4"
+constraint-dependencies = ["certifi>=2026.10.19"]
 
 [tool.poe.tasks]
 cli = "python src/krux_installer.py"

@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## Unreleased
+
+- Hardened dependency installation after the eMudhra CA key compromise by
+  requiring uv 0.13.4 or newer, constraining certifi to 2026.10.19 or newer,
+  consuming the committed lockfile without re-resolution in CI, sourcing uv
+  from a pinned Nixpkgs revision, and pinning pysudoer to an immutable commit;
+
 ## 0.0.24
 
 - Embedded firmware bumped to `v26.09.0` (`prebuild/fetch_firmware.sh` and

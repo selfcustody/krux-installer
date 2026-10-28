@@ -10,6 +10,9 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  UV_FROZEN: "1"
+
 jobs:
   build:
     strategy:
@@ -34,12 +37,13 @@ jobs:
       - name: Install uv
         uses: astral-sh/setup-uv@v7
         with:
+          version: ">=0.13.4"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12"
+          python-version: "3.12.10"
 
       - name: Setup (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -66,7 +70,7 @@ jobs:
           echo "dyld-path=${OPENSSL_PATH}/lib" >> $GITHUB_OUTPUT
 
       - name: Install project and its dependencies
-        run: uv sync
+        run: uv sync --frozen
 
 
       - name: Build dist (Linux)
@@ -74,7 +78,6 @@ jobs:
         uses: coactions/setup-xvfb@6b00cf1889f4e1d5a48635647013c0508128ee1a
         with:
           run: |
-            uv add pytest-xvfb
             uv run poe build-linux
 
       - name: Build dist (MacOS)

@@ -69,6 +69,7 @@ class AskPermissionDialoutScreen(BaseScreen):
             AskPermissionDialoutScreen, "on_permission_created", on_permission_created
         )
 
+        # pylint: disable=broad-exception-caught
         def on_ref_press(*args):
             if args[1] == "Allow":
                 # If user isnt in the dialout group,
@@ -85,7 +86,6 @@ class AskPermissionDialoutScreen(BaseScreen):
                     sudoer = SudoerLinux(name=f"Add {self.user} to {self.group}")
                     sudoer.exec(cmd=cmd, env={}, callback=on_permission_created)
 
-                # pylint: disable=broad-exception-caught
                 except Exception as err:
                     self.redirect_exception(exception=err)
 

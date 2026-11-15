@@ -10,7 +10,7 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">3.10,<=3.14.3"
 dependencies = [
-    "kivy==2.3.1",
+    "kivy==2.3.2",
     "pyserial>=3.5",
     "easy-i18n>=1.2.0",
     "pysudoer @ git+https://github.com/qlrd/pysudoer.git@4738b19743dc6aeb328ededc08960a967cf0bd91",

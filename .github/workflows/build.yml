@@ -43,7 +43,7 @@ jobs:
 
       - uses: actions/setup-python@v7
         with:
-          python-version: "3.12.10"
+          python-version: "3.12"
 
       - name: Setup (Linux)
         if: ${{ runner.os == 'Linux' }}
@@ -136,7 +136,7 @@ jobs:
             -b "${BINARY_PATH}" \
             -i ./assets/icon.png
           tree ./release
-          rpmbuild -vv -bb --define "_bindir /usr/local/bin" $HOME/rpmbuild/SPECS/$NAME.spec
+          rpmbuild -vv -bb --define "_bindir /usr/local/bin" --define "debug_package %{nil}" $HOME/rpmbuild/SPECS/$NAME.spec
           cp $HOME/rpmbuild/RPMS/x86_64/${NAME}-${RPM_VERSION}-1.x86_64.rpm ./release/${NAME}-${RPM_VERSION}-1.x86_64.rpm4
           echo "build-path=${HOME}/rpmbuild/RPMS/x86_64" >> $GITHUB_OUTPUT
           echo "pkg=${NAME}-${RPM_VERSION}-1.x86_64.rpm" >> $GITHUB_OUTPUT
